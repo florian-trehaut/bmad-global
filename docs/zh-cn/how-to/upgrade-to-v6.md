@@ -66,15 +66,17 @@ sidebar:
 **v6 统一结构：**
 
 ```text
+~/.claude/skills/bmad/       # 全局安装
+├── _config/                 # 您的自定义配置
+│   └── agents/              # 智能体自定义文件
+├── core/                    # 通用核心框架
+├── bmm/                     # BMad Method 模块
+├── bmb/                     # BMad Builder
+├── cis/                     # Creative Intelligence Suite
+└── manifest.yaml            # 安装清单
+
 your-project/
-├── _bmad/               # 单一安装文件夹
-│   ├── _config/         # 您的自定义配置
-│   │   └── agents/      # 智能体自定义文件
-│   ├── core/            # 通用核心框架
-│   ├── bmm/             # BMad Method 模块
-│   ├── bmb/             # BMad Builder
-│   └── cis/             # Creative Intelligence Suite
-└── _bmad-output/        # 输出文件夹（v4 中为 doc 文件夹）
+└── _bmad-output/            # 输出文件夹（v4 中为 doc 文件夹）
 ```
 
 ## 模块迁移
@@ -91,8 +93,8 @@ your-project/
 
 | 概念         | v4                                      | v6                                   |
 | ------------ | --------------------------------------- | ------------------------------------ |
-| **核心**     | `_bmad-core` 实际上是 BMad Method      | `_bmad/core/` 是通用框架             |
-| **方法**     | `_bmad-method`                          | `_bmad/bmm/`                         |
+| **核心**     | `_bmad-core` 实际上是 BMad Method      | `~/.claude/skills/bmad/core/` 是通用框架             |
+| **方法**     | `_bmad-method`                          | `~/.claude/skills/bmad/bmm/`                         |
 | **配置**     | 直接修改文件                            | 每个模块使用 `config.yaml`           |
 | **文档**     | 需要设置分片或非分片                    | 完全灵活，自动扫描                   |
 

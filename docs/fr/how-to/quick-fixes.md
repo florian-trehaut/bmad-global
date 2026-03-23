@@ -15,7 +15,7 @@ Utilisez **Quick Dev** pour les corrections de bugs, les refactorisations ou les
 - Mises à jour de dépendances
 
 :::note[Prérequis]
-- Méthode BMad installée (`npx bmad-method install`)
+- Méthode BMad installée (`bmad install`)
 - Un IDE IA (Claude Code, Cursor, ou similaire)
 :::
 

@@ -21,7 +21,7 @@ Build software faster using AI-powered workflows with specialized agents that gu
 :::
 
 :::tip[The Easiest Path]
-**Install** → `npx bmad-method install`
+**Install** → `bmad install`
 **Ask** → `bmad-help what should I do first?`
 **Build** → Let BMad-Help guide you workflow by workflow
 :::
@@ -89,19 +89,15 @@ Story counts are guidance, not definitions. Choose your track based on planning 
 
 ## Installation
 
-Open a terminal in your project directory and run:
+Open a terminal and run:
 
 ```bash
-npx bmad-method install
+bmad install
 ```
 
-If you want the newest prerelease build instead of the default release channel, use `npx bmad-method@next install`.
+Or if you haven't installed the package globally: `npx bmad-method install`.
 
-When prompted to select modules, choose **BMad Method**.
-
-The installer creates two folders:
-- `_bmad/` — agents, workflows, tasks, and configuration
-- `_bmad-output/` — empty for now, but this is where your artifacts will be saved
+The installer sets up BMad globally at `~/.claude/skills/bmad/` — agents, workflows, tasks, and configuration. Your project will also have a `_bmad-output/` folder for generated artifacts.
 
 :::tip[Your Next Step]
 Open your AI IDE in the project folder and run:
@@ -207,7 +203,6 @@ Your project now has:
 
 ```text
 your-project/
-├── _bmad/                                   # BMad configuration
 ├── _bmad-output/
 │   ├── planning-artifacts/
 │   │   ├── PRD.md                           # Your requirements document

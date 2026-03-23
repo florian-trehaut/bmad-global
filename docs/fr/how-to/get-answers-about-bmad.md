@@ -56,17 +56,17 @@ Utilisez cette section lorsque :
 
 | Source                  | Idéal pour                                           | Exemples                              |
 |-------------------------|------------------------------------------------------|---------------------------------------|
-| **Dossier `_bmad`**     | Comment fonctionne BMad — agents, workflows, prompts | "Que fait l'agent Analyste ?"         |
+| **Dossier `~/.claude/skills/bmad`**     | Comment fonctionne BMad — agents, workflows, prompts | "Que fait l'agent Analyste ?"         |
 | **Repo GitHub complet** | Historique, installateur, architecture               | "Qu'est-ce qui a changé dans la v6 ?" |
 | **`llms-full.txt`**     | Aperçu rapide depuis la documentation                | "Expliquez les quatre phases de BMad" |
 
-Le dossier `_bmad` est créé lorsque vous installez BMad. Si vous ne l'avez pas encore, clonez le repo à la place.
+Le dossier `~/.claude/skills/bmad` est créé lorsque vous installez BMad. Si vous ne l'avez pas encore, clonez le repo à la place.
 
 ### 2. Pointez votre IA vers la source
 
 **Si votre IA peut lire des fichiers (Claude Code, Cursor, etc.) :**
 
-- **BMad installé :** Pointez vers le dossier `_bmad` et posez vos questions directement
+- **BMad installé :** Pointez vers le dossier `~/.claude/skills/bmad` et posez vos questions directement
 - **Vous voulez plus de contexte :** Clonez le [repo complet](https://github.com/bmad-code-org/BMAD-METHOD)
 
 **Si vous utilisez ChatGPT ou Claude.ai (LLM en ligne) :**

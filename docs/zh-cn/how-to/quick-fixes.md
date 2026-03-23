@@ -15,7 +15,7 @@ sidebar:
 - 依赖更新
 
 :::note[前置条件]
-- 已安装 BMad Method（`npx bmad-method install`）
+- 已安装 BMad Method（`bmad install`）
 - AI 驱动的 IDE（Claude Code、Cursor 或类似工具）
 :::
 
