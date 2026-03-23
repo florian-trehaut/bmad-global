@@ -1,6 +1,6 @@
 ---
 main_config: '{project-root}/_bmad/bmm/config.yaml'
-validateWorkflow: './steps-v/step-v-01-discovery.md'
+validateWorkflow: './steps/step-01-discovery.md'
 ---
 
 # PRD Validate Workflow
@@ -55,8 +55,27 @@ Load and read full config from {main_config} and resolve:
 ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the configured `{communication_language}`.
 ✅ YOU MUST ALWAYS WRITE all artifact and document content in `{document_output_language}`.
 
-### 2. Route to Validate Workflow
+### 2. Load shared rules
+
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+
+Apply these rules for the entire workflow execution.
+
+### 3. Route to Validate Workflow
 
 "**Validate Mode: Validating an existing PRD against BMAD standards.**"
 
-Then read fully and follow: `{validateWorkflow}` (steps-v/step-v-01-discovery.md)
+Then read fully and follow: `{validateWorkflow}` (steps/step-01-discovery.md)
+
+---
+
+## WORKFLOW COMPLETION — RETROSPECTIVE
+
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+
+This shared step reviews the execution for friction points and proposes improvements to either:
+- The workflow itself (steps, data files)
+- The project knowledge (`.claude/workflow-knowledge/`)
+- The project context (`.claude/workflow-context.md`)
+
+**This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

@@ -1,6 +1,4 @@
 ---
-name: validate-doc
-description: Validate documentation against standards and best practices
 menu-code: VD
 ---
 

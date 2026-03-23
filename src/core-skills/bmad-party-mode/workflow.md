@@ -23,7 +23,7 @@ This uses **micro-file architecture** with **sequential conversation orchestrati
 
 ## INITIALIZATION
 
-### Configuration Loading
+### 1. Configuration Loading
 
 Load config from `{project-root}/_bmad/core/config.yaml` and resolve:
 
@@ -32,10 +32,16 @@ Load config from `{project-root}/_bmad/core/config.yaml` and resolve:
 - `date` as a system-generated value
 - Agent manifest path: `{project-root}/_bmad/_config/agent-manifest.csv`
 
-### Paths
+### 2. Paths
 
 - `agent_manifest_path` = `{project-root}/_bmad/_config/agent-manifest.csv`
 - `standalone_mode` = `true` (party mode is an interactive workflow)
+
+### 3. Load shared rules
+
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+
+Apply these rules for the entire workflow execution.
 
 ---
 
@@ -188,3 +194,16 @@ If conversation naturally concludes:
 - Rotate agent participation to ensure inclusive discussion
 - Handle topic drift while maintaining productive conversation
 - Facilitate cross-agent collaboration and knowledge sharing
+
+---
+
+## WORKFLOW COMPLETION — RETROSPECTIVE
+
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+
+This shared step reviews the execution for friction points and proposes improvements to either:
+- The workflow itself (steps, data files)
+- The project knowledge (`.claude/workflow-knowledge/`)
+- The project context (`.claude/workflow-context.md`)
+
+**This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

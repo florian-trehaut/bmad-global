@@ -1,6 +1,6 @@
 ---
 name: bmad-retrospective
-description: 'Post-epic review to extract lessons and assess success. Use when the user says "run a retrospective" or "lets retro the epic [epic]"'
+description: "Epic/sprint retrospective workflow with Linear integration. Gathers metrics from Linear (issues, comments, blocked items), analyzes scope management, process quality, technical quality, and team dynamics, then saves a structured retrospective document to Linear Meta Project. Use when 'retrospective', 'rétrospective', 'retro', 'post mortem', 'bilan sprint', 'bilan epic' is mentioned."
 ---
 
 Follow the instructions in ./workflow.md.

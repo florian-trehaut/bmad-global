@@ -1,6 +1,6 @@
 ---
 name: bmad-quick-dev
-description: 'Implements any user intent, requirement, story, bug fix or change request by producing clean working code artifacts that follow the project''s existing architecture, patterns and conventions. Use when the user wants to build, fix, tweak, refactor, add or modify any code, component or feature.'
+description: Flexible development - execute tech-specs OR direct instructions with escalation routing, context gathering, adversarial self-review, and finding resolution. Use when 'quick dev', 'dev rapide', 'execute task', 'implement quickly', 'quick implementation' is mentioned.
 ---
 
 Follow the instructions in ./workflow.md.

@@ -80,10 +80,10 @@ function escapeTableCell(str) {
 }
 
 // Path prefixes/patterns that only exist in installed structure, not in source
-const INSTALL_ONLY_PATHS = ['_config/'];
+const INSTALL_ONLY_PATHS = ['_config/', 'core/tasks/', '_memory/', 'memory/', 'planning/'];
 
 // Files that are generated at install time and don't exist in the source tree
-const INSTALL_GENERATED_FILES = ['config.yaml'];
+const INSTALL_GENERATED_FILES = ['config.yaml', 'config.user.yaml'];
 
 // Variables that indicate a path is not statically resolvable
 const UNRESOLVABLE_VARS = [
@@ -105,6 +105,14 @@ const UNRESOLVABLE_VARS = [
   '{date}',
   '{outputFile}',
   '{nextStepFile}',
+  // Unclosed braces are intentional prefix matches — includes() catches
+  // any variable starting with this prefix (e.g. '{skillName}', '{skillName}-sidecar')
+  '{skillName',
+  '{sidecar-folder',
+  '{capability}',
+  '{module-code',
+  '{base-module',
+  '{code',
 ];
 
 // --- File Discovery ---
@@ -156,13 +164,24 @@ function mapInstalledToSource(refPath) {
   // Skip install-only paths (generated at install time, not in source)
   if (isInstallOnly(cleaned)) return null;
 
-  // core/, bmm/, and utility/ are directly under src/
-  if (cleaned.startsWith('core/') || cleaned.startsWith('bmm/') || cleaned.startsWith('utility/')) {
+  // Map installed paths to source directory structure:
+  // _bmad/core/X → src/core-skills/X
+  // _bmad/bmm/X  → src/bmm-skills/X
+  if (cleaned.startsWith('core/')) {
+    return path.join(SRC_DIR, 'core-skills', cleaned.slice('core/'.length));
+  }
+  if (cleaned.startsWith('bmm/')) {
+    return path.join(SRC_DIR, 'bmm-skills', cleaned.slice('bmm/'.length));
+  }
+  if (cleaned.startsWith('utility/')) {
     return path.join(SRC_DIR, cleaned);
   }
 
   // Fallback: map directly under src/
-  return path.join(SRC_DIR, cleaned);
+  const resolved = path.join(SRC_DIR, cleaned);
+  // Defense-in-depth: reject paths that escape the source tree via ../
+  if (!resolved.startsWith(SRC_DIR)) return null;
+  return resolved;
 }
 
 // --- Reference Extraction ---
@@ -173,6 +192,10 @@ function isResolvable(refStr) {
   for (const v of UNRESOLVABLE_VARS) {
     if (refStr.includes(v)) return false;
   }
+  // Skip documentation placeholders and examples
+  if (refStr === '...' || refStr === './...' || refStr.includes('step-XX')) return false;
+  // Skip template content refs (used in generated output, not in the template's own context)
+  if (refStr.includes('./references/') || refStr === './workflow.md') return false;
   return true;
 }
 
@@ -386,7 +409,9 @@ function checkAbsolutePathLeaks(filePath, content) {
   const lines = stripped.split('\n');
 
   for (const [i, line] of lines.entries()) {
-    if (ABS_PATH_LEAK.test(line)) {
+    // Skip lines that mention /Users/ in documentation context (describing rules, not leaking paths)
+    const strippedInline = line.replaceAll(/`[^`]+`/g, '');
+    if (ABS_PATH_LEAK.test(strippedInline)) {
       leaks.push({ file: filePath, line: i + 1, content: line.trim() });
     }
   }

@@ -44,6 +44,25 @@ Load and read full config from {project-root}/_bmad/bmm/config.yaml and resolve:
 - `project_name`, `output_folder`, `planning_artifacts`, `user_name`, `communication_language`, `document_output_language`
 - ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
 
-### 2. First Step EXECUTION
+### 2. Load shared rules
+
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+
+Apply these rules for the entire workflow execution.
+
+### 3. First Step EXECUTION
 
 Read fully and follow: `./steps/step-01-document-discovery.md` to begin the workflow.
+
+---
+
+## WORKFLOW COMPLETION — RETROSPECTIVE
+
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+
+This shared step reviews the execution for friction points and proposes improvements to either:
+- The workflow itself (steps, data files)
+- The project knowledge (`.claude/workflow-knowledge/`)
+- The project context (`.claude/workflow-context.md`)
+
+**This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

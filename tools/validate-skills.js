@@ -454,7 +454,9 @@ function validateSkill(skillDir) {
     const stripped = stripCodeBlocks(content);
     const lines = stripped.split('\n');
     for (const [i, line] of lines.entries()) {
-      if (/installed_path/i.test(line)) {
+      // Strip inline code before checking — documentation about the rule should not trigger it
+      const lineNoInline = line.replaceAll(/`[^`]+`/g, '');
+      if (/installed_path/i.test(lineNoInline)) {
         findings.push({
           rule: 'PATH-02',
           title: 'No installed_path Variable',

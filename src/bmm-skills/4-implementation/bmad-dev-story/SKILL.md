@@ -1,6 +1,6 @@
 ---
 name: bmad-dev-story
-description: 'Execute story implementation following a context filled story spec file. Use when the user says "dev this story [story file]" or "implement the next story in the sprint plan"'
+description: "Automated story implementation workflow. Discovers work from issue tracker, sets up worktree, implements via strict TDD (red-green-refactor), self-reviews with 6 adversarial perspectives, pushes MR. Use when 'dev story', 'implement story', 'start development', 'lance le dev', 'implémente' is mentioned."
 ---
 
 Follow the instructions in ./workflow.md.

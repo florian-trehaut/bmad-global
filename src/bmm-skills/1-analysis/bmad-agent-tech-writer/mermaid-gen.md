@@ -1,6 +1,4 @@
 ---
-name: mermaid-gen
-description: Create Mermaid-compliant diagrams
 menu-code: MG
 ---
 

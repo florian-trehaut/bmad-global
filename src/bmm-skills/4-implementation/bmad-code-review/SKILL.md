@@ -1,6 +1,6 @@
 ---
 name: bmad-code-review
-description: 'Review code changes adversarially using parallel review layers (Blind Hunter, Edge Case Hunter, Acceptance Auditor) with structured triage into actionable categories. Use when the user says "run code review" or "review this code"'
+description: "Adversarial code review workflow. Discovers reviewable MRs from forge + tracker, classifies (colleague/self/draft), sets up review worktree, detects regression risk, executes review (6 inline perspectives for self-review, 5 parallel agents for colleague review with security voting consensus), posts findings as forge DiffNotes or tracker comments, approves or blocks. Use when 'code review', 'review MR', 'review la MR', 'revue de code', 'reviewer' is mentioned."
 ---
 
 Follow the instructions in ./workflow.md.

@@ -1,6 +1,4 @@
 ---
-name: write-document
-description: Author a document following documentation best practices
 menu-code: WD
 ---
 

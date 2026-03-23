@@ -1,261 +1,101 @@
-# Sprint Status Workflow
+# Sprint Status — Workflow
 
-**Goal:** Summarize sprint status, surface risks, and recommend the next workflow action.
-
-**Your Role:** You are a Scrum Master providing clear, actionable sprint visibility. No time estimates — focus on status, risks, and next steps.
+**BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, HALT checkpoints.**
 
 ---
 
 ## INITIALIZATION
 
-### Configuration Loading
+### 1. Load project context
 
-Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
+Read `.claude/workflow-context.md` from the project root (the git repository root).
 
-- `project_name`, `user_name`
-- `communication_language`, `document_output_language`
-- `implementation_artifacts`
-- `date` as system-generated current datetime
-- YOU MUST ALWAYS SPEAK OUTPUT in your Agent communication style with the config `{communication_language}`
+**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
 
-### Paths
+Extract the following from the YAML frontmatter:
 
-- `sprint_status_file` = `{implementation_artifacts}/sprint-status.yaml`
+| Variable | Key | Example |
+|----------|-----|---------|
+| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
+| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM_ID}` | `tracker_team_id` | `32825b3b-...` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
+| `{USER_NAME}` | `user_name` | `Florian` |
 
-### Input Files
+### 2. Load shared rules
 
-| Input | Path | Load Strategy |
-|-------|------|---------------|
-| Sprint status | `{sprint_status_file}` | FULL_LOAD |
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
 
-### Context
+Apply these rules for the entire workflow execution. Key rule for this workflow: **never fabricate issue counts or statuses — all data must come from live tracker queries.**
 
-- `project_context` = `**/project-context.md` (load if exists)
+### 3. Load tracker knowledge (optional)
+
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns, status mappings, and document conventions.
+
+### 4. Set defaults
+
+- `CYCLE_ID` = none
+- `CYCLE_NAME` = none
+- `ALL_ISSUES` = empty list
+- `ALL_PROJECTS` = empty list
+- `RISKS` = empty list
 
 ---
 
-## EXECUTION
+## YOUR ROLE
 
-<workflow>
+You are a **Scrum Master reporter**. You query the issue tracker for the current sprint state, classify and count issues, detect risks, and present a clear, actionable status report.
 
-<step n="0" goal="Determine execution mode">
-  <action>Set mode = {{mode}} if provided by caller; otherwise mode = "interactive"</action>
+- You query the tracker for cycle, issues, and projects
+- You classify issues by status and group by epic/project
+- You detect risks: blocked issues, empty cycles, pipeline gaps, cycle deadlines
+- You recommend the next workflow action based on issue priorities
+- You present data factually — no embellishment, no speculation
 
-  <check if="mode == data">
-    <action>Jump to Step 20</action>
-  </check>
+**Tone:** factual, structured, concise.
 
-  <check if="mode == validate">
-    <action>Jump to Step 30</action>
-  </check>
+**Communication language:** use `{COMMUNICATION_LANGUAGE}` from workflow-context.md for all outputs.
 
-  <check if="mode == interactive">
-    <action>Continue to Step 1</action>
-  </check>
-</step>
+---
 
-<step n="1" goal="Locate sprint status file">
-  <action>Load {project_context} for project-wide patterns and conventions (if exists)</action>
-  <action>Try {sprint_status_file}</action>
-  <check if="file not found">
-    <output>❌ sprint-status.yaml not found.
-Run `/bmad:bmm:workflows:sprint-planning` to generate it, then rerun sprint-status.</output>
-    <action>Exit workflow</action>
-  </check>
-  <action>Continue to Step 2</action>
-</step>
+## CRITICAL RULES
 
-<step n="2" goal="Read and parse sprint-status.yaml">
-  <action>Read the FULL file: {sprint_status_file}</action>
-  <action>Parse fields: generated, last_updated, project, project_key, tracking_system, story_location</action>
-  <action>Parse development_status map. Classify keys:</action>
-  - Epics: keys starting with "epic-" (and not ending with "-retrospective")
-  - Retrospectives: keys ending with "-retrospective"
-  - Stories: everything else (e.g., 1-2-login-form)
-  <action>Map legacy story status "drafted" → "ready-for-dev"</action>
-  <action>Count story statuses: backlog, ready-for-dev, in-progress, review, done</action>
-  <action>Map legacy epic status "contexted" → "in-progress"</action>
-  <action>Count epic statuses: backlog, in-progress, done</action>
-  <action>Count retrospective statuses: optional, done</action>
+- **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
+- Execute ALL steps in exact order — NO skipping
+- **ABSOLUTELY NO TIME ESTIMATES** — do NOT mention hours, days, weeks, durations, timelines, or velocity. Never estimate when something will be done. Never calculate remaining effort. This is a status snapshot, not a forecast.
+- **All data comes from live tracker queries** — never use cached, assumed, or fabricated data
+- **Present counts and facts only** — no opinions on team performance or productivity
 
-<action>Validate all statuses against known values:</action>
+---
 
-- Valid story statuses: backlog, ready-for-dev, in-progress, review, done, drafted (legacy)
-- Valid epic statuses: backlog, in-progress, done, contexted (legacy)
-- Valid retrospective statuses: optional, done
+## STEP SEQUENCE
 
-  <check if="any status is unrecognized">
-    <output>
-⚠️ **Unknown status detected:**
-{{#each invalid_entries}}
+| Step | File | Goal |
+| ---- | ---- | ---- |
+| 1 | `step-01-query.md` | Get current cycle, list all issues, list all projects |
+| 2 | `step-02-report.md` | Classify by status, group by epic, detect risks, present report |
 
-- `{{key}}`: "{{status}}" (not recognized)
-  {{/each}}
+## ENTRY POINT
 
-**Valid statuses:**
+Load and execute `./steps/step-01-query.md`.
 
-- Stories: backlog, ready-for-dev, in-progress, review, done
-- Epics: backlog, in-progress, done
-- Retrospectives: optional, done
-  </output>
-  <ask>How should these be corrected?
-  {{#each invalid_entries}}
-  {{@index}}. {{key}}: "{{status}}" → [select valid status]
-  {{/each}}
+## HALT CONDITIONS (GLOBAL)
 
-Enter corrections (e.g., "1=in-progress, 2=backlog") or "skip" to continue without fixing:</ask>
-<check if="user provided corrections">
-<action>Update sprint-status.yaml with corrected values</action>
-<action>Re-parse the file with corrected statuses</action>
-</check>
-</check>
+These apply at ANY step:
 
-<action>Detect risks:</action>
+- Tracker MCP tools unavailable or returning auth errors
+- No current cycle found in the tracker
+- User requests stop
 
-- IF any story has status "review": suggest `/bmad:bmm:workflows:code-review`
-- IF any story has status "in-progress" AND no stories have status "ready-for-dev": recommend staying focused on active story
-- IF all epics have status "backlog" AND no stories have status "ready-for-dev": prompt `/bmad:bmm:workflows:create-story`
-- IF `last_updated` timestamp is more than 7 days old (or `last_updated` is missing, fall back to `generated`): warn "sprint-status.yaml may be stale"
-- IF any story key doesn't match an epic pattern (e.g., story "5-1-..." but no "epic-5"): warn "orphaned story detected"
-- IF any epic has status in-progress but has no associated stories: warn "in-progress epic has no stories"
-  </step>
+---
 
-<step n="3" goal="Select next action recommendation">
-  <action>Pick the next recommended workflow using priority:</action>
-  <note>When selecting "first" story: sort by epic number, then story number (e.g., 1-1 before 1-2 before 2-1)</note>
-  1. If any story status == in-progress → recommend `dev-story` for the first in-progress story
-  2. Else if any story status == review → recommend `code-review` for the first review story
-  3. Else if any story status == ready-for-dev → recommend `dev-story`
-  4. Else if any story status == backlog → recommend `create-story`
-  5. Else if any retrospective status == optional → recommend `retrospective`
-  6. Else → All implementation items done; congratulate the user - you both did amazing work together!
-  <action>Store selected recommendation as: next_story_id, next_workflow_id, next_agent (SM/DEV as appropriate)</action>
-</step>
+## WORKFLOW COMPLETION — RETROSPECTIVE
 
-<step n="4" goal="Display summary">
-  <output>
-## 📊 Sprint Status
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
 
-- Project: {{project}} ({{project_key}})
-- Tracking: {{tracking_system}}
-- Status file: {sprint_status_file}
+This shared step reviews the execution for friction points and proposes improvements to either:
+- The global skill (workflow steps, data files)
+- The project knowledge (`.claude/workflow-knowledge/`)
+- The project context (`.claude/workflow-context.md`)
 
-**Stories:** backlog {{count_backlog}}, ready-for-dev {{count_ready}}, in-progress {{count_in_progress}}, review {{count_review}}, done {{count_done}}
-
-**Epics:** backlog {{epic_backlog}}, in-progress {{epic_in_progress}}, done {{epic_done}}
-
-**Next Recommendation:** /bmad:bmm:workflows:{{next_workflow_id}} ({{next_story_id}})
-
-{{#if risks}}
-**Risks:**
-{{#each risks}}
-
-- {{this}}
-  {{/each}}
-  {{/if}}
-
-  </output>
-  </step>
-
-<step n="5" goal="Offer actions">
-  <ask>Pick an option:
-1) Run recommended workflow now
-2) Show all stories grouped by status
-3) Show raw sprint-status.yaml
-4) Exit
-Choice:</ask>
-
-  <check if="choice == 1">
-    <output>Run `/bmad:bmm:workflows:{{next_workflow_id}}`.
-If the command targets a story, set `story_key={{next_story_id}}` when prompted.</output>
-  </check>
-
-  <check if="choice == 2">
-    <output>
-### Stories by Status
-- In Progress: {{stories_in_progress}}
-- Review: {{stories_in_review}}
-- Ready for Dev: {{stories_ready_for_dev}}
-- Backlog: {{stories_backlog}}
-- Done: {{stories_done}}
-    </output>
-  </check>
-
-  <check if="choice == 3">
-    <action>Display the full contents of {sprint_status_file}</action>
-  </check>
-
-  <check if="choice == 4">
-    <action>Exit workflow</action>
-  </check>
-</step>
-
-<!-- ========================= -->
-<!-- Data mode for other flows -->
-<!-- ========================= -->
-
-<step n="20" goal="Data mode output">
-  <action>Load and parse {sprint_status_file} same as Step 2</action>
-  <action>Compute recommendation same as Step 3</action>
-  <template-output>next_workflow_id = {{next_workflow_id}}</template-output>
-  <template-output>next_story_id = {{next_story_id}}</template-output>
-  <template-output>count_backlog = {{count_backlog}}</template-output>
-  <template-output>count_ready = {{count_ready}}</template-output>
-  <template-output>count_in_progress = {{count_in_progress}}</template-output>
-  <template-output>count_review = {{count_review}}</template-output>
-  <template-output>count_done = {{count_done}}</template-output>
-  <template-output>epic_backlog = {{epic_backlog}}</template-output>
-  <template-output>epic_in_progress = {{epic_in_progress}}</template-output>
-  <template-output>epic_done = {{epic_done}}</template-output>
-  <template-output>risks = {{risks}}</template-output>
-  <action>Return to caller</action>
-</step>
-
-<!-- ========================= -->
-<!-- Validate mode -->
-<!-- ========================= -->
-
-<step n="30" goal="Validate sprint-status file">
-  <action>Check that {sprint_status_file} exists</action>
-  <check if="missing">
-    <template-output>is_valid = false</template-output>
-    <template-output>error = "sprint-status.yaml missing"</template-output>
-    <template-output>suggestion = "Run sprint-planning to create it"</template-output>
-    <action>Return</action>
-  </check>
-
-<action>Read and parse {sprint_status_file}</action>
-
-<action>Validate required metadata fields exist: generated, project, project_key, tracking_system, story_location (last_updated is optional for backward compatibility)</action>
-<check if="any required field missing">
-<template-output>is_valid = false</template-output>
-<template-output>error = "Missing required field(s): {{missing_fields}}"</template-output>
-<template-output>suggestion = "Re-run sprint-planning or add missing fields manually"</template-output>
-<action>Return</action>
-</check>
-
-<action>Verify development_status section exists with at least one entry</action>
-<check if="development_status missing or empty">
-<template-output>is_valid = false</template-output>
-<template-output>error = "development_status missing or empty"</template-output>
-<template-output>suggestion = "Re-run sprint-planning or repair the file manually"</template-output>
-<action>Return</action>
-</check>
-
-<action>Validate all status values against known valid statuses:</action>
-
-- Stories: backlog, ready-for-dev, in-progress, review, done (legacy: drafted)
-- Epics: backlog, in-progress, done (legacy: contexted)
-- Retrospectives: optional, done
-  <check if="any invalid status found">
-  <template-output>is_valid = false</template-output>
-  <template-output>error = "Invalid status values: {{invalid_entries}}"</template-output>
-  <template-output>suggestion = "Fix invalid statuses in sprint-status.yaml"</template-output>
-  <action>Return</action>
-  </check>
-
-<template-output>is_valid = true</template-output>
-<template-output>message = "sprint-status.yaml valid: metadata complete, all statuses recognized"</template-output>
-</step>
-
-</workflow>
+**This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

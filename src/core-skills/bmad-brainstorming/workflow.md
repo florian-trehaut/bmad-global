@@ -30,7 +30,7 @@ This uses **micro-file architecture** for disciplined execution:
 
 ## INITIALIZATION
 
-### Configuration Loading
+### 1. Configuration Loading
 
 Load config from `{project-root}/_bmad/core/config.yaml` and resolve:
 
@@ -38,12 +38,19 @@ Load config from `{project-root}/_bmad/core/config.yaml` and resolve:
 - `communication_language`, `document_output_language`, `user_skill_level`
 - `date` as system-generated current datetime
 
-### Paths
+### 2. Paths
 
 - `brainstorming_session_output_file` = `{output_folder}/brainstorming/brainstorming-session-{{date}}-{{time}}.md` (evaluated once at workflow start)
 
 All steps MUST reference `{brainstorming_session_output_file}` instead of the full path pattern.
 - `context_file` = Optional context file path from workflow invocation for project-specific guidance
+
+### 3. Load shared rules
+
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+
+Apply these rules for the entire workflow execution.
+
 ---
 
 ## EXECUTION
@@ -51,3 +58,16 @@ All steps MUST reference `{brainstorming_session_output_file}` instead of the fu
 Read fully and follow: `./steps/step-01-session-setup.md` to begin the workflow.
 
 **Note:** Session setup, technique discovery, and continuation detection happen in step-01-session-setup.md.
+
+---
+
+## WORKFLOW COMPLETION — RETROSPECTIVE
+
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+
+This shared step reviews the execution for friction points and proposes improvements to either:
+- The workflow itself (steps, data files)
+- The project knowledge (`.claude/workflow-knowledge/`)
+- The project context (`.claude/workflow-context.md`)
+
+**This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

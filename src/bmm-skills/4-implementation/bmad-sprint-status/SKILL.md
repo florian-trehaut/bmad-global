@@ -1,6 +1,6 @@
 ---
 name: bmad-sprint-status
-description: 'Summarize sprint status and surface risks. Use when the user says "check sprint status" or "show sprint status"'
+description: "Sprint status reporter. Queries the issue tracker for the current cycle, classifies all issues by status, groups by epic/project, detects risks, and presents a structured sprint status report. Use when 'sprint status', 'état du sprint', 'status sprint', 'avancement sprint', 'where are we' is mentioned."
 ---
 
 Follow the instructions in ./workflow.md.

@@ -1,263 +1,109 @@
-# Sprint Planning Workflow
+# Sprint Planning — Workflow
 
-**Goal:** Generate sprint status tracking from epics, detecting current story statuses and building a complete sprint-status.yaml file.
-
-**Your Role:** You are a Scrum Master generating and maintaining sprint tracking. Parse epic files, detect story statuses, and produce a structured sprint-status.yaml.
+**BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, HALT checkpoints.**
 
 ---
 
 ## INITIALIZATION
 
-### Configuration Loading
+### 1. Load project context
 
-Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
+Read `.claude/workflow-context.md` from the project root (the git repository root).
 
-- `project_name`, `user_name`
-- `communication_language`, `document_output_language`
-- `implementation_artifacts`
-- `planning_artifacts`
-- `date` as system-generated current datetime
-- YOU MUST ALWAYS SPEAK OUTPUT in your Agent communication style with the config `{communication_language}`
+**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
 
-### Paths
+Extract the following from the YAML frontmatter:
 
-- `tracking_system` = `file-system`
-- `project_key` = `NOKEY`
-- `story_location` = `{implementation_artifacts}`
-- `story_location_absolute` = `{implementation_artifacts}`
-- `epics_location` = `{planning_artifacts}`
-- `epics_pattern` = `*epic*.md`
-- `status_file` = `{implementation_artifacts}/sprint-status.yaml`
+| Variable | Key | Example |
+|----------|-----|---------|
+| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
+| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM_ID}` | `tracker_team_id` | `32825b3b-...` |
+| `{TRACKER_STATES}` | `tracker_states` | YAML map of state name to ID |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
+| `{USER_NAME}` | `user_name` | `Florian` |
 
-### Input Files
+### 2. Load shared rules
 
-| Input | Path | Load Strategy |
-|-------|------|---------------|
-| Epics | `{planning_artifacts}/*epic*.md` (whole) or `{planning_artifacts}/*epic*/*.md` (sharded) | FULL_LOAD |
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
 
-### Context
+Apply these rules for the entire workflow execution. Key rule for this workflow: **never create duplicate Linear items — always query existing state and match before creating.**
 
-- `project_context` = `**/project-context.md` (load if exists)
+### 3. Load tracker knowledge (optional)
+
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+
+### 4. Set defaults
+
+Initialize workflow state:
+
+- `epics_found`: empty list
+- `stories_found`: empty list
+- `projects_created`: 0
+- `projects_skipped`: 0
+- `issues_created`: 0
+- `issues_skipped`: 0
+- `issues_assigned`: 0
 
 ---
 
-## EXECUTION
+## YOUR ROLE
 
-### Document Discovery - Full Epic Loading
+You are a **Scrum Master** facilitating sprint planning. You parse epic files, synchronize work items with the issue tracker, and manage cycle assignment.
 
-**Strategy**: Sprint planning needs ALL epics and stories to build complete status tracking.
+- You discover and parse epic files from the project's BMAD output directory
+- You query the tracker for existing Projects and Issues to avoid duplicates
+- You create missing Projects (for epics) and Issues (for stories)
+- You facilitate interactive cycle assignment with the user
+- You report a clear summary of all actions taken
 
-**Epic Discovery Process:**
+**Tone:** methodical, precise, no unnecessary commentary.
 
-1. **Search for whole document first** - Look for `epics.md`, `bmm-epics.md`, or any `*epic*.md` file
-2. **Check for sharded version** - If whole document not found, look for `epics/index.md`
-3. **If sharded version found**:
-   - Read `index.md` to understand the document structure
-   - Read ALL epic section files listed in the index (e.g., `epic-1.md`, `epic-2.md`, etc.)
-   - Process all epics and their stories from the combined content
-   - This ensures complete sprint status coverage
-4. **Priority**: If both whole and sharded versions exist, use the whole document
+**Communication language:** use `{COMMUNICATION_LANGUAGE}` from workflow-context.md for all outputs.
 
-**Fuzzy matching**: Be flexible with document names - users may use variations like `epics.md`, `bmm-epics.md`, `user-stories.md`, etc.
+---
 
-<workflow>
+## CRITICAL RULES
 
-<step n="1" goal="Parse epic files and extract all work items">
-<action>Load {project_context} for project-wide patterns and conventions (if exists)</action>
-<action>Communicate in {communication_language} with {user_name}</action>
-<action>Look for all files matching `{epics_pattern}` in {epics_location}</action>
-<action>Could be a single `epics.md` file or multiple `epic-1.md`, `epic-2.md` files</action>
+- **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
+- Execute ALL steps in exact order — NO skipping
+- **NEVER create duplicates** — always match existing Projects/Issues by title or story key before creating
+- **Story ID conversion is mandatory** — `1.1` becomes `1-1`, title becomes kebab-case, final key is `1-1-kebab-case`
+- **Issues start in Backlog** — cycle assignment is a separate interactive step
+- **Use `{TRACKER_MCP_PREFIX}` for all MCP tool calls** — never hardcode tool prefixes
 
-<action>For each epic file found, extract:</action>
+---
 
-- Epic numbers from headers like `## Epic 1:` or `## Epic 2:`
-- Story IDs and titles from patterns like `### Story 1.1: User Authentication`
-- Convert story format from `Epic.Story: Title` to kebab-case key: `epic-story-title`
+## STEP SEQUENCE
 
-**Story ID Conversion Rules:**
+| Step | File | Goal |
+| ---- | ---- | ---- |
+| 1 | `step-01-load.md` | Load epic files, parse stories, query existing Linear state |
+| 2 | `step-02-sync.md` | Create/skip Projects and Issues, assign to current Cycle |
+| 3 | `step-03-report.md` | Summary of created/skipped items |
 
-- Original: `### Story 1.1: User Authentication`
-- Replace period with dash: `1-1`
-- Convert title to kebab-case: `user-authentication`
-- Final key: `1-1-user-authentication`
+## ENTRY POINT
 
-<action>Build complete inventory of all epics and stories from all epic files</action>
-</step>
+Load and execute `./steps/step-01-load.md`.
 
-<step n="2" goal="Build sprint status structure">
-<action>For each epic found, create entries in this order:</action>
+## HALT CONDITIONS (GLOBAL)
 
-1. **Epic entry** - Key: `epic-{num}`, Default status: `backlog`
-2. **Story entries** - Key: `{epic}-{story}-{title}`, Default status: `backlog`
-3. **Retrospective entry** - Key: `epic-{num}-retrospective`, Default status: `optional`
+These apply at ANY step:
 
-**Example structure:**
+- No epic files found in the project
+- Linear MCP tools unavailable or returning auth errors
+- User requests stop
+- `.claude/workflow-context.md` missing or incomplete
 
-```yaml
-development_status:
-  epic-1: backlog
-  1-1-user-authentication: backlog
-  1-2-account-management: backlog
-  epic-1-retrospective: optional
-```
+---
 
-</step>
+## WORKFLOW COMPLETION — RETROSPECTIVE
 
-<step n="3" goal="Apply intelligent status detection">
-<action>For each story, detect current status by checking files:</action>
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
 
-**Story file detection:**
+This shared step reviews the execution for friction points and proposes improvements to either:
+- The global skill (workflow steps, data files)
+- The project knowledge (`.claude/workflow-knowledge/`)
+- The project context (`.claude/workflow-context.md`)
 
-- Check: `{story_location_absolute}/{story-key}.md` (e.g., `stories/1-1-user-authentication.md`)
-- If exists → upgrade status to at least `ready-for-dev`
-
-**Preservation rule:**
-
-- If existing `{status_file}` exists and has more advanced status, preserve it
-- Never downgrade status (e.g., don't change `done` to `ready-for-dev`)
-
-**Status Flow Reference:**
-
-- Epic: `backlog` → `in-progress` → `done`
-- Story: `backlog` → `ready-for-dev` → `in-progress` → `review` → `done`
-- Retrospective: `optional` ↔ `done`
-  </step>
-
-<step n="4" goal="Generate sprint status file">
-<action>Create or update {status_file} with:</action>
-
-**File Structure:**
-
-```yaml
-# generated: {date}
-# last_updated: {date}
-# project: {project_name}
-# project_key: {project_key}
-# tracking_system: {tracking_system}
-# story_location: {story_location}
-
-# STATUS DEFINITIONS:
-# ==================
-# Epic Status:
-#   - backlog: Epic not yet started
-#   - in-progress: Epic actively being worked on
-#   - done: All stories in epic completed
-#
-# Epic Status Transitions:
-#   - backlog → in-progress: Automatically when first story is created (via create-story)
-#   - in-progress → done: Manually when all stories reach 'done' status
-#
-# Story Status:
-#   - backlog: Story only exists in epic file
-#   - ready-for-dev: Story file created in stories folder
-#   - in-progress: Developer actively working on implementation
-#   - review: Ready for code review (via Dev's code-review workflow)
-#   - done: Story completed
-#
-# Retrospective Status:
-#   - optional: Can be completed but not required
-#   - done: Retrospective has been completed
-#
-# WORKFLOW NOTES:
-# ===============
-# - Epic transitions to 'in-progress' automatically when first story is created
-# - Stories can be worked in parallel if team capacity allows
-# - SM typically creates next story after previous one is 'done' to incorporate learnings
-# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
-
-generated: { date }
-last_updated: { date }
-project: { project_name }
-project_key: { project_key }
-tracking_system: { tracking_system }
-story_location: { story_location }
-
-development_status:
-  # All epics, stories, and retrospectives in order
-```
-
-<action>Write the complete sprint status YAML to {status_file}</action>
-<action>CRITICAL: Metadata appears TWICE - once as comments (#) for documentation, once as YAML key:value fields for parsing</action>
-<action>Ensure all items are ordered: epic, its stories, its retrospective, next epic...</action>
-</step>
-
-<step n="5" goal="Validate and report">
-<action>Perform validation checks:</action>
-
-- [ ] Every epic in epic files appears in {status_file}
-- [ ] Every story in epic files appears in {status_file}
-- [ ] Every epic has a corresponding retrospective entry
-- [ ] No items in {status_file} that don't exist in epic files
-- [ ] All status values are legal (match state machine definitions)
-- [ ] File is valid YAML syntax
-
-<action>Count totals:</action>
-
-- Total epics: {{epic_count}}
-- Total stories: {{story_count}}
-- Epics in-progress: {{in_progress_count}}
-- Stories done: {{done_count}}
-
-<action>Display completion summary to {user_name} in {communication_language}:</action>
-
-**Sprint Status Generated Successfully**
-
-- **File Location:** {status_file}
-- **Total Epics:** {{epic_count}}
-- **Total Stories:** {{story_count}}
-- **Epics In Progress:** {{in_progress_count}}
-- **Stories Completed:** {{done_count}}
-
-**Next Steps:**
-
-1. Review the generated {status_file}
-2. Use this file to track development progress
-3. Agents will update statuses as they work
-4. Re-run this workflow to refresh auto-detected statuses
-
-</step>
-
-</workflow>
-
-## Additional Documentation
-
-### Status State Machine
-
-**Epic Status Flow:**
-
-```
-backlog → in-progress → done
-```
-
-- **backlog**: Epic not yet started
-- **in-progress**: Epic actively being worked on (stories being created/implemented)
-- **done**: All stories in epic completed
-
-**Story Status Flow:**
-
-```
-backlog → ready-for-dev → in-progress → review → done
-```
-
-- **backlog**: Story only exists in epic file
-- **ready-for-dev**: Story file created (e.g., `stories/1-3-plant-naming.md`)
-- **in-progress**: Developer actively working
-- **review**: Ready for code review (via Dev's code-review workflow)
-- **done**: Completed
-
-**Retrospective Status:**
-
-```
-optional ↔ done
-```
-
-- **optional**: Ready to be conducted but not required
-- **done**: Finished
-
-### Guidelines
-
-1. **Epic Activation**: Mark epic as `in-progress` when starting work on its first story
-2. **Sequential Default**: Stories are typically worked in order, but parallel work is supported
-3. **Parallel Work Supported**: Multiple stories can be `in-progress` if team capacity allows
-4. **Review Before Done**: Stories should pass through `review` before `done`
-5. **Learning Transfer**: SM typically creates next story after previous one is `done` to incorporate learnings
+**This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

@@ -1,0 +1,169 @@
+# Step File Template
+
+Use this template when generating step files for a new bmad-* skill.
+
+---
+
+## Template
+
+````markdown
+# Step {N}: {Descriptive Name}
+
+## STEP GOAL
+
+{One paragraph describing what this step accomplishes and why it matters in the workflow.}
+
+## RULES
+
+{Step-specific rules — constraints, prohibitions, or requirements that apply only to this step.}
+{Do NOT repeat workflow-global rules from workflow.md — those are always active.}
+
+## SEQUENCE
+
+### 1. {First action}
+
+{Clear instructions for what to do.}
+{Include expected outcome.}
+{Include error handling if applicable.}
+
+### 2. {Second action}
+
+{Instructions.}
+
+### 3. {Third action}
+
+{Instructions.}
+
+{Continue numbering for all actions.}
+
+### N. CHECKPOINT
+
+{Present findings, decisions, or output to the user.}
+
+{Format the output clearly — use tables, code blocks, or structured text.}
+
+"Does this look correct? {Specific question about what the user should verify.}"
+
+WAIT for user confirmation. Apply any corrections.
+
+---
+
+**Next:** Read fully and follow `./steps/step-{NN}-{name}.md`
+````
+
+---
+
+## Variants
+
+### Auto Step (no user interaction)
+
+Omit the CHECKPOINT section. End with:
+
+```markdown
+---
+
+**Next:** Read fully and follow `./steps/step-{NN}-{name}.md`
+```
+
+### Interactive Step (user must confirm)
+
+Include the CHECKPOINT section. Always:
+1. Present what was found/decided in structured format
+2. Ask a specific question (not just "OK?")
+3. Include `WAIT for user confirmation.`
+
+### Final Step
+
+Replace the NEXT section with:
+
+```markdown
+---
+
+## END OF WORKFLOW
+
+The bmad-{name} workflow is complete.
+```
+
+### Loop Step (repeats for a list)
+
+Add iteration tracking:
+
+```markdown
+## SEQUENCE
+
+### 1. {Action per item}
+
+For EACH {item} in {list}:
+
+#### 1a. {Sub-action}
+{Instructions}
+
+#### 1b. {Sub-action}
+{Instructions}
+
+Report progress: "{item_type} {current} of {total} processed."
+
+### 2. Verify completeness
+
+After all items processed:
+{Verification instructions}
+```
+
+---
+
+## Rules for Step Files
+
+| Rule | Limit |
+|------|-------|
+| Line count | < 200 (soft), 250 max (hard) |
+| Self-contained | Understandable without reading other steps |
+| Single goal | One sentence describes the entire step |
+| SEQUENCE section | Always numbered, always present |
+| NEXT pointer | Always present (body, not just frontmatter) |
+| Variables | `{UPPER_SNAKE_CASE}` format |
+| Hardcoded values | None — use workflow-context.md variables |
+| Data file refs | `./data/{filename}.md` — relative to skill root |
+| Step file refs | `./steps/step-{NN}-{name}.md` — relative to skill root |
+
+---
+
+## Common Patterns
+
+### Loading a data file at the start of a step
+```markdown
+### 1. Load reference data
+
+Read `./data/{filename}.md` before proceeding.
+```
+
+### HALT condition within a step
+```markdown
+<check if="{condition}">
+  HALT: "{Error message explaining what is wrong and how to fix it.}"
+</check>
+```
+
+### Conditional logic
+```markdown
+**If {condition A}:**
+{Instructions for case A}
+
+**If {condition B}:**
+{Instructions for case B}
+```
+
+### Executing shell commands
+```markdown
+```bash
+{FORGE_CLI} {command}
+```
+
+### Presenting a selection to the user
+```markdown
+| # | {Column1} | {Column2} |
+|---|-----------|-----------|
+| 1 | {value}   | {value}   |
+| 2 | {value}   | {value}   |
+
+Which {item_type} do you want to {action}?
+```

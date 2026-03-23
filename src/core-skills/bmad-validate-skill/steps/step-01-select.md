@@ -1,0 +1,64 @@
+# Step 1: Select Skill to Validate
+
+## STEP GOAL
+
+Identify which bmad-* skill the user wants to validate. Load its entire structure for inspection.
+
+## RULES
+
+- Scan BOTH global (`~/.claude/skills/bmad-*/`) and project (`.claude/skills/bmad-*/`) locations
+- NEVER modify any file — this is a read-only audit
+- If the user provides a path directly, skip the listing
+- HALT if the target is not a bmad-* skill (no SKILL.md found)
+
+## SEQUENCE
+
+### 1. List all bmad-* skills
+
+Scan both locations:
+
+**Global:** `~/.claude/skills/bmad-*/`
+**Project:** `.claude/skills/bmad-*/` (from the git repository root)
+
+For each skill found, read `SKILL.md` and extract:
+- `name` from frontmatter
+- `description` from frontmatter
+- Location (global / project)
+
+### 2. Present the skill list
+
+```
+## Available bmad-* skills
+
+| #   | Name                    | Location | Description                     |
+| --- | ----------------------- | -------- | ------------------------------- |
+| 1   | bmad-dev-story          | global   | Automated story implementation  |
+| 2   | bmad-validation-metier  | global   | Production validation gate      |
+| ... | ...                     | ...      | ...                             |
+
+Which skill do you want to validate? (or provide a path)
+```
+
+**If the user already specified a skill name or path** — skip the list.
+
+WAIT for user selection.
+
+### 3. Load the entire skill
+
+Store `TARGET_SKILL = {name, location, base_path}`.
+
+Read ALL files in the skill:
+- `SKILL.md`
+- `workflow.md`
+- All files in `steps/` (or root-level step files)
+- All files in `data/` (if exists)
+- All files in `subagent-workflows/` (if exists)
+- All files in `templates/` (if exists)
+
+Record file inventory with line counts.
+
+### 4. Confirm and proceed
+
+"Validating **{TARGET_SKILL.name}** at `{base_path}`. Starting checks..."
+
+Load and execute `./steps/step-02-structure.md`.

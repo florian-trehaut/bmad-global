@@ -15,6 +15,12 @@ Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
 - `communication_language`, `document_output_language`, `user_skill_level`
 - `date` as a system-generated value
 
+### 1. Load shared rules
+
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+
+Apply these rules for the entire workflow execution.
+
 ## QUICK TOPIC DISCOVERY
 
 "Welcome {{user_name}}! Let's get started with your **domain/industry research**.
@@ -42,8 +48,21 @@ After gathering the topic and goals:
 2. Set `research_topic = [discovered topic from discussion]`
 3. Set `research_goals = [discovered goals from discussion]`
 4. Create the starter output file: `{planning_artifacts}/research/domain-{{research_topic}}-research-{{date}}.md` with exact copy of the `./research.template.md` contents
-5. Load: `./domain-steps/step-01-init.md` with topic context
+5. Load: `./steps/step-01-init.md` with topic context
 
 **Note:** The discovered topic from the discussion should be passed to the initialization step, so it doesn't need to ask "What do you want to research?" again - it can focus on refining the scope for domain research.
 
 **✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`**
+
+---
+
+## WORKFLOW COMPLETION — RETROSPECTIVE
+
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+
+This shared step reviews the execution for friction points and proposes improvements to either:
+- The workflow itself (steps, data files)
+- The project knowledge (`.claude/workflow-knowledge/`)
+- The project context (`.claude/workflow-context.md`)
+
+**This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

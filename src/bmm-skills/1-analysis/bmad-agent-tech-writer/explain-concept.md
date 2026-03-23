@@ -1,6 +1,4 @@
 ---
-name: explain-concept
-description: Create clear technical explanations with examples
 menu-code: EC
 ---
 

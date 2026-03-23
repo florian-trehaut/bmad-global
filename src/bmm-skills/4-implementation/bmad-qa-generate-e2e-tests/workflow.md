@@ -8,7 +8,13 @@
 
 ## INITIALIZATION
 
-### Configuration Loading
+### 1. Load shared rules
+
+Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+
+Apply these rules for the entire workflow execution.
+
+### 2. Configuration Loading
 
 Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
 
@@ -18,13 +24,13 @@ Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
 - `date` as system-generated current datetime
 - YOU MUST ALWAYS SPEAK OUTPUT in your Agent communication style with the config `{communication_language}`
 
-### Paths
+### 3. Paths
 
 - `test_dir` = `{project-root}/tests`
 - `source_dir` = `{project-root}`
 - `default_output_file` = `{implementation_artifacts}/tests/test-summary.md`
 
-### Context
+### 4. Context
 
 - `project_context` = `**/project-context.md` (load if exists)
 
@@ -134,3 +140,11 @@ If the project needs:
 Save summary to: `{default_output_file}`
 
 **Done!** Tests generated and verified. Validate against `./checklist.md`.
+
+---
+
+## WORKFLOW COMPLETION — RETROSPECTIVE
+
+After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+
+This shared step reviews the execution for friction points and proposes improvements. **This step is CONDITIONAL** — it only activates if difficulties were encountered.
