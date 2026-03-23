@@ -1,64 +1,46 @@
-const path = require('node:path');
 const prompts = require('../lib/prompts');
-const { Installer } = require('../installers/lib/core/installer');
-const { Manifest } = require('../installers/lib/core/manifest');
-const { UI } = require('../lib/ui');
-
-const installer = new Installer();
-const manifest = new Manifest();
-const ui = new UI();
+const { GlobalInstaller } = require('../installers/lib/core/global-installer');
+const { getGlobalInstallPath } = require('../installers/lib/core/global-paths');
 
 module.exports = {
   command: 'status',
   description: 'Display BMAD installation status and module versions',
   options: [],
-  action: async (options) => {
+  action: async () => {
     try {
-      // Find the bmad directory
-      const projectDir = process.cwd();
-      const { bmadDir } = await installer.findBmadDir(projectDir);
+      const installer = new GlobalInstaller();
+      const targetDir = getGlobalInstallPath();
+      const manifest = await installer.readManifest(targetDir);
 
-      // Check if bmad directory exists
-      const fs = require('fs-extra');
-      if (!(await fs.pathExists(bmadDir))) {
-        await prompts.log.warn('No BMAD installation found in the current directory.');
-        await prompts.log.message(`Expected location: ${bmadDir}`);
+      if (!manifest) {
+        await prompts.log.warn('No BMAD installation found.');
+        await prompts.log.message(`Expected location: ${targetDir}`);
         await prompts.log.message('Run "bmad install" to set up a new installation.');
         process.exit(0);
         return;
       }
 
-      // Read manifest
-      const manifestData = await manifest._readRaw(bmadDir);
+      const installation = manifest.installation || {};
+      const modules = manifest.modules || [];
 
-      if (!manifestData) {
-        await prompts.log.warn('No BMAD installation manifest found.');
-        await prompts.log.message('Run "bmad install" to set up a new installation.');
-        process.exit(0);
-        return;
-      }
+      await prompts.intro('BMAD Status');
 
-      // Get installation info
-      const installation = manifestData.installation || {};
-      const modules = manifestData.modules || [];
+      const lines = [
+        `Version: ${installation.version || 'unknown'}`,
+        `Location: ${installation.targetPath || targetDir}`,
+        `Installed: ${installation.installDate ? new Date(installation.installDate).toLocaleDateString() : 'unknown'}`,
+        `Last updated: ${installation.lastUpdated ? new Date(installation.lastUpdated).toLocaleDateString() : 'unknown'}`,
+        '',
+        `Modules (${modules.length}):`,
+        ...modules.map((m) => `  ${m.name} v${m.version || 'unknown'} (${m.source || 'unknown'})`),
+      ];
 
-      // Check for available updates (only for external modules)
-      const availableUpdates = await manifest.checkForUpdates(bmadDir);
-
-      // Display status
-      await ui.displayStatus({
-        installation,
-        modules,
-        availableUpdates,
-        bmadDir,
-      });
+      await prompts.note(lines.join('\n'), 'Installation');
+      await prompts.outro('');
 
       process.exit(0);
     } catch (error) {
       await prompts.log.error(`Status check failed: ${error.message}`);
-      if (process.env.BMAD_DEBUG) {
-        await prompts.log.message(error.stack);
-      }
       process.exit(1);
     }
   },

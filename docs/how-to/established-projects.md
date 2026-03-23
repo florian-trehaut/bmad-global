@@ -10,7 +10,7 @@ Use BMad Method effectively when working on existing projects and legacy codebas
 This guide covers the essential workflow for onboarding to existing projects with BMad Method.
 
 :::note[Prerequisites]
-- BMad Method installed (`npx bmad-method install`)
+- BMad Method installed (`bmad install`)
 - An existing codebase you want to work on
 - Access to an AI-powered IDE (Claude Code or Cursor)
 :::

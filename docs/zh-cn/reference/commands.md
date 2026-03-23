@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-斜杠命令是预构建的提示词，用于在 IDE 中加载智能体、运行工作流或执行任务。BMad 安装程序在安装时根据已安装的模块生成这些命令。如果您后续添加、删除或更改模块，请重新运行安装程序以保持命令同步（参见[故障排除](#troubleshooting)）。
+斜杠命令是预构建的提示词，用于在 IDE 中加载智能体、运行工作流或执行任务。BMad 安装程序在安装时自动生成这些命令。如需更新，请重新运行安装程序（参见[故障排除](#troubleshooting)）。
 
 ## 命令与智能体菜单触发器
 
@@ -20,7 +20,7 @@ BMad 提供两种开始工作的方式，它们服务于不同的目的。
 
 ## 命令如何生成
 
-当您运行 `npx bmad-method install` 时，安装程序会读取每个选定模块的清单，并为每个智能体、工作流、任务和工具编写一个命令文件。每个文件都是一个简短的 Markdown 提示词，指示 AI 加载相应的源文件并遵循其指令。
+当您运行 `npx bmad-method install` 时，安装程序会读取内置模块（core 和 bmm）的清单，并为每个智能体、工作流、任务和工具编写一个命令文件。每个文件都是一个简短的 Markdown 提示词，指示 AI 加载相应的源文件并遵循其指令。
 
 安装程序为每种命令类型使用模板：
 
@@ -32,33 +32,22 @@ BMad 提供两种开始工作的方式，它们服务于不同的目的。
 | **工具命令** | 加载独立工具文件并遵循其指令 |
 
 :::note[重新运行安装程序]
-如果您添加或删除模块，请再次运行安装程序。它会重新生成所有命令文件以匹配您当前的模块选择。
+如需更新，请再次运行安装程序。它会重新生成所有命令文件。
 :::
 
 ## 命令文件的位置
 
-安装程序将命令文件写入项目内 IDE 特定的目录中。确切路径取决于您在安装期间选择的 IDE。
-
-| IDE / CLI | 命令目录 |
-| --- | --- |
-| Claude Code | `.claude/commands/` |
-| Cursor | `.cursor/commands/` |
-| Windsurf | `.windsurf/workflows/` |
-| 其他 IDE | 请参阅安装程序输出中的目标路径 |
-
-所有 IDE 都在其命令目录中接收一组扁平的命令文件。例如，Claude Code 安装看起来像：
+安装程序将所有文件全局安装到 `~/.claude/skills/bmad/`。
 
 ```text
-.claude/commands/
-├── bmad-agent-bmm-dev.md
-├── bmad-agent-bmm-pm.md
-├── bmad-bmm-create-prd.md
-├── bmad-editorial-review-prose.md
-├── bmad-help.md
-└── ...
+~/.claude/skills/bmad/
+├── core/                    # 通用核心框架
+├── bmm/                     # BMad Method 模块
+├── _config/                 # 自定义配置
+└── manifest.yaml            # 安装清单
 ```
 
-文件名决定了 IDE 中的技能名称。例如，文件 `bmad-agent-bmm-dev.md` 注册技能 `bmad-agent-bmm-dev`。
+技能名称由文件名决定。例如，文件 `bmad-agent-bmm-dev.md` 注册技能 `bmad-agent-bmm-dev`。
 
 ## 如何发现您的命令
 
@@ -67,7 +56,7 @@ BMad 提供两种开始工作的方式，它们服务于不同的目的。
 运行 `bmad-help` 获取关于下一步的上下文感知指导。
 
 :::tip[快速发现]
-项目中生成的命令文件夹是权威列表。在文件资源管理器中打开它们以查看每个命令及其描述。
+`~/.claude/skills/bmad/` 是权威列表。在文件资源管理器中打开它以查看每个命令及其描述。
 :::
 
 ## 命令类别
@@ -140,15 +129,15 @@ bmad-help 我在 PRD 工作流上卡住了
 | `bmad-<module>-<workflow>` | 工作流命令 | `bmad-bmm-create-prd` |
 | `bmad-<name>` | 核心任务或工具 | `bmad-help` |
 
-模块代码：`bmm`（敏捷套件）、`bmb`（构建器）、`tea`（测试架构师）、`cis`（创意智能）、`gds`（游戏开发工作室）。参见[模块](./modules.md)获取描述。
+内置模块代码：`bmm`（敏捷套件）。参见[模块](./modules.md)获取附加模块描述。
 
 ## 故障排除
 
 **安装后命令未出现。** 重启您的 IDE 或重新加载窗口。某些 IDE 会缓存命令列表，需要刷新才能获取新文件。
 
-**预期的命令缺失。** 安装程序仅为您选择的模块生成命令。再次运行 `npx bmad-method install` 并验证您的模块选择。检查命令文件是否存在于预期目录中。
+**预期的命令缺失。** 再次运行 `npx bmad-method install` 并检查 `~/.claude/skills/bmad/` 中是否存在对应文件。
 
-**已删除模块的命令仍然出现。** 安装程序不会自动删除旧的命令文件。从 IDE 的命令目录中删除过时的文件，或删除整个命令目录并重新运行安装程序以获取一组干净的命令。
+**旧命令仍然出现。** 运行 `npx bmad-method uninstall` 完全移除，然后重新运行安装程序以获取一组干净的命令。
 
 ---
 ## 术语说明

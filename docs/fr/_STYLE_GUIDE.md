@@ -75,7 +75,6 @@ Avertissements critiques uniquement — perte de données, problèmes de sécuri
 ````md
 ```
 votre-projet/
-├── _bmad/                                   # Configuration BMad
 ├── _bmad-output/
 │   ├── planning-artifacts/
 │   │   └── PRD.md                           # Votre document d'exigences

@@ -56,17 +56,17 @@ BMad-Help 通常会返回：
 
 | 来源 | 适合回答的问题 | 示例 |
 | --- | --- | --- |
-| **`_bmad` 文件夹** | 智能体、工作流、提示词如何工作 | “PM 智能体具体做什么？” |
+| **`~/.claude/skills/bmad` 文件夹** | 智能体、工作流、提示词如何工作 | “PM 智能体具体做什么？” |
 | **完整 GitHub 仓库** | 版本历史、安装器、整体架构 | “v6 主要改了什么？” |
 | **`llms-full.txt`** | 文档层面的快速全景理解 | “解释 BMad 的四个阶段” |
 
-安装 BMad 后会生成 `_bmad` 文件夹；如果你还没有安装，可先克隆仓库。
+安装 BMad 后会生成 `~/.claude/skills/bmad` 文件夹；如果你还没有安装，可先克隆仓库。
 
 ### 2. 让 AI 读取来源
 
 **如果你的 AI 可以直接读文件（如 Claude Code、Cursor）：**
 
-- **已安装 BMad：** 直接让它读取 `_bmad` 并提问
+- **已安装 BMad：** 直接让它读取 `~/.claude/skills/bmad` 并提问
 - **想看更深上下文：** 克隆[完整仓库](https://github.com/bmad-code-org/BMAD-METHOD)
 
 **如果你使用 ChatGPT 或 Claude.ai：**

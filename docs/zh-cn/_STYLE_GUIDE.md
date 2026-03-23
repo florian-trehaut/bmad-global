@@ -75,7 +75,6 @@ Show in "What You've Accomplished" sections:
 ````md
 ```
 your-project/
-├── _bmad/                                   # BMad configuration
 ├── _bmad-output/
 │   ├── planning-artifacts/
 │   │   └── PRD.md                           # Your requirements document

@@ -5,96 +5,64 @@ sidebar:
   order: 1
 ---
 
-使用 `npx bmad-method install` 在项目中安装 BMad，并按需选择模块和 AI 工具。
-
-如果你需要在命令行里一次性传入全部安装参数（例如 CI/CD 场景），请阅读[非交互式安装指南](./non-interactive-installation.md)。
+使用 `bmad install` 命令在你的机器上全局安装 BMad。
 
 ## 何时使用
 
-- 使用 BMad 启动新项目
-- 将 BMad 添加到现有代码库
+- 首次安装 BMad
 - 更新现有的 BMad 安装
 
 :::note[前置条件]
 - **Node.js** 20+（安装程序必需）
-- **Git**（推荐）
 - **AI 工具**（Claude Code、Cursor 或类似工具）
 :::
 
 ## 步骤
 
-### 1. 运行安装程序
+### 1. 安装包
+
+```bash
+npm install -g bmad-method
+```
+
+或直接运行而无需全局安装：
 
 ```bash
 npx bmad-method install
 ```
 
-:::tip[想要最新预发布版本？]
-使用 `next` 发布标签：
+### 2. 运行安装程序
+
 ```bash
-npx bmad-method@next install
+bmad install
 ```
 
-这会更早拿到新改动，但相比默认安装通道，出现变动的概率也更高。
-:::
+安装程序无需任何交互提示，直接将所有 BMad skills 全局安装到 `~/.claude/skills/bmad/`。
 
-:::tip[前沿版本]
-要从主分支安装最新版本（可能不稳定）：
+强制重新安装（覆盖现有文件）：
+
 ```bash
-npx github:bmad-code-org/BMAD-METHOD install
+bmad install --force
 ```
-:::
 
-### 2. 选择安装位置
+查看安装过程的详细输出：
 
-安装程序会询问在哪里安装 BMad 文件：
-
-- 当前目录（如果你自己创建了目录并从该目录运行，推荐用于新项目）
-- 自定义路径
-
-### 3. 选择你的 AI 工具
-
-选择你使用的 AI 工具：
-
-- Claude Code
-- Cursor
-- 其他
-
-每种工具都有自己的 skills 集成方式。安装程序会生成用于激活工作流和智能体的轻量提示文件，并放到该工具约定的位置。
-
-:::note[启用 Skills]
-某些平台需要你在设置中手动启用 skills 才会显示。如果你已经安装 BMad 但看不到 skills，请检查平台设置，或直接询问你的 AI 助手如何启用 skills。
-:::
-
-### 4. 选择模块
-
-安装程序会显示可用的模块。选择你需要的模块——大多数用户只需要 **BMad Method**（软件开发模块）。
-
-### 5. 按照提示操作
-
-安装程序会引导你完成剩余步骤——自定义内容、设置等。
+```bash
+bmad install --debug
+```
 
 ## 你将获得
 
-以下目录结构仅作示例。工具相关目录会随你选择的平台变化（例如可能是
-`.claude/skills`、`.cursor/skills` 或 `.kiro/skills`），并不一定会同时出现。
-
 ```text
+~/.claude/skills/bmad/
+├── bmm/            # BMad Method 模块
+│   └── config.yaml # 模块设置
+├── core/           # 必需核心模块
+├── manifest.yaml   # 安装清单
+└── ...
+
 your-project/
-├── _bmad/
-│   ├── bmm/            # 你选择的模块
-│   │   └── config.yaml # 模块设置（后续如需可修改）
-│   ├── core/           # 必需核心模块
-│   └── ...
-├── _bmad-output/       # 生成产物
-├── .claude/            # Claude Code skills（如使用 Claude Code）
-│   └── skills/
-│       ├── bmad-help/
-│       ├── bmad-persona/
-│       └── ...
-└── .cursor/            # Cursor skills（如使用 Cursor）
-    └── skills/
-        └── ...
+└── _bmad-output/       # 生成产物（项目本地）
 ```
 
 ## 验证安装

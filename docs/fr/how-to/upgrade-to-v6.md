@@ -41,7 +41,7 @@ Supprimez manuellement les commandes/skills IDE v4 existants - par exemple si vo
 
 Les nouveaux skills v6 sont installés dans :
 
-- `.claude/skills/`
+- `~/.claude/skills/bmad/`
 
 ### 4. Migrer les artefacts de planification
 
@@ -69,15 +69,17 @@ Si vous avez des stories[^3] créées ou implémentées :
 **Structure unifiée v6 :**
 
 ```text
+~/.claude/skills/bmad/       # Installation globale
+├── _config/                 # Vos personnalisations
+│   └── agents/              # Fichiers de personnalisation des agents
+├── core/                    # Framework core universel
+├── bmm/                     # Module BMad Method
+├── bmb/                     # BMad Builder
+├── cis/                     # Creative Intelligence Suite
+└── manifest.yaml            # Manifeste d'installation
+
 votre-projet/
-├── _bmad/               # Dossier d'installation unique
-│   ├── _config/         # Vos personnalisations
-│   │   └── agents/      # Fichiers de personnalisation des agents
-│   ├── core/            # Framework core universel
-│   ├── bmm/             # Module BMad Method
-│   ├── bmb/             # BMad Builder
-│   └── cis/             # Creative Intelligence Suite
-└── _bmad-output/        # Dossier de sortie (était le dossier doc en v4)
+└── _bmad-output/            # Dossier de sortie (était le dossier doc en v4)
 ```
 
 ## Migration des modules
@@ -94,8 +96,8 @@ votre-projet/
 
 | Concept       | v4                                    | v6                                   |
 | ------------- | ------------------------------------- | ------------------------------------ |
-| **Core**      | `_bmad-core` était en fait la méthode BMad | `_bmad/core/` est le framework universel |
-| **Method**    | `_bmad-method`                        | `_bmad/bmm/`                         |
+| **Core**      | `_bmad-core` était en fait la méthode BMad | `~/.claude/skills/bmad/core/` est le framework universel |
+| **Method**    | `_bmad-method`                        | `~/.claude/skills/bmad/bmm/`                         |
 | **Config**    | Fichiers modifiés directement         | `config.yaml` par module             |
 | **Documents** | Division ou non division requise | Entièrement flexible, scan automatique         |
 

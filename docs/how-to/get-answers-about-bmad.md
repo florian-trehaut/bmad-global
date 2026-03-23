@@ -56,17 +56,17 @@ Use this section when:
 
 | Source               | Best For                                  | Examples                     |
 | -------------------- | ----------------------------------------- | ---------------------------- |
-| **`_bmad` folder**   | How BMad works—agents, workflows, prompts | "What does the PM agent do?" |
+| **`~/.claude/skills/bmad` folder**   | How BMad works—agents, workflows, prompts | "What does the PM agent do?" |
 | **Full GitHub repo** | History, installer, architecture          | "What changed in v6?"        |
 | **`llms-full.txt`**  | Quick overview from docs                  | "Explain BMad's four phases" |
 
-The `_bmad` folder is created when you install BMad. If you don't have it yet, clone the repo instead.
+The `~/.claude/skills/bmad` folder is created when you install BMad. If you don't have it yet, clone the repo instead.
 
 ### 2. Point Your AI at the Source
 
 **If your AI can read files (Claude Code, Cursor, etc.):**
 
-- **BMad installed:** Point at the `_bmad` folder and ask directly
+- **BMad installed:** Point at the `~/.claude/skills/bmad` folder and ask directly
 - **Want deeper context:** Clone the [full repo](https://github.com/bmad-code-org/BMAD-METHOD)
 
 **If you use ChatGPT or Claude.ai:**

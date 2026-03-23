@@ -9,18 +9,18 @@ Tests for the BMAD-METHOD tooling infrastructure.
 npm run quality
 
 # Run individual test suites
-npm run test:install    # Installation component tests
+npm run test:install    # Global installer tests
 npm run test:refs       # File reference CSV tests
 npm run validate:refs   # File reference validation (strict)
 ```
 
 ## Test Scripts
 
-### Installation Component Tests
+### Global Installer Tests
 
-**File**: `test/test-installation-components.js`
+**File**: `test/test-global-installer.js`
 
-Validates that the installer compiles and assembles agents correctly.
+Validates path resolution, module discovery, manifest read/write, and the full install flow to `~/.claude/skills/bmad/`.
 
 ### File Reference Tests
 

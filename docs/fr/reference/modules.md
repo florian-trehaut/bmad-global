@@ -5,10 +5,10 @@ sidebar:
   order: 4
 ---
 
-BMad s'étend via des modules officiels que vous sélectionnez lors de l'installation. Ces modules additionnels fournissent des agents, des workflows et des tâches spécialisés pour des domaines spécifiques, au-delà du noyau intégré et de BMM (suite Agile).
+BMad inclut automatiquement les modules intégrés (core + bmm) lors de l'installation. Des modules additionnels fournissent des agents, des workflows et des tâches spécialisés pour des domaines spécifiques.
 
-:::tip[Installer des Modules]
-Exécutez `npx bmad-method install` et sélectionnez les modules souhaités. L'installateur gère automatiquement le téléchargement, la configuration et l'intégration IDE.
+:::tip[Modules intégrés]
+Les modules core et bmm (suite Agile) sont installés automatiquement avec `npx bmad-method install`. Les modules additionnels ci-dessous s'installent séparément via leur propre package npm.
 :::
 
 ## BMad Builder
