@@ -29,11 +29,31 @@ Read all files in `{project-root}/_bmad/core/bmad-shared/`.
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **never fabricate impact assessments — all data must come from real tracker state (issues, cycles, projects).**
 
-### 3. Load tracker knowledge (optional)
+### 3. Load planning artifacts
+
+| Input | Path | Load Strategy |
+|-------|------|---------------|
+| PRD | `{planning_artifacts}/*prd*.md` (whole) or `{planning_artifacts}/*prd*/*.md` (sharded) | FULL_LOAD |
+| Epics | `{planning_artifacts}/*epic*.md` (whole) or `{planning_artifacts}/*epic*/*.md` (sharded) | FULL_LOAD |
+| Architecture | `{planning_artifacts}/*architecture*.md` (whole) or `{planning_artifacts}/*architecture*/*.md` (sharded) | FULL_LOAD |
+| UX Design | `{planning_artifacts}/*ux*.md` (whole) or `{planning_artifacts}/*ux*/*.md` (sharded) | FULL_LOAD |
+| Spec | `{planning_artifacts}/*spec-*.md` (whole) | FULL_LOAD |
+| Document Project | `{project_knowledge}/index.md` (sharded) | INDEX_GUIDED |
+
+**Discovery process for FULL_LOAD documents:**
+
+1. **Search for whole document first** — Look for files matching the whole-document pattern (e.g., `*prd*.md`, `*epic*.md`, `*architecture*.md`, `*ux*.md`, `*spec-*.md`)
+2. **Check for sharded version** — If whole document not found, look for a directory with `index.md` (e.g., `prd/index.md`, `epics/index.md`)
+3. **If sharded version found**: Read `index.md` to understand the document structure, then read ALL section files listed in the index. Process the combined content as a single document.
+4. **Priority**: If both whole and sharded versions exist, use the whole document
+
+**Missing documents**: PRD and Epics are essential — HALT if not found. Architecture, UX Design, Spec, and Document Project are loaded if available.
+
+### 4. Load tracker knowledge (optional)
 
 If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
 
-### 4. Set defaults
+### 5. Set defaults
 
 - `MODE`: unset (will be chosen by user in step 1)
 - `CHANGE_DESCRIPTION`: unset

@@ -43,6 +43,8 @@ Load project context from `.claude/workflow-context.md` (if exists) and resolve:
 
 ### 3. Paths
 
+- `wipFile` = `{implementation_artifacts}/spec-wip.md`
+
 - `project_context` = `**/project-context.md` OR `.claude/workflow-knowledge/stack.md` (load if exists)
 
 ### 4. Related Workflows
