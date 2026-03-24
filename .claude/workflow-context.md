@@ -36,6 +36,9 @@ forge_mr_create: "gh pr create"
 forge_mr_list: "gh pr list"
 forge_mr_approve: "gh pr review --approve"
 forge_api_base: "gh api"
+# Git remotes: origin=user's fork, upstream=bmad-code-org/BMAD-METHOD
+fork_remote: origin
+upstream_remote: upstream
 
 # --- Worktree naming ---
 worktree_prefix: bmad-global
