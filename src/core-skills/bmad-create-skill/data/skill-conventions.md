@@ -20,8 +20,10 @@ bmad-{name}/
 │   └── {descriptive-name}.md
 ├── templates/                     # Output templates (OPTIONAL)
 │   └── {purpose}-template.md
-└── subagent-workflows/            # Subagent instructions (OPTIONAL)
-    └── {name}.md
+├── subagent-workflows/            # Subagent instructions (OPTIONAL)
+│   └── {name}.md
+└── team-workflows/                # Agent Teams configurations (OPTIONAL)
+    └── team-config.md
 ```
 
 **Rules:**
@@ -240,6 +242,65 @@ The NEXT pointer in the body is the primary navigation mechanism.
 
 ---
 
+## 7b. Team Workflows
+
+- Purpose: Agent Teams role definitions and team configuration for parallel execution
+- Only create this directory if the skill supports Agent Teams parallel execution
+- Contains exactly one file: `team-config.md`
+- The team router (`bmad-shared/team-router.md`) detects this directory to activate team mode
+- Skills without `team-workflows/` are completely unaffected — they run as today
+
+### team-config.md Schema
+
+```yaml
+---
+team_name_template: '{skill-slug}-{context_id}'
+description_template: '{workflow description} for {context}'
+---
+```
+
+#### Roles
+
+```yaml
+roles:
+  role-key:                          # Unique identifier, used in task contracts
+    persona: |                       # Role description embedded in spawn prompt
+      You are a {role} specialist...
+    count: 1                         # Number of teammates with this role
+    claims:                          # Task ID patterns this role can claim (self-service mode)
+      - 'A'
+      - 'B'
+    constraints:
+      read_only: true
+    knowledge_files:                 # Override project-level knowledge_mapping for this role
+      - review-perspectives.md
+      - stack.md
+```
+
+#### Distribution and Consensus
+
+```yaml
+distribution: 'self-service'         # self-service | assigned
+
+consensus:                           # Optional — voting/agreement rules
+  strategy: 'majority'               # majority | unanimous | single
+  scope:                             # Which roles participate in consensus
+    - 'security-reviewer'
+
+fallback:                            # When TEAM_MODE == false
+  mode: 'sequential-inline'          # Execute tasks sequentially in main context
+  subagent_workflow: '../subagent-workflows/{name}.md'  # Existing fallback file
+```
+
+### Rules
+
+- `team-config.md` is the only file in `team-workflows/`
+- Every role must have a `persona` and a `count`
+- `fallback` section is REQUIRED — Agent Teams is an enhancement, never a dependency
+- Role keys must be valid identifiers (lowercase, hyphenated)
+
+---
+
 ## 8. Naming Conventions
 
 | Element | Format | Example |
@@ -249,6 +310,7 @@ The NEXT pointer in the body is the primary navigation mechanism.
 | Data files | `{descriptive-name}.md` | `vm-classification-rules.md` |
 | Template files | `{purpose}-template.md` | `tracker-comment-template.md` |
 | Subagent files | `{name}.md` | `self-review.md` |
+| Team config files | `team-config.md` | `team-config.md` |
 | Variables | `{UPPER_SNAKE_CASE}` | `{TRACKER_TEAM}` |
 
 - Step numbers are zero-padded to 2 digits
@@ -303,3 +365,7 @@ Before considering a skill complete, verify:
 - [ ] HALT conditions are comprehensive
 - [ ] Variables use `{UPPER_SNAKE_CASE}` format
 - [ ] workflow.md has RETROSPECTIVE section at the end (unless read-only analysis skill)
+- [ ] If `team-workflows/` exists, it contains `team-config.md`
+- [ ] `team-config.md` defines at least one role with persona and count
+- [ ] `team-config.md` has a `fallback` section for when Agent Teams is unavailable
+- [ ] Each role key in `team-config.md` matches a role key in task contracts
