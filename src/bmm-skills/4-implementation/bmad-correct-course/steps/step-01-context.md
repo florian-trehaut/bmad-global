@@ -23,7 +23,23 @@ Store the response as `CHANGE_DESCRIPTION`.
 
 If the description is too vague (fewer than two sentences, no clear trigger), ask for clarification before proceeding.
 
-### 2. Load current sprint state from tracker
+### 2. Load planning artifacts
+
+Load available planning documents to understand the project scope for impact assessment:
+
+| Input | Path | Load Strategy |
+|-------|------|---------------|
+| PRD | `{planning_artifacts}/*prd*.md` or `{planning_artifacts}/*prd*/*.md` (sharded) | FULL_LOAD |
+| Epics | `{planning_artifacts}/*epic*.md` or `{planning_artifacts}/*epic*/*.md` (sharded) | FULL_LOAD |
+| Architecture | `{planning_artifacts}/*architecture*.md` or `{planning_artifacts}/*architecture*/*.md` (sharded) | FULL_LOAD |
+| UX Design | `{planning_artifacts}/*ux*.md` or `{planning_artifacts}/*ux*/*.md` (sharded) | FULL_LOAD |
+| Spec | `{planning_artifacts}/*spec-*.md` | FULL_LOAD |
+
+**Discovery:** Search for whole document first, then check for sharded version (`index.md` + section files). If both exist, use whole document.
+
+**Missing documents:** PRD and Epics are essential — HALT if not found. Architecture, UX Design, and Spec are loaded if available.
+
+### 3. Load current sprint state from tracker
 
 Execute the following tracker queries:
 
@@ -37,7 +53,7 @@ From the loaded data, build a sprint snapshot:
 - **Issues by status**: group by tracker state (Todo, In Progress, In Review, Done, Canceled)
 - **Projects**: list active projects with their issue counts
 
-### 3. Present sprint snapshot
+### 4. Present sprint snapshot
 
 Display the sprint snapshot to {USER_NAME} in a structured format:
 
@@ -59,7 +75,7 @@ Display the sprint snapshot to {USER_NAME} in a structured format:
 ...
 ```
 
-### 4. CHECKPOINT — Choose analysis mode
+### 5. CHECKPOINT — Choose analysis mode
 
 Present the mode choice to {USER_NAME}:
 
