@@ -1,109 +1,96 @@
 ![BMad Method](banner-bmad-method.png)
 
-[![Version](https://img.shields.io/npm/v/bmad-method?color=blue&label=version)](https://www.npmjs.com/package/bmad-method)
+# bmad-global — Personal BMad Fork
+
+[![Upstream](https://img.shields.io/badge/upstream-bmad--code--org%2FBMAD--METHOD-blue)](https://github.com/bmad-code-org/BMAD-METHOD)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Community-7289da?logo=discord&logoColor=white)](https://discord.gg/gk8jAdXWmj)
 
-**Build More Architect Dreams** — An AI-driven agile development module for the BMad Method Module Ecosystem, the best and most comprehensive Agile AI Driven Development framework that has true scale-adaptive intelligence that adjusts from bug fixes to enterprise systems.
+Personal fork of [BMad Method](https://github.com/bmad-code-org/BMAD-METHOD) with opinionated extensions for daily professional use.
 
-**100% free and open source.** No paywalls. No gated content. No gated Discord. We believe in empowering everyone, not just those who can pay for a gated community or courses.
+## What this fork adds
 
-## Why the BMad Method?
+This fork extends the upstream BMad Method with:
 
-Traditional AI tools do the thinking for you, producing average results. BMad agents and facilitated workflows act as expert collaborators who guide you through a structured process to bring out your best thinking in partnership with the AI.
-
-- **AI Intelligent Help** — Invoke the `bmad-help` skill anytime for guidance on what's next
-- **Scale-Domain-Adaptive** — Automatically adjusts planning depth based on project complexity
-- **Structured Workflows** — Grounded in agile best practices across analysis, planning, architecture, and implementation
-- **Specialized Agents** — 12+ domain experts (PM, Architect, Developer, UX, Scrum Master, and more)
-- **Party Mode** — Bring multiple agent personas into one session to collaborate and discuss
-- **Complete Lifecycle** — From brainstorming to deployment
-
-[Learn more at **docs.bmad-method.org**](https://docs.bmad-method.org)
-
----
-
-## 🚀 What's Next for BMad?
-
-**V6 is here and we're just getting started!** The BMad Method is evolving rapidly with optimizations including Cross Platform Agent Team and Sub Agent inclusion, Skills Architecture, BMad Builder v1, Dev Loop Automation, and so much more in the works.
-
-**[📍 Check out the complete Roadmap →](https://docs.bmad-method.org/roadmap/)**
-
----
+- **Global flat install** — Skills install to `~/.claude/skills/{skill-name}/` for Claude Code discovery, with auto git commit/push
+- **Agent Teams infrastructure** — Shared schemas, protocols, and conventions for Claude Code Agent Teams (`bmad-shared/`)
+- **Knowledge Bootstrap** — Automated workflow-knowledge file generation (`bmad-knowledge-bootstrap`)
+- **Daily Planning** — Personal daily planning workflow with velocity tracking (`bmad-daily-planning`)
+- **TEA suite** — Test Engineering & Automation skills (ATDD, automation, CI, framework, test review, traceability)
+- **Desktop validation** — Business validation gate for desktop applications (`bmad-validation-desktop`)
+- **Workflow improvements** — "Investigate first, ask second" for troubleshooting, anti-rationalization rule for code review
+- **Path corrections** — All skill paths updated for global flat install (no more `_bmad/core/` dead refs)
+- **Upstream sync skill** — `bmad-upstream-sync` for merging upstream changes with guided conflict resolution
 
 ## Quick Start
 
-**Prerequisites**: [Node.js](https://nodejs.org) v20+
-
 ```bash
-npx bmad-method install
+# Clone this fork
+git clone https://github.com/florian-trehaut/bmad-global.git
+cd bmad-global
+
+# Install dependencies
+npm ci
+
+# Install skills globally (flat layout to ~/.claude/skills/)
+npx bmad install --force
 ```
 
-> Want the newest prerelease build? Use `npx bmad-method@next install`. Expect higher churn than the default install.
+After install, open any project in Claude Code — all `bmad-*` skills are available globally.
 
-Follow the installer prompts, then open your AI IDE (Claude Code, Cursor, etc.) in your project folder.
+## Upstream Sync
 
-**Non-Interactive Installation** (for CI/CD):
+This fork tracks `bmad-code-org/BMAD-METHOD` as `upstream`. To merge upstream changes:
 
-```bash
-npx bmad-method install --directory /path/to/project --modules bmm --tools claude-code --yes
+```
+bmad-upstream-sync
 ```
 
-[See all installation options](https://docs.bmad-method.org/how-to/non-interactive-installation/)
+This runs the upstream sync skill which fetches, analyzes divergence, resolves conflicts guided by our conventions, and produces a clean merge commit.
 
-> **Not sure what to do?** Ask `bmad-help` — it tells you exactly what's next and what's optional. You can also ask questions like `bmad-help I just finished the architecture, what do I do next?`
+## Project Structure
 
-## Modules
+```
+src/
+  core-skills/          # Framework skills (shared, init, help, builders)
+  bmm-skills/           # BMad Method skills by category
+    1-analysis/         # Research, documentation, product briefs
+    2-plan-workflows/   # PRD, UX, specs, validation
+    3-solutioning/      # Architecture, epics, readiness checks
+    4-implementation/   # Dev, review, test, troubleshoot, sprint
+tools/cli/              # Installer and CLI
+test/                   # Test suites
+docs/                   # Documentation site (Starlight)
+```
 
-BMad Method extends with official modules for specialized domains. Available during installation or anytime after.
+## Key Differences from Upstream
 
-| Module                                                                                                            | Purpose                                           |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| **[BMad Method (BMM)](https://github.com/bmad-code-org/BMAD-METHOD)**                                             | Core framework with 34+ workflows                 |
-| **[BMad Builder (BMB)](https://github.com/bmad-code-org/bmad-builder)**                                           | Create custom BMad agents and workflows           |
-| **[Test Architect (TEA)](https://github.com/bmad-code-org/bmad-method-test-architecture-enterprise)**             | Risk-based test strategy and automation           |
-| **[Game Dev Studio (BMGD)](https://github.com/bmad-code-org/bmad-module-game-dev-studio)**                        | Game development workflows (Unity, Unreal, Godot) |
-| **[Creative Intelligence Suite (CIS)](https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite)** | Innovation, brainstorming, design thinking        |
+| Aspect | Upstream | This fork |
+|--------|----------|-----------|
+| Install target | `_bmad/` in project | `~/.claude/skills/` global |
+| Skill layout | Nested `_bmad/core/`, `_bmad/bmm/` | Flat `~/.claude/skills/bmad-*/` |
+| Config loading | `_bmad/bmm/config.yaml` | `.claude/workflow-context.md` |
+| Shared files path | `{project-root}/_bmad/core/bmad-shared/` | `~/.claude/skills/bmad-shared/` |
+| Agent Teams | Not supported | Schemas + protocols in bmad-shared |
+| Issue tracker | GitHub Issues | Linear (via MCP) |
 
-## Documentation
+## Development
 
-[BMad Method Docs Site](https://docs.bmad-method.org) — Tutorials, guides, concepts, and reference
+```bash
+npm test          # Run all checks (refs, install, lint, format)
+npm run lint      # ESLint
+npm run lint:md   # Markdownlint (781+ files)
+npm run format    # Prettier check
+```
 
-**Quick links:**
-- [Getting Started Tutorial](https://docs.bmad-method.org/tutorials/getting-started/)
-- [Upgrading from Previous Versions](https://docs.bmad-method.org/how-to/upgrade-to-v6/)
-- [Test Architect Documentation](https://bmad-code-org.github.io/bmad-method-test-architecture-enterprise/)
+## Upstream
 
-
-## Community
-
-- [Discord](https://discord.gg/gk8jAdXWmj) — Get help, share ideas, collaborate
-- [Subscribe on YouTube](https://www.youtube.com/@BMadCode) — Tutorials, master class, and podcast (launching Feb 2025)
-- [GitHub Issues](https://github.com/bmad-code-org/BMAD-METHOD/issues) — Bug reports and feature requests
-- [Discussions](https://github.com/bmad-code-org/BMAD-METHOD/discussions) — Community conversations
-
-## Support BMad
-
-BMad is free for everyone — and always will be. If you'd like to support development:
-
-- ⭐ Please click the star project icon near the top right of this page
-- ☕ [Buy Me a Coffee](https://buymeacoffee.com/bmad) — Fuel the development
-- 🏢 Corporate sponsorship — DM on Discord
-- 🎤 Speaking & Media — Available for conferences, podcasts, interviews (BM on Discord)
-
-## Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+- [BMad Method](https://github.com/bmad-code-org/BMAD-METHOD) — Original project
+- [BMad Docs](https://docs.bmad-method.org) — Official documentation
+- [Discord](https://discord.gg/gk8jAdXWmj) — Community
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE).
 
----
-
-**BMad** and **BMAD-METHOD** are trademarks of BMad Code, LLC. See [TRADEMARK.md](TRADEMARK.md) for details.
-
-[![Contributors](https://contrib.rocks/image?repo=bmad-code-org/BMAD-METHOD)](https://github.com/bmad-code-org/BMAD-METHOD/graphs/contributors)
-
-See [CONTRIBUTORS.md](CONTRIBUTORS.md) for contributor information.
+**BMad** and **BMAD-METHOD** are trademarks of BMad Code, LLC. See [TRADEMARK.md](TRADEMARK.md).
