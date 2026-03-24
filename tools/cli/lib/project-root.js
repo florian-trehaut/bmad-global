@@ -8,15 +8,18 @@ const fs = require('fs-extra');
 function findProjectRoot(startPath = __dirname) {
   let currentPath = path.resolve(startPath);
 
-  // Keep going up until we find package.json with bmad-method
+  // Keep going up until we find package.json with a bmad package name
   while (currentPath !== path.dirname(currentPath)) {
     const packagePath = path.join(currentPath, 'package.json');
 
     if (fs.existsSync(packagePath)) {
       try {
         const pkg = fs.readJsonSync(packagePath);
-        // Check if this is the BMAD project
-        if (pkg.name === 'bmad-method' || fs.existsSync(path.join(currentPath, 'src', 'core-skills'))) {
+        // Check if this is a BMAD project (upstream or fork)
+        if (
+          (pkg.name && (pkg.name === 'bmad-method' || pkg.name.includes('bmad'))) ||
+          fs.existsSync(path.join(currentPath, 'src', 'core-skills'))
+        ) {
           return currentPath;
         }
       } catch {

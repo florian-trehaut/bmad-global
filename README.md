@@ -24,15 +24,18 @@ This fork extends the upstream BMad Method with:
 
 ## Quick Start
 
+### Option 1: npx (no clone needed)
+
 ```bash
-# Clone this fork
+npx @florian-trehaut/bmad-global install
+```
+
+### Option 2: Clone and install from source
+
+```bash
 git clone https://github.com/florian-trehaut/bmad-global.git
 cd bmad-global
-
-# Install dependencies
 npm ci
-
-# Install skills globally (flat layout to ~/.claude/skills/)
 npx bmad install --force
 ```
 

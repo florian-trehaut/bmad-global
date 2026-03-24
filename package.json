@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "bmad-method",
+  "name": "@florian-trehaut/bmad-global",
   "version": "6.2.1",
-  "description": "Breakthrough Method of Agile AI-driven Development",
+  "description": "Personal fork of BMad Method with global flat install, Agent Teams, and workflow improvements",
   "keywords": [
     "agile",
     "ai",
@@ -14,14 +14,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bmad-code-org/BMAD-METHOD.git"
+    "url": "git+https://github.com/florian-trehaut/bmad-global.git"
   },
   "license": "MIT",
-  "author": "Brian (BMad) Madison",
+  "author": "Florian Trehaut",
   "main": "tools/cli/bmad-cli.js",
   "bin": {
     "bmad": "tools/bmad-npx-wrapper.js",
-    "bmad-method": "tools/bmad-npx-wrapper.js"
+    "bmad-global": "tools/bmad-npx-wrapper.js"
   },
   "scripts": {
     "bmad:install": "node tools/cli/bmad-cli.js install",
