@@ -108,11 +108,11 @@ async function runTests() {
   try {
     const installer = new GlobalInstaller();
     const testModules = [
-      { name: 'core', version: '6.2.0', source: 'built-in' },
-      { name: 'bmm', version: '6.2.0', source: 'built-in' },
+      { name: 'core', version: '6.2.0', source: 'built-in', skills: [] },
+      { name: 'bmm', version: '6.2.0', source: 'built-in', skills: [] },
     ];
 
-    await installer.writeManifest(tmpManifestDir, testModules);
+    await installer.writeManifest(tmpManifestDir, testModules, []);
 
     const manifestPath = path.join(tmpManifestDir, 'manifest.yaml');
     assert(await fs.pathExists(manifestPath), 'writeManifest creates manifest.yaml at target path');
@@ -127,6 +127,7 @@ async function runTests() {
     assert(manifest.modules[0].name === 'core', 'first module is core');
     assert(manifest.modules[1].name === 'bmm', 'second module is bmm');
     assert(manifest.modules[0].source === 'built-in', 'core module source is built-in');
+    assert(Array.isArray(manifest.installedSkills), 'manifest has installedSkills array');
 
     // readManifest on non-existent dir returns null
     const emptyDir = await fs.mkdtemp(path.join(os.tmpdir(), 'bmad-empty-'));
@@ -138,52 +139,59 @@ async function runTests() {
   }
 
   // ============================================================
-  // Suite 4: Full Install Flow (Integration, tmpdir)
+  // Suite 4: Full Install Flow — Flat Layout (Integration, tmpdir)
   // ============================================================
   console.log(`\n${colors.yellow}Suite 4: Full Install Flow${colors.reset}\n`);
 
-  const tmpInstallDir = await fs.mkdtemp(path.join(os.tmpdir(), 'bmad-install-test-'));
+  // Create a tmpdir that simulates ~/.claude/skills/
+  // targetDir = tmpdir/bmad (manifest location)
+  // skills install to tmpdir/{skill-name}/ (flat)
+  const tmpSkillsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'bmad-install-test-'));
+  const tmpTargetDir = path.join(tmpSkillsDir, 'bmad');
 
   try {
-    const installer = new GlobalInstaller({ targetDir: tmpInstallDir });
+    const installer = new GlobalInstaller({ targetDir: tmpTargetDir });
 
-    // Fresh install (no existing installation)
+    // Fresh install
     const result = await installer.install({ force: true });
 
     assert(result.success === true, 'install() returns success: true');
-    assert(await fs.pathExists(path.join(tmpInstallDir, 'core')), 'core/ directory created');
-    assert(await fs.pathExists(path.join(tmpInstallDir, 'bmm')), 'bmm/ directory created');
-    assert(await fs.pathExists(path.join(tmpInstallDir, 'manifest.yaml')), 'manifest.yaml created');
+    assert(result.skillCount > 0, `install() reports skillCount > 0 (got ${result.skillCount})`);
 
-    // Check SKILL.md files exist in core
-    const coreFiles = await getFilesRecursive(path.join(tmpInstallDir, 'core'));
-    const coreSkillFiles = coreFiles.filter((f) => f.endsWith('SKILL.md'));
-    assert(coreSkillFiles.length > 0, `core/ contains SKILL.md files (found ${coreSkillFiles.length})`);
+    // Manifest exists in bmad/
+    assert(await fs.pathExists(path.join(tmpTargetDir, 'manifest.yaml')), 'manifest.yaml created in bmad/');
 
-    // Check SKILL.md files exist in bmm
-    const bmmFiles = await getFilesRecursive(path.join(tmpInstallDir, 'bmm'));
-    const bmmSkillFiles = bmmFiles.filter((f) => f.endsWith('SKILL.md'));
-    assert(bmmSkillFiles.length > 0, `bmm/ contains SKILL.md files (found ${bmmSkillFiles.length})`);
+    // Skills installed flat at top level
+    const topLevelDirs = (await fs.readdir(tmpSkillsDir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name);
 
-    // Check module.yaml was NOT copied (filtered out)
-    const coreModuleYaml = coreFiles.filter((f) => path.basename(f) === 'module.yaml');
-    assert(coreModuleYaml.length === 0, 'module.yaml not copied to core/ (filtered)');
+    const bmadSkills = topLevelDirs.filter((d) => d.startsWith('bmad-'));
+    assert(bmadSkills.length > 0, `bmad-* skill directories at top level (found ${bmadSkills.length})`);
 
-    // Check root config.yaml was NOT copied (filtered out)
-    const coreRootConfigYaml = path.join(tmpInstallDir, 'core', 'config.yaml');
-    assert(!(await fs.pathExists(coreRootConfigYaml)), 'root config.yaml not copied to core/ (filtered)');
+    // Check a known core skill is at top level
+    assert(topLevelDirs.includes('bmad-shared'), 'bmad-shared installed at top level');
+    assert(topLevelDirs.includes('bmad-knowledge-bootstrap'), 'bmad-knowledge-bootstrap installed at top level');
 
-    // Verify manifest content
-    const manifest = await installer.readManifest(tmpInstallDir);
-    assert(manifest.installation.version !== undefined, 'installed manifest has version');
-    assert(manifest.modules.length >= 2, 'installed manifest has at least core + bmm');
+    // Check SKILL.md exists in a top-level skill
+    assert(await fs.pathExists(path.join(tmpSkillsDir, 'bmad-shared', 'SKILL.md')), 'bmad-shared/SKILL.md exists at top level');
 
-    // Re-install with force (overwrite)
+    // Check that skills are NOT nested in core/ or bmm/
+    assert(!(await fs.pathExists(path.join(tmpTargetDir, 'core'))), 'no core/ subdirectory in bmad/ (flat layout)');
+    assert(!(await fs.pathExists(path.join(tmpTargetDir, 'bmm'))), 'no bmm/ subdirectory in bmad/ (flat layout)');
+
+    // Manifest tracks installed skills
+    const manifest = await installer.readManifest(tmpTargetDir);
+    assert(manifest.installation.version !== undefined, 'manifest has version');
+    assert(manifest.modules.length >= 2, 'manifest has at least core + bmm modules');
+    assert(manifest.installedSkills.length > 0, `manifest tracks ${manifest.installedSkills.length} installed skills`);
+    assert(manifest.installedSkills.includes('bmad-shared'), 'manifest tracks bmad-shared');
+
+    // Re-install with force (overwrite) — should clean previous skills
     const result2 = await installer.install({ force: true });
     assert(result2.success === true, 'reinstall with force succeeds');
+    assert(result2.skillCount > 0, 'reinstall reports skills installed');
 
-    // Install with missing module source should throw (zero fallback — TAC-5)
-    const installerBadModule = new GlobalInstaller({ targetDir: tmpInstallDir, builtInModules: ['nonexistent-xyz'] });
+    // Install with missing module source should throw (zero fallback)
+    const installerBadModule = new GlobalInstaller({ targetDir: tmpTargetDir, builtInModules: ['nonexistent-xyz'] });
     let threwOnMissing = false;
     try {
       await installerBadModule.install({ force: true });
@@ -193,7 +201,7 @@ async function runTests() {
     }
     assert(threwOnMissing, 'install throws when module source not found (zero fallback)');
   } finally {
-    await fs.remove(tmpInstallDir);
+    await fs.remove(tmpSkillsDir);
   }
 
   // ============================================================
@@ -204,20 +212,6 @@ async function runTests() {
   console.log(`========================================${colors.reset}`);
 
   process.exit(failed > 0 ? 1 : 0);
-}
-
-async function getFilesRecursive(dir) {
-  const files = [];
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...(await getFilesRecursive(fullPath)));
-    } else {
-      files.push(fullPath);
-    }
-  }
-  return files;
 }
 
 runTests().catch((error) => {

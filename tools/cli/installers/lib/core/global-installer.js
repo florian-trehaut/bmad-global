@@ -22,14 +22,18 @@ class GlobalInstaller {
 
   /**
    * Install all modules to the global skills directory.
+   * Each skill directory (containing SKILL.md) is installed flat at the top level
+   * of the skills directory so Claude Code can discover them.
+   *
    * @param {Object} options
    * @param {boolean} [options.force=false] - Skip confirmation on existing install
    * @param {boolean} [options.debug=false] - Enable debug output
-   * @returns {Promise<{success: boolean, modules: string[], cancelled?: boolean}>}
+   * @returns {Promise<{success: boolean, modules: string[], cancelled?: boolean, skillCount?: number}>}
    */
   async install({ force = false, debug = false } = {}) {
     const prompts = require('../../../lib/prompts');
     const targetDir = this.targetDir;
+    const skillsDir = path.dirname(targetDir); // ~/.claude/skills/
 
     // Check for existing installation
     const existingManifest = await this.readManifest(targetDir);
@@ -47,14 +51,16 @@ class GlobalInstaller {
         }
       }
 
-      // Remove existing installation
-      await fs.remove(targetDir);
+      // Remove previously installed skills (tracked in manifest)
+      await this.removeInstalledSkills(existingManifest, skillsDir);
     }
 
-    // Create target directory
+    // Ensure manifest directory exists
     await fs.ensureDir(targetDir);
 
     const installedModules = [];
+    let totalSkillCount = 0;
+    const installedSkillDirs = [];
 
     // Install each built-in module
     for (const moduleCode of this.builtInModules) {
@@ -64,43 +70,111 @@ class GlobalInstaller {
         throw new Error(`Source for module '${moduleCode}' not found. Cannot install without source files.`);
       }
 
-      const moduleTargetPath = path.join(targetDir, moduleCode);
-      await this.moduleManager.copyModuleWithFiltering(sourcePath, moduleTargetPath);
+      // Find all skill directories (containing SKILL.md) in the module source
+      const skillDirs = await this.findSkillDirs(sourcePath);
+      let moduleSkillCount = 0;
+
+      for (const skillDir of skillDirs) {
+        const skillName = path.basename(skillDir);
+        const skillTargetPath = path.join(skillsDir, skillName);
+
+        // Copy the skill directory flat to ~/.claude/skills/{skill-name}/
+        await this.moduleManager.copyModuleWithFiltering(skillDir, skillTargetPath);
+        installedSkillDirs.push(skillName);
+        moduleSkillCount++;
+      }
+
+      totalSkillCount += moduleSkillCount;
 
       installedModules.push({
         name: moduleCode,
         version: packageJson.version,
         source: 'built-in',
+        skillCount: moduleSkillCount,
+        skills: skillDirs.map((d) => path.basename(d)),
       });
 
       if (debug) {
-        await prompts.log.info(`Installed module: ${moduleCode} → ${moduleTargetPath}`);
+        await prompts.log.info(`Installed module: ${moduleCode} (${moduleSkillCount} skills)`);
       }
     }
 
-    // Write manifest
-    await this.writeManifest(targetDir, installedModules);
+    // Write manifest (tracks which skills were installed for cleanup)
+    await this.writeManifest(targetDir, installedModules, installedSkillDirs);
 
     // Git commit + push if target is inside a git repo
-    await this.gitCommitAndPush(targetDir, prompts, debug);
+    await this.gitCommitAndPush(skillsDir, prompts, debug);
 
     // Summary
     const moduleNames = installedModules.map((m) => m.name).join(', ');
-    await prompts.log.success(`BMAD v${packageJson.version} installed — ${installedModules.length} modules (${moduleNames})`);
-    await prompts.log.info(`Location: ${targetDir}`);
+    await prompts.log.success(
+      `BMAD v${packageJson.version} installed — ${installedModules.length} modules (${moduleNames}), ${totalSkillCount} skills`,
+    );
+    await prompts.log.info(`Location: ${skillsDir}`);
 
     return {
       success: true,
       modules: installedModules.map((m) => m.name),
+      skillCount: totalSkillCount,
     };
   }
 
   /**
-   * Write manifest to target directory.
-   * @param {string} targetDir - Directory to write manifest into
-   * @param {Array<{name: string, version: string, source: string}>} modules - Installed modules
+   * Find all directories containing a SKILL.md file (recursively).
+   * @param {string} basePath - Root directory to search
+   * @returns {Promise<string[]>} Array of absolute paths to skill directories
    */
-  async writeManifest(targetDir, modules) {
+  async findSkillDirs(basePath) {
+    const results = [];
+
+    const walk = async (dir) => {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+
+      // Check if this directory contains SKILL.md
+      if (entries.some((e) => e.isFile() && e.name === 'SKILL.md')) {
+        results.push(dir);
+        return; // Don't recurse into skill directories (they are leaf nodes)
+      }
+
+      // Recurse into subdirectories
+      for (const entry of entries) {
+        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+          await walk(path.join(dir, entry.name));
+        }
+      }
+    };
+
+    await walk(basePath);
+    return results;
+  }
+
+  /**
+   * Remove previously installed skill directories tracked in the manifest.
+   * @param {Object} manifest - Parsed manifest object
+   * @param {string} skillsDir - The ~/.claude/skills/ directory
+   */
+  async removeInstalledSkills(manifest, skillsDir) {
+    const installedSkills = manifest.installedSkills || [];
+    for (const skillName of installedSkills) {
+      const skillPath = path.join(skillsDir, skillName);
+      if (await fs.pathExists(skillPath)) {
+        await fs.remove(skillPath);
+      }
+    }
+    // Also remove the manifest directory (bmad/)
+    const manifestDir = path.join(skillsDir, 'bmad');
+    if (await fs.pathExists(manifestDir)) {
+      await fs.remove(manifestDir);
+    }
+  }
+
+  /**
+   * Write manifest to target directory.
+   * @param {string} targetDir - Directory to write manifest into (bmad/)
+   * @param {Array<{name: string, version: string, source: string, skills: string[]}>} modules
+   * @param {string[]} installedSkillDirs - All skill directory names installed
+   */
+  async writeManifest(targetDir, modules, installedSkillDirs) {
     const manifestPath = path.join(targetDir, 'manifest.yaml');
     const now = new Date().toISOString();
 
@@ -109,9 +183,10 @@ class GlobalInstaller {
         version: packageJson.version,
         installDate: now,
         lastUpdated: now,
-        targetPath: targetDir,
+        targetPath: path.dirname(targetDir),
       },
       modules,
+      installedSkills: installedSkillDirs,
     };
 
     const yamlContent = yaml.stringify(manifest, { lineWidth: 0 });
