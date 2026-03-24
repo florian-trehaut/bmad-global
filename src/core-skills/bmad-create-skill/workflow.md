@@ -10,7 +10,7 @@ This is a **meta-skill** — it creates new bmad-* skills. It does NOT need `.cl
 
 ### 1. Load shared rules
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 Apply these rules for the entire workflow execution.
 
@@ -101,7 +101,7 @@ These apply at ANY step:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)

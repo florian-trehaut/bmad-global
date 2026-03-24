@@ -96,7 +96,7 @@ menu:
 
 ```yaml
 # ✅ CORRECT
-exec: '{project-root}/_bmad/core/workflows/brainstorming/workflow.md'
+exec: '~/.claude/skills/bmad-brainstorming/workflow.md'
 
 # ❌ WRONG
 exec: '../../../core/workflows/brainstorming/workflow.md'
@@ -172,7 +172,7 @@ menu:
     description: '[WI] Initialize workflow'
 
   - trigger: BS or fuzzy match on brainstorm
-    exec: '{project-root}/_bmad/core/workflows/brainstorming/workflow.md'
+    exec: '~/.claude/skills/bmad-brainstorming/workflow.md'
     description: '[BS] Guided brainstorming'
 ```
 

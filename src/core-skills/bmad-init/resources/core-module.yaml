@@ -23,3 +23,15 @@ output_folder:
   prompt: "Where should output files be saved?"
   default: "_bmad-output"
   result: "{project-root}/{value}"
+
+app_type:
+  prompt: |
+    What type of application is this project?
+    Auto-detect hints: desktop (Electron, Tauri, Rust GUI, Flutter, Swift/macOS),
+    web (Next.js, Nuxt, NestJS, etc.), cli (binary without GUI), library (lib-only crate/package).
+  default: "web"
+  single-select:
+    - web
+    - desktop
+    - cli
+    - library

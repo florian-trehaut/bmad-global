@@ -1,5 +1,4 @@
 ---
-main_config: '{project-root}/_bmad/bmm/config.yaml'
 ---
 
 # PRD Edit Workflow
@@ -56,7 +55,7 @@ Load and read full config from {main_config} and resolve:
 
 ### 2. Load shared rules
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 Apply these rules for the entire workflow execution.
 
@@ -72,7 +71,7 @@ Then read fully and follow: `./steps/step-01-discovery.md`
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The workflow itself (steps, data files)

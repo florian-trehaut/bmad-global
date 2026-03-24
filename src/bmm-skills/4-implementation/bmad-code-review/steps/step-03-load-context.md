@@ -12,7 +12,7 @@ Load all review checklists, project standards, and tracker issue details needed 
 
 ### 1. Load Shared Rules (if not already loaded)
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 ### 2. Load Project Review Perspectives (if available)
 

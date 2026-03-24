@@ -1,7 +1,7 @@
 ---
 nextStepFile: './step-05b-impact.md'
-advancedElicitationTask: '{project-root}/_bmad/core/bmad-advanced-elicitation/SKILL.md'
-partyModeWorkflow: '{project-root}/_bmad/core/bmad-party-mode/workflow.md'
+advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
+partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
 ---
 
 # Step 5: Implementation Plan

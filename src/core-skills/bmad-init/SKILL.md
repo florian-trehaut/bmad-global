@@ -1,21 +1,18 @@
 ---
 name: bmad-init
-description: "Initialize BMad project configuration and load config variables. Use when any skill needs module-specific configuration values, or when setting up a new BMad project."
+description: "Initialize BMad project configuration and load config variables. Use when any skill needs module-specific configuration values, or when setting up a new BMad project. Also use when 'init bmad', 'setup workflows', 'initialize project', 'bmad init', 'setup bmad', 'configure project for bmad' is mentioned."
 argument-hint: "[--module=module_code] [--vars=var1:default1,var2] [--skill-path=/path/to/calling/skill]"
 ---
 
-## Overview
+This skill has two entry points:
 
-This skill is the configuration entry point for all BMad skills. It has two modes:
+## 1. Config Loader (called by other skills)
 
-- **Fast path**: Config exists for the requested module — returns vars as JSON. Done.
-- **Init path**: Config is missing — walks the user through configuration, writes config files, then returns vars.
-
-Every BMad skill should call this on activation to get its config vars. The caller never needs to know whether init happened — they just get their config back.
+Other bmad-* skills call this to get their config vars. Follow the instructions below.
 
 The script `bmad_init.py` is located in this skill's `scripts/` directory. Locate and run it using python for all commands below.
 
-## On Activation — Fast Path
+### On Activation — Fast Path
 
 Run the `bmad_init.py` script with the `load` subcommand. Pass `--project-root` set to the project root directory.
 
@@ -28,11 +25,11 @@ Run the `bmad_init.py` script with the `load` subcommand. Pass `--project-root` 
 
 **If the script returns an error or `init_required`** — proceed to the Init Path below.
 
-## Init Path — First-Time Setup
+### Init Path — First-Time Setup
 
 When the fast path fails (config missing for a module), run this init flow.
 
-### Step 1: Check what needs setup
+#### Check what needs setup
 
 Run `bmad_init.py` with the `check` subcommand, passing `--module {module_code}`, `--skill-path {calling_skill_path}`, and `--project-root`.
 
@@ -48,7 +45,7 @@ The response includes:
 - `target_module` — Target module.yaml questions (when module setup needed, discovered from `--skill-path` or `_bmad/{module}/`)
 - `core_vars` — Existing core config values (when core exists but module doesn't)
 
-### Step 2: Ask core questions (if `core_missing`)
+#### Ask core questions (if `core_missing`)
 
 The check response includes `core_module` with header, subheader, and variable definitions.
 
@@ -58,7 +55,7 @@ The check response includes `core_module` with header, subheader, and variable d
 4. For variables with multi-line `prompt` (array), show all lines
 5. Let the user accept defaults or provide values
 
-### Step 3: Ask module questions (if module was requested)
+#### Ask module questions (if module was requested)
 
 The check response includes `target_module` with the module's questions. Variables may reference core answers in their defaults (e.g., `{output_folder}`).
 
@@ -67,7 +64,7 @@ The check response includes `target_module` with the module's questions. Variabl
 3. For each variable, present the prompt with resolved default
 4. For `single-select` variables, show options as a numbered list
 
-### Step 4: Write config
+#### Write config
 
 Collect all answers and run `bmad_init.py` with the `write` subcommand, passing `--answers '{all_answers_json}'` and `--project-root`.
 
@@ -95,6 +92,12 @@ The script:
 - Creates `_bmad/{module}/config.yaml` with core values + module values (result-expanded)
 - Creates any directories listed in the module.yaml `directories` array
 
-### Step 5: Return vars
+#### Return vars
 
 After writing, re-run `bmad_init.py` with the `load` subcommand (same as the fast path) to return resolved vars. Store returned vars as `{var-name}` and return them to the calling skill.
+
+## 2. Project Initialization (invoked by user)
+
+When the user invokes this skill directly (e.g., "bmad init", "initialize project"), follow the instructions in `./workflow.md`.
+
+This workflow scans the codebase, detects project type/stack/tracker/forge/infrastructure, creates `workflow-context.md` and `workflow-knowledge/` files, and handles migration from legacy BMAD installations.

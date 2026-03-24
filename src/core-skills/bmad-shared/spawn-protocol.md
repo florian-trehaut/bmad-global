@@ -55,7 +55,7 @@ Read these files BEFORE starting work:
 {endfor}
 
 ### Global rules (REQUIRED)
-- {project-root}/_bmad/core/bmad-shared/no-fallback-no-false-data.md
+- ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
 ```
 
 **Knowledge resolution order** (highest priority wins):

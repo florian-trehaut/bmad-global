@@ -28,7 +28,7 @@ This uses **step-file architecture** for focused execution:
 
 ### 1. Load shared rules
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 Apply these rules for the entire workflow execution.
 
@@ -75,6 +75,6 @@ Read fully and follow: `steps/step-01-mode-detection.md` to begin the workflow.
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements. **This step is CONDITIONAL** — it only activates if difficulties were encountered.

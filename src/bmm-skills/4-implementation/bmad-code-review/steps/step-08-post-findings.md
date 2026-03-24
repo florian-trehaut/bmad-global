@@ -174,7 +174,7 @@ cd {REVIEW_WORKTREE_PATH}
 
 ## NEXT STEP — MANDATORY
 
-After the final report is presented, **execute the retrospective step**: read and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`. This is NOT optional — it runs after EVERY execution (and silently skips if no friction was encountered).
+After the final report is presented, **execute the retrospective step**: read and follow `~/.claude/skills/bmad-shared/retrospective-step.md`. This is NOT optional — it runs after EVERY execution (and silently skips if no friction was encountered).
 
 ## SUCCESS/FAILURE:
 

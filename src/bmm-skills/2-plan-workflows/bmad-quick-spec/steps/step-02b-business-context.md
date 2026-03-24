@@ -1,7 +1,7 @@
 ---
 nextStepFile: './step-03-investigate.md'
-advancedElicitationTask: '{project-root}/_bmad/core/bmad-advanced-elicitation/SKILL.md'
-partyModeWorkflow: '{project-root}/_bmad/core/bmad-party-mode/workflow.md'
+advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
+partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
 businessContextTemplate: '../data/business-context-template.md'
 ---
 

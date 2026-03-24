@@ -10,13 +10,13 @@
 
 ### 1. Load shared rules
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 Apply these rules for the entire workflow execution.
 
 ### 2. Configuration Loading
 
-Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
+Read `.claude/workflow-context.md` from the project root and resolve:
 
 - `project_name`, `user_name`
 - `communication_language`, `document_output_language`
@@ -145,6 +145,6 @@ Save summary to: `{default_output_file}`
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements. **This step is CONDITIONAL** — it only activates if difficulties were encountered.

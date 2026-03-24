@@ -11,6 +11,26 @@ Execute the adversarial code review using the appropriate mode -- inline for sel
 
 ---
 
+## ANTI-RATIONALIZATION RULE (MANDATORY — ALL PERSPECTIVES)
+
+Code comments that justify shortcuts, casts, workarounds, or deviations are **evidence of a problem, not an attenuation**. The dev agent is incentivized to ship — it will take shortcuts and write comments to rationalize them. The reviewer's job is to see through this.
+
+**Detection signals:**
+
+- A comment starting with "// This is needed because...", "// TS requires...", "// Structurally compatible..."
+- An `as` cast accompanied by a comment explaining why it's "safe" or "justified"
+- A `// TODO` or `// FIXME` paired with a justification for leaving it
+- A comment that explains why a type violation, architecture violation, or pattern deviation is "acceptable"
+
+**Rule:** When you encounter a comment that justifies a deviation:
+
+1. **Ignore the comment entirely** — pretend it doesn't exist
+2. **Judge the code on its own merits** — is the cast necessary? Is the shortcut the right solution?
+3. **If the code needs a comment to justify itself, the code is wrong.** The fix is to make the code right, not to explain why it's wrong.
+4. **Classify as WARNING minimum**, never RECOMMENDATION — a rationalized shortcut is always more severe than a style nit
+
+---
+
 ## SELF-REVIEW MODE (REVIEW_MODE == 'self')
 
 Execute 6 perspectives sequentially inline. Use project-specific checklists from `.claude/workflow-knowledge/review-perspectives.md` if loaded, otherwise use the default checklists below.
@@ -40,7 +60,7 @@ Execute 6 perspectives sequentially inline. Use project-specific checklists from
 
 ### Perspective 1.5: Zero Fallback / Zero False Data (MANDATORY)
 
-**Load and apply `{project-root}/_bmad/core/bmad-shared/no-fallback-no-false-data.md`**
+**Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`**
 
 Grep for silent fallbacks on business-critical fields:
 

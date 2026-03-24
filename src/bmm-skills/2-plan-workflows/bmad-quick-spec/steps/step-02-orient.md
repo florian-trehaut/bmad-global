@@ -1,7 +1,7 @@
 ---
 nextStepFile: './step-02b-business-context.md'
-advancedElicitationTask: '{project-root}/_bmad/core/bmad-advanced-elicitation/SKILL.md'
-partyModeWorkflow: '{project-root}/_bmad/core/bmad-party-mode/workflow.md'
+advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
+partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
 ---
 
 # Step 2: Orient & Scope

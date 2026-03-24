@@ -70,7 +70,7 @@ Follow the instructions in ./workflow.md.
 
 ### Retrospective Integration (REQUIRED)
 
-Every workflow.md MUST end with a `## WORKFLOW COMPLETION — RETROSPECTIVE` section that references `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`. This enables the self-improvement loop where each workflow execution can detect friction points and propose improvements.
+Every workflow.md MUST end with a `## WORKFLOW COMPLETION — RETROSPECTIVE` section that references `~/.claude/skills/bmad-shared/retrospective-step.md`. This enables the self-improvement loop where each workflow execution can detect friction points and propose improvements.
 
 Exception: read-only analysis workflows (like bmad-validate-skill) that don't modify anything and can't have meaningful friction points may omit this section.
 
@@ -113,7 +113,7 @@ If `.claude/workflow-knowledge/{filename}.md` exists at project root, read it.
 ```markdown
 ### N. Load shared rules
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **{one-sentence key rule}.**
 ```

@@ -83,7 +83,7 @@ Verify:
 
 ### 4. RETROSPECTIVE section
 
-Append the standard retrospective completion section from the workflow.md template. This is mandatory for all workflow skills (exception: read-only analysis skills). The section must reference `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+Append the standard retrospective completion section from the workflow.md template. This is mandatory for all workflow skills (exception: read-only analysis skills). The section must reference `~/.claude/skills/bmad-shared/retrospective-step.md`.
 
 ### 5. Create placeholder data files
 

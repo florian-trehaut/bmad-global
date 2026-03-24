@@ -1,8 +1,8 @@
 ---
 nextStepFile: './step-07-create-issue.md'
-advancedElicitationTask: '{project-root}/_bmad/core/bmad-advanced-elicitation/SKILL.md'
-partyModeWorkflow: '{project-root}/_bmad/core/bmad-party-mode/workflow.md'
-adversarialReview: '{project-root}/_bmad/core/bmad-review-adversarial-general/SKILL.md'
+advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
+partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
+adversarialReview: '~/.claude/skills/bmad-review-adversarial-general/SKILL.md'
 ---
 
 # Step 6: Review & Finalize

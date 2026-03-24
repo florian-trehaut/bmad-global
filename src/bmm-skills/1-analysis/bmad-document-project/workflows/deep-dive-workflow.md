@@ -11,7 +11,7 @@
 
 ### Configuration Loading
 
-Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
+Read `.claude/workflow-context.md` from the project root and resolve:
 
 - `project_knowledge`
 - `user_name`

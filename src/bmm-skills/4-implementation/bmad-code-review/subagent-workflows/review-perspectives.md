@@ -20,7 +20,7 @@ You received a `review_contract` in your task description (claimed from TaskList
 - Execute ONLY the perspectives listed in `contract.perspectives`
 - Review ONLY files listed in `contract.changed_files`
 - Load and apply project review perspectives from `.claude/workflow-knowledge/review-perspectives.md` if it exists (JIT loading)
-- Load and apply `{project-root}/_bmad/core/bmad-shared/no-fallback-no-false-data.md` (always)
+- Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` (always)
 - Load stack knowledge from `.claude/workflow-knowledge/stack.md` if it exists (for reference code, legacy code, forbidden patterns)
 - Report findings with exact file:line references
 - You are **READ-ONLY** -- do NOT edit, fix, commit, or modify anything
@@ -78,7 +78,7 @@ git log -1 --oneline
 
 ```bash
 # Load shared rules (always)
-Read({project-root}/_bmad/core/bmad-shared/no-fallback-no-false-data.md)
+Read(~/.claude/skills/bmad-shared/no-fallback-no-false-data.md)
 
 # Load project review perspectives (if exists)
 Read(.claude/workflow-knowledge/review-perspectives.md)  # project-specific checklists
@@ -152,7 +152,7 @@ If `contract.phase2_suspicious_removals` is present, verify each suspicious remo
 
 ## PERSPECTIVE: zero_fallback (ALWAYS EXECUTED -- not conditional)
 
-**Load and apply `{project-root}/_bmad/core/bmad-shared/no-fallback-no-false-data.md`**
+**Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`**
 
 This perspective is ALWAYS executed regardless of `contract.perspectives`. It catches the most dangerous class of bugs: code that appears to work but sends wrong data.
 

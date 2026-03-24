@@ -22,7 +22,7 @@ This uses **micro-file architecture** for disciplined execution:
 
 ### 1. Configuration Loading
 
-Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
+Read `.claude/workflow-context.md` from the project root and resolve:
 
 - `project_name`, `output_folder`, `user_name`
 - `communication_language`, `document_output_language`, `user_skill_level`
@@ -36,7 +36,7 @@ Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
 
 ### 3. Load shared rules
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 Apply these rules for the entire workflow execution.
 
@@ -52,7 +52,7 @@ Load and execute `./steps/step-01-discover.md` to begin the workflow.
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The workflow itself (steps, data files)

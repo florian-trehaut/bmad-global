@@ -32,10 +32,10 @@ This uses **micro-file architecture** for disciplined execution:
 
 ### 1. Configuration Loading
 
-Load config from `{project-root}/_bmad/core/config.yaml` and resolve:
+Read `.claude/workflow-context.md` from the project root and resolve:
 
-- `project_name`, `output_folder`, `user_name`
-- `communication_language`, `document_output_language`, `user_skill_level`
+- `{PROJECT_NAME}`, `{OUTPUT_FOLDER}`, `{USER_NAME}`
+- `{COMMUNICATION_LANGUAGE}`, `{DOCUMENT_OUTPUT_LANGUAGE}`, `{USER_SKILL_LEVEL}`
 - `date` as system-generated current datetime
 
 ### 2. Paths
@@ -47,7 +47,7 @@ All steps MUST reference `{brainstorming_session_output_file}` instead of the fu
 
 ### 3. Load shared rules
 
-Read all files in `{project-root}/_bmad/core/bmad-shared/`.
+Read all files in `~/.claude/skills/bmad-shared/`.
 
 Apply these rules for the entire workflow execution.
 
@@ -63,7 +63,7 @@ Read fully and follow: `./steps/step-01-session-setup.md` to begin the workflow.
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `{project-root}/_bmad/core/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The workflow itself (steps, data files)

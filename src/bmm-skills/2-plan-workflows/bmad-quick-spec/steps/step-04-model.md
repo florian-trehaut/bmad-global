@@ -1,7 +1,7 @@
 ---
 nextStepFile: './step-04b-interfaces.md'
-advancedElicitationTask: '{project-root}/_bmad/core/bmad-advanced-elicitation/SKILL.md'
-partyModeWorkflow: '{project-root}/_bmad/core/bmad-party-mode/workflow.md'
+advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
+partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
 dataModelTemplate: '../data/data-model-template.md'
 apiContractTemplate: '../data/api-contract-template.md'
 infraAssessmentTemplate: '../data/infra-assessment-template.md'
