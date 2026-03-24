@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-每次运行 `npx bmad-method install`，BMad 会基于你选择的模块生成一组 **skills**。你可以直接输入 skill 名称调用 workflow、任务、工具或智能体角色。
+运行 `bmad install` 后，BMad 会基于内置模块（core 和 bmm）自动生成一组 **skills**。你可以直接输入 skill 名称调用 workflow、任务、工具或智能体角色。
 
 ## Skills 与菜单触发器的区别
 

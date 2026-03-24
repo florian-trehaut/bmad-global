@@ -10,7 +10,7 @@ sidebar:
 如果你是从零开始的新项目，建议先看[快速入门](../tutorials/getting-started.md)；本文主要面向既有项目接入场景。
 
 :::note[前置条件]
-- 已安装 BMad Method（`npx bmad-method install`）
+- 已安装 BMad Method（`bmad install`）
 - 一个你想要处理的现有代码库
 - 访问 AI 驱动的 IDE（Claude Code 或 Cursor）
 :::

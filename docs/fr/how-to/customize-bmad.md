@@ -30,7 +30,7 @@ Utilisez toujours les fichiers `.customize.yaml` décrits ici plutôt que de mod
 Après l'installation, vous trouverez un fichier `.customize.yaml` par agent dans :
 
 ```text
-_bmad/_config/agents/
+~/.claude/skills/bmad/_config/agents/
 ├── bmm-analyst.customize.yaml
 ├── bmm-architect.customize.yaml
 └── ... (un fichier par agent installé)
@@ -130,23 +130,16 @@ prompts:
 Après modification, réinstallez pour appliquer les changements :
 
 ```bash
-npx bmad-method install
+bmad install --force
 ```
 
-L'installateur détecte l'installation existante et propose ces options :
-
-| Option                              | Ce qu'elle fait                                                        |
-| ----------------------------------- | ---------------------------------------------------------------------- |
-| **Quick Update**                    | Met à jour tous les modules vers la dernière version et applique les personnalisations |
-| **Modify BMad Installation**        | Flux d'installation complet pour ajouter ou supprimer des modules     |
-
-Pour des modifications de personnalisation uniquement, **Quick Update** est l'option la plus rapide.
+Cela met à jour tous les modules vers la dernière version et applique vos personnalisations.
 
 ## Résolution des problèmes
 
 **Les modifications n'apparaissent pas ?**
 
-- Exécutez `npx bmad-method install` et sélectionnez **Quick Update** pour appliquer les modifications
+- Exécutez `bmad install --force` pour appliquer les modifications
 - Vérifiez que votre syntaxe YAML est valide (l'indentation compte)
 - Assurez-vous d'avoir modifié le bon fichier `.customize.yaml` pour l'agent
 
@@ -159,7 +152,7 @@ Pour des modifications de personnalisation uniquement, **Quick Update** est l'op
 **Besoin de réinitialiser un agent ?**
 
 - Effacez ou supprimez le fichier `.customize.yaml` de l'agent
-- Exécutez `npx bmad-method install` et sélectionnez **Quick Update** pour restaurer les valeurs par défaut
+- Exécutez `bmad install --force` pour restaurer les valeurs par défaut
 
 ## Personnalisation des workflows
 

@@ -5,93 +5,64 @@ sidebar:
   order: 1
 ---
 
-Utilisez la commande `npx bmad-method install` pour configurer BMad dans votre projet avec votre choix de modules et d'outils d'IA.
-
-Si vous souhaitez utiliser un installateur non interactif et fournir toutes les options d'installation en ligne de commande, consultez [ce guide](./non-interactive-installation.md).
+Utilisez la commande `bmad install` pour configurer BMad globalement sur votre machine.
 
 ## Quand l'utiliser
 
-- Démarrer un nouveau projet avec BMad
-- Ajouter BMad à une base de code existante
+- Configurer BMad pour la première fois
 - Mettre à jour une installation BMad existante
 
 :::note[Prérequis]
 - **Node.js** 20+ (requis pour l'installateur)
-- **Git** (recommandé)
 - **Outil d'IA** (Claude Code, Cursor, ou similaire)
 :::
 
 ## Étapes
 
-### 1. Lancer l'installateur
+### 1. Installer le package
+
+```bash
+npm install -g bmad-method
+```
+
+Ou exécuter directement sans installation globale :
 
 ```bash
 npx bmad-method install
 ```
 
-:::tip[Vous voulez la dernière version préliminaire ?]
-Utilisez le dist-tag `next` :
+### 2. Lancer l'installateur
+
 ```bash
-npx bmad-method@next install
+bmad install
 ```
 
-Cela vous permet d'obtenir les nouvelles modifications plus tôt, avec un risque plus élevé de changements que l'installation par défaut.
-:::
+L'installateur s'exécute sans aucune invite et installe tous les skills BMad globalement dans `~/.claude/skills/bmad/`.
 
-:::tip[Version de développement]
-Pour installer la dernière version depuis la branche main (peut être instable) :
+Pour forcer une nouvelle installation (écrasement des fichiers existants) :
+
 ```bash
-npx github:bmad-code-org/BMAD-METHOD install
+bmad install --force
 ```
-:::
 
-### 2. Choisir l'emplacement d'installation
+Pour voir la sortie détaillée pendant l'installation :
 
-L'installateur vous demandera où installer les fichiers BMad :
-
-- Répertoire courant (recommandé pour les nouveaux projets si vous avez créé le répertoire vous-même et l'exécutez depuis ce répertoire)
-- Chemin personnalisé
-
-### 3. Sélectionner vos outils d'IA
-
-Choisissez les outils d'IA que vous utilisez :
-
-- Claude Code
-- Cursor
-- Autres
-
-Chaque outil a sa propre façon d'intégrer les skills. L'installateur crée de petits fichiers de prompt pour activer les workflows et les agents — il les place simplement là où votre outil s'attend à les trouver.
-
-:::note[Activer les skills]
-Certaines plateformes nécessitent que les skills soient explicitement activés dans les paramètres avant d'apparaître. Si vous installez BMad et ne voyez pas les skills, vérifiez les paramètres de votre plateforme ou demandez à votre assistant IA comment activer les skills.
-:::
-
-### 4. Choisir les modules
-
-L'installateur affiche les modules disponibles. Sélectionnez ceux dont vous avez besoin — la plupart des utilisateurs veulent simplement **méthode BMad** (le module de développement logiciel).
-
-### 5. Suivre les instructions
-
-L'installateur vous guide pour le reste — contenu personnalisé, paramètres, etc.
+```bash
+bmad install --debug
+```
 
 ## Ce que vous obtenez
 
 ```text
+~/.claude/skills/bmad/
+├── bmm/            # Module BMad Method
+│   └── config.yaml # Paramètres du module
+├── core/           # Module core requis
+├── manifest.yaml   # Manifeste d'installation
+└── ...
+
 votre-projet/
-├── _bmad/
-│   ├── bmm/            # Vos modules sélectionnés
-│   │   └── config.yaml # Paramètres du module (si vous devez les modifier)
-│   ├── core/           # Module core requis
-│   └── ...
-├── _bmad-output/       # Artefacts générés
-├── .claude/            # Skills Claude Code (si vous utilisez Claude Code)
-│   └── skills/
-│       ├── bmad-help/
-│       ├── bmad-persona/
-│       └── ...
-└── .cursor/            # Skills Cursor (si vous utilisez Cursor)
-    └── skills/
-        └── ...
+└── _bmad-output/       # Artefacts générés (local au projet)
 ```
 
 ## Vérifier l'installation

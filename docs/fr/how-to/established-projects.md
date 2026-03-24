@@ -10,7 +10,7 @@ Utilisez la méthode BMad efficacement lorsque vous travaillez sur des projets e
 Ce guide couvre le flux de travail essentiel pour l'intégration à des projets existants avec la méthode BMad.
 
 :::note[Prérequis]
-- méthode BMad installée (`npx bmad-method install`)
+- méthode BMad installée (`bmad install`)
 - Une base de code existante sur laquelle vous souhaitez travailler
 - Accès à un IDE IA (Claude Code ou Cursor)
 :::

@@ -21,7 +21,7 @@ Construisez des logiciels plus rapidement en utilisant des workflows propulsés 
 :::
 
 :::tip[Le chemin le plus simple]
-**Installer** → `npx bmad-method install`
+**Installer** → `bmad install`
 **Demander** → `bmad-help que dois-je faire en premier ?`
 **Construire** → Laissez BMad-Help vous guider workflow par workflow
 :::
@@ -89,19 +89,15 @@ Les comptes de stories sont indicatifs, pas des définitions. Choisissez votre v
 
 ## Installation
 
-Ouvrez un terminal dans le répertoire de votre projet et exécutez :
+Ouvrez un terminal et exécutez :
 
 ```bash
-npx bmad-method install
+bmad install
 ```
 
-Si vous souhaitez la version préliminaire la plus récente au lieu du canal de release par défaut, utilisez `npx bmad-method@next install`.
+Ou si vous n'avez pas installé le package globalement : `npx bmad-method install`.
 
-Lorsque vous êtes invité à sélectionner des modules, choisissez **méthode BMad**.
-
-L'installateur crée deux dossiers :
-- `_bmad/` — agents, workflows, tâches et configuration
-- `_bmad-output/` — vide pour l'instant, mais c'est là que vos artefacts seront enregistrés
+L'installateur configure BMad globalement dans `~/.claude/skills/bmad/` — agents, workflows, tâches et configuration. Le dossier `_bmad-output/` est créé automatiquement par les workflows lors de la génération des artefacts, pas par l'installateur.
 
 :::tip[Votre prochaine étape]
 Ouvrez votre IDE avec IA dans le dossier du projet et exécutez :
@@ -203,7 +199,6 @@ Votre projet contient maintenant :
 
 ```text
 your-project/
-├── _bmad/                                   # Configuration BMad
 ├── _bmad-output/
 │   ├── planning-artifacts/
 │   │   ├── PRD.md                           # Votre document d'exigences

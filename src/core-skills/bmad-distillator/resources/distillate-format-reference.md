@@ -171,15 +171,13 @@ parts: 1
 - Out: BMAD Builder, marketplace web platform, skill conversion (prerequisite, separate), one-click install for all platforms, monetization, quality certification process (gated-submission principle is architectural requirement; process defined separately)
 - Deferred: CI/CD integration, telemetry for module authors, air-gapped enterprise install, zip bundle integrity verification (checksums/signing), deeper non-technical platform integrations
 
-## Current Installer (migration context)
-- Entry: `tools/cli/bmad-cli.js` (Commander.js) → `tools/cli/installers/lib/core/installer.js`
-- Platforms: `platform-codes.yaml` (~20 platforms with target dirs, legacy dirs, template types, special flags)
-- Manifests: CSV files (skill/workflow/agent-manifest.csv) are current source of truth, not JSON
-- External modules: `external-official-modules.yaml` (CIS, GDS, TEA, WDS) from npm with semver
-- Dependencies: 4-pass resolver (collect → parse → resolve → transitive); YAML-declared only
-- Config: prompts for name, communication language, document output language, output folder
-- Skills already use directory-per-skill layout; bmad-manifest.json sidecars exist but are not source of truth
-- Key shift: CSV-based static manifests → JSON-based runtime scanning
+## Current Installer
+- Entry: `tools/cli/bmad-cli.js` (Commander.js) → `tools/cli/installers/lib/core/global-installer.js`
+- Target: `~/.claude/skills/bmad/` (global, single location)
+- Built-in modules: core + bmm (copied with filtering)
+- External modules: `external-official-modules.yaml` (cloned to cache, copied to target)
+- Manifest: `manifest.yaml` in target directory (version, install date, module list)
+- Commands: `install`, `uninstall`, `status`
 
 ## Vercel Skills CLI
 - `npx skills add <source>` — GitHub, GitLab, local paths, git URLs

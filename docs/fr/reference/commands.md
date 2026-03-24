@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Les skills sont des prompts pré-construits qui chargent des agents, exécutent des workflows ou lancent des tâches dans votre IDE. L'installateur BMad les génère à partir de vos modules installés au moment de l'installation. Si vous ajoutez, supprimez ou modifiez des modules ultérieurement, relancez l'installateur pour garder les skills synchronisés (voir [Dépannage](#dépannage)).
+Les skills sont des prompts pré-construits qui chargent des agents, exécutent des workflows ou lancent des tâches dans votre IDE. L'installateur BMad les génère automatiquement à partir des modules intégrés (core + bmm) lors de l'installation dans `~/.claude/skills/bmad/`. Si vous mettez à jour BMad, relancez l'installateur pour garder les skills synchronisés (voir [Dépannage](#dépannage)).
 
 ## Skills vs. Déclencheurs du menu Agent
 
@@ -20,7 +20,7 @@ Les déclencheurs du menu agent nécessitent une session agent active. Utilisez 
 
 ## Comment les skills sont générés
 
-Lorsque vous exécutez `npx bmad-method install`, l'installateur lit les manifests de chaque module sélectionné et écrit un skill par agent, workflow, tâche et outil. Chaque skill est un répertoire contenant un fichier `SKILL.md` qui indique à l'IA de charger le fichier source correspondant et de suivre ses instructions.
+Lorsque vous exécutez `npx bmad-method install`, l'installateur lit les manifests des modules intégrés (core + bmm) et écrit un skill par agent, workflow, tâche et outil. Chaque skill est un répertoire contenant un fichier `SKILL.md` qui indique à l'IA de charger le fichier source correspondant et de suivre ses instructions.
 
 L'installateur utilise des modèles pour chaque type de skill :
 
@@ -32,24 +32,17 @@ L'installateur utilise des modèles pour chaque type de skill :
 | **Skill d'outil** | Charge un fichier d'outil autonome et suit ses instructions |
 
 :::note[Relancer l'installateur]
-Si vous ajoutez ou supprimez des modules, relancez l'installateur. Il régénère tous les fichiers de skill pour correspondre à votre sélection actuelle de modules.
+Si vous mettez à jour BMad, relancez l'installateur. Il régénère tous les fichiers de skill.
 :::
 
 ## Emplacement des fichiers de skill
 
-L'installateur écrit les fichiers de skill dans un répertoire spécifique à l'IDE à l'intérieur de votre projet. Le chemin exact dépend de l'IDE que vous avez sélectionné lors de l'installation.
+L'installateur écrit les fichiers de skill dans le répertoire global `~/.claude/skills/bmad/`.
 
-| IDE / CLI | Répertoire des skills |
-| --- | --- |
-| Claude Code | `.claude/skills/` |
-| Cursor | `.cursor/skills/` |
-| Windsurf | `.windsurf/skills/` |
-| Autres IDE | Consultez la sortie de l'installateur pour le chemin cible |
-
-Chaque skill est un répertoire contenant un fichier `SKILL.md`. Par exemple, une installation Claude Code ressemble à :
+Chaque skill est un répertoire contenant un fichier `SKILL.md`. Par exemple :
 
 ```text
-.claude/skills/
+~/.claude/skills/bmad/
 ├── bmad-help/
 │   └── SKILL.md
 ├── bmad-create-prd/
@@ -129,9 +122,9 @@ Tous les skills utilisent le préfixe `bmad-` suivi d'un nom descriptif (ex. `bm
 
 **Les skills n'apparaissent pas après l'installation.** Certaines plateformes nécessitent d'activer explicitement les skills dans les paramètres. Consultez la documentation de votre IDE ou demandez à votre assistant IA comment activer les skills. Vous devrez peut-être aussi redémarrer votre IDE ou recharger la fenêtre.
 
-**Des skills attendus sont manquants.** L'installateur génère uniquement les skills pour les modules que vous avez sélectionnés. Exécutez à nouveau `npx bmad-method install` et vérifiez votre sélection de modules. Vérifiez que les fichiers de skill existent dans le répertoire attendu.
+**Des skills attendus sont manquants.** Exécutez à nouveau `npx bmad-method install` pour régénérer les skills. Vérifiez que les fichiers de skill existent dans `~/.claude/skills/bmad/`.
 
-**Des skills d'un module supprimé apparaissent encore.** L'installateur ne supprime pas automatiquement les anciens fichiers de skill. Supprimez les répertoires obsolètes du répertoire de skills de votre IDE, ou supprimez tout le répertoire de skills et relancez l'installateur pour obtenir un ensemble propre.
+**Des skills obsolètes apparaissent encore.** Supprimez les répertoires obsolètes de `~/.claude/skills/bmad/`, ou supprimez tout le répertoire et relancez l'installateur pour obtenir un ensemble propre.
 
 ## Glossaire
 

@@ -30,7 +30,7 @@ sidebar:
 安装完成后，每个已安装智能体都会在下面目录生成一个 `.customize.yaml`：
 
 ```text
-_bmad/_config/agents/
+~/.claude/skills/bmad/_config/agents/
 ├── core-bmad-master.customize.yaml
 ├── bmm-dev.customize.yaml
 ├── bmm-pm.customize.yaml
@@ -131,23 +131,16 @@ prompts:
 编辑完成后，重新安装以应用配置：
 
 ```bash
-npx bmad-method install
+bmad install --force
 ```
 
-安装程序会识别现有安装，并给出以下选项：
-
-| 选项 | 作用 |
-| ---------------------------- | ------------------------------------------------------------------- |
-| **Quick Update** | 更新所有模块到最新版本，并应用你的自定义配置 |
-| **Modify BMad Installation** | 进入完整安装流程，用于增删模块 |
-
-如果只是调整 `.customize.yaml`，优先选 **Quick Update**。
+这会将所有模块更新到最新版本并应用你的自定义配置。
 
 ## 故障排查
 
 **改动没有生效？**
 
-- 运行 `npx bmad-method install` 并选择 **Quick Update** 以应用更改
+- 运行 `bmad install --force` 以应用更改
 - 检查 YAML 语法是否正确（尤其是缩进）
 - 确认你编辑的是目标智能体对应的 `.customize.yaml`
 
@@ -160,7 +153,7 @@ npx bmad-method install
 **需要重置某个智能体？**
 
 - 清空或删除智能体的 `.customize.yaml` 文件
-- 运行 `npx bmad-method install` 并选择 **Quick Update** 以恢复默认设置
+- 运行 `bmad install --force` 以恢复默认设置
 
 ## 工作流自定义
 

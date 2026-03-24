@@ -37,15 +37,15 @@ sidebar:
 
 如果你把 BMad Method 目录改成了其他名字，需要你自己手动定位并删除。
 
-### 3. 清理 IDE 命令与技能目录
+### 3. 清理 IDE 技能
 
-手动删除旧版 v4 IDE 命令/技能目录。以 Claude Code 为例，请在旧目录中删除以 `bmad` 开头的嵌套目录：
+手动删除旧版 v4 IDE 命令/技能——例如如果您使用 Claude Code，查找任何以 bmad 开头的嵌套文件夹并删除它们：
 
 - `.claude/commands/`
 
-v6 新技能会安装到：
+新的 v6 技能安装到：
 
-- `.claude/skills/`
+- `~/.claude/skills/bmad/`
 
 ### 4. 迁移规划产物
 
@@ -73,15 +73,14 @@ v6 新技能会安装到：
 **v6 统一结构：**
 
 ```text
-your-project/
-├── _bmad/               # 单一安装目录
-│   ├── _config/         # 你的自定义配置
-│   │   └── agents/      # 智能体自定义文件
-│   ├── core/            # 通用核心框架
-│   ├── bmm/             # BMad Method 模块
-│   ├── bmb/             # BMad Builder
-│   └── cis/             # Creative Intelligence Suite
-└── _bmad-output/        # 输出目录（v4 时代常见为 doc 目录）
+~/.claude/skills/bmad/       # 全局安装
+├── _config/                 # 您的自定义配置
+│   └── agents/              # 智能体自定义文件
+├── core/                    # 通用核心框架
+├── bmm/                     # BMad Method 模块
+├── bmb/                     # BMad Builder
+├── cis/                     # Creative Intelligence Suite
+└── manifest.yaml            # 安装清单
 ```
 
 ## 模块迁移

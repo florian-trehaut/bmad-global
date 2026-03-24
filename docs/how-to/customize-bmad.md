@@ -30,7 +30,7 @@ Always use the `.customize.yaml` files described here rather than editing agent 
 After installation, find one `.customize.yaml` file per agent in:
 
 ```text
-_bmad/_config/agents/
+~/.claude/skills/bmad/_config/agents/
 ├── core-bmad-master.customize.yaml
 ├── bmm-dev.customize.yaml
 ├── bmm-pm.customize.yaml
@@ -131,23 +131,16 @@ prompts:
 After editing, reinstall to apply changes:
 
 ```bash
-npx bmad-method install
+bmad install --force
 ```
 
-The installer detects the existing installation and offers these options:
-
-| Option                       | What It Does                                                        |
-| ---------------------------- | ------------------------------------------------------------------- |
-| **Quick Update**             | Updates all modules to the latest version and applies customizations |
-| **Modify BMad Installation** | Full installation flow for adding or removing modules               |
-
-For customization-only changes, **Quick Update** is the fastest option.
+This updates all modules to the latest version and applies your customizations.
 
 ## Troubleshooting
 
 **Changes not appearing?**
 
-- Run `npx bmad-method install` and select **Quick Update** to apply changes
+- Run `bmad install --force` to apply changes
 - Check that your YAML syntax is valid (indentation matters)
 - Verify you edited the correct `.customize.yaml` file for the agent
 
@@ -160,7 +153,7 @@ For customization-only changes, **Quick Update** is the fastest option.
 **Need to reset an agent?**
 
 - Clear or delete the agent's `.customize.yaml` file
-- Run `npx bmad-method install` and select **Quick Update** to restore defaults
+- Run `bmad install --force` to restore defaults
 
 ## Workflow Customization
 

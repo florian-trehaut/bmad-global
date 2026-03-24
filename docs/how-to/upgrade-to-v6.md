@@ -39,9 +39,9 @@ Manually remove legacy v4 IDE commands/skills - for example if you have Claude C
 
 - `.claude/commands/`
 
-The new v6 skills are installed to:
+The new v6 skills are installed globally to:
 
-- `.claude/skills/`
+- `~/.claude/skills/bmad/`
 
 ### 4. Migrate Planning Artifacts
 
@@ -69,15 +69,17 @@ If you have stories created or implemented:
 **v6 unified structure:**
 
 ```text
+~/.claude/skills/bmad/       # Global installation
+├── _config/                 # Your customizations
+│   └── agents/              # Agent customization files
+├── core/                    # Universal core framework
+├── bmm/                     # BMad Method module
+├── bmb/                     # BMad Builder
+├── cis/                     # Creative Intelligence Suite
+└── manifest.yaml            # Installation manifest
+
 your-project/
-├── _bmad/               # Single installation folder
-│   ├── _config/         # Your customizations
-│   │   └── agents/      # Agent customization files
-│   ├── core/            # Universal core framework
-│   ├── bmm/             # BMad Method module
-│   ├── bmb/             # BMad Builder
-│   └── cis/             # Creative Intelligence Suite
-└── _bmad-output/        # Output folder (was doc folder in v4)
+└── _bmad-output/            # Output folder (was doc folder in v4)
 ```
 
 ## Module Migration
@@ -94,7 +96,7 @@ your-project/
 
 | Concept       | v4                                    | v6                                   |
 | ------------- | ------------------------------------- | ------------------------------------ |
-| **Core**      | `_bmad-core` was actually BMad Method | `_bmad/core/` is universal framework |
-| **Method**    | `_bmad-method`                        | `_bmad/bmm/`                         |
+| **Core**      | `_bmad-core` was actually BMad Method | `~/.claude/skills/bmad/core/` is universal framework |
+| **Method**    | `_bmad-method`                        | `~/.claude/skills/bmad/bmm/`                         |
 | **Config**    | Modified files directly               | `config.yaml` per module             |
 | **Documents** | Sharded or unsharded required setup   | Fully flexible, auto-scanned         |

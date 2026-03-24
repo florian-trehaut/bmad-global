@@ -20,7 +20,7 @@ Agent menu triggers require an active agent session. Use skills when you know wh
 
 ## How Skills Are Generated
 
-When you run `npx bmad-method install`, the installer reads the manifests for every selected module and writes one skill per agent, workflow, task, and tool. Each skill is a directory containing a `SKILL.md` file that instructs the AI to load the corresponding source file and follow its instructions.
+When you run `npx bmad-method install`, the installer reads the manifests for every built-in module and writes one skill per agent, workflow, task, and tool. Each skill is a directory containing a `SKILL.md` file that instructs the AI to load the corresponding source file and follow its instructions.
 
 The installer uses templates for each skill type:
 
@@ -32,24 +32,15 @@ The installer uses templates for each skill type:
 | **Tool skill** | Loads a standalone tool file and follows its instructions |
 
 :::note[Re-running the installer]
-If you add or remove modules, run the installer again. It regenerates all skill files to match your current module selection.
+If you update BMad or add external modules, run the installer again. It regenerates all skill files.
 :::
 
 ## Where Skill Files Live
 
-The installer writes skill files into an IDE-specific directory inside your project. The exact path depends on which IDE you selected during installation.
-
-| IDE / CLI | Skills directory |
-| --- | --- |
-| Claude Code | `.claude/skills/` |
-| Cursor | `.cursor/skills/` |
-| Windsurf | `.windsurf/skills/` |
-| Other IDEs | See the installer output for the target path |
-
-Each skill is a directory containing a `SKILL.md` file. For example, a Claude Code installation looks like:
+The installer writes skill files to a single global directory:
 
 ```text
-.claude/skills/
+~/.claude/skills/bmad/
 ├── bmad-help/
 │   └── SKILL.md
 ├── bmad-create-prd/
@@ -59,7 +50,7 @@ Each skill is a directory containing a `SKILL.md` file. For example, a Claude Co
 └── ...
 ```
 
-The directory name determines the skill name in your IDE. For example, the directory `bmad-dev/` registers the skill `bmad-dev`.
+Each skill is a directory containing a `SKILL.md` file. The directory name determines the skill name in your IDE. For example, the directory `bmad-dev/` registers the skill `bmad-dev`.
 
 ## How to Discover Your Skills
 
@@ -68,7 +59,7 @@ Type the skill name in your IDE to invoke it. Some platforms require you to enab
 Run `bmad-help` for context-aware guidance on your next step.
 
 :::tip[Quick discovery]
-The generated skill directories in your project are the canonical list. Open them in your file explorer to see every skill with its description.
+The generated skill directories in `~/.claude/skills/bmad/` are the canonical list. Open them in your file explorer to see every skill with its description.
 :::
 
 ## Skill Categories
@@ -129,6 +120,6 @@ All skills use the `bmad-` prefix followed by a descriptive name (e.g., `bmad-de
 
 **Skills not appearing after install.** Some platforms require skills to be explicitly enabled in settings. Check your IDE's documentation or ask your AI assistant how to enable skills. You may also need to restart your IDE or reload the window.
 
-**Expected skills are missing.** The installer only generates skills for modules you selected. Run `npx bmad-method install` again and verify your module selection. Check that the skill files exist in the expected directory.
+**Expected skills are missing.** Run `npx bmad-method install` again and verify the installation completed successfully. Check that the skill files exist in `~/.claude/skills/bmad/`.
 
-**Skills from a removed module still appear.** The installer does not delete old skill files automatically. Remove the stale directories from your IDE's skills directory, or delete the entire skills directory and re-run the installer for a clean set.
+**Skills from a removed module still appear.** The installer does not delete old skill files automatically. Remove the stale directories from `~/.claude/skills/bmad/`, or delete the entire `bmad/` directory and re-run the installer for a clean set.
