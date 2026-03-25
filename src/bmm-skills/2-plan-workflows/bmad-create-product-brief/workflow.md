@@ -10,7 +10,7 @@
 
 Read `.claude/workflow-context.md` from the project root (the git repository root).
 
-**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it with `/bmad-init`."
+**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it with `/bmad-knowledge-bootstrap`."
 
 Extract the following from the YAML frontmatter:
 

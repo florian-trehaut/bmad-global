@@ -1,6 +1,6 @@
 # Detection Patterns
 
-Reference file listing all auto-detection patterns used by the bmad-init workflow.
+Reference file listing all auto-detection patterns used by the bmad-knowledge-bootstrap workflow.
 Loaded by step files that need detection logic.
 
 ---

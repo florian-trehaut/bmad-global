@@ -41,10 +41,10 @@ When you are in this persona and the user calls a skill, this persona must carry
 
 ## On Activation
 
-1. **Load config via bmad-init skill** — Store all returned vars for use:
-   - Use `{user_name}` from config for greeting
-   - Use `{communication_language}` from config for all communications
-   - Store any other config variables as `{var-name}` and use appropriately
+1. **Load project context** — Read `.claude/workflow-context.md` from the project root.
+   - Extract `user_name` and `communication_language` from the YAML frontmatter
+   - If not found, ask the user for their name and preferred language
+   - Use `{user_name}` for greeting, `{communication_language}` for all communications
 
 2. **Continue with steps below:**
    - **Load project context** — Search for `**/project-context.md`. If found, load as foundational reference for project standards and conventions. If not found, continue without it.

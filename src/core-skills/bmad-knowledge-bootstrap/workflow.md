@@ -2,87 +2,98 @@
 
 **BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, HALT checkpoints.**
 
+**Goal:** Set up a project to work with all bmad-* workflow skills by creating `.claude/workflow-context.md` and `.claude/workflow-knowledge/` files from automated codebase detection.
+
+---
+
+## WORKFLOW ARCHITECTURE
+
+- **Micro-file Design**: Each step is self-contained and followed exactly
+- **Just-In-Time Loading**: Only load the current step file
+- **Sequential Enforcement**: Complete steps in order, no skipping
+- **Interactive**: Each step presents findings and asks for confirmation/correction
+
+### Step Processing Rules
+
+1. **READ COMPLETELY**: Read the entire step file before acting
+2. **FOLLOW SEQUENCE**: Execute sections in order
+3. **DETECT FIRST, ASK SECOND**: Always try to infer from codebase before asking the user
+4. **CONFIRM, DON'T GUESS**: Present findings for user validation
+
 ---
 
 ## INITIALIZATION
 
-### 1. Load project context
+### 1. Verify project root
 
-Read `.claude/workflow-context.md` from the project root (the git repository root).
-
-**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Run `bmad-init` first."
-
-Extract the following from the YAML frontmatter:
-
-| Variable | Key | Example |
-|----------|-----|---------|
-| `{PROJECT_NAME}` | `project_name` | MyProject |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | English |
+Confirm we are in a git repository root (`git rev-parse --show-toplevel`). HALT if not.
 
 ### 2. Load shared rules
 
 Read all files in `~/.claude/skills/bmad-shared/`.
 
-Apply these rules for the entire workflow execution. Key rule for this workflow: **generated knowledge must be derived from real codebase data — never fabricate content from assumptions.**
+Apply these rules for the entire workflow execution. Key rule: **generated knowledge must be derived from real codebase data — never fabricate content from assumptions.**
 
 ---
 
 ## YOUR ROLE
 
-You are a **knowledge engineer** bootstrapping the project knowledge layer for BMAD workflows. You detect the project's technology stack, research conventions, scan the codebase, and produce structured knowledge files that enable all downstream workflows (dev-story, code-review, troubleshoot, etc.) to operate with full project awareness.
+You are a **meticulous project analyst** who scans the codebase, detects everything possible automatically, and asks the user only for what cannot be inferred. You:
 
-**Tone:** systematic, thorough, precise. Present findings clearly. Let the user validate before writing.
+1. Assess project state and determine what needs to be done
+2. Detect project identity, tracker, forge, tech stack, and infrastructure
+3. Generate workflow-context.md with all configuration
+4. Research conventions and deeply scan the codebase
+5. Generate structured knowledge files from templates
+6. Present each file for user review before writing
+7. Verify completeness and assess workflow readiness
+8. Migrate legacy workflows if present
 
-**Communication language:** use `{COMMUNICATION_LANGUAGE}` from workflow-context.md for all outputs.
+**Tone:** Factual, direct, thorough. Report what you found, ask what you can't infer.
 
 ---
 
 ## CRITICAL RULES
 
-- **NEVER fabricate knowledge** — every fact in a generated file must trace to a real file, config, or scan result
-- **Templates define structure, not content** — the scan and research provide the content
-- **User review is mandatory** — no knowledge file is written without explicit user approval
-- **Staleness tracking is mandatory** — every generated file includes frontmatter with generation date and source hash
+- **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
+- **NEVER fabricate knowledge** — every fact must trace to real files, configs, or scan results
+- **Templates define structure only** — scan + research provide content
+- **User review mandatory** before writing any file
+- **Staleness tracking mandatory** — every knowledge file gets frontmatter with generation date + source hash
+- **ZERO FALLBACK / ZERO FALSE DATA** — apply shared rules loaded at initialization
 - Execute ALL steps in exact order — NO skipping
 
 ---
 
 ## STEP SEQUENCE
 
-| Step | File | Goal |
-|------|------|------|
-| 1 | `step-01-init.md` | Inventory existing knowledge, detect staleness, user selects targets |
-| 2 | `step-02-detect.md` | Auto-detect languages, frameworks, tools from codebase |
-| 3 | `step-03-research.md` | Web research for detected stack conventions |
-| 4 | `step-04-scan.md` | Deep codebase scan informed by detection + research |
-| 5 | `step-05-generate.md` | Produce knowledge file drafts from templates + data |
-| 6 | `step-06-review.md` | Present each draft to user for Accept/Edit/Reject |
-| 7 | `step-07-write.md` | Write approved files to workflow-knowledge/ |
-
----
+| Step | File | Goal | Condition |
+| ---- | ---- | ---- | --------- |
+| 1 | `step-01-preflight.md` | Assess state, inventory, routing | Always |
+| 2 | `step-02-detect-project.md` | Detect project identity, tracker, forge | Full/Resume |
+| 3 | `step-03-detect-stack.md` | Detect stack, frameworks, infra, source patterns | Full/Resume |
+| 4 | `step-04-generate-context.md` | Generate workflow-context.md | Full/Resume |
+| 5 | `step-05-research-scan.md` | Web research + deep codebase scan | Always (for knowledge) |
+| 6 | `step-06-generate-knowledge.md` | Generate knowledge file drafts from templates | Always (for knowledge) |
+| 7 | `step-07-review-write.md` | Per-file user review + write approved files | Always (for knowledge) |
+| 8 | `step-08-verify-migrate.md` | Verify, readiness, conditional legacy migration | Always |
 
 ## ENTRY POINT
 
-Load and execute `./steps/step-01-init.md`.
+Load and execute `./steps/step-01-preflight.md`.
 
 ---
 
 ## HALT CONDITIONS (GLOBAL)
 
-- `workflow-context.md` not found → HALT
-- No TARGET_FILES selected (user chose [N] in step 1) → exit gracefully
-- Codebase scan produces no usable data for a target file → skip that file, report
+- Not in a git repository → HALT
 - User explicitly requests stop → HALT
+- Codebase scan produces no usable data and no fallback exists → HALT
 
 ---
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
 After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
-
-This shared step reviews the execution for friction points and proposes improvements to either:
-- The global skill (workflow steps, data files)
-- The project knowledge (`.claude/workflow-knowledge/`)
-- The project context (`.claude/workflow-context.md`)
 
 **This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

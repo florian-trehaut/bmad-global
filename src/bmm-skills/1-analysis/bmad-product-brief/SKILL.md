@@ -84,4 +84,4 @@ Check activation context immediately:
 ## External Skills
 
 This workflow uses:
-- `bmad-init` — Configuration loading (module: bmm)
+- `bmad-knowledge-bootstrap` — Project initialization and configuration

@@ -1,0 +1,124 @@
+---
+nextStepFile: './step-06-generate-knowledge.md'
+---
+
+# Step 5: Research and Deep Scan
+
+## STEP GOAL:
+
+Web research detected technologies for conventions, then deeply scan the codebase to extract concrete data for populating knowledge file templates. This step is automated — no user interaction.
+
+## MANDATORY SEQUENCE
+
+### 1. Web Research (for detected stack)
+
+**Skip if:** TARGET_FILES contains only `tracker.md` or `environment-config.md`.
+
+For each technology detected in step 03, research:
+1. **Conventions** — file naming, project structure, coding style
+2. **Forbidden patterns** — anti-patterns, security pitfalls, deprecated APIs
+3. **Test conventions** — file organization, assertion patterns, mocking policies
+4. **Security** — OWASP-relevant patterns for this stack
+
+Store structured `research_findings` per technology.
+
+### 2. Stack Scan (for stack.md)
+
+If `stack.md` in TARGET_FILES:
+
+- Read main package manifest → dependencies, scripts, metadata
+- Read lint config files → active rules, severity, overrides
+- Read formatter config → key options
+- Read test config → test roots, coverage thresholds
+- Read pre-commit config → hook commands
+- **Source file patterns**: Use `source_extensions` and `test_file_patterns` from step 03 detection
+- **Architecture patterns**: Use classification from step 03
+
+### 3. Infrastructure Scan (for infrastructure.md)
+
+If `infrastructure.md` in TARGET_FILES:
+
+- Read all CI/CD workflow files → jobs, triggers, dependencies
+- Read Dockerfiles → base images, build stages, exposed ports
+- Read deployment configs → Terraform, k8s, serverless
+- Read .env.example → variable names (NOT values)
+- Identify cloud service references in code
+
+### 4. Domain Scan (for domain-glossary.md, api-surface.md, investigation-checklist.md)
+
+If any of these in TARGET_FILES:
+
+Use `source_extensions` from step 03 to scope searches (do NOT hardcode file extensions):
+
+```bash
+# Entity/model definitions — use detected extensions
+grep -rn "class.*Entity\|interface.*Model\|schema\|@Entity\|@Table\|struct " --include="{source_ext}" . | grep -v node_modules | grep -v vendor | grep -v test | head -30
+
+# Route/endpoint definitions
+grep -rn "@Get\|@Post\|@Put\|@Delete\|@Controller\|app\.get\|app\.post\|router\." --include="{source_ext}" . | grep -v node_modules | grep -v vendor | head -30
+```
+
+- Scan DTOs/request-response schemas
+- Scan domain exceptions/errors
+- Identify bounded contexts from directory structure
+
+### 5. Conventions Scan (for conventions.md)
+
+If `conventions.md` in TARGET_FILES:
+
+```bash
+git log --oneline -30
+```
+
+- Read .editorconfig if present
+- Check for PR template: `.github/pull_request_template.md`
+- Analyze import ordering patterns from a sample of source files
+- Check branch naming from `git branch -r | head -20`
+
+### 6. Review Perspectives Scan (for review-perspectives.md)
+
+If `review-perspectives.md` in TARGET_FILES:
+
+- Identify security-relevant patterns (auth middleware, input validation)
+- Identify forbidden patterns enforced by linter
+- Check existing review-perspectives.md format if present
+
+### 7. Tracker Scan (for tracker.md)
+
+If `tracker.md` in TARGET_FILES:
+
+- Read workflow-context.md for tracker configuration
+- If file-based: check sprint-status.yaml structure
+
+### 8. Environment Config Scan (for environment-config.md)
+
+If `environment-config.md` in TARGET_FILES:
+
+- Scan environment references in code
+- Read deployment configs for environment URLs
+- Check for feature flag systems
+
+### 9. Compile Results
+
+For each TARGET_FILE, compile the relevant scan data into a structured format for step 06.
+
+### 10. Proceed
+
+Load and execute {nextStepFile}.
+
+---
+
+## SYSTEM SUCCESS/FAILURE METRICS
+
+### SUCCESS:
+
+- All TARGET_FILES have corresponding scan data
+- Source extensions used dynamically (not hardcoded)
+- Research findings sourced from web (not LLM memory)
+- Scan data includes file:line references
+
+### FAILURE:
+
+- Hardcoding file extensions in grep commands
+- Relying on LLM knowledge instead of web research
+- Skipping scan areas for TARGET_FILES
