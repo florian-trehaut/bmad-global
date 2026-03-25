@@ -90,4 +90,4 @@ If this is the first run (no previous daily-log), note: "First daily planning se
 
 ---
 
-**Next:** Read fully and follow `./steps/step-02-check-mrs.md`
+**Next:** Read fully and follow `./steps/step-01b-collect-slack.md`

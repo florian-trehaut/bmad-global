@@ -42,6 +42,20 @@ No velocity data yet — this is your first daily planning session.
 How many points do you want to take today?
 ```
 
+### 2b. Present Slack pending actions
+
+If `SLACK_DISCUSSIONS` contains entries with `action_needed != null`:
+
+```
+Slack actions pending:
+| # | Channel/DM | Action | With |
+|---|------------|--------|------|
+```
+
+These are not tracker issues — present them as potential tasks the user may want to account for in today's plan. The user can:
+- Include them as custom tasks (e.g., "add: Reply to @bastien about deployment")
+- Ignore them (they'll still appear in the daily script blockers section)
+
 ### 3. CHECKPOINT
 
 Ask the user:

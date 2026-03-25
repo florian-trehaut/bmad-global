@@ -1,4 +1,4 @@
-# Step 5: Generate Daily Script
+# Step 6: Generate Daily Script
 
 ## STEP GOAL
 
@@ -33,6 +33,18 @@ From `TODAY_ISSUES`:
 - For each planned issue: `• {ISSUE_PREFIX}-{ID} — {title} ({points} pts)`
 - For unestimated issues: `• {ISSUE_PREFIX}-{ID} — {title} (? pts)`
 - Add the budget line: `Budget: {TODAY_BUDGET} pts (average: {AVG_VELOCITY} pts/day)` or `Budget: {TODAY_BUDGET} pts (first session)` if no velocity
+
+### 3b. Build the "Slack Actions" section
+
+If `SLACK_DISCUSSIONS` contains entries with `action_needed != null`:
+
+```
+Slack Actions:
+  • #{channel_name}: {action_detail} (with @participant)
+  • DM @participant: {action_detail}
+```
+
+If no pending Slack actions: omit this section entirely (do not display an empty section).
 
 ### 4. Build the "Blockers" section
 

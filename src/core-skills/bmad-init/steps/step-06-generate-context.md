@@ -61,6 +61,7 @@ worktree_templates:
   spec_review: "../{project_name}-review-spec-{issue_number}"
   validation: "../{project_name}-validation-{issue_number}"
   quick_spec: "../{project_name}-spec-{slug}"
+  spike: "../{project_name}-spike-{slug}"
 branch_template: "feat/{issue_number}-{short_description}"
 
 # --- Application type ---

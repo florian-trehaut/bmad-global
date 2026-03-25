@@ -30,6 +30,7 @@ Capture the current date in ISO format (`YYYY-MM-DD`). This is `{TODAY}`.
 
 - `YESTERDAY_COMMITS = []`
 - `YESTERDAY_ISSUES = []`
+- `SLACK_DISCUSSIONS = []` (loaded in step 01b)
 - `OPEN_MRS = []` (loaded in step 02)
 - `BACKLOG_ISSUES = []`
 - `AVG_VELOCITY = null` (calculated in step 04, null = no history)
@@ -72,6 +73,7 @@ You do this by:
 | Step | File | Goal | Mode |
 | ---- | ---- | ---- | ---- |
 | 1 | `step-01-collect-yesterday.md` | Analyze git log + tracker issues to summarize yesterday's work | Auto |
+| 1b | `step-01b-collect-slack.md` | Scan Slack discussions since last daily — surface pending actions | Auto |
 | 2 | `step-02-check-mrs.md` | Review open Merge Requests — status, blockers, action needed | Auto |
 | 3 | `step-03-load-backlog.md` | Load all non-Done issues assigned to or created by the user + unassigned team issues | Auto |
 | 4 | `step-04-velocity.md` | Calculate average daily velocity from past daily-logs | Auto |
