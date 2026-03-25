@@ -93,4 +93,4 @@ Preflight — {ENVIRONMENT}
 
 ### 7. Proceed
 
-Load and execute `./steps/step-03-setup-worktree.md`.
+Load and execute `./steps/step-04-validate.md`.

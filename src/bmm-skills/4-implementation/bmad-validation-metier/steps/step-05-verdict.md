@@ -82,7 +82,7 @@ Display: "Issue **{ISSUE_IDENTIFIER}** remains in current status. Fix the failed
 
 ### 6. Cleanup worktree
 
-Remove the worktree created in step 3:
+Remove the worktree created in step 1:
 
 ```bash
 git worktree remove {WORKTREE_PATH} --force

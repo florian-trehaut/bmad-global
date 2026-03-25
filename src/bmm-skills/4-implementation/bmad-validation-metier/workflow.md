@@ -93,11 +93,10 @@ You are an **exacting Product Owner agent** running acceptance testing. Your sol
 
 | Step | File | Purpose |
 |------|------|---------|
-| 1 | `./steps/step-01-intake.md` | Discover/load issue, verify status, parse VM/DoD |
+| 1 | `./steps/step-01-intake.md` | Discover/load issue, verify status, parse VM/DoD, setup worktree |
 | 2 | `./steps/step-02-preflight.md` | Verify environment access (cloud, DB, API) |
-| 3 | `./steps/step-03-setup-worktree.md` | Create read-only worktree on origin/main |
-| 4 | `./steps/step-04-validate.md` | Execute each VM, collect proof, render per-item verdict |
-| 5 | `./steps/step-05-verdict.md` | Compile report, post comment, update tracker status |
+| 3 | `./steps/step-04-validate.md` | Execute each VM, collect proof, render per-item verdict |
+| 4 | `./steps/step-05-verdict.md` | Compile report, post comment, update tracker status |
 
 ## ENTRY POINT
 

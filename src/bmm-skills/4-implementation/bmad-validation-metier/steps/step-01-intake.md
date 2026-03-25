@@ -86,7 +86,36 @@ Search in `ISSUE_DESCRIPTION`:
 - If Yes — analyze the issue, propose inferred VM items, wait for user validation
 - If No — HALT: "Cannot continue without Validation Metier. Add the sections to the issue and re-launch."
 
-### 5. Ask for environment
+### 5. Setup Worktree
+
+Create a read-only worktree on `origin/main` immediately — this is needed before preflight (to read routes, configs, endpoints for URL discovery) and before validation.
+
+Derive path from `WORKTREE_TEMPLATE_VALIDATION` with `{issue_number}` replaced.
+
+```bash
+git worktree list | grep "{WORKTREE_PATH base name}"
+```
+
+**If the worktree exists:**
+```bash
+cd {WORKTREE_PATH}
+git fetch origin
+git checkout origin/main --detach
+```
+
+**If the worktree does not exist:**
+```bash
+git fetch origin
+git worktree add --detach {WORKTREE_PATH} origin/main
+```
+
+Verify: `cd {WORKTREE_PATH} && git log --oneline -1`
+
+Display: "Worktree created on `origin/main` ({commit_short}) — read-only."
+
+Store `WORKTREE_PATH` for all subsequent steps.
+
+### 6. Ask for environment
 
 "Which environment should I validate against? **[S]taging** (default) / **[P]roduction**"
 
@@ -95,7 +124,7 @@ Search in `ISSUE_DESCRIPTION`:
 
 Store `ENVIRONMENT`.
 
-### 6. CHECKPOINT
+### 7. CHECKPOINT
 
 Present the parsed VM items to the user:
 
@@ -113,6 +142,6 @@ Proceed with validation?
 
 WAIT for user confirmation.
 
-### 7. Proceed
+### 8. Proceed
 
 Load and execute `./steps/step-02-preflight.md`.
