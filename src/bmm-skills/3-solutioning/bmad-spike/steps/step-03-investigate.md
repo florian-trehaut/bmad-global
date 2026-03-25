@@ -78,6 +78,17 @@ Inside `{SPIKE_WORKTREE_PATH}`:
 - Cross-reference against `stack.md` if it exists
 - Document findings with `file:line` references
 
+**Checkpoint — present codebase findings before continuing:**
+
+> **Codebase analysis complete.** Key findings:
+> {summary of what was found — patterns, dependencies, integration points}
+>
+> **[C]** Continue to next investigation axis
+> **[Q]** Questions about these findings
+> **[D]** Add an investigation direction based on what we found
+
+WAIT for selection. Process Q/D, redisplay menu. On C, continue.
+
 ### 3. Execute Investigation — Web Research (WHEN NEEDED)
 
 - Use WebSearch for official documentation (version-specific)
@@ -85,6 +96,17 @@ Inside `{SPIKE_WORKTREE_PATH}`:
 - Look for community experience reports, benchmarks, comparisons
 - **Document every source with URL** for traceability
 - Distinguish official documentation from community opinions
+
+**Checkpoint — present research findings before continuing:**
+
+> **Web research complete.** Key findings:
+> {summary — approaches identified, best practices, gotchas}
+>
+> **[C]** Continue to next investigation axis
+> **[Q]** Questions about these findings
+> **[D]** Add an investigation direction based on what we found
+
+WAIT for selection. Process Q/D, redisplay menu. On C, continue.
 
 ### 4. Execute Investigation — PoC Prototyping (TECHNICAL SPIKES)
 
@@ -122,6 +144,17 @@ d. **CRITICAL:** If the PoC cannot be executed in the current environment (needs
    - Propose an alternative verification approach
    - Ask user how to proceed — do NOT silently skip
 
+**Checkpoint — present PoC results before continuing:**
+
+> **PoC prototyping complete.** Results:
+> {summary — what ran, what passed/failed, key observations}
+>
+> **[C]** Continue to next investigation axis
+> **[Q]** Questions about the PoC results
+> **[D]** Add an investigation direction based on what we found
+
+WAIT for selection. Process Q/D, redisplay menu. On C, continue.
+
 ### 5. Execute Investigation — Benchmarking (WHEN PERFORMANCE KACs EXIST)
 
 Follow benchmarking best practices:
@@ -154,6 +187,17 @@ c. **Report results:**
 ```
 
 d. Pin dependency versions, provide runnable script for reproduction
+
+**Checkpoint — present benchmark results before continuing:**
+
+> **Benchmarking complete.** Results:
+> {summary — metrics, targets met/missed, key observations}
+>
+> **[C]** Continue to next investigation axis
+> **[Q]** Questions about the benchmark results
+> **[D]** Add an investigation direction based on what we found
+
+WAIT for selection. Process Q/D, redisplay menu. On C, continue.
 
 ### 6. Cross-Reference with Standards
 

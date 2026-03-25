@@ -27,13 +27,13 @@ Structure raw investigation findings into the chosen deliverable format(s). Prod
 - Load and follow the appropriate template(s) from `data/`
 - The recommendation MUST include a clear verdict (Go / No-Go / Go-with-caveats)
 - Include evidence references (file:line, URLs, PoC output) throughout
-- Auto-proceed after synthesis (no menu — flows directly into review)
+- Present synthesis for user validation before proceeding to review
 
 ## EXECUTION PROTOCOLS:
 
 - Follow MANDATORY SEQUENCE exactly
-- Save WIP file before auto-proceeding
-- Auto-proceed to next step (no menu)
+- Save WIP file before presenting menu
+- Present C/E/Q menu — user must confirm synthesis before review
 
 ---
 
@@ -175,9 +175,24 @@ Show the complete deliverable to the user:
 
 Append the full deliverable content to WIP. Update `stepsCompleted` to include this step.
 
-### 8. Auto-Proceed
+### 8. Present Menu
 
-Load, read entire file, then execute {nextStepFile}.
+> **Synthesis complete.** The deliverable is ready for review.
+>
+> Before proceeding to formal review, please validate the synthesis:
+> - Is the recommendation aligned with your understanding of the investigation?
+> - Are the trade-offs and criteria weighted correctly?
+> - Is anything missing from the follow-up actions?
+>
+> **[C]** Continue to review (Step 5)
+> **[E]** Edit — modify the synthesis (recommendation, trade-offs, follow-up)
+> **[Q]** Questions — ask about the synthesis methodology or specific sections
+
+**Menu handling:**
+
+- **C**: Save WIP, load, read entire file, execute {nextStepFile}
+- **E**: Ask user what to edit. Apply edits. Re-present the deliverable. Redisplay menu.
+- **Q**: Answer questions. Redisplay menu.
 
 ---
 
