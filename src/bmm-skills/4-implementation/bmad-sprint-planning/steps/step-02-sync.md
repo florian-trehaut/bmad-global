@@ -2,13 +2,13 @@
 
 ## STEP GOAL
 
-Create missing Linear Projects (for epics) and Issues (for stories), skip items that already exist, then interactively assign issues to the current cycle based on user choice.
+Create missing tracker projects (for epics) and issues (for stories), skip items that already exist, then interactively assign issues to the current cycle based on user choice.
 
 ## RULES
 
 - Never create a Project or Issue that already exists — use the match mapping from Step 1
 - Issues are created in Backlog state — cycle assignment is a separate decision
-- Use `{TRACKER_MCP_PREFIX}` for all MCP tool calls
+- Use the tracker CRUD patterns from tracker.md for all tracker operations
 - Log every action (created or skipped) for the final report
 - When creating Issues, associate them with the correct Project (epic)
 
@@ -16,33 +16,35 @@ Create missing Linear Projects (for epics) and Issues (for stories), skip items 
 
 ### 1. Create missing Projects (Epics)
 
-For each epic that has NO matching Linear Project:
+For each epic that has NO matching tracker project:
 
-- Create Project via `{TRACKER_MCP_PREFIX}save_project`:
-  - `name`: epic title (e.g., "Epic 1: Campaign Management")
-  - `teamIds`: `[{TRACKER_TEAM_ID}]`
-  - `description`: epic description from the source file (if available)
+- Create Project in the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+  - Operation: Create project
+  - Name: epic title (e.g., "Epic 1: Campaign Management")
+  - Team: {TRACKER_TEAM_ID}
+  - Description: epic description from the source file (if available)
 - Log: "Project created: {project_name} ({project_id})"
 - Store the new project ID for issue association
 
-For each epic that HAS a matching Linear Project:
+For each epic that HAS a matching tracker project:
 - Log: "Project exists: {project_name} ({project_id})"
 - Use the existing project ID for issue association
 
 ### 2. Create missing Issues (Stories)
 
-For each story that has NO matching Linear Issue:
+For each story that has NO matching tracker issue:
 
-- Create Issue via `{TRACKER_MCP_PREFIX}save_issue`:
-  - `title`: story title (e.g., "Story 1.1: User Authentication")
-  - `teamId`: `{TRACKER_TEAM_ID}`
-  - `projectId`: the Project ID for this story's parent epic
-  - `stateId`: `{TRACKER_STATES.backlog}` (Backlog state)
-  - `description`: story description from the source file (if available), including the story key (e.g., `Key: 1-1-user-authentication`)
+- Create Issue in the tracker (using CRUD patterns from tracker.md):
+  - Operation: Create issue
+  - Title: story title (e.g., "Story 1.1: User Authentication")
+  - Team: {TRACKER_TEAM_ID}
+  - Project: the Project ID for this story's parent epic
+  - Status: {TRACKER_STATES.backlog}
+  - Description: story description from the source file (if available), including the story key (e.g., `Key: 1-1-user-authentication`)
 - Log: "Issue created: {identifier} — {title}"
 - Add to the list of newly created issues
 
-For each story that HAS a matching Linear Issue:
+For each story that HAS a matching tracker issue:
 - Log: "Issue exists: {identifier} — {title} [{status}]"
 
 ### 3. CHECKPOINT — Cycle assignment
@@ -80,9 +82,10 @@ Based on user choice:
 **Choice 1 — Assign all Backlog issues:**
 
 For each issue in Backlog status:
-- Update via `{TRACKER_MCP_PREFIX}save_issue`:
-  - `id`: issue ID
-  - `cycleId`: current cycle ID
+- Update the issue in the tracker (using CRUD patterns from tracker.md):
+  - Operation: Update issue
+  - Issue: issue ID
+  - Cycle: current cycle ID
 - Log: "Assigned to cycle: {identifier} — {title}"
 - Increment `issues_assigned` counter
 
@@ -100,9 +103,10 @@ Ask: "Entrez les numeros des issues a assigner (ex: 1,3,5) :"
 WAIT for user input.
 
 For each selected issue:
-- Update via `{TRACKER_MCP_PREFIX}save_issue`:
-  - `id`: issue ID
-  - `cycleId`: current cycle ID
+- Update the issue in the tracker (using CRUD patterns from tracker.md):
+  - Operation: Update issue
+  - Issue: issue ID
+  - Cycle: current cycle ID
 - Log: "Assigned to cycle: {identifier} — {title}"
 - Increment `issues_assigned` counter
 

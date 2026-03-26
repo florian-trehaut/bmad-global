@@ -16,10 +16,9 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 

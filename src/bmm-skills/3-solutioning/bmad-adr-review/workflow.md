@@ -22,7 +22,6 @@ Extract the following from the YAML frontmatter:
 | `FORGE_API_BASE` | `forge_api_base` |
 | `FORGE_PROJECT_PATH` | `forge_project_path` |
 | `TRACKER` | `tracker` |
-| `TRACKER_MCP_PREFIX` | `tracker_mcp_prefix` |
 | `TRACKER_META_PROJECT_ID` | `tracker_meta_project_id` |
 | `WORKTREE_PREFIX` | `worktree_prefix` |
 | `COMMUNICATION_LANGUAGE` | `communication_language` |

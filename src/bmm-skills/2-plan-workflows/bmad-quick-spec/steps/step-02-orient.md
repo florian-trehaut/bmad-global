@@ -59,8 +59,8 @@ Scan the codebase and tracker for context, ask informed questions (not generic),
 
 **ELSE (MCP-based tracker):**
 
-- Check tracker for related issues: `{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', query: '{keywords}', limit: 5)`
-- Check for related Project (Epic): `{TRACKER_MCP_PREFIX}list_projects(team: '{TRACKER_TEAM}')`
+- Check tracker for related issues (using CRUD patterns from tracker.md): List issues for team {TRACKER_TEAM}, query: {keywords}, limit: 5
+- Check for related epics/projects (using CRUD patterns from tracker.md): List epics/projects for team {TRACKER_TEAM}
 
 **BOTH:**
 

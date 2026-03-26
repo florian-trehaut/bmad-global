@@ -16,9 +16,9 @@ Present the user with documentation mode options and gather the parameters neede
 
 Search for existing documentation in the Meta Project:
 
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: "{TRACKER_META_PROJECT_ID}")
-```
+List documents in the Meta Project (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {TRACKER_META_PROJECT_ID}
 
 Identify any documents that look like project documentation (titles containing "Documentation", "Architecture", "Service:", "Module:", etc.). Store as `{EXISTING_DOCS}`.
 

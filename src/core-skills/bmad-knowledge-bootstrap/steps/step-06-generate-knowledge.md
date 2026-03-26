@@ -23,6 +23,7 @@ Read the corresponding template from `../templates/{name}-template.md`.
 | conventions.md | conventions-template.md |
 | review-perspectives.md | review-perspectives-template.md |
 | tracker.md | tracker-template.md |
+| comm-platform.md | comm-platform-template.md |
 | environment-config.md | environment-config-template.md |
 | investigation-checklist.md | investigation-checklist-template.md |
 | domain-glossary.md | domain-glossary-template.md |
@@ -38,6 +39,7 @@ Identify key source files for this knowledge type:
 | infrastructure.md | .github/workflows/*.yml, Dockerfile, deploy configs |
 | review-perspectives.md | lint configs, test configs, stack.md |
 | tracker.md | workflow-context.md (tracker section) |
+| comm-platform.md | workflow-context.md (comm platform section) |
 | environment-config.md | .env*, deploy configs |
 | investigation-checklist.md | src/ directory structure |
 | conventions.md | .editorconfig, lint configs, git log patterns |

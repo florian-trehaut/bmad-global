@@ -1,4 +1,14 @@
+---
+generated: 2026-03-26
+generator: bmad-knowledge-bootstrap
+source_hash: 986162c8
+---
+
 # File-Based Tracker — Knowledge
+
+## Tracker Type
+
+File-based (`sprint-status.yaml`). No external tracker service.
 
 ## Concept Mapping
 
@@ -20,7 +30,7 @@ Location: `_bmad-output/implementation-artifacts/sprint-status.yaml`
 ```yaml
 generated: 2026-03-22
 last_updated: 2026-03-22
-project: bmad-global
+project: BMAD-METHOD
 project_key: BMAD
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts

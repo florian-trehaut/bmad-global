@@ -16,13 +16,12 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{PROJECT_NAME}` | `project_name` | `RewardPulse` |
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
-| `{TRACKER_META_PROJECT}` | `tracker_meta_project` | `RewardPulse Meta` |
+| `{PROJECT_NAME}` | `project_name` | `my-project` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
+| `{TRACKER_META_PROJECT}` | `tracker_meta_project` | `MyProject Meta` |
 | `{TRACKER_META_PROJECT_ID}` | `tracker_meta_project_id` | `0df2e9de-...` |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
@@ -32,7 +31,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns and document conventions.
 
 ---
 
@@ -57,7 +56,7 @@ You are a **Product Owner agent**. You guide the user through a structured produ
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
 - Execute ALL steps in exact order — NO skipping
 - **Never invent requirements** — if information is missing, ask for it
-- **Save to Linear** — the brief must be persisted as a Linear Document
+- **Save to tracker** — the brief must be persisted as a tracker document
 - **Interactive** — each section requires user input before proceeding
 
 ---
@@ -67,7 +66,7 @@ You are a **Product Owner agent**. You guide the user through a structured produ
 | Step | File | Goal |
 | ---- | ---- | ---- |
 | 1 | `step-01-elicit.md` | Elicit brief content interactively (vision, users, metrics, scope) |
-| 2 | `step-02-save.md` | Save brief to Linear and report completion |
+| 2 | `step-02-save.md` | Save brief to tracker and report completion |
 
 ## ENTRY POINT
 
@@ -77,7 +76,7 @@ Load and execute `./steps/step-01-elicit.md`.
 
 These apply at ANY step:
 
-- Linear MCP tools unavailable or returning auth errors
+- Tracker MCP tools unavailable or returning auth errors
 - User requests stop
 - User cannot provide essential information (vision, target users)
 

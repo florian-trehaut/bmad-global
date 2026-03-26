@@ -87,18 +87,14 @@ For each selected story, load `../templates/spike-story-template.md` and compose
 
 ### 4. Create Tracker Issues
 
-For each story:
-
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  title: '{title}',
-  team: '{TRACKER_TEAM}',
-  description: '{composed_description}',
-  priority: 3,
-  labels: ['spike-informed'],
-  state: '{TRACKER_STATES.backlog}'
-)
-```
+For each story, create an issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create issue
+- Title: {title}
+- Team: {TRACKER_TEAM}
+- Description: {composed_description}
+- Priority: 3
+- Labels: spike-informed
+- Status: {TRACKER_STATES.backlog}
 
 If a related epic/project exists (from Step 1 context): assign the story to that project.
 
@@ -106,15 +102,11 @@ Store created issue IDs and identifiers for the summary.
 
 **If creation fails for any story:** HALT — report error, do NOT silently fallback to local file.
 
-Link each created story to the spike issue (if `SPIKE_ISSUE_ID` is not null):
-
-```
-{TRACKER_MCP_PREFIX}create_issue_relation(
-  issueId: '{NEW_STORY_ID}',
-  relatedIssueId: '{SPIKE_ISSUE_ID}',
-  type: 'blocked'
-)
-```
+Link each created story to the spike issue (if `SPIKE_ISSUE_ID` is not null) via the tracker (using CRUD patterns from tracker.md):
+- Operation: Create issue relation
+- Issue: {NEW_STORY_ID}
+- Related issue: {SPIKE_ISSUE_ID}
+- Type: blocked
 
 ### 5. Update WIP
 

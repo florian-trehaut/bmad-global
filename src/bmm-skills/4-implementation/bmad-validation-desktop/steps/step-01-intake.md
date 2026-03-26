@@ -21,11 +21,11 @@ Identify the issue to validate (provided by the user or discovered via tracker),
 
 #### 1a. Discover issues in "To Test" status
 
-Use the tracker MCP tools (prefix: `{TRACKER_MCP_PREFIX}`) to list issues:
-
-```
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'To Test', limit: 20)
-```
+Query the tracker (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Status: {TRACKER_STATES.to_test}
+- Limit: 20
 
 Store results in `TO_TEST_CANDIDATES[]`.
 
@@ -54,9 +54,9 @@ Store `ISSUE_IDENTIFIER`.
 
 ### 2. Load the issue from tracker
 
-```
-{TRACKER_MCP_PREFIX}get_issue(identifier: ISSUE_IDENTIFIER)
-```
+Fetch the issue from the tracker (using CRUD patterns from tracker.md):
+- Operation: Get issue
+- Identifier: ISSUE_IDENTIFIER
 
 Verify:
 - **Status = "To Test"** (matching `TRACKER_STATES.to_test`) — if different status, HALT: "Issue {ISSUE_IDENTIFIER} is in status '{status}', not in 'To Test'. Business validation only applies to issues in 'To Test'."

@@ -51,23 +51,49 @@ Scan for ALL tracker signals simultaneously:
 find . -maxdepth 4 -name "sprint-status.yaml" -not -path "*/node_modules/*" -not -path "*/_bmad/bmm/workflows/*" 2>/dev/null
 ```
 
-**Linear:** Check if `mcp__linear-server__list_teams` is available.
+**MCP-based trackers:** Probe available MCP tools for tracker-like signatures:
 
-**GitHub Issues:** Check `gh` CLI + auth + GitHub remote.
+| Signature pattern | Tracker type |
+|---|---|
+| `*list_teams*` | Linear |
+| `*jira*search*` | Jira (MCP) |
 
-**GitLab Issues:** Check `glab` CLI + auth + GitLab remote.
+For each match, extract the MCP prefix (everything before the method name). For example, if `mcp__linear__list_teams` is found, the prefix is `mcp__linear__`.
+
+**CLI-based trackers:**
+- GitHub Issues: Check `gh` CLI + auth + GitHub remote
+- GitLab Issues: Check `glab` CLI + auth + GitLab remote
 
 If multiple trackers detected, present all and ask user to pick the active one. If single, auto-select.
 
-**Configure based on tracker type:**
+**Configure based on detected tracker:**
 
-- **Linear**: Call `list_teams`, `list_issue_statuses`, `list_projects`. Map states (Backlog→backlog, Todo→todo, In Progress→in_progress, In Review→in_review, To Test→to_test, Done→done, Canceled→canceled). Discover Meta project.
-- **GitHub**: States: todo/in_progress="open", done="closed". Ask about workflow labels.
-- **GitLab**: Similar to GitHub with boards.
-- **Jira**: Ask base URL + project key. Manual state mapping.
+For each tracker type, discover the concept mapping, states, and CRUD operations that will populate `workflow-knowledge/tracker.md`:
+
+- **MCP-based (e.g., Linear)**: Use discovered MCP prefix to call team listing, status listing, and project listing methods. Map states (Backlog→backlog, Todo→todo, In Progress→in_progress, In Review→in_review, To Test→to_test, Done→done, Canceled→canceled). Discover meta project if available.
+- **CLI-based (GitHub)**: States: todo/in_progress="open", done="closed". Ask about workflow labels.
+- **CLI-based (GitLab)**: Similar to GitHub with boards.
+- **MCP or Web-based (Jira)**: Ask base URL + project key. Manual state mapping.
 - **File-based**: Read sprint-status.yaml to extract states, story_location, project_key.
 
 Ask about labels: spec_reviewed, client_prefix.
+
+### 2b. Detect Communication Platform
+
+Probe for communication platform MCP tools:
+
+| Signature pattern | Platform type |
+|---|---|
+| `*channels_list*` | Slack |
+| `*teams*chat*` | Microsoft Teams |
+
+For each match, extract the MCP prefix.
+
+If no communication platform MCP detected, ask user: "Do you use a team communication platform (Slack, Teams, Discord)? If so, is an MCP server configured for it?"
+
+Accept `none` — communication platform is optional. Workflows skip comm-related steps when `comm_platform: none`.
+
+If detected or confirmed, ask for the user's handle on the platform (e.g., `@florian`).
 
 ### 3. Detect Source Code Forge
 
@@ -115,6 +141,7 @@ Package manager:  {pm}
 Commands:         install={cmd} test={cmd} lint={cmd} ...
 Tracker:          {type} (team: {team}, states: {N} mapped)
 Forge:            {type} ({project_path}, CLI: {cli})
+Comm platform:    {type} (handle: {handle}) or none
 User:             {user_name} ({skill_level}, {language})
 ```
 
@@ -132,7 +159,7 @@ Load and execute {nextStepFile}.
 
 ### SUCCESS:
 
-- All 3 detections complete (project + tracker + forge)
+- All 4 detections complete (project + tracker + forge + comm platform)
 - User confirmed values
 - Forge commands include --repo flag
 

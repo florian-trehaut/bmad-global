@@ -1,6 +1,6 @@
 ---
 name: bmad-test-design
-description: "Risk-based test design workflow with Linear storage. Loads PRD and Architecture from the issue tracker, identifies and scores risks using a 3x3 probability/impact matrix, designs test coverage with P0-P3 priorities, and saves the test plan as a Linear Document. Supports epic-level or system-level mode. Use when 'test design', 'test plan', 'plan de test', 'test strategy', 'stratégie de test', 'risk based testing', 'testarch test design', 'test architecture', 'testability review', 'test coverage plan' is mentioned."
+description: "Risk-based test design workflow with tracker storage. Loads PRD and Architecture from the issue tracker, identifies and scores risks using a 3x3 probability/impact matrix, designs test coverage with P0-P3 priorities, and saves the test plan as a tracker document. Supports epic-level or system-level mode. Use when 'test design', 'test plan', 'plan de test', 'test strategy', 'stratégie de test', 'risk based testing', 'testarch test design', 'test architecture', 'testability review', 'test coverage plan' is mentioned."
 ---
 
 Follow the instructions in ./workflow.md.

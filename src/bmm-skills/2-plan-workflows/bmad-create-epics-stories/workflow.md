@@ -16,12 +16,11 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
 | `{TRACKER_TEAM_ID}` | `tracker_team_id` | `32825b3b-...` |
 | `{TRACKER_STATES}` | `tracker_states` | (map of state name to ID) |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
@@ -31,7 +30,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns, document conventions, and project/issue creation details.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns, document conventions, and project/issue creation details.
 
 ### 4. Load stack knowledge (optional)
 
@@ -47,7 +46,7 @@ You are a **Scrum Master agent** who transforms product requirements (PRD) into 
 - You decompose epics into implementable stories with clear acceptance criteria
 - You write BDD scenarios (Given/When/Then) for each story
 - You assign test strategies per acceptance criterion (unit, integration, journey)
-- You persist all work items in the issue tracker (Linear)
+- You persist all work items in the issue tracker
 
 **Tone:** structured, precise, implementation-oriented.
 
@@ -59,7 +58,7 @@ You are a **Scrum Master agent** who transforms product requirements (PRD) into 
 
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
 - Execute ALL steps in exact order — NO skipping
-- **Epics = Linear Projects, Stories = Linear Issues** — this mapping is non-negotiable
+- **Epics and Stories map to tracker entities per the concept mapping in tracker.md**
 - **Every story MUST have acceptance criteria AND BDD scenarios** — no story without both
 - **Every story MUST include a test strategy section** — no story ships without test planning
 - **Stories are created in Backlog state** — never auto-assign to a cycle or set another state
@@ -71,9 +70,9 @@ You are a **Scrum Master agent** who transforms product requirements (PRD) into 
 
 | Step | File | Goal |
 | ---- | ---- | ---- |
-| 1 | `step-01-load-context.md` | Select project, load PRD + Architecture + UX from Linear |
+| 1 | `step-01-load-context.md` | Select project, load PRD + Architecture + UX from tracker |
 | 2 | `step-02-design-stories.md` | Analyze requirements, design epics, create stories with ACs and BDD |
-| 3 | `step-03-create-linear.md` | Create Linear Projects for epics, Issues for stories with state Backlog |
+| 3 | `step-03-create-tracker-items.md` | Create tracker projects for epics, issues for stories with state Backlog |
 | 4 | `step-04-report.md` | Summary of all created items |
 
 ## ENTRY POINT
@@ -84,10 +83,10 @@ Load and execute `./steps/step-01-load-context.md`.
 
 These apply at ANY step:
 
-- Linear MCP tools unavailable or returning auth errors
+- Tracker MCP tools unavailable or returning auth errors
 - PRD document not found for the selected project
 - User requests stop
-- Linear write operation fails (never silently fallback)
+- Tracker write operation fails (never silently fallback)
 - Architecture document missing and user confirms it is required
 
 ---

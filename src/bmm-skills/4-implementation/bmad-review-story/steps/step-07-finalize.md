@@ -94,18 +94,20 @@ WAIT for explicit user confirmation.
 
 ### 5. Push to tracker (if confirmed)
 
-```
-{TRACKER_MCP_PREFIX}save_issue(issueId: '{ISSUE_ID}', description: '{updated_description}')
-```
+Update the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update issue
+- Issue: {ISSUE_ID}
+- Description: {updated_description}
 
 ### 6. Add spec-reviewed label
 
 Check if the label `{LABELS.spec_reviewed}` exists in the team.
 
-If the label does not exist:
-```
-{TRACKER_MCP_PREFIX}create_issue_label(teamId: '{TRACKER_TEAM_ID}', name: '{LABELS.spec_reviewed}', color: '#10B981')
-```
+If the label does not exist, create it via the tracker (using CRUD patterns from tracker.md):
+- Operation: Create label
+- Team: {TRACKER_TEAM_ID}
+- Name: {LABELS.spec_reviewed}
+- Color: #10B981
 
 Add the label to the issue.
 

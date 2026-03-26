@@ -73,7 +73,7 @@ To be refined by quick-spec — these are rough criteria from the spike:
 
 ### Tracker-Specific Notes
 
-**Linear:** Create as Issue with:
+**Tracker:** Create as tracker issue with:
 - Label: `spike-informed`
 - State: Backlog
 - Relation: `blocked by` the spike issue

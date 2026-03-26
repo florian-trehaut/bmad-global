@@ -29,58 +29,38 @@ If **reference only**: skip to section 5 (final report) with a note that no trac
 
 ### 2. Create new issues
 
-For each approved new story:
-
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  title: "{title}",
-  description: "{description}\n\n## Acceptance Criteria\n{acceptance_criteria}",
-  teamId: "{TRACKER_TEAM_ID}",
-  projectId: "{target_project_id}"
-)
-```
+For each approved new story, create the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create issue
+- Title: {title}
+- Description: {description} with Acceptance Criteria section
+- Team: {TRACKER_TEAM_ID}
+- Project: {target_project_id}
 
 Record each created issue identifier.
 
 ### 3. Update modified issues
 
-For each approved modification:
+For each approved modification, update the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update issue
+- Issue: {issue_id}
+- Description: {updated_description}
 
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  id: "{issue_id}",
-  description: "{updated_description}"
-)
-```
-
-Add a traceability comment on each modified issue:
-
-```
-{TRACKER_MCP_PREFIX}save_comment(
-  issueId: "{issue_id}",
-  body: "Course correction: {change_reason}\n\nRelated change: {CHANGE_DESCRIPTION_SUMMARY}"
-)
-```
+Add a traceability comment on each modified issue (using CRUD patterns from tracker.md):
+- Operation: Create comment
+- Issue: {issue_id}
+- Body: Course correction: {change_reason} — Related change: {CHANGE_DESCRIPTION_SUMMARY}
 
 ### 4. Cancel issues
 
-For each approved cancellation:
+For each approved cancellation, update the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update issue
+- Issue: {issue_id}
+- Status: {TRACKER_STATES.canceled}
 
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  id: "{issue_id}",
-  stateId: "{TRACKER_STATES.canceled}"
-)
-```
-
-Add a traceability comment:
-
-```
-{TRACKER_MCP_PREFIX}save_comment(
-  issueId: "{issue_id}",
-  body: "Canceled via course correction: {cancellation_reason}\n\nRelated change: {CHANGE_DESCRIPTION_SUMMARY}"
-)
-```
+Add a traceability comment (using CRUD patterns from tracker.md):
+- Operation: Create comment
+- Issue: {issue_id}
+- Body: Canceled via course correction: {cancellation_reason} — Related change: {CHANGE_DESCRIPTION_SUMMARY}
 
 ### 5. Final report
 

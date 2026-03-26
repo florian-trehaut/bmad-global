@@ -107,23 +107,24 @@ Build the report with this structure:
 
 Search for an existing readiness report in the project:
 
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: "{PROJECT_ID}")
-```
+List documents in the project (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {PROJECT_ID}
 
 Look for a document titled `Readiness Report — {PROJECT_NAME}`.
 
 ### 3. Save or update the report
 
-If a matching document exists:
-```
-{TRACKER_MCP_PREFIX}update_document(id: existing_doc_id, content: report_content)
-```
+If a matching document exists, update it in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update document
+- Document: existing_doc_id
+- Content: report_content
 
-If no matching document:
-```
-{TRACKER_MCP_PREFIX}create_document(title: "Readiness Report — {PROJECT_NAME}", project: "{PROJECT_NAME}", content: report_content)
-```
+If no matching document, create it in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create document
+- Title: "Readiness Report — {PROJECT_NAME}"
+- Project: {PROJECT_NAME}
+- Content: report_content
 
 If the tracker write fails: **HALT** — report the error to the user. The report content is still available in the conversation.
 

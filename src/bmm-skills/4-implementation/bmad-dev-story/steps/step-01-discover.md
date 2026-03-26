@@ -25,10 +25,19 @@ Collect all actionable candidates — tracker issues (In Progress / Todo) and fo
 
 ### 2. Collect Tracker Candidates
 
-```bash
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'In Progress', assignee: 'me', limit: 10)
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'Todo', assignee: 'me', limit: 10)
-```
+Query the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Status: {TRACKER_STATES.in_progress}
+- Assigned to: me
+- Limit: 10
+
+Query the tracker (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Status: {TRACKER_STATES.todo}
+- Assigned to: me
+- Limit: 10
 
 Store all found issues as TRACKER_CANDIDATES[].
 

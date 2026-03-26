@@ -27,7 +27,7 @@ Gather all logged actions from Steps 1 and 2:
 Display the report to `{USER_NAME}`:
 
 ```
-## Sprint Planning — Synchronisation Linear
+## Sprint Planning — Synchronisation Tracker
 
 ### Projets (Epics)
 

@@ -22,12 +22,19 @@ Select the story to review, setup a read-only investigation worktree, load the s
 
 #### 1a. Discover stories ready for spec review
 
-Use the tracker MCP tools (prefix: `{TRACKER_MCP_PREFIX}`) to list candidate issues:
+Query the tracker (using CRUD patterns from tracker.md) to list candidate issues:
 
-```
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'Todo', limit: 25)
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'Backlog', limit: 25)
-```
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Status: {TRACKER_STATES.todo}
+- Limit: 25
+
+Then also:
+
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Status: {TRACKER_STATES.backlog}
+- Limit: 25
 
 #### 1b. Filter out already-reviewed stories
 
@@ -55,11 +62,9 @@ Store `ISSUE_IDENTIFIER`.
 
 ### 3. Load story details
 
-Fetch full story from tracker:
-
-```
-{TRACKER_MCP_PREFIX}get_issue(issueId: '{ISSUE_IDENTIFIER}')
-```
+Fetch the full story from the tracker (using CRUD patterns from tracker.md):
+- Operation: Get issue
+- Issue: {ISSUE_IDENTIFIER}
 
 Store: `ISSUE_ID`, `ISSUE_TITLE`, `ISSUE_DESCRIPTION` (full), labels, project, state, assignee, comments.
 

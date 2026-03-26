@@ -40,13 +40,13 @@ Template for the standup script generated in step-05. Output must be plain text 
 Daily — lundi 24 mars 2026
 
 Hier :
-• REW-456 — Migration email templates (3 pts) ✓
-• REW-789 — Fix booking date validation (1 pt) ✓
+• PRJ-456 — Migration email templates (3 pts) ✓
+• PRJ-789 — Fix booking date validation (1 pt) ✓
 • Refactoring polling-service error handling (no ticket)
 
 Aujourd'hui :
-• REW-123 — Intégration catalogue ACAD (5 pts)
-• REW-234 — Ajout endpoint GET /orders/:id (2 pts)
+• PRJ-123 — Intégration catalogue ACAD (5 pts)
+• PRJ-234 — Ajout endpoint GET /orders/:id (2 pts)
 Budget : 7 pts (moyenne : 6.2 pts/jour)
 
 Bloqueurs :
@@ -59,13 +59,13 @@ Bloqueurs :
 Daily — Monday March 24, 2026
 
 Yesterday:
-• REW-456 — Email template migration (3 pts) ✓
-• REW-789 — Fix booking date validation (1 pt) ✓
+• PRJ-456 — Email template migration (3 pts) ✓
+• PRJ-789 — Fix booking date validation (1 pt) ✓
 • Refactoring polling-service error handling (no ticket)
 
 Today:
-• REW-123 — ACAD catalog integration (5 pts)
-• REW-234 — Add GET /orders/:id endpoint (2 pts)
+• PRJ-123 — ACAD catalog integration (5 pts)
+• PRJ-234 — Add GET /orders/:id endpoint (2 pts)
 Budget: 7 pts (average: 6.2 pts/day)
 
 Blockers:

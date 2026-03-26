@@ -1,12 +1,12 @@
-# Step 02: Compile and Save to Linear
+# Step 02: Compile and Save to the Tracker
 
 ## STEP GOAL
 
-Compile all scan findings into a lean project-context.md document optimized for LLM consumption, then persist it as a Linear Document in the Meta Project.
+Compile all scan findings into a lean project-context.md document optimized for LLM consumption, then persist it as a tracker document in the Meta Project.
 
 ## RULES
 
-- HALT on Linear write failure — never silently fallback
+- HALT on tracker write failure — never silently fallback
 - Document must be lean — optimize for signal-to-noise ratio
 - Check for existing document before creating (update if exists)
 - Structure must be scannable — headers, tables, bullet points over prose
@@ -53,29 +53,30 @@ Generated: {current_date}
 
 Apply user corrections from the checkpoint if any were given.
 
-### 2. Check for existing document in Linear
+### 2. Check for existing document in the tracker
 
 Search for an existing "Project Context" document in the Meta Project:
 
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: "{TRACKER_META_PROJECT_ID}")
-```
+List documents in the Meta Project (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {TRACKER_META_PROJECT_ID}
 
 Look for a document titled `Project Context`.
 
 ### 3. Save or update the document
 
-If a matching document exists:
-```
-{TRACKER_MCP_PREFIX}update_document(id: existing_doc_id, content: compiled_content)
-```
+If a matching document exists, update it in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update document
+- Document: existing_doc_id
+- Content: compiled_content
 
-If no matching document:
-```
-{TRACKER_MCP_PREFIX}create_document(title: "Project Context", project: "{TRACKER_META_PROJECT}", content: compiled_content)
-```
+If no matching document, create it in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create document
+- Title: "Project Context"
+- Project: {TRACKER_META_PROJECT}
+- Content: compiled_content
 
-If the Linear write fails: **HALT** — report the error to the user. The compiled content is still available in the conversation.
+If the tracker write fails: **HALT** — report the error to the user. The compiled content is still available in the conversation.
 
 ### 4. Report completion
 
@@ -84,7 +85,7 @@ Present:
 ```
 Project Context generated and published
 
-- Document Linear: Project Context
+- Tracker document: Project Context
 - Sections: {N} sections
 - Gotchas: {N} items documented
 - Services covered: {N}

@@ -16,11 +16,10 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
 | `{TRACKER_META_PROJECT_ID}` | `tracker_meta_project_id` | `0df2e9de-...` |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
@@ -34,7 +33,7 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. It pro
 
 ### 4. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns and document conventions.
 
 ### 5. Set defaults
 
@@ -54,7 +53,7 @@ You are a **Quality Architect** conducting a rigorous, evidence-based assessment
 - You score each NFR dimension with concrete evidence (file paths, code patterns, grep results)
 - You identify gaps and rank them by severity
 - You produce actionable recommendations with clear priorities
-- You save the assessment as a Linear Document for traceability
+- You save the assessment as a tracker document for traceability
 
 **Tone:** analytical, evidence-based, structured. No speculation — only findings backed by code.
 
@@ -69,7 +68,7 @@ You are a **Quality Architect** conducting a rigorous, evidence-based assessment
 - **Every finding must cite evidence** — file paths, grep results, code patterns. No unsourced claims.
 - **Scan real code** — use Grep, Glob, and Read tools to find actual patterns. Never assume based on framework conventions alone.
 - **PASS/CONCERNS/FAIL scoring** — use only these three statuses per sub-dimension
-- **Save to Linear** — the assessment document must be persisted as a Linear Document, not just output to chat
+- **Save to tracker** — the assessment document must be persisted as a tracker document, not just output to chat
 
 ---
 
@@ -77,10 +76,10 @@ You are a **Quality Architect** conducting a rigorous, evidence-based assessment
 
 | Step | File | Goal |
 | ---- | ---- | ---- |
-| 1 | `step-01-scope.md` | Determine scope (epic-level or system-level), load context from Linear |
+| 1 | `step-01-scope.md` | Determine scope (epic-level or system-level), load context from tracker |
 | 2 | `step-02-assess-security.md` | Scan codebase for auth, validation, injection, secrets, CORS patterns |
 | 3 | `step-03-assess-other.md` | Assess performance, reliability, maintainability, observability, testability |
-| 4 | `step-04-synthesize.md` | Compile scores, gate decision (PASS/CONCERNS/FAIL), save assessment to Linear |
+| 4 | `step-04-synthesize.md` | Compile scores, gate decision (PASS/CONCERNS/FAIL), save assessment to tracker |
 
 ## ENTRY POINT
 
@@ -90,7 +89,7 @@ Load and execute `./steps/step-01-scope.md`.
 
 These apply at ANY step:
 
-- Linear MCP tools unavailable or returning auth errors
+- Tracker MCP tools unavailable or returning auth errors
 - User requests stop
 - Project root has no recognizable source code to scan
 - Scope selection is ambiguous (ask for clarification)

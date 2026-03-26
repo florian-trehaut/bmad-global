@@ -18,7 +18,7 @@ Identify the Backlog issue to enrich. Either the user provides a specific issue 
 
 If the user specified an issue identifier (e.g., `{ISSUE_PREFIX}-123` or a full issue ID):
 
-1. Fetch the issue: `{TRACKER_MCP_PREFIX}get_issue(id: identifier, includeRelations: true)`
+1. Fetch the issue from the tracker (using CRUD patterns from workflow-knowledge/tracker.md) — Operation: Get issue by ID, Issue: {identifier}, Include: relations
 2. Store: `ISSUE_ID`, `ISSUE_IDENTIFIER`, `ISSUE_TITLE`
 3. Extract the project (epic): `PROJECT_NAME`, `PROJECT_ID`
 4. Proceed to the CHECKPOINT (section 6 below)
@@ -27,8 +27,8 @@ If the user specified an issue identifier (e.g., `{ISSUE_PREFIX}-123` or a full 
 
 If no specific issue was provided:
 
-1. Get current cycle: `{TRACKER_MCP_PREFIX}list_cycles(teamId: {TRACKER_TEAM_ID}, type: 'current')`
-2. List Backlog issues: `{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'Backlog', limit: 50)`
+1. Get current cycle from the tracker (using CRUD patterns from tracker.md) — Operation: List cycles, Team: {TRACKER_TEAM_ID}, Filter: current
+2. List Backlog issues from the tracker (using CRUD patterns from tracker.md) — Operation: List issues, Team: {TRACKER_TEAM}, Status: {TRACKER_STATES.backlog}, Limit: 50
 3. Filter to issues assigned to the current cycle
 4. Sort by project name (epic), then by issue number (ascending)
 5. Select the first issue
@@ -37,7 +37,7 @@ If no specific issue was provided:
 
 If no Backlog issues found in the current cycle:
 
-1. List Todo issues: `{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'Todo', limit: 50)`
+1. List Todo issues from the tracker (using CRUD patterns from tracker.md) — Operation: List issues, Team: {TRACKER_TEAM}, Status: {TRACKER_STATES.todo}, Limit: 50
 2. Filter to current cycle
 3. If found, select the first — it may need re-enrichment
 
@@ -45,7 +45,7 @@ If no Backlog issues found in the current cycle:
 
 If still no issues found:
 
-1. List all Backlog issues: `{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'Backlog', limit: 50)`
+1. List all Backlog issues from the tracker (using CRUD patterns from tracker.md) — Operation: List issues, Team: {TRACKER_TEAM}, Status: {TRACKER_STATES.backlog}, Limit: 50
 2. Filter to issues WITHOUT a cycle assignment
 3. If found, select the first
 

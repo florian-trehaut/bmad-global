@@ -69,7 +69,7 @@ WAIT for user selection.
 
 - Read `.claude/workflow-knowledge/tracker.md` if it exists — extract tracker constants, status mappings
 - Load Project Context:
-  1. Tracker documents (primary): use `{TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')` → find "Project Context" → `{TRACKER_MCP_PREFIX}get_document(id: doc_id)`
+  1. Tracker documents (primary, using CRUD patterns from tracker.md): List documents for project {TRACKER_META_PROJECT_ID} → find "Project Context" → Get document by ID
   2. Fallback local: search for `**/project-context.md` in the project
 
 ### 3. Greet and Ask
@@ -100,11 +100,11 @@ WAIT for user decision. If they confirm it's a spike, continue. If they want spe
 
 ### 5. Discover Existing Spike Issues
 
-Check the tracker for existing spike issues that might relate:
-
-```
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', label: 'Spike', limit: 10)
-```
+Check the tracker for existing spike issues that might relate (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Label: Spike
+- Limit: 10
 
 If spikes found in Backlog/Todo:
 

@@ -16,7 +16,7 @@ The issue description (loaded from tracker in Step 2) IS the story — it contai
 
 ### 2. Load Project Context
 
-1. **Primary (tracker):** If `{TRACKER_META_PROJECT_ID}` is set, use `{TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')` to find "Project Context" document, then `{TRACKER_MCP_PREFIX}get_document(id: doc_id)`.
+1. **Primary (tracker):** If `{TRACKER_META_PROJECT_ID}` is set, list documents in the Meta Project (using CRUD patterns from tracker.md) to find "Project Context" document, then load its content by ID.
 2. **Fallback (local):** Search for `**/project-context.md` in the project.
 
 ### 3. Load Dev Standards

@@ -65,10 +65,10 @@ separated by horizontal rules.}
 
 ## Tracker-Specific Notes
 
-### Linear
+### Tracker
 - Save as a Project Document in the Meta Project (or the epic's project if applicable)
-- Linear Documents support full Markdown including tables and code blocks
-- Use `@{ISSUE_IDENTIFIER}` syntax to create clickable issue references within the document
+- Tracker documents support full Markdown including tables and code blocks
+- Use the tracker's native syntax to create clickable issue references within the document
 
 ### Jira
 - Save as a linked Confluence page (if Confluence available) or as the spike issue description

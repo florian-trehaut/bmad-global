@@ -2,11 +2,11 @@
 
 ## STEP GOAL
 
-Compile the full retrospective analysis into a structured document, save it as a Linear Document in the Meta Project, and report completion to the user.
+Compile the full retrospective analysis into a structured document, save it as a tracker document in the meta project, and report completion to the user.
 
 ## RULES
 
-- HALT on Linear write failure — never silently fallback
+- HALT on tracker write failure — never silently fallback
 - Document title must follow the convention: `Retrospective: {PROJECT_NAME}`
 - Check for existing document before creating (update if exists)
 - The document must be self-contained — readable without access to the conversation
@@ -113,25 +113,26 @@ Assemble the complete document using this structure:
 
 Search for an existing document with the same title in the Meta Project:
 
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: "{TRACKER_META_PROJECT_ID}")
-```
+List documents in the Meta Project (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {TRACKER_META_PROJECT_ID}
 
 Look for a document titled `Retrospective: {PROJECT_NAME}`.
 
 ### 3. Save or update the document
 
-If a matching document exists:
-```
-{TRACKER_MCP_PREFIX}update_document(id: existing_doc_id, content: retrospective_content)
-```
+If a matching document exists, update it in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update document
+- Document: existing_doc_id
+- Content: retrospective_content
 
-If no matching document:
-```
-{TRACKER_MCP_PREFIX}create_document(title: "Retrospective: {PROJECT_NAME}", project: "{TRACKER_META_PROJECT}", content: retrospective_content)
-```
+If no matching document, create it in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create document
+- Title: "Retrospective: {PROJECT_NAME}"
+- Project: {TRACKER_META_PROJECT}
+- Content: retrospective_content
 
-If the Linear write fails: **HALT** — report the error to the user. The retrospective content is still available in the conversation.
+If the tracker write fails: **HALT** — report the error to the user. The retrospective content is still available in the conversation.
 
 ### 4. Report completion
 
@@ -141,7 +142,7 @@ Present:
 Rétrospective terminée
 
 - Epic : {PROJECT_NAME}
-- Document Linear : Retrospective: {PROJECT_NAME}
+- Tracker document : Retrospective: {PROJECT_NAME}
 - Issues analysées : {total_issues}
 - Taux complétion : {done_count}/{total_issues} ({percentage}%)
 

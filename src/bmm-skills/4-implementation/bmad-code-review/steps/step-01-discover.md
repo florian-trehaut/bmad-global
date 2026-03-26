@@ -70,9 +70,11 @@ PROJECT_ID=$({FORGE_API_BASE} "projects/{FORGE_PROJECT_PATH_ENCODED}" | jq -r '.
 
 ### 4. Collect Tracker Issues in Review
 
-```bash
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', state: 'In Review', limit: 10)
-```
+Query the tracker (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Status: {TRACKER_STATES.in_review}
+- Limit: 10
 
 ### 5. Cross-Reference MRs and Tracker Issues
 

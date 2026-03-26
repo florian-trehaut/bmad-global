@@ -51,26 +51,21 @@ WAIT for confirmation.
 
 ### 4. Post the tracker comment
 
-Use the tracker MCP tools (prefix: `{TRACKER_MCP_PREFIX}`):
-
-```
-{TRACKER_MCP_PREFIX}save_comment(
-  issueId: ISSUE_ID,
-  body: {composed_comment}
-)
-```
+Post a comment on the issue (using CRUD patterns from tracker.md):
+- Operation: Create comment
+- Issue: ISSUE_ID
+- Body: {composed_comment}
 
 **If API failure:** HALT — "Error posting the tracker comment. Error: {error}. The comment is displayed above, you can copy it manually."
 
 ### 5. Update the status
 
 **If PASS:**
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  id: ISSUE_ID,
-  stateId: {TRACKER_STATES.done}
-)
-```
+
+Update the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update issue
+- Issue: ISSUE_ID
+- Status: {TRACKER_STATES.done}
 
 Display: "Issue **{ISSUE_IDENTIFIER}** moved to **Done**."
 

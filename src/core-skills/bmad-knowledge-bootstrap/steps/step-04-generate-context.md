@@ -13,7 +13,7 @@ Assemble all confirmed values from steps 02-03 into `.claude/workflow-context.md
 ### 1. Assemble Values
 
 Gather all confirmed values:
-- **Step 02**: project_name, issue_prefix, app_type, monorepo, package_manager, commands, user prefs, tracker config, forge config, worktree templates
+- **Step 02**: project_name, issue_prefix, app_type, monorepo, package_manager, commands, user prefs, tracker config, forge config, worktree templates, comm platform config
 - **Step 03**: (used in steps 05-07 for knowledge files, not directly in context)
 
 ### 2. Generate the File
@@ -67,6 +67,11 @@ format_fix_command: "{format_fix_command}"
 typecheck_command: "{typecheck_command}"
 quality_gate: "{quality_gate}"
 
+# --- Communication platform ---
+comm_platform: {comm_platform_type}  # slack, teams, discord, none
+comm_mcp_prefix: "{comm_mcp_prefix}" # MCP prefix if detected, empty if none
+user_comm_handle: "{user_comm_handle}" # user's handle, empty if none
+
 # --- Communication ---
 communication_language: {language}
 document_output_language: {language}
@@ -99,7 +104,8 @@ The following knowledge files are available in `.claude/workflow-knowledge/` and
 
 | File | Content | Loaded by |
 |------|---------|-----------|
-| `tracker.md` | Tracker-specific API patterns, state machines | All tracker workflows |
+| `tracker.md` | Tracker tool interface, concept mapping, CRUD operations | All tracker workflows |
+| `comm-platform.md` | Communication platform tool interface, CRUD operations | daily-planning |
 | `stack.md` | Tech stack, frameworks, forbidden patterns, test rules | dev-story, code-review, review-story, quick-spec |
 | `infrastructure.md` | Cloud infra, CI/CD, deployment, IaC | dev-story, code-review, review-story |
 | `environment-config.md` | Environment URLs, DB proxy config | validation-metier, review-story |

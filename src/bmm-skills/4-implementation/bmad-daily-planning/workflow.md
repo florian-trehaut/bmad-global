@@ -17,10 +17,12 @@ Extract the following from the YAML frontmatter:
 | Variable | Key | Example |
 |----------|-----|---------|
 | `{TRACKER}` | `tracker` | `linear` |
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server` |
 | `{TRACKER_TEAM}` | `tracker_team` | `REW` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` | `fr` |
+| `{COMM_PLATFORM}` | `comm_platform` | `slack` |
+| `{COMM_MCP_PREFIX}` | `comm_mcp_prefix` | `(see comm-platform.md)` |
+| `{USER_COMM_HANDLE}` | `user_comm_handle` | `U01ABCDEF` |
 
 ### 2. Resolve today's date
 
@@ -73,7 +75,7 @@ You do this by:
 | Step | File | Goal | Mode |
 | ---- | ---- | ---- | ---- |
 | 1 | `step-01-collect-yesterday.md` | Analyze git log + tracker issues to summarize yesterday's work | Auto |
-| 1b | `step-01b-collect-slack.md` | Scan Slack discussions since last daily — surface pending actions | Auto |
+| 1b | `step-01b-collect-comms.md` | Scan comms platform discussions since last daily — surface pending actions | Auto |
 | 2 | `step-02-check-mrs.md` | Review open Merge Requests — status, blockers, action needed | Auto |
 | 3 | `step-03-load-backlog.md` | Load all non-Done issues assigned to or created by the user + unassigned team issues | Auto |
 | 4 | `step-04-velocity.md` | Calculate average daily velocity from past daily-logs | Auto |
@@ -90,7 +92,6 @@ Load and execute `./steps/step-01-collect-yesterday.md`.
 These apply at ANY step:
 
 - Tracker MCP tools not available or returning auth errors
-- `{USER_NAME}` does not match any tracker user
 - User requests stop
 
 ---

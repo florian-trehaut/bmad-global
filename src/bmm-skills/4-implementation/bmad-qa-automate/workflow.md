@@ -17,7 +17,7 @@ Extract the following from the YAML frontmatter:
 | Variable | Key | Example |
 |----------|-----|---------|
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Francais` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 

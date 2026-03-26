@@ -141,7 +141,7 @@ Epic 2: {epic_name} ({N} stories)
 Total: {N} epics, {M} stories
 
 Souhaitez-vous:
-1. Valider et créer dans Linear
+1. Valider et créer dans le tracker
 2. Modifier une story
 3. Ajouter/supprimer une story
 4. Revoir un epic
@@ -153,4 +153,4 @@ If the user requests modifications, apply them and re-present the updated struct
 
 ---
 
-**Next:** Read fully and follow `./step-03-create-linear.md`
+**Next:** Read fully and follow `./step-03-create-tracker-items.md`

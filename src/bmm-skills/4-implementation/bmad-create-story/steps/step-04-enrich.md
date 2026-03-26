@@ -107,20 +107,21 @@ Build the enriched issue description with the following sections (in order):
 
 ### 2. Update issue in tracker
 
-1. Update the issue description: `{TRACKER_MCP_PREFIX}save_issue(id: ISSUE_ID, description: enriched_description)`
+1. Update the issue description in the tracker (using CRUD patterns from tracker.md) — Operation: Update issue, Issue: {ISSUE_ID}, Field: description, Value: enriched_description
 2. If the update fails due to size, try splitting: update description first, then add details as a comment
 
 ### 3. Update issue status to Todo
 
-1. Update status: `{TRACKER_MCP_PREFIX}save_issue(id: ISSUE_ID, stateId: {TRACKER_STATES.todo})`
+1. Update the issue status in the tracker (using CRUD patterns from tracker.md) — Operation: Update issue, Issue: {ISSUE_ID}, Status: {TRACKER_STATES.todo}
 
 ### 4. Add readiness comment
 
 Add a comment confirming the issue is ready:
 
-```
-{TRACKER_MCP_PREFIX}save_comment(issueId: ISSUE_ID, body: "Issue description enriched with tasks, guardrails, and technical requirements.\n\nRappel flux: Todo -> In Progress -> In Review -> To Test -> Done\n- Apres merge + deploy prod: la story passe en To Test\n- Les tests de Validation Metier doivent etre executes en production\n- Done = validation metier OK (jamais automatique)\n\nReady for development.")
-```
+Add a comment in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create comment
+- Issue: ISSUE_ID
+- Body: "Issue description enriched with tasks, guardrails, and technical requirements.\n\nRappel flux: Todo -> In Progress -> In Review -> To Test -> Done\n- Apres merge + deploy prod: la story passe en To Test\n- Les tests de Validation Metier doivent etre executes en production\n- Done = validation metier OK (jamais automatique)\n\nReady for development."
 
 ### 5. Check epic project status
 

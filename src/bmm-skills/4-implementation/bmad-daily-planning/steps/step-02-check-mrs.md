@@ -7,8 +7,8 @@ Review all open Merge Requests authored by the user. Classify each by action nee
 ## RULES
 
 - Use the forge CLI (`{FORGE_CLI}`) to list open MRs — do not assume MR states
-- Cross-reference with tracker issues when MRs reference an issue ID (e.g., REW-123 in the title)
-- Flag mismatches between tracker status and MR status (e.g., Linear says "In Review" but MR has no reviewers)
+- Cross-reference with tracker issues when MRs reference an issue ID (e.g., PRJ-123 in the title)
+- Flag mismatches between tracker status and MR status (e.g., tracker says "In Review" but MR has no reviewers)
 - Do NOT merge or approve anything — this step is read-only
 
 ## SEQUENCE

@@ -16,22 +16,21 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
 | `{TRACKER_TEAM_ID}` | `tracker_team_id` | `32825b3b-...` |
 | `{TRACKER_STATES}` | `tracker_states` | YAML map of state name to ID |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
 Read all files in `~/.claude/skills/bmad-shared/`.
 
-Apply these rules for the entire workflow execution. Key rule for this workflow: **never create duplicate Linear items — always query existing state and match before creating.**
+Apply these rules for the entire workflow execution. Key rule for this workflow: **never create duplicate tracker items — always query existing state and match before creating.**
 
 ### 3. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns and document conventions.
 
 ### 4. Set defaults
 
@@ -70,7 +69,7 @@ You are a **Scrum Master** facilitating sprint planning. You parse epic files, s
 - **NEVER create duplicates** — always match existing Projects/Issues by title or story key before creating
 - **Story ID conversion is mandatory** — `1.1` becomes `1-1`, title becomes kebab-case, final key is `1-1-kebab-case`
 - **Issues start in Backlog** — cycle assignment is a separate interactive step
-- **Use `{TRACKER_MCP_PREFIX}` for all MCP tool calls** — never hardcode tool prefixes
+- **Use the tracker CRUD patterns from tracker.md for all tracker operations** — never hardcode tool prefixes
 
 ---
 
@@ -78,7 +77,7 @@ You are a **Scrum Master** facilitating sprint planning. You parse epic files, s
 
 | Step | File | Goal |
 | ---- | ---- | ---- |
-| 1 | `step-01-load.md` | Load epic files, parse stories, query existing Linear state |
+| 1 | `step-01-load.md` | Load epic files, parse stories, query existing tracker state |
 | 2 | `step-02-sync.md` | Create/skip Projects and Issues, assign to current Cycle |
 | 3 | `step-03-report.md` | Summary of created/skipped items |
 
@@ -91,7 +90,7 @@ Load and execute `./steps/step-01-load.md`.
 These apply at ANY step:
 
 - No epic files found in the project
-- Linear MCP tools unavailable or returning auth errors
+- Tracker MCP tools unavailable or returning auth errors
 - User requests stop
 - `.claude/workflow-context.md` missing or incomplete
 

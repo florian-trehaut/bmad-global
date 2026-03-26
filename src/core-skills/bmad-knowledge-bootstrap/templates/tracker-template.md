@@ -4,17 +4,26 @@
 
 ## Tracker Type
 
-<!-- Which tracker: Linear, GitHub Issues, GitLab Issues, Jira, file-based (sprint-status.yaml). Detected from workflow-context.md. -->
+<!-- Which tracker type was detected: MCP-based, CLI-based, or file-based. Include the specific tool (e.g., Linear MCP, gh CLI, glab CLI, sprint-status.yaml). -->
+
+## Tool Interface
+
+<!-- How to call the tracker. Fill ONE of: -->
+
+<!-- MCP-based: prefix for MCP tool calls (e.g., mcp__linear-server__, mcp__linear__) -->
+<!-- CLI-based: CLI command and auth (e.g., gh issue list --repo org/repo) -->
+<!-- File-based: file paths and format (e.g., read/write sprint-status.yaml) -->
 
 ## Concept Mapping
 
-<!-- How BMAD concepts map to tracker entities. Table: BMAD Concept | Tracker Equivalent. -->
+<!-- How BMAD concepts map to tracker entities. Fill with detected equivalents. -->
 
 | BMAD Concept | Tracker Equivalent |
 |---|---|
-| Epic | {e.g., Linear Project, GitHub Milestone} |
-| Story | {e.g., Linear Issue, GitHub Issue} |
-| Sprint | {e.g., Linear Cycle, GitHub Project Board} |
+| Epic | {tracker's grouping entity} |
+| Story | {tracker's work item entity} |
+| Sprint | {tracker's time-boxed iteration entity} |
+| Document | {tracker's document/page entity, if any} |
 
 ## State Machines
 
@@ -26,13 +35,19 @@
 
 ## CRUD Operations
 
-<!-- How to read/create/update tracker entities. MCP tool patterns or file operations. -->
+<!-- Concrete tool calls or file operations for each operation. The knowledge-bootstrap fills these with the ACTUAL commands for the detected tracker backend. Step files reference this table instead of hardcoding tool calls. -->
 
 | Operation | Method |
 |---|---|
-| List issues | {MCP call or file read pattern} |
-| Create issue | {MCP call or file write pattern} |
-| Update status | {MCP call or file edit pattern} |
+| List issues (filtered by team, status, assignee) | {concrete call for detected backend} |
+| Get single issue by ID | {concrete call} |
+| Create issue | {concrete call} |
+| Update issue (status, description, assignee) | {concrete call} |
+| List epics/projects | {concrete call} |
+| Create epic/project | {concrete call} |
+| List sprints/cycles | {concrete call} |
+| Search issues by keyword | {concrete call} |
+| Save/create document | {concrete call, or N/A} |
 
 ## HALT Policy
 

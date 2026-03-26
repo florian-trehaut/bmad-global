@@ -73,20 +73,15 @@ Store `MR_IID` and `MR_URL`.
 
 ### 4. Update tracker
 
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  id: '{ISSUE_ID}',
-  state: '{TRACKER_STATES.in_review}'
-)
-```
+Update the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update issue
+- Issue: {ISSUE_ID}
+- Status: {TRACKER_STATES.in_review}
 
-Add a comment:
-```
-{TRACKER_MCP_PREFIX}save_comment(
-  issueId: '{ISSUE_ID}',
-  body: 'MR created: {MR_URL}\n\nFix pushed, quality gate passed. Awaiting review + merge + deploy to staging for VM verification.'
-)
-```
+Add a comment on the tracker issue (using CRUD patterns from tracker.md):
+- Operation: Create comment
+- Issue: {ISSUE_ID}
+- Body: MR created: {MR_URL} — Fix pushed, quality gate passed. Awaiting review + merge + deploy to staging for VM verification.
 
 ### 5. Auto-proceed
 

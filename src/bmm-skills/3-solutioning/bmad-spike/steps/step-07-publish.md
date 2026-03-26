@@ -49,11 +49,9 @@ Load `../templates/spike-deliverable.md`. Compose the full document combining:
 
 ### 2. Determine Document Placement
 
-Check for existing spike documents:
-
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')
-```
+Check for existing spike documents (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {TRACKER_META_PROJECT_ID}
 
 Look for a document titled `Spike: {title}`. If found, update it. If not, create it.
 
@@ -61,15 +59,11 @@ If the spike is associated with a specific epic/project (from Step 1): also cons
 
 ### 3. Save Document
 
-**Create or update the tracker document:**
-
-```
-{TRACKER_MCP_PREFIX}create_document(
-  title: "Spike: {title}",
-  project: "{TRACKER_META_PROJECT}",
-  content: '{compiled_content}'
-)
-```
+**Create or update the tracker document** (using CRUD patterns from tracker.md):
+- Operation: Create document
+- Title: Spike: {title}
+- Project: {TRACKER_META_PROJECT}
+- Content: {compiled_content}
 
 Store `DOCUMENT_ID`.
 
@@ -77,37 +71,29 @@ Store `DOCUMENT_ID`.
 
 ### 4. Update Existing Spike Issue (if SPIKE_ISSUE_ID is not null)
 
-Add a completion comment and close the issue:
+Add a completion comment and close the issue (using CRUD patterns from tracker.md):
 
-```
-{TRACKER_MCP_PREFIX}comment_issue(
-  issueId: '{SPIKE_ISSUE_ID}',
-  body: 'Spike completed.\n\n**Verdict:** {verdict}\n**Deliverable:** Spike: {title}\n**Stories created:** {list of identifiers}\n\nSee the spike deliverable document for full investigation context.'
-)
-```
+Post a comment on the issue:
+- Operation: Create comment
+- Issue: {SPIKE_ISSUE_ID}
+- Body: Spike completed. Verdict: {verdict}. Deliverable: Spike: {title}. Stories created: {list of identifiers}. See the spike deliverable document for full investigation context.
 
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  id: '{SPIKE_ISSUE_ID}',
-  stateId: '{TRACKER_STATES.done}'
-)
-```
+Update the issue:
+- Operation: Update issue
+- Issue: {SPIKE_ISSUE_ID}
+- Status: {TRACKER_STATES.done}
 
 Add label `Spike` if not already present.
 
 ### 5. Create Spike Issue (if SPIKE_ISSUE_ID is null)
 
-If the spike was initiated ad-hoc (no pre-existing tracker issue), create one for traceability:
-
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  title: 'Spike: {title}',
-  team: '{TRACKER_TEAM}',
-  description: 'Investigation completed.\n\n**Question:** {spike_question}\n**Verdict:** {verdict}\n\nSee Document: Spike: {title}\nStories created: {list of identifiers}',
-  stateId: '{TRACKER_STATES.done}',
-  labels: ['Spike']
-)
-```
+If the spike was initiated ad-hoc (no pre-existing tracker issue), create one for traceability (using CRUD patterns from tracker.md):
+- Operation: Create issue
+- Title: Spike: {title}
+- Team: {TRACKER_TEAM}
+- Description: Investigation completed. Question: {spike_question}. Verdict: {verdict}. See Document: Spike: {title}. Stories created: {list of identifiers}
+- Status: {TRACKER_STATES.done}
+- Labels: Spike
 
 Store `SPIKE_ISSUE_ID` and `SPIKE_ISSUE_IDENTIFIER`.
 

@@ -1,19 +1,14 @@
 ---
 # ============================================================
-# WORKFLOW CONTEXT — bmad-global
+# WORKFLOW CONTEXT — BMAD-METHOD
 # ============================================================
 # This file is the project-specific contract loaded by all
 # global bmad-* workflow skills (~/.claude/skills/bmad-*/).
-# It provides tracker IDs, forge config, stack info, and
-# pointers to knowledge files that workflows load JIT.
-#
 # Format: YAML frontmatter + markdown body.
-# Workflows read this file at initialization and extract
-# values from the frontmatter for dynamic behavior.
 # ============================================================
 
 # --- Project identity ---
-project_name: bmad-global
+project_name: BMAD-METHOD
 issue_prefix: BMAD
 
 # --- Issue tracker ---
@@ -32,36 +27,38 @@ tracker_states:
 forge: github
 forge_project_path: "florian-trehaut/bmad-global"
 forge_cli: gh
-forge_mr_create: "gh pr create"
-forge_mr_list: "gh pr list"
-forge_mr_approve: "gh pr review --approve"
+forge_mr_create: "gh pr create --repo florian-trehaut/bmad-global"
+forge_mr_list: "gh pr list --repo florian-trehaut/bmad-global"
+forge_mr_approve: "gh pr review --approve --repo florian-trehaut/bmad-global"
 forge_api_base: "gh api"
 # Git remotes: origin=user's fork, upstream=bmad-code-org/BMAD-METHOD
 fork_remote: origin
 upstream_remote: upstream
 
 # --- Worktree naming ---
-worktree_prefix: bmad-global
+worktree_prefix: bmad-method
 worktree_templates:
-  dev: "../bmad-global-{issue_number}-{short_description}"
-  review: "../bmad-global-review-{mr_iid}"
-  spec_review: "../bmad-global-review-spec-{issue_number}"
-  validation: "../bmad-global-validation-{issue_number}"
-  quick_spec: "../bmad-global-spec-{slug}"
+  dev: "../bmad-method-{issue_number}-{short_description}"
+  review: "../bmad-method-review-{mr_iid}"
+  spec_review: "../bmad-method-review-spec-{issue_number}"
+  validation: "../bmad-method-validation-{issue_number}"
+  quick_spec: "../bmad-method-spec-{slug}"
+  spike: "../bmad-method-spike-{slug}"
 branch_template: "feat/{issue_number}-{short_description}"
 
+# --- Application type ---
+app_type: "framework"
+
 # --- Build tooling & commands ---
-# Current: JavaScript/Node.js (being migrated to Rust)
-# Target: Rust + Cargo
-package_manager: cargo
-install_command: "cargo build"
-build_command: "cargo build --release"
-test_command: "cargo test"
-lint_command: "cargo clippy -- -D warnings"
-format_command: "cargo fmt --check"
-format_fix_command: "cargo fmt"
+package_manager: npm
+install_command: "npm install"
+build_command: ""
+test_command: "npm test"
+lint_command: "npm run lint"
+format_command: "npm run format:check"
+format_fix_command: "npm run format:fix"
 typecheck_command: ""
-quality_gate: "cargo fmt --check && cargo clippy -- -D warnings && cargo test"
+quality_gate: "npm run quality"
 
 # --- Communication ---
 communication_language: Français
@@ -75,48 +72,42 @@ labels:
   client_prefix: ""
 ---
 
-# bmad-global Workflow Context
+# BMAD-METHOD Workflow Context
 
 ## Knowledge Files
 
-The following knowledge files are available in `.claude/workflow-knowledge/` and should be loaded JIT (just-in-time) when a workflow step needs them:
+The following knowledge files are available in `.claude/workflow-knowledge/` and should be loaded JIT:
 
 | File | Content | Loaded by |
 |------|---------|-----------|
-| `tracker.md` | File-based tracker patterns, sprint-status.yaml conventions, story file naming | All workflows that interact with the tracker |
-| `stack.md` | Tech stack (Rust CLI + Markdown/YAML skill content), forbidden patterns, test rules | dev-story, code-review, review-story, quick-spec |
-| `infrastructure.md` | GitHub Actions CI/CD, cargo publish distribution, no cloud infra | dev-story, code-review, review-story |
-| `environment-config.md` | N/A — no deployed environments (distributed as cargo package) | — |
-| `investigation-checklist.md` | Domain-specific investigation guides | review-story |
-| `review-perspectives.md` | Code review perspectives, checklists, severity rules | code-review |
+| `tracker.md` | File-based tracker patterns, sprint-status.yaml conventions, story file naming | All tracker workflows |
+| `stack.md` | Tech stack (Markdown/YAML skills + JS tooling), forbidden patterns, test rules | dev-story, code-review, review-story, quick-spec |
+| `infrastructure.md` | GitHub Actions CI/CD, npm publish distribution, no cloud infra | dev-story, code-review, review-story |
+| `environment-config.md` | N/A — no deployed environments (distributed as npm package) | — |
+| `investigation-checklist.md` | Domain-specific investigation guides for skill system, CLI, docs, validators | review-story |
+| `review-perspectives.md` | Code review perspectives, severity rules | code-review |
+| `conventions.md` | Commit format, branch strategy, code style, skill naming rules | dev-story, code-review |
+| `domain-glossary.md` | BMAD ubiquitous language: skills, modules, phases, workflows, steps | review-story, quick-spec |
+| `api-surface.md` | CLI commands, module.yaml schema, skill validation rules | review-story, dev-story |
 
 ## Project Nature
 
-**bmad-global** is a fork of BMAD-METHOD, a skill distribution framework for AI-driven agile development. It is NOT a typical application — it is a collection of:
+**BMAD-METHOD** is a skill distribution framework for AI-driven agile development. It is NOT a typical application — it is a collection of:
 
 - **Skills** (~50+): Markdown/YAML workflow definitions (SKILL.md + workflow.md + steps/ + data/ + templates/) executed by LLMs
 - **Modules**: Groups of skills with configuration (module.yaml)
-- **CLI tool**: Installer that deploys skills globally via `cargo install bmad-global`
+- **CLI tool**: Node.js installer that deploys skills globally via `npx @florian-trehaut/bmad-global install`
 - **Docs site**: Astro Starlight website with llms.txt generation
 
-The core content (skills, workflows, steps) is text-based Markdown/YAML. The Rust tooling handles installation, validation, and distribution.
-
-## Migration Context
-
-This project is being migrated from JavaScript (Node.js/npm) to Rust (Cargo):
-- CLI: Commander/Clack → clap (or similar)
-- Distribution: npm publish → cargo install / cargo publish
-- Validators: Node.js scripts → Rust
-- Pre-commit: Husky/lint-staged → cargo fmt + clippy
-- The Markdown/YAML skill content remains unchanged
+The core content (skills, workflows, steps) is text-based Markdown/YAML. The JS tooling handles installation, validation, and distribution.
 
 ## Project-Specific Skills
 
-None yet — add project-specific skills as needed.
+- `bmad-upstream-sync` — Synchronize fork with upstream BMAD-METHOD repository
 
 ## Reference Code
 
-- **Good patterns**: src/bmm-skills/ (phase-organized skill structure), src/core-skills/ (utility skills)
+- **Good patterns**: `src/bmm-skills/` (phase-organized skill structure), `src/core-skills/` (utility skills)
 - **NEVER copy from**: N/A
 
 ## Alerting

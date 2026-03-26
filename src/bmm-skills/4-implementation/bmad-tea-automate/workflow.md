@@ -17,13 +17,12 @@ Extract the following from the YAML frontmatter:
 | Variable | Key | Example |
 |----------|-----|---------|
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Francais` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 Optional keys (use if present, skip gracefully if absent):
 
 | Variable | Key | Fallback |
 |----------|-----|----------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | not used |
 | `{TRACKER_TEAM}` | `tracker_team` | not used |
 
 ### 2. Load shared rules

@@ -16,11 +16,10 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
 | `{TRACKER_META_PROJECT_ID}` | `tracker_meta_project_id` | `0df2e9de-...` |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
@@ -34,7 +33,7 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. It pro
 
 ### 4. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns and document conventions.
 
 ### 5. Set defaults
 
@@ -67,7 +66,7 @@ You are a **QA Architect**. You analyze requirements and architecture to identif
 - Execute ALL steps in exact order — NO skipping
 - **Every risk must be grounded in a specific requirement or architectural decision** — no generic/hypothetical risks
 - **Test type assignment must follow the project's test pyramid** (Unit > Integration > Journey > E2E) — prefer the lowest level that adequately covers the risk
-- **Save to Linear** — the test design document must be persisted as a Linear Document, not just local output
+- **Save to tracker** — the test design document must be persisted as a tracker document, not just local output
 - **This is a NO_UPSTREAM workflow** — it can be invoked independently, without a prior workflow step
 
 ---
@@ -79,7 +78,7 @@ You are a **QA Architect**. You analyze requirements and architecture to identif
 | 1 | `step-01-scope.md` | Determine mode (epic-level or system-level), load context documents |
 | 2 | `step-02-risk-assess.md` | Identify risks, score with 3x3 matrix, classify thresholds |
 | 3 | `step-03-coverage.md` | Design test coverage: P0-P3 priorities, test types per risk, journey scenarios |
-| 4 | `step-04-save.md` | Compile test plan document, save to Linear |
+| 4 | `step-04-save.md` | Compile test plan document, save to tracker |
 
 ## ENTRY POINT
 
@@ -89,7 +88,7 @@ Load and execute `./steps/step-01-scope.md`.
 
 These apply at ANY step:
 
-- Linear MCP tools unavailable or returning auth errors
+- Tracker MCP tools unavailable or returning auth errors
 - No PRD or Architecture document found for the target epic/project (epic-level mode)
 - No active projects found (system-level mode)
 - User requests stop

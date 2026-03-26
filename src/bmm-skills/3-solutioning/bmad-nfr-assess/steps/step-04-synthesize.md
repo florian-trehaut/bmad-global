@@ -2,13 +2,13 @@
 
 ## STEP GOAL
 
-Compile all dimension assessments into a single NFR Assessment document, determine the overall verdict using deterministic gate logic, formulate prioritized recommendations, and save the document to Linear.
+Compile all dimension assessments into a single NFR Assessment document, determine the overall verdict using deterministic gate logic, formulate prioritized recommendations, and save the document to the tracker.
 
 ## RULES
 
 - Overall verdict follows strict aggregation: FAIL if any dimension FAIL, CONCERNS if any CONCERNS, PASS only if all PASS.
 - Recommendations must be actionable — each one should describe what to do, where, and why.
-- The document is saved to Linear, not just output to chat.
+- The document is saved to the tracker, not just output to chat.
 - For epic-level: save in the Epic Project. For system-level: save in the Meta Project.
 - The gate decision is deterministic — no subjective judgment. Evidence drives the verdict.
 
@@ -241,29 +241,28 @@ nfr_assessment:
   blockers: {true | false}
 ```
 
-### 6. Save to Linear
+### 6. Save to tracker
 
 **If SCOPE == "epic":**
 
-1. Check for an existing "NFR Assessment" document in the Epic Project:
-   ```
-   {TRACKER_MCP_PREFIX}list_documents(projectId: PROJECT_ID)
-   ```
-2. If a document titled "NFR Assessment" exists:
-   ```
-   {TRACKER_MCP_PREFIX}update_document(id: existing_doc_id, content: composed_content)
-   ```
-3. If no existing document:
-   ```
-   {TRACKER_MCP_PREFIX}create_document(title: 'NFR Assessment', projectId: PROJECT_ID, content: composed_content)
-   ```
+1. Check for an existing "NFR Assessment" document in the Epic Project (using CRUD patterns from tracker.md):
+   - Operation: List documents
+   - Project: PROJECT_ID
+2. If a document titled "NFR Assessment" exists, update it:
+   - Operation: Update document
+   - Document: existing_doc_id
+   - Content: composed_content
+3. If no existing document, create it:
+   - Operation: Create document
+   - Title: "NFR Assessment"
+   - Project: PROJECT_ID
+   - Content: composed_content
 
 **If SCOPE == "system":**
 
-1. Check for an existing "NFR Assessment: System" document in the Meta Project:
-   ```
-   {TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')
-   ```
+1. Check for an existing "NFR Assessment: System" document in the Meta Project (using CRUD patterns from tracker.md):
+   - Operation: List documents
+   - Project: {TRACKER_META_PROJECT_ID}
 2. Update or create as above, with title "NFR Assessment: System".
 
 ### 7. Report completion
@@ -282,7 +281,7 @@ Present to the user:
 - **Observabilite:** {observability_status}
 - **Testabilite:** {testability_status} (index: {testability_index}/5.0)
 - **Gate Decision:** {PASS | CONCERNS | FAIL}
-- **Document Linear:** sauvegarde ({created or updated})
+- **Tracker document:** sauvegarde ({created or updated})
 - **P0 actions:** {count}
 - **P1 actions:** {count}
 - **P2 actions:** {count}

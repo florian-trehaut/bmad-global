@@ -94,7 +94,7 @@ Documentation produced: {N} document(s)
 - {title} — {N} sections, ~{N} lines
 ```
 
-Ask if the user wants to adjust any document content before saving to Linear.
+Ask if the user wants to adjust any document content before saving to the tracker.
 
 WAIT for user confirmation.
 

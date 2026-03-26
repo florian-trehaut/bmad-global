@@ -57,9 +57,9 @@ Store results as `YESTERDAY_COMMITS` — a list of `{hash} {message}` entries.
 
 Query the tracker for issues that were recently completed (status = Done or equivalent) and are assigned to or created by the user.
 
-Using tracker MCP tools (`{TRACKER_MCP_PREFIX}`):
+Query the tracker (using CRUD patterns from tracker.md):
 - List issues for team `{TRACKER_TEAM}` with status "Done" or equivalent completion status
-- Filter: assigned to `{USER_NAME}` OR created by `{USER_NAME}`
+- Filter: assigned to `"me"` (authenticated user — NOT `{USER_NAME}` which may not match the tracker's user lookup) OR created by `"me"`
 - Filter: updated since `{LAST_DAILY_DATE}`
 
 For each completed issue, extract: `id`, `title`, `points` (estimate), `status`.
@@ -90,4 +90,4 @@ If this is the first run (no previous daily-log), note: "First daily planning se
 
 ---
 
-**Next:** Read fully and follow `./steps/step-01b-collect-slack.md`
+**Next:** Read fully and follow `./steps/step-01b-collect-comms.md`

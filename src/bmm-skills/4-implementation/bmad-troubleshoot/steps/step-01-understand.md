@@ -29,9 +29,12 @@ Launch these investigations in parallel based on what the user described:
 
 **a. Tracker search** — find related issues (recent, in-progress, recently closed):
 
-```
-{TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', query: '{keywords_from_symptom}', limit: 10, updatedAt: '-P7D')
-```
+Query the tracker (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Query: {keywords_from_symptom}
+- Limit: 10
+- Updated within: last 7 days
 
 **b. Recent deploys** — check CI/CD for recent deployments to the affected environment. Use the project's CI/CD skill if available.
 

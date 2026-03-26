@@ -41,11 +41,10 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This p
 ### 5. Load Tracker Issue Details
 
 <check if="LINKED_TRACKER_ISSUE exists">
-  Load issue details from tracker:
-
-```bash
-{TRACKER_MCP_PREFIX}get_issue(id: '{ISSUE_ID}', includeRelations: true)
-```
+  Load issue details from the tracker (using CRUD patterns from tracker.md):
+  - Operation: Get issue
+  - Issue: {ISSUE_ID}
+  - Include relations: yes
 
   Extract from issue description:
   - Acceptance Criteria (ACs)
@@ -65,7 +64,7 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This p
 
 If the project has a project-context document (architecture, stack decisions), load it:
 
-1. Primary: tracker documents -- `{TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')` -> find "Project Context" -> `{TRACKER_MCP_PREFIX}get_document(id: doc_id)`
+1. Primary: tracker documents — list documents for {TRACKER_META_PROJECT_ID}, find "Project Context", then get the document content (using CRUD patterns from tracker.md)
 2. Fallback: `**/project-context.md` in the project root
 
 ### 7. Store Loaded Context

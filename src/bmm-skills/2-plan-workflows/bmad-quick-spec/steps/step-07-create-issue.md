@@ -75,7 +75,7 @@ WAIT for user choice.
 
 **MCP-based tracker:**
 - IF 1: Set project to null, proceed
-- IF 2: List projects with `{TRACKER_MCP_PREFIX}list_projects(team: '{TRACKER_TEAM}')`, let user pick, proceed
+- IF 2: List epics/projects from the tracker (using CRUD patterns from tracker.md): List epics/projects for team {TRACKER_TEAM}, let user pick, proceed
 - IF any other: Explain valid options and redisplay menu
 
 ### 2. Determine Priority
@@ -100,17 +100,15 @@ Compose the full Markdown description using the template, filling in all accumul
 
 ### 5. Create the Tracker Issue
 
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  title: '{title}',
-  team: '{TRACKER_TEAM}',
-  description: '{composed_description}',
-  priority: {priority},
-  labels: [{labels}],
-  project: '{project_name_if_any}',
-  state: '{TRACKER_STATES.todo}'
-)
-```
+Create the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create issue
+- Title: {title}
+- Team: {TRACKER_TEAM}
+- Description: {composed_description}
+- Priority: {priority}
+- Labels: {labels}
+- Project: {project_name_if_any}
+- Status: {TRACKER_STATES.todo}
 
 **IMPORTANT:** The workflow NEVER sets state to 'Done'. The maximum state a workflow can set is the testing state (after merge + deploy). 'Done' requires manual confirmation after Validation Metier passes.
 

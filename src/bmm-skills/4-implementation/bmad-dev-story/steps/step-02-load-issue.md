@@ -12,9 +12,10 @@ Load the selected issue details from the tracker and extract all identifiers nee
 
 ### 1. Load Issue Details
 
-```bash
-{TRACKER_MCP_PREFIX}get_issue(id: ISSUE_IDENTIFIER, includeRelations: true)
-```
+Fetch the issue from the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+- Operation: Get issue by ID
+- Issue: {ISSUE_IDENTIFIER}
+- Include: relations
 
 Store:
 - ISSUE_ID, ISSUE_IDENTIFIER, ISSUE_TITLE, PROJECT_NAME, PROJECT_ID

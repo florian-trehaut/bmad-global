@@ -1,12 +1,12 @@
-# Step 03: Create Linear Projects and Issues
+# Step 03: Create Tracker Projects and Issues
 
 ## STEP GOAL
 
-Persist the validated epic and story structure into Linear by creating Projects (epics) and Issues (stories) with all acceptance criteria, BDD scenarios, and test strategies in the issue descriptions. All stories are created in Backlog state.
+Persist the validated epic and story structure into the project tracker by creating epics/projects and stories/issues (using concept mapping from `workflow-knowledge/tracker.md`) with all acceptance criteria, BDD scenarios, and test strategies in the issue descriptions. All stories are created in Backlog state.
 
 ## RULES
 
-- HALT on any Linear write failure — never silently skip a creation
+- HALT on any tracker write failure — never silently skip a creation
 - Check for existing projects with the same name before creating duplicates
 - Stories are ALWAYS created in Backlog state
 - Issue descriptions must contain the full story content (ACs, BDD, test strategy, dependencies, estimation)
@@ -16,16 +16,16 @@ Persist the validated epic and story structure into Linear by creating Projects 
 
 ### 1. Check for existing projects
 
-Before creating epics as projects, check if projects with the same names already exist:
+Before creating epics as tracker projects, check if projects with the same names already exist.
 
-```
-{TRACKER_MCP_PREFIX}list_projects(teamId: "{TRACKER_TEAM_ID}")
-```
+Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+- Operation: List projects
+- Filter: by team ID `{TRACKER_TEAM_ID}`
 
 If a project with the same name exists, ask the user:
 
 ```
-Le projet "{epic_name}" existe déjà dans Linear.
+Le projet "{epic_name}" existe déjà dans le tracker.
 1. Utiliser le projet existant (ajouter les stories dedans)
 2. Créer un nouveau projet avec un suffixe
 3. Annuler
@@ -33,25 +33,24 @@ Le projet "{epic_name}" existe déjà dans Linear.
 
 WAIT for user decision.
 
-### 2. Create Linear Projects for epics
+### 2. Create tracker projects for epics
 
-For each epic, create a Linear Project:
+For each epic, create a tracker project.
 
-```
-{TRACKER_MCP_PREFIX}save_project(
-  name: "{epic_name}",
-  description: "{epic_description}\n\nScope: {epic_scope}\nDependencies: {epic_dependencies}",
-  teamIds: ["{TRACKER_TEAM_ID}"]
-)
-```
+Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+- Operation: Create project
+- Fields:
+  - name: `{epic_name}`
+  - description: `{epic_description}\n\nScope: {epic_scope}\nDependencies: {epic_dependencies}`
+  - team: `{TRACKER_TEAM_ID}`
 
 Store the created project ID as `{EPIC_PROJECT_ID}` for use when creating stories.
 
 Log: `Projet créé: {epic_name} (ID: {project_id})`
 
-**HALT if creation fails:** "Échec de création du projet Linear '{epic_name}'. Erreur: {error}. Vérifiez les permissions et la connexion Linear."
+**HALT if creation fails:** "Échec de création du projet tracker '{epic_name}'. Erreur: {error}. Vérifiez les permissions et la connexion au tracker."
 
-### 3. Create Linear Issues for stories
+### 3. Create tracker issues for stories
 
 For each story in each epic, compose the issue description with all sections:
 
@@ -100,17 +99,16 @@ Then {expected_result}
 - {t_shirt_size}
 ```
 
-Create the issue in Linear:
+Create the issue in the tracker.
 
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  title: "{story_title}",
-  description: "{composed_description}",
-  teamId: "{TRACKER_TEAM_ID}",
-  projectId: "{EPIC_PROJECT_ID}",
-  stateId: "{TRACKER_STATES.backlog}"
-)
-```
+Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+- Operation: Create issue
+- Fields:
+  - title: `{story_title}`
+  - description: `{composed_description}`
+  - team: `{TRACKER_TEAM_ID}`
+  - project: `{EPIC_PROJECT_ID}`
+  - state: Backlog (mapped via `workflow-knowledge/tracker.md` state mapping)
 
 Log: `Issue créée: {identifier} — {story_title} [Backlog]`
 
@@ -118,11 +116,11 @@ Log: `Issue créée: {identifier} — {story_title} [Backlog]`
 
 ### 4. Verify creation
 
-After all issues are created, verify by listing issues in each project:
+After all issues are created, verify by listing issues in each project.
 
-```
-{TRACKER_MCP_PREFIX}list_issues(projectId: "{EPIC_PROJECT_ID}")
-```
+Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+- Operation: List issues
+- Filter: by project ID `{EPIC_PROJECT_ID}`
 
 Confirm the count matches expectations. If discrepancies exist, report them.
 

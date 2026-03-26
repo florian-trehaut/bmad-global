@@ -17,7 +17,7 @@ Extract the following from the YAML frontmatter:
 | Variable | Key | Example |
 |----------|-----|---------|
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Francais` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 | `{test_command}` | `test_command` | `npx playwright test` |
 | `{test_dir}` | `test_dir` | `tests` |
 | `{test_artifacts}` | `test_artifacts` | `test-artifacts` |

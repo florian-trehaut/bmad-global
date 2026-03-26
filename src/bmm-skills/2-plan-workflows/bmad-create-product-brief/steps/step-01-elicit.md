@@ -109,7 +109,7 @@ Compile all sections into a structured markdown document:
 
 Present the complete brief to the user:
 
-"Voici le brief complet. Des corrections avant de le sauvegarder dans Linear ?"
+"Voici le brief complet. Des corrections avant de le sauvegarder dans le tracker ?"
 
 WAIT for user confirmation or corrections. Apply any corrections.
 

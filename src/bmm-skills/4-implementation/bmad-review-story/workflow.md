@@ -19,7 +19,6 @@ Extract the following from the YAML frontmatter:
 | `PROJECT_NAME` | `project_name` | MyProject |
 | `ISSUE_PREFIX` | `issue_prefix` | PRJ |
 | `TRACKER` | `tracker` | linear, github, gitlab, jira |
-| `TRACKER_MCP_PREFIX` | `tracker_mcp_prefix` | mcp__linear-server__ |
 | `TRACKER_TEAM` | `tracker_team` | MyTeam |
 | `TRACKER_TEAM_ID` | `tracker_team_id` | UUID |
 | `TRACKER_STATES` | `tracker_states` | Map of state name to ID |

@@ -51,20 +51,17 @@ For each VM item from the tracker issue:
 
 ### 4. Post results to tracker
 
-```
-{TRACKER_MCP_PREFIX}save_comment(
-  issueId: '{ISSUE_ID}',
-  body: '## Validation Metier Results\n\n{VM_RESULTS_TABLE}\n\n**Verdict: {VERDICT}**'
-)
-```
+Post a comment on the tracker issue (using CRUD patterns from tracker.md):
+- Operation: Create comment
+- Issue: {ISSUE_ID}
+- Body: VM results table with verdict
 
 **If DONE:**
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  id: '{ISSUE_ID}',
-  state: '{TRACKER_STATES.done}'
-)
-```
+
+Update the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Update issue
+- Issue: {ISSUE_ID}
+- Status: {TRACKER_STATES.done}
 
 **If FAIL:**
 Leave state as In Review. Report which VM items failed and why.

@@ -16,14 +16,13 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
 | `{TRACKER_TEAM_ID}` | `tracker_team_id` | `32825b3b-...` |
 | `{TRACKER_META_PROJECT_ID}` | `tracker_meta_project_id` | `0df2e9de-...` |
 | `{TRACKER_STATES}` | `tracker_states` | YAML map of state IDs |
 | `{ISSUE_PREFIX}` | `issue_prefix` | `REW` |
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Francais` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 

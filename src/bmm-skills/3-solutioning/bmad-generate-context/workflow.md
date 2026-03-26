@@ -16,12 +16,11 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
-| `{TRACKER_META_PROJECT}` | `tracker_meta_project` | `RewardPulse Meta` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
+| `{TRACKER_META_PROJECT}` | `tracker_meta_project` | `MyProject Meta` |
 | `{TRACKER_META_PROJECT_ID}` | `tracker_meta_project_id` | `0df2e9de-...` |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
@@ -31,7 +30,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns and document conventions.
 
 ### 4. Set defaults
 
@@ -62,7 +61,7 @@ You are a **project analyst** specializing in codebase discovery and documentati
 - Execute ALL steps in exact order — NO skipping
 - **All findings must come from actual code** — never guess or assume based on project name
 - **Lean output** — only document what an LLM would get wrong or miss without explicit context
-- **Save to Linear** — the document must be persisted as a Linear Document, not just local
+- **Save to tracker** — the document must be persisted as a tracker document, not just local
 
 ---
 
@@ -71,7 +70,7 @@ You are a **project analyst** specializing in codebase discovery and documentati
 | Step | File | Goal |
 | ---- | ---- | ---- |
 | 1 | `step-01-scan.md` | Scan the codebase across all dimensions (stack, architecture, patterns, conventions, tests) |
-| 2 | `step-02-save.md` | Compile project-context.md, save to Linear Meta Project, report completion |
+| 2 | `step-02-save.md` | Compile project-context.md, save to tracker meta project, report completion |
 
 ## ENTRY POINT
 
@@ -81,7 +80,7 @@ Load and execute `./steps/step-01-scan.md`.
 
 These apply at ANY step:
 
-- Linear MCP tools unavailable or returning auth errors
+- Tracker MCP tools unavailable or returning auth errors
 - Project root cannot be determined (no git repository)
 - User requests stop
 - Codebase is empty or inaccessible

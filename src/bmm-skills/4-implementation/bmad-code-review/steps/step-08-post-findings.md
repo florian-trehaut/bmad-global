@@ -69,9 +69,10 @@ EXISTING_APPROVALS=$({FORGE_API_BASE} "projects/$PROJECT_ID/merge_requests/{MR_I
 <check if="LINKED_TRACKER_ISSUE exists">
   Post findings as a tracker comment:
 
-  ```bash
-  {TRACKER_MCP_PREFIX}save_comment(issueId: '{ISSUE_ID}', body: '{review_findings_markdown}')
-  ```
+  Post a comment on the tracker issue (using CRUD patterns from tracker.md):
+  - Operation: Create comment
+  - Issue: {ISSUE_ID}
+  - Body: {review_findings_markdown}
 
   Include: verdict, score, findings by severity, AC coverage table.
 </check>
@@ -105,10 +106,10 @@ cd {REVIEW_WORKTREE_PATH}
 - The worktree IS the MR branch — commits push directly
 
 <check if="all validations pass AND LINKED_TRACKER_ISSUE exists">
-  Update tracker issue status to To Test:
-  ```bash
-  {TRACKER_MCP_PREFIX}save_issue(id: '{ISSUE_ID}', state: 'To Test')
-  ```
+  Update the issue in the tracker (using CRUD patterns from tracker.md):
+  - Operation: Update issue
+  - Issue: {ISSUE_ID}
+  - Status: {TRACKER_STATES.to_test}
   Add comment: "Self-review complete — all findings resolved. Ready for validation métier."
 
   **NEVER set Done from code-review.** Done is ONLY set by the validation-metier workflow after all VM items pass.
@@ -133,10 +134,10 @@ cd {REVIEW_WORKTREE_PATH}
   - [ ] F002: {description} ({file}:{line})
   ```
 
-  Update tracker issue back to In Progress:
-  ```bash
-  {TRACKER_MCP_PREFIX}save_issue(id: '{ISSUE_ID}', stateId: '{TRACKER_STATES.in_progress}')
-  ```
+  Update the issue in the tracker (using CRUD patterns from tracker.md):
+  - Operation: Update issue
+  - Issue: {ISSUE_ID}
+  - Status: {TRACKER_STATES.in_progress}
   Add comment: "Action items created. Address and re-submit."
 </check>
 

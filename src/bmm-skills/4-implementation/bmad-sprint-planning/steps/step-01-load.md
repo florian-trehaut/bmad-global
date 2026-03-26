@@ -1,4 +1,4 @@
-# Step 1: Load Epic Files and Query Linear State
+# Step 1: Load Epic Files and Query Tracker State
 
 ## STEP GOAL
 
@@ -53,22 +53,30 @@ Epic 2: {title}
   - Story 2.1: {title} (key: 2-1-{kebab-title})
 ```
 
-### 3. Query existing Linear state
+### 3. Query existing tracker state
 
-Execute these tracker queries using `{TRACKER_MCP_PREFIX}`:
+Execute these tracker queries (using CRUD patterns from workflow-knowledge/tracker.md):
 
 1. **Get current cycle:**
-   `{TRACKER_MCP_PREFIX}list_cycles` with `teamId: {TRACKER_TEAM_ID}` — filter for the active/current cycle. Store the cycle ID and name.
+   - Operation: List cycles
+   - Team: {TRACKER_TEAM_ID}
+   - Filter: active/current cycle
+   - Store the cycle ID and name.
 
 2. **List all projects:**
-   `{TRACKER_MCP_PREFIX}list_projects` with `team: {TRACKER_TEAM}` — retrieve all existing Projects.
+   - Operation: List projects
+   - Team: {TRACKER_TEAM}
+   - Retrieve all existing Projects.
 
 3. **List all issues:**
-   `{TRACKER_MCP_PREFIX}list_issues` with `team: {TRACKER_TEAM}`, `limit: 250` — retrieve all existing Issues.
+   - Operation: List issues
+   - Team: {TRACKER_TEAM}
+   - Limit: 250
+   - Retrieve all existing Issues.
 
 ### 4. Build match mapping
 
-Cross-reference parsed epics/stories with existing Linear data:
+Cross-reference parsed epics/stories with existing tracker data:
 
 For each **epic**:
 - Check if a Project with a matching title already exists
@@ -91,7 +99,7 @@ Present the inventory to `{USER_NAME}` in `{COMMUNICATION_LANGUAGE}`:
 
 ### Epics ({count})
 {for each epic:}
-- Epic {N}: {title} — {EXISTS in Linear / TO CREATE}
+- Epic {N}: {title} — {EXISTS in tracker / TO CREATE}
 
 ### Stories ({count})
 {for each story:}

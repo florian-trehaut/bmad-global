@@ -205,6 +205,9 @@ The NEXT pointer in the body is the primary navigation mechanism.
 | `{TEST_COMMAND}` | `test_command` |
 | `{LINT_COMMAND}` | `lint_command` |
 | `{QUALITY_GATE}` | `quality_gate` |
+| `{COMM_PLATFORM}` | `comm_platform` |
+| `{COMM_MCP_PREFIX}` | `comm_mcp_prefix` |
+| `{USER_COMM_HANDLE}` | `user_comm_handle` |
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` |
 | `{USER_NAME}` | `user_name` |
 

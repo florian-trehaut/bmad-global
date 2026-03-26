@@ -16,12 +16,11 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
 | `{TRACKER_TEAM_ID}` | `tracker_team_id` | `abc123-...` |
 | `{TRACKER_STATES}` | `tracker_states` | `{todo: "Todo", ...}` |
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Francais` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
@@ -31,7 +30,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns and document conventions.
 
 ### 4. Set defaults
 

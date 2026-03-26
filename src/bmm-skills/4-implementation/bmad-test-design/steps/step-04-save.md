@@ -2,7 +2,7 @@
 
 ## STEP GOAL
 
-Compose the complete Test Design document(s) in Markdown and save to Linear. In system-level mode, produce two separate documents (Architecture + QA). In epic-level mode, produce a single document.
+Compose the complete Test Design document(s) in Markdown and save to the tracker. In system-level mode, produce two separate documents (Architecture + QA). In epic-level mode, produce a single document.
 
 ## RULES
 
@@ -153,44 +153,45 @@ Title: `Test Design — {project name}`
 {Actionable recommendations based on the analysis — infrastructure needs, missing test tooling, risks requiring architectural changes, etc.}
 ```
 
-### 2. Save to Linear
+### 2. Save to the tracker
 
 **Epic-level mode:**
 
-1. Check for an existing "Test Design" document in the project:
-   ```
-   {TRACKER_MCP_PREFIX}list_documents(projectId: PROJECT_ID)
-   ```
+1. Check for an existing "Test Design" document in the project (using CRUD patterns from tracker.md):
+   - Operation: List documents
+   - Project: PROJECT_ID
    Search for a document with "Test Design" in the title.
 
-2. If found — update it:
-   ```
-   {TRACKER_MCP_PREFIX}update_document(id: EXISTING_DOC_ID, content: composed_content)
-   ```
+2. If found — update it (using CRUD patterns from tracker.md):
+   - Operation: Update document
+   - Document: EXISTING_DOC_ID
+   - Content: composed_content
 
-3. If not found — create it:
-   ```
-   {TRACKER_MCP_PREFIX}create_document(title: 'Test Design', projectId: PROJECT_ID, content: composed_content)
-   ```
+3. If not found — create it (using CRUD patterns from tracker.md):
+   - Operation: Create document
+   - Title: "Test Design"
+   - Project: PROJECT_ID
+   - Content: composed_content
 
 **System-level mode:**
 
 Save both documents separately:
 
-1. Check for existing documents in the Meta Project:
-   ```
-   {TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')
-   ```
+1. Check for existing documents in the Meta Project (using CRUD patterns from tracker.md):
+   - Operation: List documents
+   - Project: {TRACKER_META_PROJECT_ID}
 
 2. For the Architecture document — search for "Test Design: Architecture". Update if found, create if not:
-   ```
-   {TRACKER_MCP_PREFIX}create_document(title: 'Test Design: Architecture', projectId: '{TRACKER_META_PROJECT_ID}', content: architecture_content)
-   ```
+   - Operation: Create/Update document
+   - Title: "Test Design: Architecture"
+   - Project: {TRACKER_META_PROJECT_ID}
+   - Content: architecture_content
 
 3. For the QA document — search for "Test Design: QA". Update if found, create if not:
-   ```
-   {TRACKER_MCP_PREFIX}create_document(title: 'Test Design: QA', projectId: '{TRACKER_META_PROJECT_ID}', content: qa_content)
-   ```
+   - Operation: Create/Update document
+   - Title: "Test Design: QA"
+   - Project: {TRACKER_META_PROJECT_ID}
+   - Content: qa_content
 
 ### 3. Report completion
 
@@ -202,7 +203,7 @@ Present to the user:
 > - **Target**: {project name or 'System'}
 > - **Risks**: {RISK_COUNT} identified ({HIGH_RISK_COUNT} critical)
 > - **Tests planned**: {TOTAL_TEST_COUNT}
-> - **Linear Document(s)**: saved ({created or updated})
+> - **Tracker document(s)**: saved ({created or updated})
 >   {If system-level: list both document titles}
 
 ---

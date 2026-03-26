@@ -11,9 +11,10 @@ Update tracker status, add completion comment with traceability report, and comm
 
 ### 1. Update Tracker Status
 
-```bash
-{TRACKER_MCP_PREFIX}save_issue(id: ISSUE_ID, state: '{TRACKER_STATES.in_review}')
-```
+Update the issue in the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+- Operation: Update issue
+- Issue: {ISSUE_ID}
+- Status: {TRACKER_STATES.in_review}
 
 ### 2. Add Completion Comment
 

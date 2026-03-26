@@ -2,7 +2,7 @@
 
 ## STEP GOAL
 
-Determine whether this NFR assessment targets a specific epic (project) or the entire system, then load the relevant context documents from Linear.
+Determine whether this NFR assessment targets a specific epic (project) or the entire system, then load the relevant context documents from the tracker.
 
 ## RULES
 
@@ -15,11 +15,10 @@ Determine whether this NFR assessment targets a specific epic (project) or the e
 
 ### 1. List active projects
 
-Query Linear for active projects:
-
-```
-{TRACKER_MCP_PREFIX}list_projects(team: '{TRACKER_TEAM}', state: 'started')
-```
+Query the tracker for active epics/projects (using CRUD patterns from tracker.md):
+- Operation: List epics/projects
+- Team: {TRACKER_TEAM}
+- State: started
 
 ### 2. Present scope choice to user
 
@@ -40,10 +39,9 @@ WAIT for user selection.
 **If user selects a project (epic-level):**
 
 - Set `SCOPE = "epic"`, store `PROJECT_NAME` and `PROJECT_ID`
-- List documents in the Epic Project:
-  ```
-  {TRACKER_MCP_PREFIX}list_documents(projectId: PROJECT_ID)
-  ```
+- List documents in the Epic Project (using CRUD patterns from tracker.md):
+  - Operation: List documents
+  - Project: PROJECT_ID
 - Read the following documents if they exist (they enrich the assessment but are not required):
   - **PRD** — provides the functional requirements context
   - **Architecture** — provides design decisions and constraints
@@ -53,10 +51,9 @@ WAIT for user selection.
 **If user selects "system" (system-level):**
 
 - Set `SCOPE = "system"`, `PROJECT_NAME = "System"`
-- Load global documents from Meta Project:
-  ```
-  {TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')
-  ```
+- Load global documents from Meta Project (using CRUD patterns from tracker.md):
+  - Operation: List documents
+  - Project: {TRACKER_META_PROJECT_ID}
 - Read Project Context and Architecture documents if they exist.
 
 ### 4. Determine scan perimeter
@@ -78,7 +75,7 @@ Present to the user:
 - **Type:** {SCOPE}
 - **Projet:** {PROJECT_NAME}
 - **Périmètre de scan:** {list of directories/services}
-- **Documents Linear chargés:** {list of loaded documents}
+- **Tracker documents chargés:** {list of loaded documents}
 - **Documents manquants:** {list or "aucun"}
 ```
 

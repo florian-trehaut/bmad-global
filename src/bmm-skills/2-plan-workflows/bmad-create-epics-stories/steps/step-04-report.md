@@ -2,11 +2,11 @@
 
 ## STEP GOAL
 
-Present a structured summary of all created Linear items (Projects and Issues) so the user has a clear view of the backlog and knows what to do next.
+Present a structured summary of all created tracker items (Projects and Issues) so the user has a clear view of the backlog and knows what to do next.
 
 ## RULES
 
-- Report must list every created item with its Linear identifier
+- Report must list every created item with its tracker identifier
 - Include counts and grouping by epic
 - Suggest relevant next workflow steps
 
@@ -19,12 +19,12 @@ Present the following summary to the user:
 ```
 Epics et Stories créés pour {SELECTED_PROJECT}
 
-Projets Linear (Epics):
+Tracker projects (Epics):
 {for each epic}
   - {epic_name} (ID: {project_id})
 {end}
 
-Issues Linear (Stories):
+Tracker issues (Stories):
 {for each epic}
   {epic_name}:
   {for each story}

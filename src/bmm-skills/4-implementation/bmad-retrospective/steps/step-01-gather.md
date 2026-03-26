@@ -2,11 +2,11 @@
 
 ## STEP GOAL
 
-Identify the completed epic/project for retrospective, load all issues with their statuses and metrics from Linear, retrieve scope documents (PRD, architecture), and collect git history for the epic period.
+Identify the completed epic/project for retrospective, load all issues with their statuses and metrics from the tracker, retrieve scope documents (PRD, architecture), and collect git history for the epic period.
 
 ## RULES
 
-- All data must come from real Linear API calls — no fabrication
+- All data must come from real tracker API calls — no fabrication
 - Present the project list and let the user choose — never auto-select
 - Gather ALL issues (use limit: 100), not just completed ones
 - Read comments only on issues that were blocked or had significant status changes
@@ -15,11 +15,9 @@ Identify the completed epic/project for retrospective, load all issues with thei
 
 ### 1. List available projects
 
-List all projects for the team to identify candidates for retrospective:
-
-```
-{TRACKER_MCP_PREFIX}list_projects(team: "{TRACKER_TEAM}")
-```
+List all epics/projects for the team to identify candidates for retrospective (using CRUD patterns from tracker.md):
+- Operation: List epics/projects
+- Team: {TRACKER_TEAM}
 
 ### 2. CHECKPOINT — Project selection
 
@@ -42,11 +40,11 @@ Store: `{PROJECT_NAME}`, `{PROJECT_ID}`, `{EPIC_SLUG}` (slugified project name).
 
 ### 3. Load all issues for the project
 
-Fetch all issues associated with this project:
-
-```
-{TRACKER_MCP_PREFIX}list_issues(team: "{TRACKER_TEAM}", project: "{PROJECT_NAME}", limit: 100)
-```
+Fetch all issues associated with this project (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Project: {PROJECT_NAME}
+- Limit: 100
 
 Compute and store the following metrics:
 
@@ -57,11 +55,9 @@ Compute and store the following metrics:
 
 ### 4. Load comments on key issues
 
-For issues that were blocked, cancelled, or had labels indicating problems, read their comments to understand context:
-
-```
-{TRACKER_MCP_PREFIX}list_comments(issueId: "{issue_id}")
-```
+For issues that were blocked, cancelled, or had labels indicating problems, read their comments to understand context (using CRUD patterns from tracker.md):
+- Operation: List comments
+- Issue: {issue_id}
 
 Focus on:
 - Blocked reasons and resolution
@@ -70,13 +66,11 @@ Focus on:
 
 Store notable comments and their themes.
 
-### 5. Load project documents from Linear
+### 5. Load project documents from the tracker
 
-Search for PRD, architecture, and other scope documents associated with the project:
-
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: "{PROJECT_ID}")
-```
+Search for PRD, architecture, and other scope documents associated with the project (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {PROJECT_ID}
 
 Read the PRD and architecture documents if found — these define the original scope baseline for comparison.
 
@@ -90,11 +84,9 @@ Run `git log --oneline --since="N months ago"` scoped to relevant paths or commi
 
 ### 7. Load previous retrospectives (optional)
 
-Check if any previous retrospective documents exist in the Meta Project:
-
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: "{TRACKER_META_PROJECT_ID}")
-```
+Check if any previous retrospective documents exist in the Meta Project (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {TRACKER_META_PROJECT_ID}
 
 Look for documents titled `Retrospective: *`. If found, note recurring themes for comparison.
 

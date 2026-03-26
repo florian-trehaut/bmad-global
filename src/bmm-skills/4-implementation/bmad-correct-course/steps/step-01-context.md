@@ -41,11 +41,24 @@ Load available planning documents to understand the project scope for impact ass
 
 ### 3. Load current sprint state from tracker
 
-Execute the following tracker queries:
+Query the tracker (using CRUD patterns from tracker.md) for:
 
-1. **Current cycle:** `{TRACKER_MCP_PREFIX}list_cycles(teamId: {TRACKER_TEAM_ID}, type: 'current')` — extract cycle name, start/end dates, progress
-2. **All cycle issues:** `{TRACKER_MCP_PREFIX}list_issues(team: {TRACKER_TEAM}, limit: 100)` — filter to current cycle issues
-3. **Active projects:** `{TRACKER_MCP_PREFIX}list_projects(team: {TRACKER_TEAM})` — list epics/projects with status
+1. **Current cycle:**
+   - Operation: List cycles
+   - Team: {TRACKER_TEAM_ID}
+   - Type: current
+   - Extract: cycle name, start/end dates, progress
+
+2. **All cycle issues:**
+   - Operation: List issues
+   - Team: {TRACKER_TEAM}
+   - Limit: 100
+   - Filter: current cycle issues
+
+3. **Active projects:**
+   - Operation: List projects
+   - Team: {TRACKER_TEAM}
+   - Extract: epics/projects with status
 
 From the loaded data, build a sprint snapshot:
 

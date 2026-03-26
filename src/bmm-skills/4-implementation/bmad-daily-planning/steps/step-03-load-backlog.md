@@ -17,21 +17,23 @@ Load all non-completed issues relevant to the user from the tracker — assigned
 
 ### 1. Query tracker for assigned issues
 
-Using tracker MCP tools (`{TRACKER_MCP_PREFIX}`):
-- List issues for team `{TRACKER_TEAM}`
+Query the tracker (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
 - Filter: assigned to `"me"` (authenticated user — NOT `{USER_NAME}` which may not match the tracker's user lookup)
 - Filter: status NOT in ["Done", "Cancelled", "Duplicate"]
 
 ### 2. Query tracker for created issues
 
-Using tracker MCP tools (`{TRACKER_MCP_PREFIX}`):
-- List issues for team `{TRACKER_TEAM}`
-- Filter: created by `{USER_NAME}`
+Query the tracker (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Filter: created by `"me"` (authenticated user)
 - Filter: status NOT in ["Done", "Cancelled", "Duplicate"]
 
 ### 3. Query tracker for unassigned issues
 
-Using tracker MCP tools (`{TRACKER_MCP_PREFIX}`):
+Query the tracker (using CRUD patterns from tracker.md):
 - List issues for team `{TRACKER_TEAM}`
 - Filter: assignee = null (no one assigned)
 - Filter: status NOT in ["Done", "Cancelled", "Duplicate"]
@@ -44,7 +46,7 @@ Combine assigned + created lists. Remove duplicates (same issue ID). Store as `B
 Keep `UNASSIGNED_ISSUES` separate — they are presented as a "triage" section in the planning step.
 
 For each issue, capture:
-- `id` (e.g., REW-123)
+- `id` (e.g., PRJ-123)
 - `title`
 - `status` (Backlog, Todo, In Progress, In Review)
 - `points` (estimate — null if unestimated)

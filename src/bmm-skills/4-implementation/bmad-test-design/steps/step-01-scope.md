@@ -2,14 +2,14 @@
 
 ## STEP GOAL
 
-Determine whether the test design operates at epic-level (specific project) or system-level (whole codebase), then load all relevant context documents from Linear.
+Determine whether the test design operates at epic-level (specific project) or system-level (whole codebase), then load all relevant context documents from the tracker.
 
 ## RULES
 
 - If the user specifies an epic or project name, use **epic-level** mode
 - If the user requests a system-wide review or does not specify a project, use **system-level** mode
 - If ambiguous, ask the user to clarify before proceeding
-- All documents must be loaded from Linear — do not fabricate content
+- All documents must be loaded from the tracker — do not fabricate content
 
 ## SEQUENCE
 
@@ -46,10 +46,10 @@ WAIT for user response.
 
 Set `MODE = "epic-level"`.
 
-Load the Epic Project from Linear:
-```
-{TRACKER_MCP_PREFIX}get_project(query: PROJECT_NAME, includeMilestones: true)
-```
+Load the Epic Project from the tracker (using CRUD patterns from tracker.md):
+- Operation: Get project
+- Query: PROJECT_NAME
+- Include milestones: true
 
 **If user requests system-level review OR no specific epic:**
 
@@ -59,10 +59,9 @@ Set `MODE = "system-level"`.
 
 **Epic-level mode:**
 
-1. List documents in the project:
-   ```
-   {TRACKER_MCP_PREFIX}list_documents(projectId: PROJECT_ID)
-   ```
+1. List documents in the project (using CRUD patterns from tracker.md):
+   - Operation: List documents
+   - Project: PROJECT_ID
 
 2. Find and load the **PRD** document (search for "PRD" in document titles).
    **HALT if not found:** "No PRD document found in project. A PRD is required for epic-level test design."
@@ -72,23 +71,23 @@ Set `MODE = "system-level"`.
 
 4. Find and load the **UX Design** document if available (not required).
 
-5. List all stories in the project:
-   ```
-   {TRACKER_MCP_PREFIX}list_issues(team: '{TRACKER_TEAM}', project: PROJECT_NAME)
-   ```
+5. List all stories in the project (using CRUD patterns from tracker.md):
+   - Operation: List issues
+   - Team: {TRACKER_TEAM}
+   - Project: PROJECT_NAME
 
 **System-level mode:**
 
-1. Load global documents from Meta Project:
-   ```
-   {TRACKER_MCP_PREFIX}list_documents(projectId: '{TRACKER_META_PROJECT_ID}')
-   ```
+1. Load global documents from Meta Project (using CRUD patterns from tracker.md):
+   - Operation: List documents
+   - Project: {TRACKER_META_PROJECT_ID}
+
    Find and load "Project Context" and "Architecture Globale" documents.
 
-2. List all active projects:
-   ```
-   {TRACKER_MCP_PREFIX}list_projects(team: '{TRACKER_TEAM}', state: 'started')
-   ```
+2. List all active epics/projects (using CRUD patterns from tracker.md):
+   - Operation: List epics/projects
+   - Team: {TRACKER_TEAM}
+   - State: started
 
 ### 4. CHECKPOINT
 

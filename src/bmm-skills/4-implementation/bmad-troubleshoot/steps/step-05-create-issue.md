@@ -45,16 +45,14 @@ Fill the diagnosis report template with all accumulated data:
 
 ### 4. Create the issue
 
-```
-{TRACKER_MCP_PREFIX}save_issue(
-  title: 'fix({AFFECTED_SERVICE}): {SHORT_DESCRIPTION}',
-  team: '{TRACKER_TEAM}',
-  description: '{composed_description}',
-  priority: 2,
-  labels: ['Bug'],
-  state: '{TRACKER_STATES.in_progress}'
-)
-```
+Create the issue in the tracker (using CRUD patterns from tracker.md):
+- Operation: Create issue
+- Title: fix({AFFECTED_SERVICE}): {SHORT_DESCRIPTION}
+- Team: {TRACKER_TEAM}
+- Description: {composed_description}
+- Priority: 2
+- Labels: Bug
+- Status: {TRACKER_STATES.in_progress}
 
 Store `ISSUE_ID` and `ISSUE_IDENTIFIER`.
 

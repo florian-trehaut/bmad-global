@@ -15,11 +15,9 @@ Select the target project from the tracker, then load ALL planning artifacts (PR
 
 ### 1. List available projects
 
-Query the tracker for all projects in the team:
-
-```
-{TRACKER_MCP_PREFIX}list_projects(team: "{TRACKER_TEAM}")
-```
+Query the tracker for all epics/projects in the team (using CRUD patterns from tracker.md):
+- Operation: List epics/projects
+- Team: {TRACKER_TEAM}
 
 ### 2. Ask user to select a project
 
@@ -41,17 +39,13 @@ Store: `{PROJECT_NAME}`, `{PROJECT_ID}`.
 
 ### 3. Load all project documents
 
-Fetch the document list for the selected project:
+Fetch the document list for the selected project (using CRUD patterns from tracker.md):
+- Operation: List documents
+- Project: {PROJECT_ID}
 
-```
-{TRACKER_MCP_PREFIX}list_documents(projectId: "{PROJECT_ID}")
-```
-
-For EACH document found, load its full content:
-
-```
-{TRACKER_MCP_PREFIX}get_document(id: document_id)
-```
+For EACH document found, load its full content (using CRUD patterns from tracker.md):
+- Operation: Get document
+- Document: document_id
 
 Classify each document by type based on its title and content:
 
@@ -64,9 +58,11 @@ Classify each document by type based on its title and content:
 
 ### 4. Load all project issues (stories/epics)
 
-```
-{TRACKER_MCP_PREFIX}list_issues(team: "{TRACKER_TEAM}", project: "{PROJECT_NAME}", limit: 100)
-```
+Query the tracker (using CRUD patterns from tracker.md):
+- Operation: List issues
+- Team: {TRACKER_TEAM}
+- Project: {PROJECT_NAME}
+- Limit: 100
 
 For each issue, note:
 - Title

@@ -16,27 +16,26 @@ Extract the following from the YAML frontmatter:
 
 | Variable | Key | Example |
 |----------|-----|---------|
-| `{TRACKER_MCP_PREFIX}` | `tracker_mcp_prefix` | `mcp__linear-server__` |
-| `{TRACKER_TEAM}` | `tracker_team` | `Rewardpulse` |
-| `{TRACKER_META_PROJECT}` | `tracker_meta_project` | `RewardPulse Meta` |
+| `{TRACKER_TEAM}` | `tracker_team` | `MyTeam` |
+| `{TRACKER_META_PROJECT}` | `tracker_meta_project` | `MyProject Meta` |
 | `{TRACKER_META_PROJECT_ID}` | `tracker_meta_project_id` | `0df2e9de-...` |
-| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `Français` |
-| `{USER_NAME}` | `user_name` | `Florian` |
+| `{COMMUNICATION_LANGUAGE}` | `communication_language` | `English` |
+| `{USER_NAME}` | `user_name` | `Developer` |
 
 ### 2. Load shared rules
 
 Read all files in `~/.claude/skills/bmad-shared/`.
 
-Apply these rules for the entire workflow execution. Key rule for this workflow: **never fabricate metrics or analysis — all data must come from real Linear issues, git history, and documents.**
+Apply these rules for the entire workflow execution. Key rule for this workflow: **never fabricate metrics or analysis — all data must come from real tracker issues, git history, and documents.**
 
 ### 3. Load tracker knowledge (optional)
 
-If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides Linear MCP tool patterns and document conventions.
+If `.claude/workflow-knowledge/tracker.md` exists at project root, read it. It provides tracker MCP tool patterns and document conventions.
 
 ### 4. Set defaults
 
 - `{PROJECT_NAME}` — to be selected by user in step 01
-- `{PROJECT_ID}` — resolved from Linear in step 01
+- `{PROJECT_ID}` — resolved from tracker in step 01
 - `{EPIC_SLUG}` — derived from project name in step 01
 
 ---
@@ -61,9 +60,9 @@ You are a **Scrum Master facilitator** conducting a structured retrospective aft
 
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
 - Execute ALL steps in exact order — NO skipping
-- **Every metric must come from real data** — Linear issues, git log, or documents. No estimates or approximations.
+- **Every metric must come from real data** — tracker issues, git log, or documents. No estimates or approximations.
 - **No blame** — retrospective is about process improvement, not individual performance
-- **Save to Linear** — the retrospective document must be persisted as a Linear Document in the Meta Project
+- **Save to tracker** — the retrospective document must be persisted as a tracker document in the meta project
 - **Compare scope objectively** — original PRD scope vs delivered issues, flag additions and drops without judgment
 
 ---
@@ -72,9 +71,9 @@ You are a **Scrum Master facilitator** conducting a structured retrospective aft
 
 | Step | File | Goal |
 | ---- | ---- | ---- |
-| 1 | `step-01-gather.md` | Select project, load all issues + metrics + documents from Linear, check git log |
+| 1 | `step-01-gather.md` | Select project, load all issues + metrics + documents from tracker, check git log |
 | 2 | `step-02-analyze.md` | Analyze scope management, process quality, technical quality, lessons learned |
-| 3 | `step-03-save.md` | Compile retrospective document and save to Linear Meta Project |
+| 3 | `step-03-save.md` | Compile retrospective document and save to tracker meta project |
 
 ## ENTRY POINT
 
@@ -84,7 +83,7 @@ Load and execute `./steps/step-01-gather.md`.
 
 These apply at ANY step:
 
-- Linear MCP tools unavailable or returning auth errors
+- Tracker MCP tools unavailable or returning auth errors
 - No project/epic can be identified for retrospective
 - User requests stop
 - Zero issues found for the selected project (nothing to retrospect)
