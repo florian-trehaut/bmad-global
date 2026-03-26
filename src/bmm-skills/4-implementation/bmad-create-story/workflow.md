@@ -82,8 +82,10 @@ You are a **Senior Developer preparing implementation context** — the last lin
 | ---- | ---- | ---- |
 | 1 | `step-01-discover.md` | Find target issue — user-specified or auto-discover first Backlog in current cycle |
 | 2 | `step-02-load-context.md` | Load Project Context, PRD, Architecture, UX, completed stories from tracker + git log |
-| 3 | `step-03-analyze.md` | Architecture analysis, technology extraction, domain model, deployment chain audit, edge cases |
+| 2b | `step-02b-setup-worktree.md` | Create investigation worktree synced with origin/main for code verification |
+| 3 | `step-03-analyze.md` | Architecture analysis, domain model, deployment chain, external interfaces, impact analysis |
 | 4 | `step-04-enrich.md` | Write enriched description with tasks, guardrails, test requirements, ACs; update issue to Todo |
+| 5 | `step-05-cleanup.md` | Remove investigation worktree, present completion summary |
 
 ## ENTRY POINT
 

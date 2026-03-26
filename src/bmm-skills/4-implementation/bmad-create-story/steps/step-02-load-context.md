@@ -86,4 +86,4 @@ No user checkpoint here — proceed directly to analysis.
 
 ---
 
-**Next:** Read fully and follow `./step-03-analyze.md`
+**Next:** Read fully and follow `./step-02b-setup-worktree.md`

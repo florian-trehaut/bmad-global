@@ -11,27 +11,33 @@ Write the enriched issue description incorporating ALL analysis from step 03, up
 - Infrastructure tasks get `[INFRA]` or `[CI/CD]` prefix — they are mandatory, not optional
 - Every task must be concrete and actionable — no vague "handle edge cases"
 - Guardrails must be specific to THIS story, not generic advice
-- Validation Metier items must be executable by a human in production
+- Validation Metier items must be executable by a human in production, each tracing to BACs: `VM-N *(BAC-X,Y)* : description`
+- Load `../templates/tracker-issue-description.md` for section ordering and conditional rules
 
 ## SEQUENCE
 
 ### 1. Compose enriched description
 
-Build the enriched issue description with the following sections (in order):
+Build the enriched issue description following `../templates/tracker-issue-description.md` for section ordering and conditional rules. Key principles:
 
-**Header:**
-- Story title, identifier, epic, current status
+- **Definition of Done (product)** is ALWAYS the FIRST section — it is the first thing visible when opening the ticket
+- **Conditional sections**: omit Data Model if no changes, omit API if no endpoints, omit Infrastructure if no changes, omit External Interfaces if none, omit Data Mapping if no end-to-end flow
+- **Technical Context** is wrapped in `<details><summary>Technical Context</summary>` for cleaner readability
+
+Section details:
+
+**Definition of Done (product)** — ALWAYS FIRST, ALWAYS PRESENT:
+- Two dimensions: Feature DoD (BACs satisfied, user journey validated) + Non-regression DoD (impacted flows continue to work)
+- Include non-regression VMs from impact analysis (step 03)
 
 **Contexte business** (MANDATORY):
 - If `HAS_BUSINESS_CONTEXT = true`: preserve the existing section verbatim
-- If `HAS_BUSINESS_CONTEXT = false`: synthesize from PRD:
-  - User journey E2E (from user's perspective)
-  - Business Acceptance Criteria (BACs) — observable outcomes
-  - External dependencies and validation gates
-  - Validation Metier checklist (production tests to execute after deploy)
-  - Product-level Definition of Done
+- If `HAS_BUSINESS_CONTEXT = false`: synthesize from PRD using `~/.claude/skills/bmad-shared/data/business-context-template.md`:
+  - User journey E2E (primary actor, numbered steps)
+  - Business Acceptance Criteria (BACs) in Given/When/Then — observable outcomes
+  - External dependencies and validation gates (table: Dependency, Owner, Gate, Status)
 
-**Contexte technique:**
+**Contexte technique** (inside `<details>` collapsible):
 - Technical context from Architecture document
 - Impacted services, relevant patterns, key dependencies
 - Reference code pointers (which existing code to follow as example)
@@ -56,38 +62,48 @@ Build the enriched issue description with the following sections (in order):
 - Libraries to use (with versions if relevant)
 - Architectural constraints
 
-**Data Model Changes** (if applicable):
+**Data Model Changes** (conditional — omit if no data changes):
 - Schema delta: new tables/columns, modified constraints
-- Migration plan and sequencing
+- Migration plan and sequencing (Additive vs Transformative classification)
 - Indexes for frequent query patterns
 - Data mapping table: DTO <-> Domain <-> DB
 
-**API Contract Changes** (if applicable):
+**API Contract Changes** (conditional — omit if no endpoint impacted):
 - New/modified endpoints with request/response payloads
 - Error codes and error handling requirements
 - Validation rules for request bodies
 
-**Infrastructure Changes** (if applicable):
-- New resources (GCS buckets, secrets, env vars)
-- Terraform modifications
-- Cloud Run template changes
-- New entries in configuration.ts
+**Infrastructure Changes** (conditional — omit if no changes required):
+- New cloud resources, secrets, env vars
+- IaC modifications (see workflow-knowledge/infrastructure.md for the project's IaC tool)
+- Deployment template changes
+- New entries in the project's configuration module
+
+**External Data Interface Contracts** (conditional — omit if no external interface):
+- External interface documentation from step 03 section 6
+
+**Data Mapping** (conditional — omit if no end-to-end data flow):
+- DTO -> Domain -> DB mapping from step 03 section 6
+
+**Implementation Plan:**
+- Tasks with checkboxes (from Tasks section above)
+- Technical Acceptance Criteria (TACs) in Given/When/Then
 
 **Guardrails:**
 - What NOT to do, common mistakes to avoid for THIS story
 - MUST include: "Do not consider the story complete if schema changes exist without generated migrations"
 - MUST include: "Data migrations with UPDATE/DELETE must be effective in ALL environments (dev, staging, production). WHERE clauses matching on names/slugs must be verified against real data — names often differ between environments. A migration that silently updates 0 rows is a zero-fallback violation."
 - MUST include: "Do not consider the story complete if a service is not deployable end-to-end via CI/CD"
-- MUST include: "Toute requete `findMany({ where: { column } })` frequente doit avoir un index sur `column`"
-- MUST include: "Apres ajout d'un `@@index` dans le schema, verifier que le SQL correspondant est dans la migration"
 - MUST include: "Do not consider the story complete if schema changes have no documented data mapping (DTO <-> Domain <-> DB)"
-- MUST include: "Every new `config.get()` call must have a corresponding env var in configuration.ts AND cloudrun-template.yml"
+- MUST include: "Every new config access must have a corresponding env var in the project's configuration module AND deployment template (see workflow-knowledge/infrastructure.md)"
 - Additional story-specific guardrails from analysis
 
-**Validation Metier** (MANDATORY):
+**Validation Metier** (MANDATORY — ALWAYS PRESENT):
 - Production test checklist — tests to execute in production after deployment
+- Format: `VM-N *(BAC-X,Y)* : description` — each VM traces to one or more BACs
 - Items must be concrete, executable by a human, from user/business perspective
 - Not "check logs" — observable outcomes like "email received", "API returns X", "data visible in UI"
+- Include non-regression VMs from impact analysis: `VM-NR-N *(Impact IN)* : description`
 - The story passes to "To Test" in the tracker and only moves to "Done" after manual validation
 
 **Previous Story Learnings** (if applicable):
@@ -95,11 +111,16 @@ Build the enriched issue description with the following sections (in order):
 - Patterns to replicate, mistakes to avoid
 - Regressions to watch for
 
-**Test Requirements:**
-- Unit tests: what to test, key edge cases
-- Integration tests: what interactions to verify
-- Journey tests: what end-to-end flows to cover (if applicable)
-- Test pyramid expectations for this story
+**Test Strategy:**
+
+| TAC | Priority | Unit | Integration | Journey | Key Scenarios |
+| --- | -------- | ---- | ----------- | ------- | ------------- |
+
+Priority classification:
+- P0: Revenue-critical, security, compliance, data integrity (>90% unit, >80% integration)
+- P1: Core journeys, frequently used, complex logic (>80% unit, >60% integration)
+- P2: Secondary features, admin, reporting
+- P3: Rarely used, nice-to-have
 
 **File List:**
 - Expected files to create and modify
@@ -154,6 +175,4 @@ ou le workflow review-story pour une revue adversariale avant dev.
 
 ---
 
-## END OF WORKFLOW
-
-The bmad-create-story workflow is complete.
+**Next:** Read fully and follow `./step-05-cleanup.md`

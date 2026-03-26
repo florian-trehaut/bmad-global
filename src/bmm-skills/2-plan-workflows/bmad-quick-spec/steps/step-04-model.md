@@ -2,9 +2,9 @@
 nextStepFile: './step-04b-interfaces.md'
 advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
 partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
-dataModelTemplate: '../data/data-model-template.md'
-apiContractTemplate: '../data/api-contract-template.md'
-infraAssessmentTemplate: '../data/infra-assessment-template.md'
+dataModelTemplate: '~/.claude/skills/bmad-shared/data/data-model-template.md'
+apiContractTemplate: '~/.claude/skills/bmad-shared/data/api-contract-template.md'
+infraAssessmentTemplate: '~/.claude/skills/bmad-shared/data/infra-assessment-template.md'
 ---
 
 # Step 4: Data Model, API & Infrastructure
@@ -54,7 +54,7 @@ Assess data model changes, API contracts, and infrastructure requirements. This 
 
 Investigate in {SPEC_WORKTREE_PATH}:
 
-- Read ORM schemas (e.g., `**/schema.prisma`, `**/schema.ts`, `**/migrations/`) impacted by this feature
+- Read ORM schema files and migrations impacted by this feature (see workflow-knowledge/stack.md for the project's ORM and file patterns)
 - Read existing migrations to understand the current state
 - Identify: which tables/columns must be created, modified, or deleted
 
@@ -86,7 +86,7 @@ Produce the API contract assessment following the template: endpoints table, pay
 Determine if the feature requires infra changes:
 
 - New compute services? New object storage? New secrets? New environment variables?
-- Modifications to existing infrastructure-as-code (Terraform, CDK, etc.)?
+- Modifications to existing infrastructure-as-code (see workflow-knowledge/infrastructure.md for the project's IaC tool)?
 
 Load {infraAssessmentTemplate} for output format reference.
 

@@ -1,7 +1,7 @@
 ---
 nextStepFile: './step-05-plan.md'
-externalInterfaceTemplate: '../data/external-interface-template.md'
-dataMappingTemplate: '../data/data-mapping-template.md'
+externalInterfaceTemplate: '~/.claude/skills/bmad-shared/data/external-interface-template.md'
+dataMappingTemplate: '~/.claude/skills/bmad-shared/data/data-mapping-template.md'
 ---
 
 # Step 4b: External Interfaces & Data Mapping
