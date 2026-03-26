@@ -47,7 +47,7 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This f
 ### 4. Set WIP variables
 
 ```yaml
-wip_file: ".claude/wip-quick-spec-{slug}.md"
+wip_file: "/tmp/bmad-wip-quick-spec-{slug}.md"
 ```
 
 ### 5. Set related workflow paths

@@ -39,7 +39,7 @@ Accept ADR from any source, parse into normalized sections, create worktree for 
 ### 1. Check for WIP Resume
 
 ```bash
-ls {project_root}/.claude/wip-adr-review-*.md 2>/dev/null
+ls /tmp/bmad-wip-adr-review-*.md 2>/dev/null
 ```
 
 <check if="WIP file found">
@@ -147,7 +147,7 @@ Store `WORKTREE_PATH`. From this point, all codebase investigation runs inside t
 
 ### 7. Save WIP
 
-Create WIP file at `{project_root}/.claude/wip-adr-review-{SLUG}.md`:
+Create WIP file at `/tmp/bmad-wip-adr-review-{SLUG}.md`:
 
 ```yaml
 ---

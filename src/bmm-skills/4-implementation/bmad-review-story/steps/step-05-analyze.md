@@ -102,6 +102,14 @@ Good examples:
 
 If you cannot determine the right action from evidence, state your best recommendation with the evidence that supports it — do NOT defer the decision to the story.
 
+**RESOLVE OPTIONS PROACTIVELY.** If you identify multiple possible actions for a finding, do NOT present them as "Option A or Option B" for the user to choose. Instead:
+1. Investigate autonomously — query code, databases, web search for best practices, check real system state
+2. Determine which option is best based on evidence
+3. Write a SINGLE recommended action with brief justification
+4. Note investigated alternatives in a separate `investigation_notes` field
+
+The user expects a recommendation backed by investigation, not an open question.
+
 ### 6. Append findings to intermediate file
 
 Update the intermediate file with all findings.

@@ -51,7 +51,7 @@ WAIT for user selection.
 ### 2. Delete WIP File
 
 ```bash
-rm {project_root}/.claude/wip-adr-review-{SLUG}.md
+rm /tmp/bmad-wip-adr-review-{SLUG}.md
 ```
 
 ### 3. Present Final Summary

@@ -2,19 +2,33 @@
 
 ## STEP GOAL
 
-Present findings one by one to the user, discuss each, and decide together which modifications to apply to the story.
+Present ALL findings at once to the user, then collect decisions on each. Before presenting, resolve any findings that propose multiple options by proactively investigating to determine the best recommendation.
 
 ## RULES
 
-- Present ALL findings — do not hide or skip any
+- Present ALL findings in a single message — do not drip-feed one by one
 - Order: BLOCKERs first, then MAJORs, then MINORs, then INFOs
-- Wait for user response on EACH finding before moving to the next
+- **PROACTIVE INVESTIGATION (CRITICAL):** Before presenting findings, review each proposed action. If ANY finding proposes multiple options or alternatives (e.g., "Option A: ... or Option B: ..."), you MUST autonomously investigate to determine the best option BEFORE presenting. This means: query databases, read code, search for best practices on the web, check documentation — whatever it takes. Then present a SINGLE recommended action with evidence for why it's the best choice. The user should receive a clear recommendation, not an open question.
 - Track decisions: ACCEPTED / REJECTED / MODIFIED / SKIPPED
 - Do not apply modifications yet — that happens in Step 7
 
 ## SEQUENCE
 
-### 1. Present summary
+### 1. Pre-presentation: resolve open options
+
+Before presenting anything, scan all findings:
+
+For EACH finding where `proposed_action` contains multiple options or an unresolved choice:
+1. **Investigate autonomously** — query code, databases, APIs, web search for best practices
+2. **Pick the best option** — based on evidence gathered
+3. **Rewrite `proposed_action`** — as a single, clear, executable recommendation
+4. **Add `investigation_notes`** — brief explanation of what you checked and why this option wins
+
+Only present to the user AFTER all options are resolved.
+
+### 2. Present all findings at once
+
+Present a summary header followed by ALL findings in a single message:
 
 ```
 ## Review Summary
@@ -25,14 +39,8 @@ Present findings one by one to the user, discuss each, and decide together which
 - **MINORs:** {count}
 - **INFOs:** {count}
 
-I will present each finding. For each one, we decide together whether to modify the story.
-```
+---
 
-### 2. Present each finding
-
-For each finding, starting with BLOCKERs, then MAJORs, then MINORs, then INFOs:
-
-```
 ### Finding {id} — {severity} — {category}
 
 **{title}**
@@ -41,13 +49,23 @@ For each finding, starting with BLOCKERs, then MAJORs, then MINORs, then INFOs:
 **Reality:** {reality}
 **Evidence:** {evidence}
 
-**Proposed action:** {proposed_action}
+**Recommended action:** {proposed_action}
+{if investigation_notes: **Investigation notes:** {investigation_notes}}
 
 ---
-Verdict? [A]ccept modification | [R]eject | [M]odify the proposal | [S]kip
+
+{... repeat for all findings ...}
+
+---
+
+For each finding, reply with its ID and verdict:
+**[A]**ccept | **[R]**eject | **[M]**odify | **[S]**kip
+
+Example: "F-001 A, F-002 A, F-003 M: change X to Y, F-004 S"
+Or review one at a time — your call.
 ```
 
-WAIT for user response on each finding.
+WAIT for user response.
 
 ### 3. Handle user decisions
 
@@ -64,6 +82,8 @@ WAIT for user response on each finding.
 
 **If user selects S (Skip):**
 - Mark finding as SKIPPED — move to next finding
+
+The user may respond in bulk ("F-001 A, F-002 A, F-003 R") or one at a time. Handle both styles. If some findings need discussion (M), handle those individually after processing the bulk decisions.
 
 ### 4. Present summary of decisions
 

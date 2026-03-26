@@ -40,7 +40,7 @@ Check for in-progress specs, greet the user, understand their request, and creat
 
 ### 1. WIP Resume Check
 
-Check if any `{project-root}/.claude/wip-quick-spec-*.md` file exists.
+Check if any `/tmp/bmad-wip-quick-spec-*.md` file exists.
 
 **If WIP file found:**
 
@@ -101,7 +101,7 @@ Log: "Worktree created: {SPEC_WORKTREE_PATH} (synced with main)"
 
 ### 6. Save WIP File
 
-Write `{wip_file}` (at `{project-root}/.claude/wip-quick-spec-{slug}.md`) with frontmatter:
+Write `{wip_file}` (at `/tmp/bmad-wip-quick-spec-{slug}.md`) with frontmatter:
 - `title`, `slug`, `created: {date}`, `status: in-progress`
 - `stepsCompleted: [1]`, `type: {type}`
 - `worktree_path: {SPEC_WORKTREE_PATH}`

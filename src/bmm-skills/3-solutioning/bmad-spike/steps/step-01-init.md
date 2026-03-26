@@ -41,7 +41,7 @@ Check for in-progress spikes, greet the user, validate the request is a genuine 
 
 ### 1. WIP Resume Check
 
-Check if any `{project-root}/.claude/wip-spike-*.md` file exists.
+Check if any `/tmp/bmad-wip-spike-*.md` file exists.
 
 **If WIP file found:**
 
@@ -140,7 +140,7 @@ Log: "Worktree created: {SPIKE_WORKTREE_PATH} (synced with main) — PoC code wi
 
 ### 8. Save WIP File
 
-Write `{wip_file}` (at `{project-root}/.claude/wip-spike-{slug}.md`) with frontmatter:
+Write `{wip_file}` (at `/tmp/bmad-wip-spike-{slug}.md`) with frontmatter:
 - `title`, `slug`, `created: {date}`, `status: in-progress`
 - `stepsCompleted: [1]`
 - `spike_type: pending` (set in Step 2)
