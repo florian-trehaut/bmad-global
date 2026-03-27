@@ -1,6 +1,7 @@
 ---
 name: bmad-workflow-builder
 description: Builds workflows and skills through conversational discovery and validates existing ones. Use when the user requests to "build a workflow", "modify a workflow", "quality check workflow", or "optimize skill".
+disable-model-invocation: true
 ---
 
 # Workflow & Skill Builder

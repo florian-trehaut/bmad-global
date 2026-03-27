@@ -1,6 +1,7 @@
 ---
 name: bmad-builder-setup
 description: Sets up BMad Builder module in a project. Use when the user requests to 'install bmb module', 'configure bmad builder', or 'setup bmad builder'.
+disable-model-invocation: true
 ---
 
 # Module Setup

@@ -1,6 +1,7 @@
 ---
 name: bmad-agent-builder
 description: Builds, edit or validate Agent Skill through conversational discovery. Use when the user requests to "Create an Agent", "Optimize an Agent" or "Edit an Agent".
+disable-model-invocation: true
 ---
 
 # Agent Builder

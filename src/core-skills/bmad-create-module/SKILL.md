@@ -1,6 +1,7 @@
 ---
 name: bmad-create-module
 description: Builds BMAD modules through conversational discovery and validates existing ones. Use when the user requests to "create a module", "build a module", "validate a module", or "optimize module".
+disable-model-invocation: true
 ---
 
 # Module Builder
