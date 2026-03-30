@@ -1,5 +1,87 @@
 # Changelog
 
+## v1.1.0 - 2026-03-30
+
+### Workflow Hardening
+
+Fixes from real-world code-review and dev-story execution retrospectives.
+
+#### Worktree Safety
+
+- **Pre-selected MR no longer skips worktree setup** — step-01-discover now explicitly states that only discovery steps are bypassed, the worktree step is mandatory
+- **Worktree invariant enforced across steps** — step-02 declares a WORKTREE INVARIANT, step-03 adds a PRE-CHECK HALT if no worktree is configured. Prevents reviewing code from the wrong branch.
+
+#### Retrospective Overhaul
+
+- **Diagnosis-only output** — the retrospective step no longer proposes patches or offers to edit skill files. It describes friction points with impact, and stops there.
+- **Relative framework paths** — retrospective findings now use `bmad-code-review/steps/step-01.md` instead of `~/.claude/skills/bmad-code-review/...`, so the framework developer gets actionable paths.
+- **No more file modifications** — the executing agent is explicitly forbidden from touching skill files, installed or source.
+
+#### bmad-shared Directory Reads
+
+- **36 workflow files fixed** — replaced `Read all files in ~/.claude/skills/bmad-shared/` with explicit `Glob *.md, then Read each file individually` instruction. The Read tool reads files, not directories. Agents that tried to read the directory path got an error and silently skipped shared rules.
+
+### New Workflow Capabilities
+
+Five improvements applied across 6 workflows (dev-story, code-review, quick-spec, create-story, spike, quick-dev):
+
+#### 1. Prior PR/MR Search
+
+Search for closed/rejected MRs on the same issue before starting work. Surfaces prior approaches, rejection reasons, and reviewer objections early — not after the code is written.
+
+- **dev-story** step-04: searches by issue identifier and branch pattern
+- **code-review** step-03: checks if current MR repeats a rejected approach
+- **quick-spec** step-02: includes prior PRs in context scan
+- **create-story** step-02: informs story guardrails from prior rejections
+- **spike** step-03: adds "prior attempts" as an investigation axis
+- **quick-dev** step-02: searches git log and forge for related closed PRs
+
+#### 2. Contribution Conventions Loading
+
+Load CONTRIBUTING.md, PR templates, Danger.js, CLA requirements early in the workflow — not after the code is ready.
+
+- **dev-story** step-05: stores as CONTRIBUTION_CONVENTIONS for step-13 (MR creation)
+- **code-review** step-03: verifies MR follows project contribution rules
+- **quick-dev** step-02: notes PR requirements during context gathering
+
+#### 3. Code-vs-Description Fact-Checking
+
+Verify every claim in the MR description against the actual code before publishing.
+
+- **dev-story** step-13: checks API names, numeric claims, behavioral claims, code comments, performance claims
+- **quick-dev** step-05: adds fact-checking as a 7th adversarial review perspective
+
+#### 4. Performance Measurement
+
+For features with performance implications, add temporary timing instrumentation and capture real measurements.
+
+- **dev-story** step-11: conditional 7th self-review perspective for perf-sensitive code
+- **quick-dev** step-04: performance verification checklist in self-check
+- **quick-spec** step-05: performance measurement task in implementation plan
+
+#### 5. Design Decisions Audit
+
+List all unilateral design decisions made without spec guidance, for inclusion in MR description.
+
+- **dev-story** step-11: mandatory audit after all review perspectives, produces "Design decisions open for discussion" section
+- **quick-dev** step-05: design decisions listed as part of adversarial review findings
+- **code-review** step-06: new Perspective 7 that surfaces undocumented design choices as QUESTIONs
+
+### Files Changed
+
+- 51 files, +313 / -112 lines across `src/core-skills/` and `src/bmm-skills/`
+
+---
+
+## v1.0.1 - 2026-03-28
+
+- Disable auto-invocation on all 72 bmad-* skills (`disable-model-invocation: true`)
+- Move WIP files to `/tmp`, batch findings presentation in review-story
+- Enrich create-story with quick-spec improvements, centralize shared templates
+- Reset versioning to 1.0.0, decouple from upstream BMAD
+
+---
+
 ## v6.2.1 - 2026-03-24
 
 ### 🎁 Highlights
