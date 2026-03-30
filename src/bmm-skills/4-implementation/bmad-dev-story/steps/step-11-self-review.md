@@ -34,8 +34,19 @@ Count changed files for routing decision.
   4. **QA & Testing** — Test coverage per AC, test quality, forbidden patterns (mocks in unit tests), edge cases, deterministic tests
   5. **Code Quality** — Hexagonal architecture, DDD, naming, duplication, TypeScript strict, no dead code
   6. **Tech Lead** — SOLID, N+1, scalability, DI patterns, monorepo impact, migration risks
+  7. **Performance Verification** (conditional) — If the feature touches latency-sensitive paths, batch processing, large data, startup time, or binary size: add temporary timing instrumentation, run the code path, capture real measurements. Include results in MR description if meaningful. Remove instrumentation after measurement. Skip if no performance implications.
 
   If `.claude/workflow-knowledge/review-perspectives.md` exists at project root, load and apply project-specific checklists.
+
+  **Design Decisions Audit (MANDATORY — after all perspectives):**
+
+  List all design decisions made during implementation that were NOT specified in the story or architecture docs. For each:
+  - **What was decided** — the choice made
+  - **Why** — the reasoning
+  - **Alternatives considered** — what else could have been done
+  - **Risk** — what could go wrong with this choice
+
+  Present as a "Design decisions open for discussion" section to include in the MR description. This gives reviewers explicit visibility into unilateral choices and invites targeted feedback instead of discovery-by-accident.
 
   Fix trivial issues:
   ```bash

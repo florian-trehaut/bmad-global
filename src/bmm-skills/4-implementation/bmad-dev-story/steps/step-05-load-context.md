@@ -23,6 +23,24 @@ The issue description (loaded from tracker in Step 2) IS the story — it contai
 
 If `.claude/workflow-knowledge/stack.md` exists at project root, read it for tech stack context, forbidden patterns, test rules, and reference code pointers.
 
+### 3b. Load Contribution Conventions
+
+Search for and load contribution guidelines that constrain how code is submitted:
+
+```bash
+cd {WORKTREE_PATH}
+ls CONTRIBUTING.md CONTRIBUTING.rst .github/CONTRIBUTING.md .github/pull_request_template.md .github/PULL_REQUEST_TEMPLATE.md docs/CONTRIBUTING.md 2>/dev/null
+ls .github/PULL_REQUEST_TEMPLATE/ dangerfile.js dangerfile.ts Dangerfile .cla* CLA* 2>/dev/null
+```
+
+For each file found, read and extract:
+- **PR requirements** — title format, description template, required sections
+- **CI linter rules** — Danger.js checks, commit message rules, CLA requirements
+- **Review criteria** — what reviewers expect, required approvals
+- **Code style gates** — linting, formatting, type-checking thresholds
+
+Store as `CONTRIBUTION_CONVENTIONS`. These rules apply to step-13 (push/MR creation).
+
 ### 4. Check for Progress Recovery
 
 ```bash

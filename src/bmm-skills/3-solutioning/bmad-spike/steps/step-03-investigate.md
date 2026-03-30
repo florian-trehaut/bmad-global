@@ -40,7 +40,18 @@ Execute the core investigation — code analysis, web research, PoC prototyping 
 
 ## MANDATORY SEQUENCE
 
-### 1. Plan Investigation Axes
+### 1. Search for Prior Attempts
+
+Before planning the investigation, search for prior closed/rejected MRs or PRs related to this spike's topic:
+
+```bash
+{FORGE_CLI} mr list --state closed --search "{keywords}" 2>/dev/null || true
+{FORGE_CLI} pr list --state closed --search "{keywords}" 2>/dev/null || true
+```
+
+If found: extract approach, rejection reason, reviewer comments. Prior failed attempts are critical evidence — they tell you what NOT to do and what objections to anticipate.
+
+### 2. Plan Investigation Axes
 
 Based on the spike type and KACs from Step 2, plan the investigation:
 
@@ -48,6 +59,7 @@ Based on the spike type and KACs from Step 2, plan the investigation:
 
 | Axis | Activities |
 |------|-----------|
+| **Prior attempts** | Analyze prior closed/rejected MRs — approaches tried, reasons for rejection, reviewer objections |
 | **Codebase analysis** | Read relevant files in worktree, identify patterns, dependencies, integration points |
 | **Web research** | Official docs, version-specific guides, known issues, migration guides, API references |
 | **PoC prototyping** | Write functional code in worktree, execute it, capture results |

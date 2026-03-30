@@ -125,12 +125,26 @@ Test level decision:
 - DB or internal service interaction -> Integration
 - Multi-step backend workflow through API -> Journey
 
-### 4. Identify Dependencies and Risks
+### 4. Performance Measurement Plan (if applicable)
+
+If the feature has performance implications (latency-sensitive paths, batch processing, large data, startup time, binary size), include a measurement task:
+
+```markdown
+- [ ] Task N: Performance measurement
+  - Add temporary timing instrumentation to {critical_paths}
+  - Run with realistic data, capture measurements
+  - Document results (include in MR description)
+  - Remove instrumentation before final commit
+```
+
+This ensures performance claims in the MR description are backed by evidence. Skip if no performance implications.
+
+### 5. Identify Dependencies and Risks
 
 - External libraries or services needed
 - High-risk items, known limitations
 
-### 5. Verify READY FOR DEVELOPMENT
+### 6. Verify READY FOR DEVELOPMENT
 
 Verify the spec meets this standard:
 
@@ -142,11 +156,11 @@ Verify the spec meets this standard:
 - **Self-Contained**: A fresh agent can implement without reading workflow history
 - **Business-Grounded**: Every TAC traces to at least one BAC
 - **Validation Metier**: Production test checklist defined (from Step 2b)
-### 6. Update WIP File
+### 7. Update WIP File
 
 Append tasks, ACs, test strategy sections to WIP file. Update `stepsCompleted` to add this step.
 
-### 7. Present MENU OPTIONS
+### 8. Present MENU OPTIONS
 
 Display: "**Select:** [A] Advanced Elicitation [P] Party Mode [C] Continue to impact analysis (Step 5b)"
 

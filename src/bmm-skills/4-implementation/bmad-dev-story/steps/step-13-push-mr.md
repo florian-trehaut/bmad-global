@@ -17,7 +17,21 @@ cd {WORKTREE_PATH}
 git push -u origin {BRANCH_NAME}
 ```
 
-### 2. Create or Update MR
+### 2. Fact-Check MR Description Against Code
+
+**CRITICAL — every claim in the MR description must be verifiable in the code.**
+
+Before creating/updating the MR, verify the description draft:
+
+1. **API names and function names** — grep the codebase for every function, method, class, or API name mentioned. If a name doesn't exist in the code, fix the description.
+2. **Numeric claims** — "handles N cases", "reduces X by Y%", "70+ tests" — verify the exact count. Use precise numbers, not approximations.
+3. **Behavioral claims** — "does X when Y happens" — trace the code path to confirm.
+4. **Comments in code** — verify that code comments referenced in the description accurately describe what the code does.
+5. **Performance claims** — if the description claims latency, throughput, or size improvements, these must be backed by measurements (see performance measurement step if applicable).
+
+If any claim is false or misleading, fix it before publishing. A MR description that contradicts the code destroys reviewer trust.
+
+### 3. Create or Update MR
 
 <check if="MR_IID is null (no existing MR)">
   Create MR:
@@ -54,7 +68,7 @@ All acceptance criteria tested via TDD.
   Log: "MR !{MR_IID} updated with latest changes"
 </check>
 
-### 3. Proceed
+### 4. Proceed
 
 Load and execute {nextStepFile}.
 

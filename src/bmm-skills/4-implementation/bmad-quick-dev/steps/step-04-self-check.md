@@ -32,6 +32,22 @@ For each AC:
 - [ ] Error handling consistent with codebase
 - [ ] No forbidden patterns introduced
 
+### 5. Performance Verification (if applicable)
+
+If the feature has performance implications (latency-sensitive paths, batch processing, large data, startup time, binary size), add temporary timing instrumentation:
+
+```bash
+# Example: add console.time/console.timeEnd, Date.now() diffs, or framework-specific timing
+# Run the relevant code path and capture actual measurements
+```
+
+- [ ] Performance-sensitive paths identified
+- [ ] Timing measurements captured with real data (not estimated)
+- [ ] Results documented (include in PR description if meaningful)
+- [ ] Temporary instrumentation removed before commit
+
+Skip this section if the feature has no performance implications.
+
 ---
 
 ## UPDATE TECH-SPEC (Mode A only)

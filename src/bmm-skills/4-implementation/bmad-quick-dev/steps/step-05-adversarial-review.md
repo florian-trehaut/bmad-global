@@ -49,12 +49,22 @@ Review the `{diff_output}` from these perspectives:
 4. **Patterns**: Follows codebase conventions? Forbidden patterns used?
 5. **Testing**: Adequate coverage? Missing edge case tests?
 6. **Performance**: N+1 queries, unnecessary allocations, missing indexes?
+7. **Fact-check**: Do all code comments accurately describe what the code does? Are all function/variable names semantically correct? Would a PR description based on these names and comments be truthful?
 
 If `.claude/workflow-knowledge/review-perspectives.md` exists, load it and apply those review perspectives instead.
 
 ---
 
-## 3. Process Findings
+## 3. Design Decisions Audit
+
+List all design decisions made during implementation that were NOT specified by the user or tech-spec. For each:
+- **What was decided** — the choice made
+- **Why** — the reasoning
+- **Alternatives** — what else could have been done
+
+Present these as part of the findings — they are not defects, but decisions the user should be aware of and can challenge.
+
+## 4. Process Findings
 
 - If zero findings: HALT — this is suspicious. Re-analyze or request user guidance.
 - Evaluate severity (Critical, High, Medium, Low) and validity (real, noise, undecided).

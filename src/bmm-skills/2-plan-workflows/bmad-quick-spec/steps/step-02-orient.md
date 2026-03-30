@@ -65,6 +65,12 @@ Scan the codebase and tracker for context, ask informed questions (not generic),
 **BOTH:**
 
 - Skim project context for relevant patterns
+- **Search for prior closed/rejected PRs/MRs** related to the same feature or keywords. This surfaces prior attempts, rejected approaches, and reviewer objections that must inform the spec:
+  ```bash
+  {FORGE_CLI} mr list --state closed --search "{keywords}" 2>/dev/null || true
+  {FORGE_CLI} pr list --state closed --search "{keywords}" 2>/dev/null || true
+  ```
+  If prior PRs found, note the approach taken and why it was rejected/closed.
 
 If user mentioned specific code/features, do a quick scan **inside {SPEC_WORKTREE_PATH}** (read-only):
 

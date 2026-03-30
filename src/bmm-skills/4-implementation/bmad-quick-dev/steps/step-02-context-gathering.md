@@ -34,7 +34,33 @@ Examine the identified files and their surroundings:
 
 If `.claude/workflow-knowledge/stack.md` exists, cross-reference with documented patterns and forbidden patterns.
 
-### 3. Note Dependencies
+### 3. Search for Prior Closed/Rejected PRs
+
+If the task relates to an existing issue or feature, search for prior closed/rejected PRs:
+
+```bash
+git log --all --oneline --grep="{keywords}" -- . | head -20
+```
+
+Also search the forge if available:
+
+```bash
+{FORGE_CLI} pr list --state closed --search "{keywords}" 2>/dev/null || true
+```
+
+If found, note the approach taken and why it was rejected/closed. This informs the plan.
+
+### 4. Load Contribution Conventions (if available)
+
+Search for contribution guidelines that constrain how code is submitted:
+
+```bash
+ls CONTRIBUTING.md .github/CONTRIBUTING.md .github/pull_request_template.md dangerfile.js dangerfile.ts 2>/dev/null
+```
+
+If found, note PR requirements, CI linter rules, commit message rules. These apply when presenting the final output.
+
+### 5. Note Dependencies
 
 Identify:
 - External libraries used
@@ -42,7 +68,7 @@ Identify:
 - Configuration files that may need updates
 - Related files that might be affected
 
-### 4. Create Plan
+### 6. Create Plan
 
 Synthesize gathered context into:
 - List of tasks to complete

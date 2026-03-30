@@ -32,7 +32,18 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This p
 - Forbidden patterns
 - Test conventions
 
-### 4. Load Review Mode Context
+### 4. Load Contribution Conventions (if available)
+
+Search for contribution guidelines in the worktree root — these constrain MR format and CI expectations:
+
+```bash
+cd {REVIEW_WORKTREE_PATH}
+ls CONTRIBUTING.md .github/CONTRIBUTING.md .github/pull_request_template.md dangerfile.js dangerfile.ts 2>/dev/null
+```
+
+If found, read and extract PR requirements, CI linter rules, commit message rules, CLA requirements. Store as `CONTRIBUTION_CONVENTIONS`. The review should verify the MR follows these conventions.
+
+### 5. Load Review Mode Context
 
 <check if="self-review (REVIEW_MODE == 'self')">
   <action>Warn user: "Self-reviewing your own code. Consider using a different LLM for a fresh perspective."</action>
@@ -43,7 +54,21 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This p
   <action>Colleague review will spawn parallel agents in step-06.</action>
 </check>
 
-### 5. Load Tracker Issue Details
+### 6. Search for Prior Closed/Rejected MRs on Same Issue
+
+If `LINKED_TRACKER_ISSUE` exists, search for prior closed MRs related to the same issue:
+
+```bash
+{FORGE_CLI} mr list --state closed --search "{ISSUE_IDENTIFIER}" 2>/dev/null || true
+```
+
+<check if="closed/rejected MRs found (excluding current MR)">
+  Note prior approaches, rejection reasons, and reviewer objections.
+  These inform the review — if the current MR repeats a previously rejected approach, flag it.
+  Store as `PRIOR_MRS`.
+</check>
+
+### 7. Load Tracker Issue Details
 
 <check if="LINKED_TRACKER_ISSUE exists">
   Load issue details from the tracker (using CRUD patterns from tracker.md):
@@ -65,14 +90,14 @@ If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This p
   Parse MR description for any ACs or requirements.
 </check>
 
-### 6. Load Project Context Document (optional)
+### 8. Load Project Context Document (optional)
 
 If the project has a project-context document (architecture, stack decisions), load it:
 
 1. Primary: tracker documents — list documents for {TRACKER_META_PROJECT_ID}, find "Project Context", then get the document content (using CRUD patterns from tracker.md)
 2. Fallback: `**/project-context.md` in the project root
 
-### 7. Store Loaded Context
+### 9. Store Loaded Context
 
 All loaded content is now available for step-06 review execution.
 

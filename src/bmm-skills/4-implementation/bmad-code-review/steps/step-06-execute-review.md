@@ -166,6 +166,18 @@ Use reference code directories from `.claude/workflow-knowledge/stack.md` if loa
 
 For each finding, provide `file:line` of the correct pattern reference.
 
+### Perspective 7: Design Decisions Audit
+
+Identify design decisions in the code that are NOT documented in the tracker issue, MR description, or code comments:
+
+- New patterns introduced without justification
+- Architectural choices (new modules, services, layers) not in the spec
+- Data model decisions (field types, naming, relationships) not specified
+- Error handling strategies chosen without spec guidance
+- Third-party library selections
+
+For each undocumented decision: classify as QUESTION (not a defect — but must be surfaced for reviewer awareness). Suggest the author add a "Design decisions" section to the MR description.
+
 ### Conditional Perspectives (if applicable)
 
 **Commit History** (always for colleague review, optional for self):

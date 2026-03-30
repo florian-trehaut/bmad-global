@@ -62,7 +62,17 @@ If no completed stories exist, note this — it means this is likely the first s
    ```
 4. Store as `GIT_CONTEXT` (commit summaries, not diffs)
 
-### 5. Load existing issue description
+### 5. Search for prior closed/rejected MRs on same issue
+
+Search the forge for closed MRs related to this issue — prior attempts surface rejected approaches and reviewer objections that must inform the story:
+
+```bash
+{FORGE_CLI} mr list --state closed --search "{ISSUE_IDENTIFIER}" 2>/dev/null || true
+```
+
+If found, extract: approach taken, rejection reason, reviewer comments. Store as `PRIOR_MRS`. These inform step-03 analysis — if a prior approach was rejected, the story should note it as a guardrail.
+
+### 6. Load existing issue description
 
 1. Read the current issue description from the issue fetched in step 01
 2. Store as `CURRENT_DESCRIPTION`
@@ -70,7 +80,7 @@ If no completed stories exist, note this — it means this is likely the first s
    - If present, flag `HAS_BUSINESS_CONTEXT = true` — this section will be preserved as-is
    - If absent, flag `HAS_BUSINESS_CONTEXT = false` — it will be synthesized from PRD
 
-### 6. Summary of loaded context
+### 7. Summary of loaded context
 
 Log internally what was loaded:
 
