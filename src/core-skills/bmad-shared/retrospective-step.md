@@ -43,70 +43,38 @@ If any friction points were found, present them concisely:
 ```
 Workflow Retrospective — {workflow_name}
 
-During this execution, I noticed {N} friction point(s):
+Friction point {N}: {short title}
 
-1. [{TYPE}] {description}
-   Impact: {what went wrong or was slower}
-   Proposed fix: {specific change}
-   Target: {which file to modify}
+  What happened: {description of what occurred}
+  Impact: {what went wrong or was slower}
+  Workflow file involved: {relative framework path}
 
-2. ...
+  ...
 ```
 
-### 3. Propose Improvements
+**PATH RULES — CRITICAL:**
+- Use **relative framework paths** from the skill root: `bmad-code-review/steps/step-01-discover.md`
+- For shared files: `bmad-shared/retrospective-step.md`
+- For project-level files: `.claude/workflow-context.md`, `.claude/workflow-knowledge/{file}.md`
+- **NEVER** use absolute installed paths like `~/.claude/skills/bmad-{skill}/...`
+- The retrospective is consumed by the framework developer — installed paths point to the wrong files
 
-For each friction point, propose ONE of these actions:
+**SCOPE RULES:**
+- **Diagnose only** — describe the problem and its impact, identify which file(s) are involved
+- **Do NOT propose specific code changes** — the framework developer decides the fix
+- **Do NOT offer to apply changes** — this agent executes workflows, it does not modify the framework
+- **Do NOT modify any skill files** — not installed files, not source files, nothing
 
-| Action | When | Target |
-|--------|------|--------|
-| **Edit global skill** | The workflow step itself is wrong/missing | `~/.claude/skills/bmad-{skill}/steps/step-XX.md` |
-| **Edit project knowledge** | Project-specific info is missing | `.claude/workflow-knowledge/{file}.md` |
-| **Edit project context** | A config value is missing | `.claude/workflow-context.md` |
-| **Create new knowledge file** | A whole new domain of knowledge is needed | `.claude/workflow-knowledge/{new-file}.md` |
-| **Add to CLAUDE.md** | A project convention should be documented | `CLAUDE.md` |
-| **No action** | It was a one-off issue, not worth codifying | — |
+### 3. Done
 
-### 4. User Decision
-
-Present the proposed improvements and ask:
-
-> **[A] Apply all** — I'll make all proposed changes now
-> **[S] Select** — Let me pick which ones to apply
-> **[L] Log only** — Don't change anything, just note these for later
-> **[N] No thanks** — Skip, nothing worth changing
-
-HALT and wait.
-
-### 5. Apply (if chosen)
-
-For each accepted improvement:
-
-- **Global skill edit**: Read the target file, apply the change, verify it doesn't break the step-file conventions (< 250 lines, has NEXT pointer, etc.)
-- **Project knowledge edit**: Read the target knowledge file, add the new section/information
-- **Project context edit**: Read workflow-context.md, add/modify the YAML frontmatter key
-- **New knowledge file**: Create the file with appropriate structure
-- **CLAUDE.md edit**: Read CLAUDE.md, add the convention in the appropriate section
-
-After each change, briefly confirm: "Updated {file}: {what was added/changed}"
-
-### 6. Summary
-
-If any changes were made:
-
-```
-Retrospective complete:
-  {N} improvements applied
-  Files modified: {list}
-
-These changes will take effect in the next workflow execution.
-```
+Present the findings and end the workflow. No further action needed from this step.
 
 ---
 
 ## IMPORTANT RULES
 
-- **Never force changes** — always present and let the user decide
-- **Be specific** — "add X to line Y of file Z", not "consider updating the workflow"
-- **Don't over-engineer** — one-off issues don't need permanent fixes
-- **Respect scope** — global skill changes affect ALL projects, project changes affect only this one. When in doubt, prefer project-level changes.
+- **Diagnose, don't fix** — describe what happened and the impact, never propose or apply code changes
+- **Relative paths only** — use framework-relative paths (e.g., `bmad-code-review/steps/step-01.md`), never installed paths (`~/.claude/skills/...`)
+- **Don't over-engineer** — one-off issues don't need reporting
+- **Don't modify any files** — not skill files, not project files, nothing. Output is text only.
 - **Don't modify the retrospective step itself** — that's recursive madness

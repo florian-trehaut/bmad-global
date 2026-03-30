@@ -19,7 +19,9 @@ Collect all open MRs from the forge, cross-reference with tracker issues in revi
 ### 1. Check for Pre-Selected MR
 
 <check if="mr_iid is provided and not empty">
-  <action>Use provided MR IID -- skip discovery, store MR_IID, go directly to {nextStepFile}</action>
+  <action>Use provided MR IID -- skip discovery steps 2-8 below (listing, classification, presentation).
+  Store MR_IID and proceed DIRECTLY to {nextStepFile} (worktree setup).
+  The worktree step is MANDATORY and must NOT be skipped -- only the discovery steps in THIS file are bypassed.</action>
 </check>
 
 ### 2. Get Current User

@@ -10,7 +10,7 @@ This is a **meta-skill** — it edits existing bmad-* skills. It does NOT need `
 
 ### 1. Load shared rules
 
-Read all files in `~/.claude/skills/bmad-shared/`.
+Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
 
 Apply these rules for the entire workflow execution.
 

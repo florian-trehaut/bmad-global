@@ -8,11 +8,16 @@ nextStepFile: './step-04-discover-changes.md'
 
 Load all review checklists, project standards, and tracker issue details needed for the review.
 
+## PRE-CHECK: Worktree Invariant
+
+**HALT if** `REVIEW_WORKTREE_PATH` is not set, empty, or the directory does not exist.
+This step reads project files — without a worktree, reads target the main repo (wrong branch).
+
 ## MANDATORY SEQUENCE
 
 ### 1. Load Shared Rules (if not already loaded)
 
-Read all files in `~/.claude/skills/bmad-shared/`.
+Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
 
 ### 2. Load Project Review Perspectives (if available)
 

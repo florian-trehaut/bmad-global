@@ -83,7 +83,20 @@ Store `REVIEW_WORKTREE_PATH`.
 
 Proceed to {nextStepFile}.
 
+## WORKTREE INVARIANT (enforced by all subsequent steps)
+
+**REVIEW_WORKTREE_PATH must be set and point to a valid directory before ANY subsequent step executes.**
+
+All steps from step-03 onward MUST verify this at entry:
+- `REVIEW_WORKTREE_PATH` is set and non-empty
+- The directory exists
+- `git branch --show-current` inside the worktree returns a branch name
+
+**If any check fails → HALT: "No valid worktree. Step 02 must complete successfully before continuing."**
+
+This invariant exists because: skipping the worktree causes all file reads to target the main repo (wrong branch), producing a review based on stale code.
+
 ## SUCCESS/FAILURE:
 
-### SUCCESS: Worktree created on MR branch (not detached), tracking origin/{MR_SOURCE_BRANCH}, deps installed
-### FAILURE: Detached HEAD, working outside worktree, skipping install
+### SUCCESS: Worktree created on MR branch (not detached), tracking origin/{MR_SOURCE_BRANCH}, deps installed, REVIEW_WORKTREE_PATH stored
+### FAILURE: Detached HEAD, working outside worktree, skipping install, REVIEW_WORKTREE_PATH not set
