@@ -21,11 +21,11 @@ Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bma
 
 ### 2. Load Project Review Perspectives (if available)
 
-If `.claude/workflow-knowledge/review-perspectives.md` exists at project root, read it. This file contains project-specific review checklists that override defaults in step-06.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` exists at project root, read it. This file contains project-specific review checklists that override defaults in step-06.
 
 ### 3. Load Stack Knowledge (if available)
 
-If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This provides:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists at project root, read it. This provides:
 
 - Reference code directories (use as pattern source)
 - Legacy code directories (NEVER reference as pattern)

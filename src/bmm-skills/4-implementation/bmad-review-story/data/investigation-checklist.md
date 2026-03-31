@@ -2,7 +2,7 @@
 
 This is the generic investigation framework applicable to any project. It covers the fundamental investigation axes that apply regardless of tech stack, domain, or architecture.
 
-**For project-specific domain checklists** (provider-specific, service-specific, infra-specific), load `.claude/workflow-knowledge/investigation-checklist.md` from the project root. The project-specific checklist extends this generic one — apply both.
+**For project-specific domain checklists** (provider-specific, service-specific, infra-specific), load `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md` from the project root. The project-specific checklist extends this generic one — apply both.
 
 ---
 

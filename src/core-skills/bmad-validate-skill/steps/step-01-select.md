@@ -6,7 +6,7 @@ Identify which bmad-* skill the user wants to validate. Load its entire structur
 
 ## RULES
 
-- Scan BOTH global (`~/.claude/skills/bmad-*/`) and project (`.claude/skills/bmad-*/`) locations
+- Scan BOTH global (`~/.claude/skills/bmad-*/`) and project (`{MAIN_PROJECT_ROOT}/.claude/skills/bmad-*/`) locations
 - NEVER modify any file — this is a read-only audit
 - If the user provides a path directly, skip the listing
 - HALT if the target is not a bmad-* skill (no SKILL.md found)
@@ -18,7 +18,7 @@ Identify which bmad-* skill the user wants to validate. Load its entire structur
 Scan both locations:
 
 **Global:** `~/.claude/skills/bmad-*/`
-**Project:** `.claude/skills/bmad-*/` (from the git repository root)
+**Project:** `{MAIN_PROJECT_ROOT}/.claude/skills/bmad-*/` (from the git repository root)
 
 For each skill found, read `SKILL.md` and extract:
 - `name` from frontmatter

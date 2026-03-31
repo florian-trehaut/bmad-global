@@ -2,7 +2,7 @@
 
 **BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, HALT checkpoints.**
 
-**Goal:** Set up a project to work with all bmad-* workflow skills by creating `.claude/workflow-context.md` and `.claude/workflow-knowledge/` files from automated codebase detection.
+**Goal:** Set up a project to work with all bmad-* workflow skills by creating `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` files from automated codebase detection.
 
 ---
 
@@ -33,6 +33,10 @@ Confirm we are in a git repository root (`git rev-parse --show-toplevel`). HALT 
 Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
 
 Apply these rules for the entire workflow execution. Key rule: **generated knowledge must be derived from real codebase data — never fabricate content from assumptions.**
+
+### 3. Resolve project root
+
+Run `MAIN_PROJECT_ROOT=$(dirname "$(git rev-parse --git-common-dir)")` to resolve the main repository root. All `.claude/` file operations in this workflow use `{MAIN_PROJECT_ROOT}` as the base path. This ensures correct behavior when running from a git worktree.
 
 ---
 

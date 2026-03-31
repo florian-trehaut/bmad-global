@@ -21,7 +21,7 @@ The issue description (loaded from tracker in Step 2) IS the story — it contai
 
 ### 3. Load Dev Standards
 
-If `.claude/workflow-knowledge/stack.md` exists at project root, read it for tech stack context, forbidden patterns, test rules, and reference code pointers.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists at project root, read it for tech stack context, forbidden patterns, test rules, and reference code pointers.
 
 ### 3b. Load Contribution Conventions
 

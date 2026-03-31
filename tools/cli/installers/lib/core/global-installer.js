@@ -112,6 +112,13 @@ class GlobalInstaller {
     );
     await prompts.log.info(`Location: ${skillsDir}`);
 
+    await prompts.log.warn(
+      'Next step: run /bmad-knowledge-bootstrap in each project to generate (or update) your workflow context and knowledge files.',
+    );
+    await prompts.log.message(
+      'This is required for all bmad-* workflows to function. Re-run it after each BMAD update to keep knowledge in sync.',
+    );
+
     return {
       success: true,
       modules: installedModules.map((m) => m.name),

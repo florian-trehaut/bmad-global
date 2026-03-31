@@ -6,7 +6,7 @@ Identify which bmad-* skill the user wants to edit, load its entire structure, a
 
 ## RULES
 
-- Scan BOTH global (`~/.claude/skills/bmad-*/`) and project (`.claude/skills/bmad-*/`) locations
+- Scan BOTH global (`~/.claude/skills/bmad-*/`) and project (`{MAIN_PROJECT_ROOT}/.claude/skills/bmad-*/`) locations
 - NEVER modify any file in this step — read-only discovery
 - Present enough context for the user to confirm the right skill
 - Load the ENTIRE skill structure before proceeding
@@ -18,7 +18,7 @@ Identify which bmad-* skill the user wants to edit, load its entire structure, a
 Scan both locations:
 
 **Global:** `~/.claude/skills/bmad-*/`
-**Project:** `.claude/skills/bmad-*/` (from the git repository root)
+**Project:** `{MAIN_PROJECT_ROOT}/.claude/skills/bmad-*/` (from the git repository root)
 
 For each skill found, read `SKILL.md` and extract:
 - `name` from frontmatter

@@ -6,7 +6,7 @@ nextStepFile: './step-05-research-scan.md'
 
 ## STEP GOAL:
 
-Assemble all confirmed values from steps 02-03 into `.claude/workflow-context.md` and write the file.
+Assemble all confirmed values from steps 02-03 into `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and write the file.
 
 ## MANDATORY SEQUENCE
 
@@ -18,7 +18,7 @@ Gather all confirmed values:
 
 ### 2. Generate the File
 
-Write `.claude/workflow-context.md` with the following structure:
+Write `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` with the following structure:
 
 **YAML frontmatter:**
 
@@ -104,7 +104,7 @@ labels:
 
 ## Knowledge Files
 
-The following knowledge files are available in `.claude/workflow-knowledge/` and should be loaded JIT:
+The following knowledge files are available in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` and should be loaded JIT:
 
 | File | Content | Loaded by |
 |------|---------|-----------|
@@ -121,7 +121,7 @@ The following knowledge files are available in `.claude/workflow-knowledge/` and
 
 ## Project-Specific Skills
 
-{Scan `.claude/skills/*/SKILL.md` — list found skills, or "None yet"}
+{Scan `{MAIN_PROJECT_ROOT}/.claude/skills/*/SKILL.md` — list found skills, or "None yet"}
 
 ## Reference Code
 
@@ -135,7 +135,7 @@ The following knowledge files are available in `.claude/workflow-knowledge/` and
 
 ### 3. Write the File
 
-Write to `.claude/workflow-context.md`.
+Write to `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`.
 
 ### 4. Present for Review
 

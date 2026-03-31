@@ -82,7 +82,7 @@ Check `adr_location` from workflow-context.md.
 
 ### 4. Cross-Reference with Standards
 
-If `.claude/workflow-knowledge/stack.md` exists at project root, load and cross-reference investigation results with project dev standards. Note any deviations or patterns the implementation must follow.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists at project root, load and cross-reference investigation results with project dev standards. Note any deviations or patterns the implementation must follow.
 
 ### 5. Document Technical Context
 

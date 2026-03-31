@@ -8,9 +8,9 @@
 
 ### 1. Load project context
 
-Read `.claude/workflow-context.md` from the project root (the git repository root).
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`.
 
-**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
+**HALT if not found:** "No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
 
 Extract the following from the YAML frontmatter:
 
@@ -63,7 +63,7 @@ You do this by:
 
 - Execute ALL steps in exact order — NO skipping
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
-- **Velocity is calculated ONLY from local daily-logs** (`.claude/daily-log/`) — never from tracker history
+- **Velocity is calculated ONLY from local daily-logs** (`{MAIN_PROJECT_ROOT}/.claude/daily-log/`) — never from tracker history
 - **First-time usage**: if no daily-logs exist, skip velocity calculation and ask the user for their budget directly
 - **Issues without point estimates**: display them but flag as "unestimated" — do not invent estimates
 - **Daily script must be copy-pasteable** — no markdown formatting that breaks in Slack/chat
@@ -102,7 +102,7 @@ After the final step completes (whether successfully or via early termination), 
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)
-- The project knowledge (`.claude/workflow-knowledge/`)
-- The project context (`.claude/workflow-context.md`)
+- The project knowledge (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`)
+- The project context (`{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`)
 
 **This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

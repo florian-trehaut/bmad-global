@@ -46,7 +46,7 @@ If found → load and parse `team-config.md`. Extract:
 
 ### 3. Check Project Configuration
 
-Does `.claude/workflow-context.md` have Agent Teams enabled?
+Does `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` have Agent Teams enabled?
 
 ```
 Check: agent_teams.enabled == true in workflow-context.md YAML frontmatter?

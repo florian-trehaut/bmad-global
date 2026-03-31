@@ -6,7 +6,7 @@ Calculate the user's average daily velocity from past daily-log files. This info
 
 ## RULES
 
-- Velocity is calculated ONLY from `.claude/daily-log/*.md` files — never from tracker history
+- Velocity is calculated ONLY from `{MAIN_PROJECT_ROOT}/.claude/daily-log/*.md` files — never from tracker history
 - Only days with `velocity_actual > 0` contribute to the average (days with no completions are excluded, not counted as zero)
 - If no daily-logs exist (first usage), skip calculation — velocity will be unknown
 - Display the trend if enough data points exist (last 5 days)
@@ -17,7 +17,7 @@ Calculate the user's average daily velocity from past daily-log files. This info
 
 Read `../data/daily-log-format.md` to understand the file structure.
 
-List all files in `.claude/daily-log/` at the project root. Sort by filename (= date) descending.
+List all files in `{MAIN_PROJECT_ROOT}/.claude/daily-log/` at the project root. Sort by filename (= date) descending.
 
 **If no files exist:** set `AVG_VELOCITY = null`, `HISTORY_DAYS = 0`. Skip to step 5.
 

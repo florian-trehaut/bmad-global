@@ -48,7 +48,7 @@ Verify:
 
 ### 3. Design knowledge loading
 
-For each `.claude/workflow-knowledge/` file the skill needs:
+For each `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` file the skill needs:
 
 | File | Loaded by step | Why |
 |------|----------------|-----|

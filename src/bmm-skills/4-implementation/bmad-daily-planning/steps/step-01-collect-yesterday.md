@@ -16,7 +16,7 @@ Build a complete picture of what was accomplished since the last daily planning 
 
 ### 1. Determine the reference date
 
-Check if `.claude/daily-log/` exists at the project root.
+Check if `{MAIN_PROJECT_ROOT}/.claude/daily-log/` exists at the project root.
 
 **If it exists:** find the most recent daily-log file (sorted by filename = date). Extract its `date` field. This is `{LAST_DAILY_DATE}`.
 

@@ -47,11 +47,11 @@ Communication language: {COMMUNICATION_LANGUAGE}
 Read these files BEFORE starting work:
 
 ### Project config (REQUIRED)
-- {project-root}/.claude/workflow-context.md
+- {MAIN_PROJECT_ROOT}/.claude/workflow-context.md
 
 ### Project knowledge (REQUIRED — generate if missing)
 {for each file in resolved_knowledge_files:}
-- {project-root}/.claude/workflow-knowledge/{file}
+- {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{file}
 {endfor}
 
 ### Global rules (REQUIRED)
@@ -102,7 +102,7 @@ Include this section when knowledge files may be missing (e.g., first run on a n
 If ANY knowledge file listed in PROJECT CONTEXT does NOT exist:
 1. Log: "Missing knowledge: {file}. Generating from codebase scan."
 2. Analyze the codebase to produce the missing knowledge
-3. Write it to {project-root}/.claude/workflow-knowledge/{file}
+3. Write it to {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{file}
 4. Include YAML frontmatter: generated date, source_hash, generator name
 5. Report the generation in your task completion message
 

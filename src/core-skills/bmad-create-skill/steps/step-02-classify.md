@@ -21,7 +21,7 @@ Based on the design brief:
 - It uses `workflow-context.md` for project-specific values (standard pattern)
 - Other bmad-* skills in the ecosystem are global
 
-**Project** (`.claude/skills/bmad-{name}/`) if:
+**Project** (`{MAIN_PROJECT_ROOT}/.claude/skills/bmad-{name}/`) if:
 - The skill is deeply specific to one project (e.g., references custom domain logic)
 - It cannot be generalized via workflow-context.md variables
 
@@ -31,9 +31,9 @@ Default: **Global** (most skills should be global with project-specific values f
 
 | Decision | Options |
 |----------|---------|
-| **Needs workflow-context.md?** | YES = project-dependent (load at init, HALT if missing) / NO = standalone meta-skill |
+| **Needs `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`?** | YES = project-dependent (load at init, HALT if missing) / NO = standalone meta-skill |
 | **Which variables?** | List exact keys needed from workflow-context.md YAML frontmatter |
-| **Needs workflow-knowledge/?** | List which files and which step loads them (JIT) |
+| **Needs `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`?** | List which files and which step loads them (JIT) |
 | **Needs no-fallback-no-false-data?** | YES if the skill touches code, data, or makes assertions about correctness |
 
 ### 3. Estimate step count
@@ -85,7 +85,7 @@ Rules:
 Check existing skills:
 ```bash
 ls ~/.claude/skills/bmad-*/SKILL.md 2>/dev/null
-ls .claude/skills/bmad-*/SKILL.md 2>/dev/null
+ls {MAIN_PROJECT_ROOT}/.claude/skills/bmad-*/SKILL.md 2>/dev/null
 ```
 
 Propose the name and verify no conflict.
@@ -94,7 +94,7 @@ Propose the name and verify no conflict.
 
 Based on scope and name:
 - Global: `~/.claude/skills/bmad-{name}/`
-- Project: `.claude/skills/bmad-{name}/`
+- Project: `{MAIN_PROJECT_ROOT}/.claude/skills/bmad-{name}/`
 
 Check if the directory already exists. If it does: HALT and ask whether to overwrite, rename, or abort.
 
@@ -109,9 +109,9 @@ Present all classification decisions:
 **Scope:**         {global / project}
 **Target:**        {target_directory}
 **Dependencies:**
-  - workflow-context.md: {yes/no}
+  - {MAIN_PROJECT_ROOT}/.claude/workflow-context.md: {yes/no}
     Variables: {list or "N/A"}
-  - workflow-knowledge/: {list of files or "none"}
+  - {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/: {list of files or "none"}
   - no-fallback-no-false-data: {yes/no}
 **Steps:**         {count} steps
   {numbered list: step-XX-name — goal}

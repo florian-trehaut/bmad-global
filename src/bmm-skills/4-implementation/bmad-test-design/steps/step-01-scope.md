@@ -33,7 +33,7 @@ Apply the following detection logic in priority order:
 
 **B) Context-based detection:**
 
-- If `.claude/workflow-knowledge/sprint-status.yaml` (or similar sprint artifact) exists at project root --> **epic-level** (active implementation phase)
+- If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/sprint-status.yaml` (or similar sprint artifact) exists at project root --> **epic-level** (active implementation phase)
 - Otherwise --> **system-level**
 
 **C) If still ambiguous --> ask:**

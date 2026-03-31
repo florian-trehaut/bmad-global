@@ -43,8 +43,8 @@ Load all standards and knowledge files JIT:
 
 ```bash
 # Load dev standards from project workflow-knowledge
-Read(.claude/workflow-knowledge/stack.md)                    # if exists
-Read(.claude/workflow-knowledge/review-perspectives.md)      # if exists — project-specific checklists
+Read({MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md)                    # if exists
+Read({MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md)      # if exists — project-specific checklists
 Read(~/.claude/skills/bmad-shared/no-fallback-no-false-data.md)  # always
 ```
 
@@ -96,7 +96,7 @@ Also check for computed substitutions (deriving a value instead of reading the a
 
 ### P2: Security
 
-Apply security checklist from project knowledge (`.claude/workflow-knowledge/review-perspectives.md`) if available, otherwise apply these defaults:
+Apply security checklist from project knowledge (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md`) if available, otherwise apply these defaults:
 
 - Injection (SQL raw concat, command exec/spawn, XSS)
 - Auth/AuthZ (missing guards/decorators, decorator order, privilege escalation)
@@ -143,7 +143,7 @@ Apply tech lead checklist from project knowledge if available, otherwise apply t
 
 ### P6: Pattern Consistency
 
-If `.claude/workflow-knowledge/stack.md` specifies reference code directories and legacy directories, apply those rules. Otherwise:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` specifies reference code directories and legacy directories, apply those rules. Otherwise:
 
 - Check that new code follows patterns from the most modern/well-maintained parts of the codebase
 - Never reference legacy code as a pattern to follow

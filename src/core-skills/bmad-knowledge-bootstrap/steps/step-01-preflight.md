@@ -15,21 +15,21 @@ Assess the project's current state, inventory existing configuration and knowled
 Run a comprehensive scan:
 
 **A. New-format setup:**
-- `.claude/workflow-context.md` exists?
-- `.claude/workflow-knowledge/` directory exists? Which files?
-- Count TODOs in existing files (`grep -rc "TODO" .claude/workflow-context.md .claude/workflow-knowledge/*.md 2>/dev/null`)
+- `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` exists?
+- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` directory exists? Which files?
+- Count TODOs in existing files (`grep -rc "TODO" {MAIN_PROJECT_ROOT}/.claude/workflow-context.md {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/*.md 2>/dev/null`)
 - Check for missing required keys in workflow-context.md frontmatter
 
 **B. Legacy BMAD installation:**
 - `_bmad/` directory at project root?
-- `.claude/workflows/` with `workflow.yaml` or `instructions.md` files?
-- `.claude/commands/` files referencing `workflow.xml` or `workflow.yaml`?
+- `{MAIN_PROJECT_ROOT}/.claude/workflows/` with `workflow.yaml` or `instructions.md` files?
+- `{MAIN_PROJECT_ROOT}/.claude/commands/` files referencing `workflow.xml` or `workflow.yaml`?
 - BMAD config files: `_bmad/bmm/config.yaml`, `_bmad/core/config.yaml`?
 
 **C. Knowledge file staleness (if files exist):**
 
 For each existing knowledge file, check staleness:
-- `MISSING` — file not in workflow-knowledge/
+- `MISSING` — file not in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`
 - `FOUND_STALE` — no `generated` frontmatter OR `generated` date > 7 days ago
 - `FOUND_FRESH` — `generated` date ≤ 7 days
 
@@ -54,7 +54,7 @@ New-format setup:
 
 Legacy artifacts:
   _bmad/ directory:       {YES / NO}
-  Legacy workflows:       {N files in .claude/workflows/}
+  Legacy workflows:       {N files in {MAIN_PROJECT_ROOT}/.claude/workflows/}
   Extractable config:     {YES / NO}
 ```
 
@@ -72,7 +72,7 @@ If state is LEGACY_ONLY or MIGRATION_IN_PROGRESS and user chose Extract/Resume:
 
 Read available BMAD config files and extract defaults:
 - `_bmad/bmm/config.yaml` or `_bmad/core/config.yaml` → `user_name`, `communication_language`, `project_name`
-- `.claude/workflows/**/workflow.yaml` → worktree templates, forge paths, branch templates
+- `{MAIN_PROJECT_ROOT}/.claude/workflows/**/workflow.yaml` → worktree templates, forge paths, branch templates
 
 Store all extracted values as defaults for subsequent steps.
 
@@ -92,7 +92,7 @@ Based on state and user choice:
 ### 5. Create Target Directories
 
 ```bash
-mkdir -p .claude/workflow-knowledge
+mkdir -p {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge
 ```
 
 ### 6. Determine TARGET_FILES for Knowledge Generation
@@ -119,7 +119,13 @@ Present knowledge file inventory:
 
 Store TARGET_FILES list.
 
-### 7. Proceed
+### 7. Worktree Detection
+
+If `git rev-parse --git-common-dir` does not return `.git` (i.e., we are in a worktree):
+- Inform the user: "Running from a worktree. Knowledge files will be written to the main repository at `{MAIN_PROJECT_ROOT}`."
+- This is informational only — proceed normally.
+
+### 8. Proceed
 
 Load and execute {nextStepFile}.
 

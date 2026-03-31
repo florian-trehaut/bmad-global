@@ -65,7 +65,7 @@ WAIT for user selection.
 
 ### 2. Load Context
 
-- Read `.claude/workflow-knowledge/tracker.md` if it exists -- extract tracker constants, status mappings
+- Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/tracker.md` if it exists -- extract tracker constants, status mappings
 - Load Project Context:
   1. Tracker documents (primary): list documents in the Meta Project (using CRUD patterns from tracker.md) -> find "Project Context" -> load its content by document ID
   2. Fallback local: search for `**/project-context.md` in the project

@@ -33,7 +33,7 @@ Code comments that justify shortcuts, casts, workarounds, or deviations are **ev
 
 ## SELF-REVIEW MODE (REVIEW_MODE == 'self')
 
-Execute 6 perspectives sequentially inline. Use project-specific checklists from `.claude/workflow-knowledge/review-perspectives.md` if loaded, otherwise use the default checklists below.
+Execute 6 perspectives sequentially inline. Use project-specific checklists from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded, otherwise use the default checklists below.
 
 ### Perspective 1: Specs Compliance
 
@@ -157,7 +157,7 @@ Apply project tech lead checklist if loaded.
 
 ### Perspective 6: Pattern Consistency
 
-Use reference code directories from `.claude/workflow-knowledge/stack.md` if loaded. NEVER reference legacy code.
+Use reference code directories from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` if loaded. NEVER reference legacy code.
 
 - DTO validation patterns, config access patterns
 - In-memory repository patterns, logger usage

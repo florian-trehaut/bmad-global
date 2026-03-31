@@ -39,7 +39,7 @@
 
 ### 1. Module Configuration Loading
 
-Read `.claude/workflow-context.md` from the project root and resolve:
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and resolve:
 
 - `project_name`, `output_folder`, `planning_artifacts`, `user_name`, `communication_language`, `document_output_language`
 - ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
@@ -62,7 +62,7 @@ After the final step completes (whether successfully or via early termination), 
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The workflow itself (steps, data files)
-- The project knowledge (`.claude/workflow-knowledge/`)
-- The project context (`.claude/workflow-context.md`)
+- The project knowledge (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`)
+- The project context (`{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`)
 
 **This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

@@ -9,7 +9,7 @@
 At the start of any bmad-* workflow, check if a daily plan exists for today:
 
 ```
-.claude/daily-log/{TODAY}.md
+{MAIN_PROJECT_ROOT}/.claude/daily-log/{TODAY}.md
 ```
 
 Where `{TODAY}` is the current date in `YYYY-MM-DD` format.
@@ -36,7 +36,7 @@ Add this to the INITIALIZATION section of any workflow that benefits from daily 
 ```markdown
 ### N. Load daily plan (optional)
 
-If `.claude/daily-log/{TODAY}.md` exists at project root (where `{TODAY}` is today's date in YYYY-MM-DD format), read it. This provides context about the user's planned work for the day — issues selected, point budget, and notes.
+If `{MAIN_PROJECT_ROOT}/.claude/daily-log/{TODAY}.md` exists (where `{TODAY}` is today's date in YYYY-MM-DD format), read it. This provides context about the user's planned work for the day — issues selected, point budget, and notes.
 ```
 
 This is **optional** — the workflow must function without it. It only enriches context.

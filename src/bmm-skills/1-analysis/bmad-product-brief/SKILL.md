@@ -31,16 +31,18 @@ Check activation context immediately:
 
 ## On Activation
 
-1. Read `.claude/workflow-context.md` from the project root and resolve::
+1. **Resolve project root** — Run `MAIN_PROJECT_ROOT=$(dirname "$(git rev-parse --git-common-dir)")` to find the main repository root (required for worktree support).
+
+2. Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and resolve:
    - Use `{user_name}` for greeting
    - Use `{communication_language}` for all communications
    - Use `{document_output_language}` for output documents
    - Use `{planning_artifacts}` for output location and artifact scanning
    - Use `{project_knowledge}` for additional context scanning
 
-2. **Greet user** as `{user_name}`, speaking in `{communication_language}`. Be warm but efficient — dream builder energy.
+3. **Greet user** as `{user_name}`, speaking in `{communication_language}`. Be warm but efficient — dream builder energy.
 
-3. **Stage 1: Understand Intent** (handled here in SKILL.md)
+4. **Stage 1: Understand Intent** (handled here in SKILL.md)
 
 ### Stage 1: Understand Intent
 

@@ -16,7 +16,7 @@ Apply these rules for the entire workflow execution.
 
 ### 2. Configuration Loading
 
-Read `.claude/workflow-context.md` from the project root and resolve:
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and resolve:
 
 - `project_name`, `user_name`
 - `communication_language`, `document_output_language`

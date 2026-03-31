@@ -26,7 +26,7 @@ These variables MUST be set in this step and available to all subsequent steps:
 
 ### 2. Load Project Context
 
-Read `.claude/workflow-context.md` (if exists) and `.claude/workflow-knowledge/stack.md` (if exists) from the project root as foundational references for ALL implementation decisions.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` (if exists) and `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` (if exists) from the project root as foundational references for ALL implementation decisions.
 
 ### 3. Parse User Input
 

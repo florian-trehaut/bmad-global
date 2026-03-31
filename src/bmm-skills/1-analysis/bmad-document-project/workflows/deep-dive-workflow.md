@@ -11,7 +11,7 @@
 
 ### Configuration Loading
 
-Read `.claude/workflow-context.md` from the project root and resolve:
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` from the project root and resolve:
 
 - `project_knowledge`
 - `user_name`

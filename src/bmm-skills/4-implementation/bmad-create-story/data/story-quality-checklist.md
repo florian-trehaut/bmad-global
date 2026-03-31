@@ -36,7 +36,7 @@ This is a COMPETITION to create the **ULTIMATE story context** that makes LLM de
 - The story quality validation framework will automatically:
   - Load this checklist file
   - Load the newly created story file (`{story_file_path}`)
-  - Load workflow variables from `.claude/workflow-context.md`
+  - Load workflow variables from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`
   - Execute the validation process
 
 ### **When Running in Fresh Context:**
@@ -61,7 +61,7 @@ You will systematically re-do the entire story creation process, but with a crit
 
 ### **Step 1: Load and Understand the Target**
 
-1. **Load the workflow configuration**: `.claude/workflow-context.md` for variable inclusion
+1. **Load the workflow configuration**: `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` for variable inclusion
 2. **Load the story file**: `{story_file_path}` (provided by user or discovered)
 3. **Load validation checklist**: this file (`story-quality-checklist.md`)
 4. **Extract metadata**: epic_num, story_num, story_key, story_title from story file

@@ -121,7 +121,7 @@ find . -maxdepth 4 -name "ADR-*" -o -name "adr-*" -o -name "[0-9][0-9][0-9][0-9]
 
 **Conflict resolution rule:** when multiple ADRs exist on the same topic, the most recent one (by date or sequence number) takes precedence.
 
-Update `workflow-context.md` with `adr_location` and `adr_format` values.
+Update `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` with `adr_location` and `adr_format` values.
 
 ### 10. Compile Results
 

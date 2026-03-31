@@ -8,9 +8,9 @@
 
 ### 1. Load project context
 
-Read `.claude/workflow-context.md` from the project root (the git repository root).
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` from the project root (the git repository root).
 
-**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
+**HALT if not found:** "No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
 
 Extract the following from the YAML frontmatter:
 
@@ -40,15 +40,15 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 3. Load stack knowledge (optional)
 
-If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
 
 ### 4. Load infrastructure knowledge (optional)
 
-If `.claude/workflow-knowledge/infrastructure.md` exists at project root, read it. This file contains cloud infra, CI/CD, deployment config.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/infrastructure.md` exists at project root, read it. This file contains cloud infra, CI/CD, deployment config.
 
 ### 5. Load investigation checklist (optional)
 
-If `.claude/workflow-knowledge/investigation-checklist.md` exists at project root, read it. This file contains project-specific domain investigation checklists (provider-specific, service-specific, infra-specific).
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md` exists at project root, read it. This file contains project-specific domain investigation checklists (provider-specific, service-specific, infra-specific).
 
 The generic investigation checklist at `./data/investigation-checklist.md` is always loaded as baseline. Project-specific checklists extend (not replace) the generic one.
 
@@ -123,7 +123,7 @@ After the final step completes (whether successfully or via early termination), 
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)
-- The project knowledge (`.claude/workflow-knowledge/`)
-- The project context (`.claude/workflow-context.md`)
+- The project knowledge (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`)
+- The project context (`{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`)
 
 **This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

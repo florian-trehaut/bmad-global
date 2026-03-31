@@ -80,9 +80,9 @@ Exception: read-only analysis workflows (like bmad-validate-skill) that don't mo
 ```markdown
 ### 1. Load project context
 
-Read `.claude/workflow-context.md` from the project root (the git repository root).
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` from the project root (the git repository root).
 
-**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
+**HALT if not found:** "No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
 
 Extract the following from the YAML frontmatter:
 
@@ -104,7 +104,7 @@ This is a **{type}-skill** — {reason}.
 ```markdown
 ### N. Load {knowledge_name} (optional)
 
-If `.claude/workflow-knowledge/{filename}.md` exists at project root, read it.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{filename}.md` exists at project root, read it.
 {What it provides and why.}
 ```
 
@@ -187,7 +187,7 @@ The NEXT pointer in the body is the primary navigation mechanism.
 
 ## 5. Variable Resolution
 
-- All project-specific values come from `.claude/workflow-context.md` YAML frontmatter
+- All project-specific values come from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` YAML frontmatter
 - Variables use `{VARIABLE_NAME}` format (curly braces, UPPER_SNAKE_CASE)
 - Common variables:
 
@@ -211,7 +211,7 @@ The NEXT pointer in the body is the primary navigation mechanism.
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` |
 | `{USER_NAME}` | `user_name` |
 
-- Never hardcode values that should come from workflow-context.md
+- Never hardcode values that should come from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`
 
 ---
 
@@ -229,7 +229,7 @@ The NEXT pointer in the body is the primary navigation mechanism.
 - Exception: `bmad-shared` files can be referenced by path since they are shared infrastructure
 
 ### External References
-- Project files: use `{project-root}` prefix or `.claude/` relative from project root
+- Project files: use `{MAIN_PROJECT_ROOT}` prefix for `.claude/` paths (e.g., `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`)
 - No absolute paths (no `~/`, no `/Users/`)
 - No `{installed_path}` variable (legacy BMAD pattern)
 
@@ -329,8 +329,8 @@ fallback:                            # When TEAM_MODE == false
 | `workflow.yaml` | Legacy BMAD format — replaced by workflow.md |
 | `instructions.xml` | Legacy BMAD format — replaced by step files |
 | `workflow.xml` | Legacy BMAD engine reference |
-| `{project-root}/_bmad/` | Legacy BMAD path — our skills are in `~/.claude/skills/` or `.claude/skills/` |
-| Hardcoded project names | Use `{PROJECT_NAME}` from workflow-context.md |
+| `{project-root}/_bmad/` | Legacy BMAD path — our skills are in `~/.claude/skills/` or `{MAIN_PROJECT_ROOT}/.claude/skills/` |
+| Hardcoded project names | Use `{PROJECT_NAME}` from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` |
 | Hardcoded tool names (`pnpm`, `glab`, `gh`) | Use config variables (`{PACKAGE_MANAGER}`, `{FORGE_CLI}`) |
 | Hardcoded tracker IDs | Use `{TRACKER_TEAM_ID}`, `{TRACKER_STATES}` |
 | Hardcoded URLs | Use workflow-knowledge files |

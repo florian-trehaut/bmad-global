@@ -18,9 +18,9 @@ Aggressively investigate the bug — logs, database, code, deployments — witho
 
 Read `../data/troubleshooting-methodology.md`.
 
-If `.claude/workflow-knowledge/investigation-checklist.md` exists at project root, read it for domain-specific investigation patterns.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md` exists at project root, read it for domain-specific investigation patterns.
 
-If `.claude/workflow-knowledge/stack.md` exists at project root, read it for stack-specific debugging context.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists at project root, read it for stack-specific debugging context.
 
 ### 2. Launch parallel investigations
 

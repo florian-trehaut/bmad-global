@@ -6,7 +6,7 @@
 
 ## INITIALIZATION
 
-This is a **meta-skill** — it creates new bmad-* skills. It does NOT need `.claude/workflow-context.md`.
+This is a **meta-skill** — it creates new bmad-* skills. It does NOT need `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`.
 
 ### 1. Load shared rules
 
@@ -31,7 +31,7 @@ Read the following templates — they are the starting point for every generated
 Ask the user (or infer from context):
 
 - **Global skill** (`~/.claude/skills/bmad-{name}/`) — usable across all projects
-- **Project skill** (`.claude/skills/bmad-{name}/`) — scoped to the current project
+- **Project skill** (`{MAIN_PROJECT_ROOT}/.claude/skills/bmad-{name}/`) — scoped to the current project
 
 Default: global.
 
@@ -105,7 +105,7 @@ After the final step completes (whether successfully or via early termination), 
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)
-- The project knowledge (`.claude/workflow-knowledge/`)
-- The project context (`.claude/workflow-context.md`)
+- The project knowledge (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`)
+- The project context (`{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`)
 
 **This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

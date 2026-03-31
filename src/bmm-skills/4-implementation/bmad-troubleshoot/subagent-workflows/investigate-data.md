@@ -5,7 +5,7 @@
 - `AFFECTED_SERVICE`: name of the service with the bug
 - `TARGET_ENV`: environment to investigate
 - `SYMPTOM`: description of the symptom
-- `LOCAL_SKILLS`: list of available project skills (from `.claude/skills/`)
+- `LOCAL_SKILLS`: list of available project skills (from `{MAIN_PROJECT_ROOT}/.claude/skills/`)
 - `INVESTIGATION_PATTERNS`: domain-specific investigation queries (from investigation-checklist.md if available)
 
 ## Your Role

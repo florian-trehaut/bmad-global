@@ -34,7 +34,7 @@ For each task:
 - Write code following existing patterns
 - Handle errors appropriately
 - Follow conventions observed in codebase
-- Follow forbidden patterns from `.claude/workflow-knowledge/stack.md` (if exists)
+- Follow forbidden patterns from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` (if exists)
 
 ### 3. Test
 

@@ -64,7 +64,7 @@ This ensures generated tests match the project's established conventions.
 
 ### 4. Load knowledge fragments (if available)
 
-If `.claude/workflow-knowledge/` exists, check for and load relevant fragments:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` exists, check for and load relevant fragments:
 
 - `fixture-architecture.md` — fixture composition patterns
 - `data-factories.md` — factory patterns with faker

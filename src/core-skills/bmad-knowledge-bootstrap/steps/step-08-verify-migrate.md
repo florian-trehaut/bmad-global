@@ -14,16 +14,16 @@ Validate all generated files, count TODOs, assess workflow readiness, suggest ne
 
 ```bash
 for file in \
-  ".claude/workflow-context.md" \
-  ".claude/workflow-knowledge/tracker.md" \
-  ".claude/workflow-knowledge/stack.md" \
-  ".claude/workflow-knowledge/infrastructure.md" \
-  ".claude/workflow-knowledge/environment-config.md" \
-  ".claude/workflow-knowledge/investigation-checklist.md" \
-  ".claude/workflow-knowledge/review-perspectives.md" \
-  ".claude/workflow-knowledge/conventions.md" \
-  ".claude/workflow-knowledge/domain-glossary.md" \
-  ".claude/workflow-knowledge/api-surface.md"; do
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-context.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/tracker.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/infrastructure.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/environment-config.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/conventions.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain-glossary.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api-surface.md"; do
   if [ -s "$file" ]; then
     lines=$(wc -l < "$file")
     echo "OK  $file ($lines lines)"
@@ -60,7 +60,7 @@ Check YAML frontmatter for required keys:
 ### 3. Count TODOs
 
 ```bash
-grep -rn "TODO" .claude/workflow-context.md .claude/workflow-knowledge/*.md 2>/dev/null
+grep -rn "TODO" {MAIN_PROJECT_ROOT}/.claude/workflow-context.md {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/*.md 2>/dev/null
 ```
 
 ### 4. Assess Workflow Readiness
@@ -101,7 +101,7 @@ Workflow readiness:
 
 #### 6a. Build Coverage Map
 
-Inventory all legacy workflows in `.claude/workflows/`. Inventory all global bmad-* skills in `~/.claude/skills/`. Build mapping table:
+Inventory all legacy workflows in `{MAIN_PROJECT_ROOT}/.claude/workflows/`. Inventory all global bmad-* skills in `~/.claude/skills/`. Build mapping table:
 
 ```
 Legacy workflow              | Global skill           | Status
@@ -131,13 +131,13 @@ Group by verdict. HALT — wait for user approval.
 #### 6d. Execute Migrations
 
 - **UPSTREAM_SUFFICIENT**: Mark legacy as safe to delete
-- **LEGACY_HAS_VALUE**: Extract additions to workflow-knowledge/ or project-local skills
+- **LEGACY_HAS_VALUE**: Extract additions to `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` or project-local skills
 - **MERGE_NEEDED**: Propose merge, use /bmad-create-skill if approved
 - **NO_UPSTREAM**: Create via /bmad-create-skill
 
 #### 6e. Legacy Commands Cleanup
 
-Classify commands in `.claude/commands/`: REDUNDANT or STILL_NEEDED.
+Classify commands in `{MAIN_PROJECT_ROOT}/.claude/commands/`: REDUNDANT or STILL_NEEDED.
 
 HALT — ask: **[D] Delete redundant / [K] Keep all / [Q] Quit**
 

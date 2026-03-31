@@ -6,7 +6,7 @@ nextStepFile: './step-08-verify-migrate.md'
 
 ## STEP GOAL:
 
-Present each generated knowledge file draft to the user for Accept/Edit/Reject, then write approved files to `.claude/workflow-knowledge/`.
+Present each generated knowledge file draft to the user for Accept/Edit/Reject, then write approved files to `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`.
 
 ## MANDATORY SEQUENCE
 
@@ -45,7 +45,7 @@ Knowledge files:
   APPROVED: {N} — {list}
   REJECTED: {N} — {list with reasons}
 
-Ready to write {N} files to .claude/workflow-knowledge/
+Ready to write {N} files to {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/
 ```
 
 HALT — wait for confirmation to write.
@@ -53,11 +53,11 @@ HALT — wait for confirmation to write.
 ### 3. Write Approved Files
 
 ```bash
-mkdir -p .claude/workflow-knowledge
+mkdir -p {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge
 ```
 
 For each APPROVED file:
-- Write to `.claude/workflow-knowledge/{filename}` (frontmatter + body)
+- Write to `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{filename}` (frontmatter + body)
 - Log: "Written: {filename} ({N} lines, source_hash: {hash})"
 
 ### 4. Present Write Summary
@@ -66,13 +66,13 @@ For each APPROVED file:
 Knowledge Bootstrap — Files Written
 
 Written:
-- .claude/workflow-knowledge/{filename} ({N} lines, hash: {hash})
+- {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{filename} ({N} lines, hash: {hash})
 {repeat for each file}
 
 Rejected (not written):
 - {filename}: {reason}
 
-Total knowledge files: {count in .claude/workflow-knowledge/}
+Total knowledge files: {count in {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/}
 ```
 
 ### 5. Proceed

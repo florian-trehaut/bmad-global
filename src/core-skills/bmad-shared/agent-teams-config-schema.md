@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Documents the optional `agent_teams` YAML section that projects add to their `.claude/workflow-context.md` to enable Agent Teams features. This section is read by the team router during workflow initialization to determine whether team mode is available and how teammates should be configured.
+Documents the optional `agent_teams` YAML section that projects add to their `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` to enable Agent Teams features. This section is read by the team router during workflow initialization to determine whether team mode is available and how teammates should be configured.
 
 Projects without this section default to `TEAM_MODE = false` — all workflows run in their existing single-session mode.
 
@@ -14,7 +14,7 @@ Projects without this section default to `TEAM_MODE = false` — all workflows r
 
 ## YAML Schema
 
-Add this section to `.claude/workflow-context.md` YAML frontmatter:
+Add this section to `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` YAML frontmatter:
 
 ```yaml
 # --- Agent Teams (OPTIONAL) ---
@@ -61,7 +61,7 @@ agent_teams:
 | `default_worker_model` | string | NO | `sonnet` | Model suggestion for worker teammates. Informational — Claude Code may override |
 | `default_lead_model` | string | NO | `opus` | Model suggestion for lead/orchestrator |
 | `max_teammates` | integer | NO | `5` | Upper bound on concurrent teammates. Prevents runaway token usage |
-| `knowledge_mapping` | map | NO | `{}` | Role key → list of knowledge filenames in `.claude/workflow-knowledge/` |
+| `knowledge_mapping` | map | NO | `{}` | Role key → list of knowledge filenames in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` |
 | `global_knowledge` | list | NO | `[]` | Knowledge files loaded by every teammate regardless of role |
 
 ### teammate_mode Values
@@ -73,7 +73,7 @@ agent_teams:
 
 ### knowledge_mapping Keys
 
-Knowledge mapping keys are **role identifiers** — they must match the `role` field in task contracts and the role keys in `team-config.md`. The values are filenames (not full paths) relative to `.claude/workflow-knowledge/`.
+Knowledge mapping keys are **role identifiers** — they must match the `role` field in task contracts and the role keys in `team-config.md`. The values are filenames (not full paths) relative to `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`.
 
 Individual workflows can override the project-level mapping in their `team-workflows/team-config.md` by specifying `knowledge_files` per role.
 

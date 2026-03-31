@@ -39,8 +39,8 @@ Options:
 
 | Dependency | Question |
 |------------|----------|
-| Project context | Does it need `.claude/workflow-context.md`? (i.e., does it use tracker, forge, build commands, etc.) |
-| Project knowledge | Does it need `.claude/workflow-knowledge/` files? (stack info, environment config, etc.) |
+| Project context | Does it need `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`? (i.e., does it use tracker, forge, build commands, etc.) |
+| Project knowledge | Does it need `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` files? (stack info, environment config, etc.) |
 | External tools | Does it call CLI tools, MCP servers, APIs? |
 | Subagents | Are there steps that benefit from parallel execution via subagents? |
 | Shared rules | Does `no-fallback-no-false-data.md` apply? (usually yes if the skill touches code or data) |
@@ -67,8 +67,8 @@ Assemble the answers into a mental design brief:
 **Output:** {what the skill produces}
 **Interaction model:** {automated / interactive / mixed}
 **Dependencies:**
-  - workflow-context.md: {yes/no}
-  - workflow-knowledge/: {list of files or "none"}
+  - {MAIN_PROJECT_ROOT}/.claude/workflow-context.md: {yes/no}
+  - {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/: {list of files or "none"}
   - External tools: {list or "none"}
   - Subagents: {yes/no — if yes, for what}
   - Shared rules: {yes/no}

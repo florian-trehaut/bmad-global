@@ -47,19 +47,19 @@ List the trigger phrases from the SKILL.md description, showing both slash-comma
 "This skill is installed at `~/.claude/skills/bmad-{SKILL_NAME}/` and is already active. It will appear in the skill list for all projects."
 
 **If project skill:**
-"This skill is at `.claude/skills/bmad-{SKILL_NAME}/`. To make it available:
+"This skill is at `{MAIN_PROJECT_ROOT}/.claude/skills/bmad-{SKILL_NAME}/`. To make it available:
 1. It is already active for this project
-2. Commit the `.claude/skills/bmad-{SKILL_NAME}/` directory to version control for team access"
+2. Commit the `{MAIN_PROJECT_ROOT}/.claude/skills/bmad-{SKILL_NAME}/` directory to version control for team access"
 
 ### 4. Dependency reminders
 
 **If the skill needs workflow-context.md:**
-"This skill requires `.claude/workflow-context.md` in the project root. If the project is not yet initialized, run `/bmad-knowledge-bootstrap` first."
+"This skill requires `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` in the project root. If the project is not yet initialized, run `/bmad-knowledge-bootstrap` first."
 
 **If the skill needs specific workflow-knowledge files:**
 "This skill loads the following knowledge files JIT:
 {list files}
-Ensure these exist in `.claude/workflow-knowledge/` (created by `/bmad-knowledge-bootstrap`)."
+Ensure these exist in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` (created by `/bmad-knowledge-bootstrap`)."
 
 ### 5. Suggest validation
 

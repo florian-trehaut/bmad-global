@@ -16,7 +16,7 @@ Verify that all access to the target environment is operational before starting 
 
 ### 1. Load environment configuration
 
-If `.claude/workflow-knowledge/environment-config.md` was loaded during initialization, extract the parameters for `{ENVIRONMENT}`.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/environment-config.md` was loaded during initialization, extract the parameters for `{ENVIRONMENT}`.
 
 If no environment-config.md exists, proceed with dynamic discovery only (steps 2-3).
 

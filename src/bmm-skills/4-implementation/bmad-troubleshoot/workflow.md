@@ -8,9 +8,9 @@
 
 ### 1. Load project context
 
-Read `.claude/workflow-context.md` from the project root (the git repository root).
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`.
 
-**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
+**HALT if not found:** "No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
 
 Extract the following from the YAML frontmatter:
 
@@ -47,7 +47,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load stack knowledge (optional)
 
-If `.claude/workflow-knowledge/stack.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
 
 ### 4. Set defaults
 
@@ -83,7 +83,7 @@ You are a **systematic bug hunter**. You aggressively investigate problems witho
 - **AGGRESSIVE INVESTIGATION** — in step 03, you do NOT ask before reading logs, connecting to DB, or searching code. You ACT. The user described the symptom — that is your mandate.
 - **READ-ONLY in investigation** — all DB access during investigation is read-only. Write access only during fix (step 06).
 - **ZERO FALLBACK / ZERO FALSE DATA** — never fabricate evidence. "I read the code and it looks correct" is NOT proof. Only real logs, real DB queries, real API responses count.
-- **DISCOVER, DON'T HARDCODE** — discover local skills in `.claude/skills/`, discover infra from workflow-knowledge/. Never hardcode tool names, ports, or URLs.
+- **DISCOVER, DON'T HARDCODE** — discover local skills in `{MAIN_PROJECT_ROOT}/.claude/skills/`, discover infra from workflow-knowledge/. Never hardcode tool names, ports, or URLs.
 - **ALL implementation work MUST happen inside the worktree** — NEVER in the main repo.
 
 ---
@@ -109,7 +109,7 @@ Load and execute `./steps/step-01-understand.md`.
 
 These apply at ANY step:
 
-- Missing `.claude/workflow-context.md` → HALT
+- Missing `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` → HALT
 - User explicitly requests stop → HALT
 - Evidence fabrication detected → HALT (zero-fallback violation)
 - Environment access impossible and no alternative path → HALT
@@ -124,7 +124,7 @@ After the final step completes (whether successfully or via early termination), 
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)
-- The project knowledge (`.claude/workflow-knowledge/`)
-- The project context (`.claude/workflow-context.md`)
+- The project knowledge (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`)
+- The project context (`{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`)
 
 **This step is CONDITIONAL** — it only activates if difficulties were encountered. If the workflow ran smoothly with no HALTs, corrections, or workarounds, it is silently skipped.

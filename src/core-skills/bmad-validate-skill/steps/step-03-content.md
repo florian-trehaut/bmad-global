@@ -62,7 +62,7 @@ For each step file:
 Determine if this skill is project-dependent (not a meta-skill):
 
 **Check 3.9 — workflow-context.md loading:**
-- If the skill is project-dependent, INITIALIZATION must load `.claude/workflow-context.md`
+- If the skill is project-dependent, INITIALIZATION must load `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`
 - Meta-skills (bmad-create-skill, bmad-edit-skill, bmad-validate-skill) are exempt
 - Severity: WARN if project-dependent but does not load context
 

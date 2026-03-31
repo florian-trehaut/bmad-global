@@ -33,7 +33,7 @@ Generate specific implementation tasks, testable acceptance criteria, and a mand
 ## EXECUTION PROTOCOLS:
 
 - Follow MANDATORY SEQUENCE exactly
-- Load test knowledge files from `.claude/workflow-knowledge/stack.md` if available for test strategy
+- Load test knowledge files from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` if available for test strategy
 - Update WIP file before presenting checkpoint menu
 - ALWAYS halt and wait for user input at menu
 
@@ -95,7 +95,7 @@ Each TAC should trace to at least one BAC. If a TAC exists without a parent BAC,
 
 ### 3. Generate Test Strategy (MANDATORY)
 
-If test knowledge files exist in the project (`.claude/workflow-knowledge/stack.md` or TEA knowledge files referenced there), load them.
+If test knowledge files exist in the project (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` or TEA knowledge files referenced there), load them.
 
 For each TAC (Technical AC), classify using the test pyramid and priority matrix:
 

@@ -37,7 +37,7 @@ Count changed files for routing decision.
   7. **ADR Conformity** (conditional) — If `PROJECT_ADRS` is loaded: verify the implementation follows all active ADRs. Check new patterns, services, or architectural choices against decided approaches. If a violation is found → BLOCKER. If a new ADR should exist but doesn't → QUESTION with suggestion to invoke `skill:bmad-create-adr` before or after merge.
   8. **Performance Verification** (conditional) — If the feature touches latency-sensitive paths, batch processing, large data, startup time, or binary size: add temporary timing instrumentation, run the code path, capture real measurements. Include results in MR description if meaningful. Remove instrumentation after measurement. Skip if no performance implications.
 
-  If `.claude/workflow-knowledge/review-perspectives.md` exists at project root, load and apply project-specific checklists.
+  If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` exists at project root, load and apply project-specific checklists.
 
   **Design Decisions Audit (MANDATORY — after all perspectives):**
 
@@ -63,8 +63,8 @@ Count changed files for routing decision.
 
   Read {selfReviewSubagent} and spawn a subagent with the review contract:
   - worktree_path, baseline_commit, issue_identifier, ACs
-  - Dev standards from `.claude/workflow-knowledge/stack.md`
-  - Review perspectives from `.claude/workflow-knowledge/review-perspectives.md`
+  - Dev standards from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md`
+  - Review perspectives from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md`
 
   Wait for report. The subagent returns a structured YAML report per {reviewReportFormat}.
 </check>

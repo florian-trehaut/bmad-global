@@ -1,6 +1,6 @@
 # Daily Log Format
 
-Defines the structure of each daily-log file persisted in `.claude/daily-log/`. One file per day, named `{YYYY-MM-DD}.md`.
+Defines the structure of each daily-log file persisted in `{MAIN_PROJECT_ROOT}/.claude/daily-log/`. One file per day, named `{YYYY-MM-DD}.md`.
 
 ---
 

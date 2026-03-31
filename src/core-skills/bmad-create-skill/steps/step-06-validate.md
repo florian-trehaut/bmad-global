@@ -56,7 +56,7 @@ Read `{TARGET_DIR}/workflow.md` and verify:
 | Has CRITICAL RULES section | `## CRITICAL RULES` heading exists | PASS/FAIL |
 | Has STEP SEQUENCE section | `## STEP SEQUENCE` heading exists | PASS/FAIL |
 | Has ENTRY POINT section | `## ENTRY POINT` heading exists | PASS/FAIL |
-| Context loading | If project-dependent: loads workflow-context.md with HALT | PASS/FAIL/N/A |
+| Context loading | If project-dependent: loads `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` with HALT | PASS/FAIL/N/A |
 | Step sequence matches files | Every step in the table has a corresponding file in `steps/` | PASS/FAIL |
 | Entry point valid | References an existing step file | PASS/FAIL |
 | No hardcoded project refs | No project names, URLs, IDs | PASS/FAIL |

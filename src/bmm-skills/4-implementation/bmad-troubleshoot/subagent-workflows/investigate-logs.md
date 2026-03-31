@@ -6,7 +6,7 @@
 - `TARGET_ENV`: environment to investigate (staging, production, dev, local)
 - `SYMPTOM`: description of the symptom and approximate timestamp
 - `INFRA_CONTEXT`: infrastructure knowledge (from workflow-knowledge/)
-- `LOCAL_SKILLS`: list of available project skills (from `.claude/skills/`)
+- `LOCAL_SKILLS`: list of available project skills (from `{MAIN_PROJECT_ROOT}/.claude/skills/`)
 
 ## Your Role
 

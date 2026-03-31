@@ -46,9 +46,9 @@ Customize the **INITIALIZATION** section:
 ```markdown
 ### 1. Load project context
 
-Read `.claude/workflow-context.md` from the project root (the git repository root).
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` from the project root (the git repository root).
 
-**HALT if not found:** "No `.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
+**HALT if not found:** "No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
 
 Extract the following from the YAML frontmatter:
 
@@ -57,9 +57,9 @@ Extract the following from the YAML frontmatter:
 {list only the variables this skill actually needs}
 ```
 
-**If standalone/meta** (does not need workflow-context.md):
+**If standalone/meta** (does not need `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`):
 ```markdown
-This is a **{type}-skill** — {reason it doesn't need workflow-context.md}.
+This is a **{type}-skill** — {reason it doesn't need `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`}.
 
 ### 1. {First initialization step}
 {what to load instead}

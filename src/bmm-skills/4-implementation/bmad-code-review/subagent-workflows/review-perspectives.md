@@ -19,9 +19,9 @@ You received a `review_contract` in your task description (claimed from TaskList
 
 - Execute ONLY the perspectives listed in `contract.perspectives`
 - Review ONLY files listed in `contract.changed_files`
-- Load and apply project review perspectives from `.claude/workflow-knowledge/review-perspectives.md` if it exists (JIT loading)
+- Load and apply project review perspectives from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if it exists (JIT loading)
 - Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` (always)
-- Load stack knowledge from `.claude/workflow-knowledge/stack.md` if it exists (for reference code, legacy code, forbidden patterns)
+- Load stack knowledge from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` if it exists (for reference code, legacy code, forbidden patterns)
 - Report findings with exact file:line references
 - You are **READ-ONLY** -- do NOT edit, fix, commit, or modify anything
 - Do NOT run format, lint --fix, or any write operation
@@ -81,10 +81,10 @@ git log -1 --oneline
 Read(~/.claude/skills/bmad-shared/no-fallback-no-false-data.md)
 
 # Load project review perspectives (if exists)
-Read(.claude/workflow-knowledge/review-perspectives.md)  # project-specific checklists
+Read({MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md)  # project-specific checklists
 
 # Load stack knowledge (if exists)
-Read(.claude/workflow-knowledge/stack.md)  # reference code, legacy dirs, forbidden patterns
+Read({MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md)  # reference code, legacy dirs, forbidden patterns
 ```
 
 ### 3. Construct Diff
@@ -178,7 +178,7 @@ grep -rn "/ 1\.2\|/ 1\.1\|\* 0\.8\|\* 1\.2" --include="*.ts" {changed_files_dirs
 
 **Condition:** `security` in `contract.perspectives`.
 
-Apply project security checklist from `.claude/workflow-knowledge/review-perspectives.md` if loaded, otherwise:
+Apply project security checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded, otherwise:
 
 - [ ] Injection: SQL raw concat, command exec/spawn, XSS
 - [ ] Auth/AuthZ: missing guards/decorators, privilege escalation
@@ -214,7 +214,7 @@ grep -rn "password\|secret\|api_key\|apiKey\|token" --include="*.ts" {changed_fi
 
 **Condition:** `qa` in `contract.perspectives`.
 
-Apply project QA checklist from `.claude/workflow-knowledge/review-perspectives.md` if loaded.
+Apply project QA checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded.
 
 ### Forbidden Patterns (BLOCKER)
 
@@ -256,7 +256,7 @@ If `contract.linear_issue` is not null:
 
 **Condition:** `code_quality` in `contract.perspectives`.
 
-Apply project code quality checklist from `.claude/workflow-knowledge/review-perspectives.md` if loaded.
+Apply project code quality checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded.
 
 - [ ] Architecture boundaries (domain never imports infrastructure -> BLOCKER)
 - [ ] Ports explicit in domain layer
@@ -283,7 +283,7 @@ grep -rn "from.*infrastructure" {changed_files_dirs} | grep "/domain/"
 
 **Condition:** `tech_lead` in `contract.perspectives`.
 
-Apply project tech lead checklist from `.claude/workflow-knowledge/review-perspectives.md` if loaded.
+Apply project tech lead checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded.
 
 - [ ] SOLID principles
 - [ ] N+1 queries, scalability, unbounded queries
@@ -307,7 +307,7 @@ ls .changeset/*.md 2>/dev/null | head -5
 
 **Condition:** `patterns` in `contract.perspectives`.
 
-Use reference code directories from `.claude/workflow-knowledge/stack.md` if loaded. NEVER reference legacy code.
+Use reference code directories from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` if loaded. NEVER reference legacy code.
 
 - [ ] DTO validation patterns
 - [ ] ConfigService usage (no `process.env` direct access)
