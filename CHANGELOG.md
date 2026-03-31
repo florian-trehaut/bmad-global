@@ -1,5 +1,84 @@
 # Changelog
 
+## v1.2.0 - 2026-03-31
+
+### ADR Ecosystem Complete
+
+Cette release complète l'écosystème ADR du framework : découverte, création, conformité, et revue sont maintenant couverts de bout en bout.
+
+#### bmad-create-adr — Workflow complet (NEW)
+
+Implémentation complète du workflow de création d'ADR, remplaçant le placeholder. 7 étapes séquentielles avec prévention structurelle des anti-patterns :
+
+- **step-01-init** — Reprend un WIP existant, accepte le contexte de décision (standalone ou sub-workflow), valide la location ADR, charge les ADR existantes, détecte la convention de numérotation (4-digit zero-padded par défaut)
+- **step-02-context** — Capture le problème, les forces en jeu, les contraintes et les decision drivers. Scan du codebase pour contexte technique. Détection de conflit avec les ADR existantes — propose la supersession via menu [U]/[R]/[X]
+- **step-03-options** — Minimum 3 options obligatoire (dont "Do Nothing"). Recherche proactive d'alternatives (web + codebase + reframing). Garde Sprint : refuse un ADR avec < 3 options sauf justification explicite
+- **step-04-evidence** — Collecte d'evidence pour chaque option : analyse codebase (file:line), recherche web (URLs), input utilisateur. Garde Retroactive Fiction : chaque pro/con doit avoir une source vérifiable. Garde Fairy Tale : l'option préférée doit avoir des cons réels
+- **step-05-decision** — Matrice de trade-off qualitative (pas de scoring pseudo-quantitatif). 3 questions de challenge (falsifiabilité, futur lecteur, trade-offs honnêtes). Conséquences négatives obligatoires (min 1). Check Tunnel Vision obligatoire : opérationnel, cross-team, sécurité, maintenance
+- **step-06-compose** — Draft de l'ADR depuis le template (MADR 4.0 ou Nygard). Self-review avec 7 checks de qualité + scan des 4 anti-patterns. Génération d'un Y-statement de synthèse. Menu complet : edit, adversarial review, elicitation, party mode
+- **step-07-publish** — Écriture du fichier ADR avec confirmation utilisateur. Gestion atomique de la supersession (update old + write new). Cleanup WIP. Retour de contrôle au workflow appelant si sub-workflow
+
+**4 data files :**
+
+- `anti-patterns.md` — 4 patterns (Fairy Tale, Sprint, Tunnel Vision, Retroactive Fiction) avec heuristiques de détection et règles d'escalade combinée
+- `self-review-checklist.md` — 7 catégories de checks (contexte, options, evidence, logique, conséquences, risques, anti-patterns) avec scoring PASS/CONCERN/FAIL
+- `adr-template-madr.md` — Template MADR 4.0 complet avec frontmatter YAML, confirmation section, quality checklist
+- `adr-template-nygard.md` — Template Michael Nygard (5 sections : Status, Context, Decision, Consequences)
+
+**Sub-workflow transparent :** les mêmes 7 étapes s'exécutent en mode standalone et sub-workflow. Seuls l'init (détection du mode) et le publish (retour de contrôle) diffèrent.
+
+#### ADR Awareness — 12 workflows enrichis
+
+Découverte, chargement, conformité et triggers de création d'ADR ajoutés à travers tout le framework :
+
+**Découverte (knowledge-bootstrap) :**
+
+- `step-05-research-scan` — Nouveau "ADR Discovery Scan" : scan des locations conventionnelles (docs/adr/, docs/decisions/, doc/adr/, etc.), détection du format (MADR, Nygard, custom), fallback sur le tracker
+- `step-04-generate-context` — Nouveaux champs `adr_location` et `adr_format` dans le template workflow-context.md
+
+**Chargement des ADR en contexte (6 workflows) :**
+
+| Workflow | Step | Variable stockée |
+|----------|------|-------------------|
+| bmad-quick-spec | step-03-investigate | `PROJECT_ADRS` |
+| bmad-dev-story | step-05-load-context | `PROJECT_ADRS` |
+| bmad-code-review | step-03-load-context | `PROJECT_ADRS` |
+| bmad-review-story | step-01-intake | `PROJECT_ADRS` |
+| bmad-quick-dev | step-02-context-gathering | ADRs chargés |
+| bmad-adr-review | step-01-init | `EXISTING_ADRS` |
+
+**Conformité ADR dans les reviews (4 workflows) :**
+
+- **bmad-dev-story** step-11 — Perspective 7 "ADR Conformity" : violation = BLOCKER, gap = QUESTION avec suggestion `bmad-create-adr`
+- **bmad-code-review** step-06 — Perspective 7 "ADR Conformity" : vérifie que le MR ne viole pas les ADR actives
+- **bmad-quick-dev** step-05 — Perspective 8 "ADR conformity" dans l'adversarial review
+- **bmad-review-story** step-05 — Section "1b. ADR Need Detection" : crée un finding MAJOR si une décision architecturale manque d'ADR
+
+**Triggers de création d'ADR [A]/[S]/[N] (8 workflows) :**
+
+| Workflow | Step | Trigger |
+|----------|------|---------|
+| bmad-quick-spec | step-05-plan | Plan qui introduit une décision architecturale |
+| bmad-dev-story | step-07-plan-approval | Plan qui viole ou nécessite un ADR |
+| bmad-create-architecture | step-04-decisions | Après chaque décision critique |
+| bmad-create-story | step-03-analyze | Story qui introduit un pattern non documenté |
+| bmad-create-epics-and-stories | step-03-create-stories | Guardrail "Requires ADR" sur les stories |
+| bmad-spike | step-04-synthesize | Vérification de supersession/conflit avec ADR existantes |
+| bmad-code-review | step-06-execute-review | Suggestion dans le finding ADR conformity |
+| bmad-dev-story | step-11-self-review | Suggestion dans la perspective ADR conformity |
+
+#### Daily Planning — Re-sync des estimations
+
+- **bmad-daily-planning** step-01 — Les issues planifiées avec `points: null` sont re-synchronisées avec le tracker. Si une issue a été estimée après la session de planning, le `velocity_planned` est recalculé. Corrige la dérive de vélocité quand les estimations arrivent en retard.
+
+### Fichiers modifiés
+
+- 32 fichiers, +1921 / -36 lignes
+- 13 fichiers nouveaux (bmad-create-adr : workflow + 7 steps + 4 data)
+- 19 fichiers modifiés (ADR awareness cross-workflow + daily-planning fix)
+
+---
+
 ## v1.1.0 - 2026-03-30
 
 ### Workflow Hardening
