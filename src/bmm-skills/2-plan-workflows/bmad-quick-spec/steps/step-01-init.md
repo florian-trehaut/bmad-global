@@ -6,7 +6,7 @@ nextStepFile: './step-02-orient.md'
 
 ## STEP GOAL:
 
-Check for in-progress specs, greet the user, understand their request, and create a temporary worktree for code investigation.
+Greet the user, understand their request, check for an existing WIP on the same topic, and create a temporary worktree for code investigation.
 
 ## MANDATORY EXECUTION RULES (READ FIRST):
 
@@ -38,47 +38,48 @@ Check for in-progress specs, greet the user, understand their request, and creat
 
 ## MANDATORY SEQUENCE
 
-### 1. WIP Resume Check
-
-Check if any `/tmp/bmad-wip-quick-spec-*.md` file exists.
-
-**If WIP file found:**
-
-Read the WIP file frontmatter -- extract `title`, `slug`, `stepsCompleted`, `status`.
-
-Present to user:
-
-> I found a draft in progress:
->
-> **{title}** (slug: `{slug}`)
-> - Steps completed: {stepsCompleted}
-> - Status: {status}
->
-> **[Y]** Resume where we left off
-> **[N]** Archive and start fresh
-
-WAIT for user selection.
-
-- **IF Y:** Load WIP state (all accumulated sections) and jump to the next incomplete step
-- **IF N:** Rename WIP file to `wip-quick-spec-{slug}.archived.md`, then continue below
-- **IF other:** Explain valid options and redisplay menu
-
-### 2. Load Context
+### 1. Load Context
 
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/tracker.md` if it exists -- extract tracker constants, status mappings
 - Load Project Context:
   1. Tracker documents (primary): list documents in the Meta Project (using CRUD patterns from tracker.md) -> find "Project Context" -> load its content by document ID
   2. Fallback local: search for `**/project-context.md` in the project
 
-### 3. Greet and Ask
+### 2. Greet and Ask
 
 Greet {USER_NAME} and ask what they want to spec today. Adapt tone to {COMMUNICATION_LANGUAGE}. Keep it casual and open-ended -- bug, task, feature, improvement, anything goes.
 
 WAIT for user input.
 
-### 4. Understand and Derive Slug
+### 3. Understand and Derive Slug
 
 Get their initial description. Understand enough to know the domain and derive a URL-safe slug (lowercase, hyphens).
+
+### 4. WIP Resume Check
+
+Check if `/tmp/bmad-wip-quick-spec-{slug}.md` exists (using the slug just derived).
+
+**If WIP file found for this slug:**
+
+Read the WIP file frontmatter -- extract `title`, `slug`, `stepsCompleted`, `status`.
+
+Present to user:
+
+> I found a draft in progress for this topic:
+>
+> **{title}** (slug: `{slug}`)
+> - Steps completed: {stepsCompleted}
+> - Status: {status}
+>
+> **[Y]** Resume where we left off
+> **[N]** Start fresh (delete old WIP)
+
+WAIT for user selection.
+
+- **IF Y:** Load WIP state (all accumulated sections) and jump to the next incomplete step
+- **IF N:** Delete the WIP file, then continue below
+
+**If no WIP file for this slug:** Continue below.
 
 ### 5. Create Worktree
 
@@ -102,6 +103,7 @@ Log: "Worktree created: {SPEC_WORKTREE_PATH} (synced with main)"
 ### 6. Save WIP File
 
 Write `{wip_file}` (at `/tmp/bmad-wip-quick-spec-{slug}.md`) with frontmatter:
+
 - `title`, `slug`, `created: {date}`, `status: in-progress`
 - `stepsCompleted: [1]`, `type: {type}`
 - `worktree_path: {SPEC_WORKTREE_PATH}`
@@ -116,16 +118,16 @@ Load, read entire file, then execute {nextStepFile}.
 
 ### SUCCESS:
 
-- WIP check performed
 - Context loaded (tracker or local fallback)
 - User's request understood, slug derived
+- WIP check performed for this specific slug only
 - Worktree created successfully
 - WIP file saved with initial state
 - Next step loaded
 
 ### FAILURE:
 
-- Skipping WIP check
+- Checking WIP for ALL slugs (must only check the current slug)
 - Proceeding without worktree
 - Not saving WIP before next step
 - Asking detailed technical questions (too early)
