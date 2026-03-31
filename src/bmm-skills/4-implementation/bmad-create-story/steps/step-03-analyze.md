@@ -11,6 +11,7 @@ Perform deep analysis of the loaded context: extract architecture patterns, data
 - Zero Fallback: if source data for a mapping is unavailable, flag as MISSING, never propose a substitute
 - The audit is presented to the user BEFORE enrichment — user must approve scope
 - Load structured templates from `~/.claude/skills/bmad-shared/data/` for reproducible output format
+- **ADR HALT is MANDATORY**: When the story introduces a new architectural decision (new service, integration pattern, data store, or deviation from existing ADRs) → you MUST HALT and present the ADR menu. NEVER silently document an ADR need as a "note" or "recommendation" — the HALT forces an explicit decision.
 
 ## SEQUENCE
 
@@ -49,28 +50,45 @@ From `EPIC_PRD`, extract:
 - Edge cases and error scenarios
 - User journey for this story's scope
 
-### 4. ADR Conformity Analysis (if available)
+### 4. ADR Conformity Analysis
 
-Check `adr_location` from workflow-context.md.
+**This section is MANDATORY — not conditional.** Check `adr_location` from workflow-context.md.
 
-<check if="adr_location is set and not 'none'">
-  Load all ADRs from the configured location. When multiple ADRs on the same topic, the most recent takes precedence.
+**Step A — Cross-reference existing ADRs:**
 
-  Cross-reference the story scope against active ADRs:
-  - Does the story's architecture align with decided approaches?
-  - Does the story introduce patterns, services, or integrations that would require a new ADR?
-  - If an ADR violation or gap is detected, add it as a guardrail in the enriched story description.
+If ADRs are available (adr_location is set and not 'none'), load all ADRs from the configured location. When multiple ADRs on the same topic, the most recent takes precedence.
 
-  Store relevant ADRs as `RELEVANT_ADRS` for inclusion in the enriched story.
+Cross-reference the story scope against active ADRs:
+- Does the story's architecture align with decided approaches?
+- Does the story introduce patterns, services, or integrations that would require a new ADR?
+- If an ADR violation or gap is detected, add it as a guardrail in the enriched story description.
 
-  If the story introduces a new service, integration pattern, data store, or deviates from decided architecture without a covering ADR → flag and ask user:
-  "This story involves {X} which should be recorded as an ADR. Options:
-  [A] Create ADR now (invoke `bmad-create-adr`)
-  [S] Skip — will create ADR later (add as guardrail in story)
-  [N] Not needed"
-  If [A]: invoke `skill:bmad-create-adr` with the decision context, then resume.
-  If [S]: add a guardrail to the enriched story: "ADR required for {X} before or during implementation."
-</check>
+Store relevant ADRs as `RELEVANT_ADRS` for inclusion in the enriched story.
+
+**Step B — Detect new architectural decisions:**
+
+Scan the story scope for any of these signals:
+- New service, worker, or scheduled job
+- New integration pattern (new queue, new event bus, new external API)
+- New data store or significant schema pattern change
+- Deviation from an existing ADR's decided approach
+- Technology choice not covered by existing ADRs
+
+**If ANY signal is detected → HALT.** Present the menu:
+
+> This story introduces **{description of the architectural decision}** which should be recorded as an Architecture Decision Record.
+>
+> **[A]** Create ADR now (invoke `bmad-create-adr`)
+> **[S]** Skip — will create ADR later (add as guardrail in story)
+> **[N]** Not needed — this doesn't warrant an ADR
+
+WAIT for user selection.
+
+- **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume analysis.
+- **IF S:** Add a guardrail to the enriched story: "ADR required for {X} before or during implementation." Then proceed.
+- **IF N:** Log the user's choice and proceed.
+
+**NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
 ### 5. Previous stories extraction
 

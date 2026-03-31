@@ -22,12 +22,22 @@ Draft implementation plan covering:
 - Guardrails from the issue description
 - **Data integrity check**: for every data mapping (source -> target), confirm source field is semantically correct — no fallbacks to different fields. Apply the zero-fallback rules loaded at initialization.
 - Risks or open questions
-- **ADR conformity check** (if `PROJECT_ADRS` is loaded): for each architectural decision in the plan, verify it doesn't violate an active ADR. If the plan introduces a new service, integration pattern, data store, or deviates from established architecture, flag and ask user:
-  "This plan introduces {X} which may require a new ADR. Options:
-  [A] Create ADR now (invoke `bmad-create-adr`)
-  [S] Skip — will create ADR later
-  [N] Not needed"
-  If [A]: invoke `skill:bmad-create-adr` with the decision context, then resume plan approval.
+- **ADR conformity check** (if `PROJECT_ADRS` is loaded): for each architectural decision in the plan, verify it doesn't violate an active ADR. If the plan introduces a new service, integration pattern, data store, or deviates from established architecture:
+
+  **HALT.** Present the menu:
+
+  > This plan introduces **{description}** which should be recorded as an Architecture Decision Record.
+  >
+  > **[A]** Create ADR now (invoke `bmad-create-adr`)
+  > **[S]** Skip — will create ADR later
+  > **[N]** Not needed — this doesn't warrant an ADR
+
+  WAIT for user selection.
+
+  - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume plan approval.
+  - **IF S or N:** Log the user's choice and proceed.
+
+  **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
 Present:
 

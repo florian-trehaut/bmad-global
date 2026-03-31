@@ -38,7 +38,22 @@ If the project uses ADRs (`PROJECT_ADRS` is loaded), check whether the story int
 - Deviation from patterns established by existing ADRs
 - Technology choice that sets a precedent
 
-For each gap found: create a MAJOR finding with proposed action: "Create ADR for {X} before implementation." Offer to invoke `skill:bmad-create-adr`.
+For each gap found: create a MAJOR finding with proposed action: "Create ADR for {X} before implementation."
+
+**Then immediately HALT.** Present the menu:
+
+> This story introduces **{description}** which should be recorded as an Architecture Decision Record.
+>
+> **[A]** Create ADR now (invoke `bmad-create-adr`)
+> **[S]** Skip — will create ADR later
+> **[N]** Not needed — this doesn't warrant an ADR
+
+WAIT for user selection.
+
+- **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume review analysis.
+- **IF S or N:** Log the user's choice and proceed.
+
+**NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
 ### 2. The production chain hypothesis
 

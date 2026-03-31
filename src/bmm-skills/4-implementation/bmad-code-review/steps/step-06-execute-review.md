@@ -174,7 +174,23 @@ For each finding, provide `file:line` of the correct pattern reference.
   - For each ADR, check if the MR touches the domain or component covered by that ADR
   - If it does, verify the implementation follows the decided approach
   - If the MR introduces a new pattern, service, or architectural choice that contradicts an ADR → BLOCKER
-  - If the MR introduces something that SHOULD have an ADR but doesn't (new service, new integration pattern, new data store, deviation from established architecture) → QUESTION: "This change introduces {X} which may warrant a new ADR. Consider invoking `bmad-create-adr` to document this decision."
+
+  If the MR introduces something that SHOULD have an ADR but doesn't (new service, new integration pattern, new data store, deviation from established architecture):
+
+  **HALT the review.** Present the menu:
+
+  > This change introduces **{description}** which should be recorded as an Architecture Decision Record.
+  >
+  > **[A]** Create ADR now (invoke `bmad-create-adr`)
+  > **[S]** Skip — will create ADR later
+  > **[N]** Not needed — this doesn't warrant an ADR
+
+  WAIT for user selection.
+
+  - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume the review.
+  - **IF S or N:** Log the user's choice and resume the review.
+
+  **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
   **Conflict resolution:** when multiple ADRs exist on the same topic, the most recent one takes precedence.
 </check>

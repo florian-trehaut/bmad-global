@@ -192,12 +192,20 @@ Search the web: "{{technology}} production readiness"
 After each critical or important decision, check if the project uses ADRs (check `adr_location` from workflow-context.md if available).
 
 <check if="adr_location is set and not 'none'">
-  For each critical decision, ask the user:
-  "This decision ({decision_name}) is a significant architectural choice. Should we record it as an ADR?
-  [A] Create ADR now (invoke `bmad-create-adr`)
-  [S] Skip — will create ADR later
-  [N] Not needed — already covered by architecture doc"
-  If [A]: invoke `skill:bmad-create-adr` with the decision context, then resume.
+  For each critical decision — **HALT.** Present the menu:
+
+  > This decision (**{decision_name}**) is a significant architectural choice that should be recorded as an Architecture Decision Record.
+  >
+  > **[A]** Create ADR now (invoke `bmad-create-adr`)
+  > **[S]** Skip — will create ADR later
+  > **[N]** Not needed — already covered by architecture doc
+
+  WAIT for user selection.
+
+  - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume.
+  - **IF S or N:** Log the user's choice and proceed to the next decision.
+
+  **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 </check>
 
 ### 5. Check for Cascading Implications

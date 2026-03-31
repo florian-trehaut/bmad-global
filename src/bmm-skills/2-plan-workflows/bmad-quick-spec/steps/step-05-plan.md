@@ -29,6 +29,7 @@ Generate specific implementation tasks, testable acceptance criteria, and a mand
 - Focus on actionable, testable, ordered tasks -- not vague descriptions
 - FORBIDDEN: placeholders like "TBD" or "to be determined"
 - Approach: every task has a file path, every AC has Given/When/Then
+- **ADR HALT is MANDATORY**: If the feature introduces a new architectural decision (new service, integration pattern, data store, or deviation from existing ADRs) → you MUST HALT and present the ADR menu. Documenting it as a "note" or "recommendation" is NOT acceptable — the HALT forces a decision.
 
 ## EXECUTION PROTOCOLS:
 
@@ -144,19 +145,39 @@ This ensures performance claims in the MR description are backed by evidence. Sk
 - External libraries or services needed
 - High-risk items, known limitations
 
-### 6. ADR Conformity Check (if applicable)
+### 6. ADR Conformity Check
 
-<check if="PROJECT_ADRS is loaded and non-empty">
-  Verify the implementation plan doesn't violate active ADRs:
-  - Cross-reference each task's architectural approach against relevant ADRs
-  - If a task introduces a new service, integration pattern, data store, or deviates from decided architecture → flag and discuss with user
-  - If the feature introduces an architectural decision that should be recorded → HALT and ask user:
-    "This feature introduces {X} which should be recorded as an Architecture Decision Record. Options:
-    [A] Create ADR now (invoke `bmad-create-adr`)
-    [S] Skip — will create ADR later
-    [N] Not needed — this doesn't warrant an ADR"
-    If [A]: invoke `skill:bmad-create-adr` with the decision context, then resume this step.
-</check>
+**This section is MANDATORY — not optional.** Check `adr_location` from workflow-context.md.
+
+**Step A — Cross-reference existing ADRs:**
+
+If ADRs were loaded in Step 3, verify the implementation plan doesn't violate any active ADR. Flag violations to the user.
+
+**Step B — Detect new architectural decisions:**
+
+Scan the implementation plan for any of these signals:
+
+- New service, worker, or scheduled job
+- New integration pattern (new queue, new event bus, new external API)
+- New data store or significant schema pattern change
+- Deviation from an existing ADR's decided approach
+- Technology choice not covered by existing ADRs
+
+**If ANY signal is detected → HALT.** Present the menu:
+
+> This feature introduces **{description of the architectural decision}**.
+> This should be recorded as an Architecture Decision Record.
+>
+> **[A]** Create ADR now (invoke `bmad-create-adr`)
+> **[S]** Skip — will create ADR later
+> **[N]** Not needed — this doesn't warrant an ADR
+
+WAIT for user selection.
+
+- **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume this step.
+- **IF S or N:** Log the user's choice and proceed.
+
+**NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
 ### 7. Verify READY FOR DEVELOPMENT
 

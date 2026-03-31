@@ -50,7 +50,22 @@ Review the `{diff_output}` from these perspectives:
 5. **Testing**: Adequate coverage? Missing edge case tests?
 6. **Performance**: N+1 queries, unnecessary allocations, missing indexes?
 7. **Fact-check**: Do all code comments accurately describe what the code does? Are all function/variable names semantically correct? Would a PR description based on these names and comments be truthful?
-8. **ADR conformity** (if ADRs loaded): Does the implementation follow all active Architecture Decision Records? Any new patterns that contradict decided approaches? Any architectural choices that should have an ADR but don't? If a gap is found, suggest invoking `skill:bmad-create-adr`.
+8. **ADR conformity** (if ADRs loaded): Does the implementation follow all active Architecture Decision Records? Any new patterns that contradict decided approaches? Any architectural choices that should have an ADR but don't?
+
+   If an ADR gap is found — **HALT.** Present the menu:
+
+   > This implementation introduces **{description}** which should be recorded as an Architecture Decision Record.
+   >
+   > **[A]** Create ADR now (invoke `bmad-create-adr`)
+   > **[S]** Skip — will create ADR later
+   > **[N]** Not needed — this doesn't warrant an ADR
+
+   WAIT for user selection.
+
+   - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume the review.
+   - **IF S or N:** Log the user's choice and resume the review.
+
+   **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
 If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` exists, load it and apply those review perspectives instead.
 
