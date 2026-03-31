@@ -85,12 +85,22 @@ WAIT for user choice.
 
 Ask user to confirm or adjust.
 
-### 3. Determine Labels
+### 3. Estimate Story Points
+
+Estimate the story complexity in Fibonacci points (1, 2, 3, 5, 8, 13) based on all accumulated context from previous steps. Consider:
+
+- **Scope**: number of tasks, services impacted, data model changes
+- **Uncertainty**: how well-defined is the solution? Are there unknowns?
+- **Risk**: infrastructure changes, external dependencies, migration complexity
+
+This is autonomous -- do NOT ask the user. Just set `{estimate}` based on your assessment. Include it in the issue creation.
+
+### 4. Determine Labels
 
 - Type label: "Bug", "Task", "Improvement", "Feature"
 - Client label if applicable (using the label prefix from `workflow-context.md`)
 
-### 4. Compose Issue Description
+### 5. Compose Issue Description
 
 Load {trackerIssueTemplate} for the description structure.
 
@@ -98,9 +108,10 @@ Compose the full Markdown description using the template, filling in all accumul
 
 **CRITICAL ordering:** The **Definition of Done (product)** section is the FIRST section of the ticket (before Problem, Solution, everything). It is the first thing visible when opening the ticket -- the success criteria at a glance. The **Validation Metier** stays in its natural position after the implementation plan. Each VM item must trace to its BACs: `VM-N *(BAC-X,Y)* : description`. The **Technical context** section goes inside a `<details>` collapsible block.
 
-### 5. Create the Tracker Issue
+### 6. Create the Tracker Issue
 
 Create the issue in the tracker (using CRUD patterns from tracker.md):
+
 - Operation: Create issue
 - Title: {title}
 - Team: {TRACKER_TEAM}
@@ -109,6 +120,7 @@ Create the issue in the tracker (using CRUD patterns from tracker.md):
 - Labels: {labels}
 - Project: {project_name_if_any}
 - Status: {TRACKER_STATES.todo}
+- Estimate: {estimate}
 
 **IMPORTANT:** The workflow NEVER sets state to 'Done'. The maximum state a workflow can set is the testing state (after merge + deploy). 'Done' requires manual confirmation after Validation Metier passes.
 
@@ -116,7 +128,7 @@ Store: `NEW_ISSUE_ID`, `NEW_ISSUE_IDENTIFIER`.
 
 **If issue creation fails:** HALT -- report error. Do NOT silently fallback to local file.
 
-### 6. Auto-Proceed
+### 7. Auto-Proceed
 
 Load, read entire file, then execute {nextStepFile}.
 

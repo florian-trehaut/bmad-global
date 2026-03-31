@@ -80,6 +80,10 @@ Before presenting to the user, verify the ENTIRE updated story (original + all r
 - [ ] No VM items like "check logs", "verify in DB", "look at the code"
 - [ ] VM items cover both feature validation and non-regression
 
+**Story points estimate:**
+- [ ] The issue has a story point estimate set in the tracker (Fibonacci: 1, 2, 3, 5, 8, 13)
+- [ ] If missing: estimate autonomously based on scope, uncertainty, and risk, then update the tracker issue estimate field. Do NOT ask the user.
+
 **If any item fails:** fix it in the story description BEFORE presenting to the user. Do NOT present a story that fails this gate — the purpose of the review is to produce an implementation-ready story, not a partially-improved one.
 
 ### 4. Present to user

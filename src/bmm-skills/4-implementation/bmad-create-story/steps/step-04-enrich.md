@@ -126,16 +126,27 @@ Priority classification:
 - Expected files to create and modify
 - Grouped by service/area
 
-### 2. Update issue in tracker
+### 2. Estimate Story Points
+
+Estimate the story complexity in Fibonacci points (1, 2, 3, 5, 8, 13) based on the enriched description. Consider:
+
+- **Scope**: number of tasks, services impacted, data model changes
+- **Uncertainty**: how well-defined is the solution? Are there unknowns?
+- **Risk**: infrastructure changes, external dependencies, migration complexity
+
+This is autonomous -- do NOT ask the user. Set `{estimate}` based on your assessment.
+
+### 3. Update issue in tracker
 
 1. Update the issue description in the tracker (using CRUD patterns from tracker.md) — Operation: Update issue, Issue: {ISSUE_ID}, Field: description, Value: enriched_description
-2. If the update fails due to size, try splitting: update description first, then add details as a comment
+2. Update the issue estimate in the tracker — Operation: Update issue, Issue: {ISSUE_ID}, Field: estimate, Value: {estimate}
+3. If the update fails due to size, try splitting: update description first, then add details as a comment
 
-### 3. Update issue status to Todo
+### 4. Update issue status to Todo
 
 1. Update the issue status in the tracker (using CRUD patterns from tracker.md) — Operation: Update issue, Issue: {ISSUE_ID}, Status: {TRACKER_STATES.todo}
 
-### 4. Add readiness comment
+### 5. Add readiness comment
 
 Add a comment confirming the issue is ready:
 
@@ -144,11 +155,11 @@ Add a comment in the tracker (using CRUD patterns from tracker.md):
 - Issue: ISSUE_ID
 - Body: "Issue description enriched with tasks, guardrails, and technical requirements.\n\nRappel flux: Todo -> In Progress -> In Review -> To Test -> Done\n- Apres merge + deploy prod: la story passe en To Test\n- Les tests de Validation Metier doivent etre executes en production\n- Done = validation metier OK (jamais automatique)\n\nReady for development."
 
-### 5. Check epic project status
+### 6. Check epic project status
 
 If this is the first story in the epic (no completed stories found in step 02), check if the Project status in the tracker needs updating to indicate the epic is now active.
 
-### 6. Report completion
+### 7. Report completion
 
 Present the completion report:
 
@@ -158,6 +169,7 @@ Present the completion report:
 - Issue : {ISSUE_IDENTIFIER} — {ISSUE_TITLE}
 - Epic : {PROJECT_NAME}
 - Statut tracker : Todo
+- Estimation : {estimate} points
 
 ### Contenu
 
