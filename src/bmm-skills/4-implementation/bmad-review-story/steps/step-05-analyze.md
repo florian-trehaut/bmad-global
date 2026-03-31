@@ -28,6 +28,18 @@ Read the story description carefully. For each AC, task, and description paragra
 
 List ALL hypotheses — explicit AND implicit.
 
+### 1b. ADR Need Detection (if PROJECT_ADRS loaded)
+
+If the project uses ADRs (`PROJECT_ADRS` is loaded), check whether the story introduces architectural decisions that lack a covering ADR:
+
+- New service, module, or bounded context
+- New integration pattern or external dependency
+- New data store or significant schema change
+- Deviation from patterns established by existing ADRs
+- Technology choice that sets a precedent
+
+For each gap found: create a MAJOR finding with proposed action: "Create ADR for {X} before implementation." Offer to invoke `skill:bmad-create-adr`.
+
 ### 2. The production chain hypothesis
 
 **"Works in production" is the hypothesis that matters most.** For each AC, the story implicitly assumes that every link in the production chain exists and is active:

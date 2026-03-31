@@ -34,7 +34,7 @@ Count changed files for routing decision.
   4. **QA & Testing** — Test coverage per AC, test quality, forbidden patterns (mocks in unit tests), edge cases, deterministic tests
   5. **Code Quality** — Hexagonal architecture, DDD, naming, duplication, TypeScript strict, no dead code
   6. **Tech Lead** — SOLID, N+1, scalability, DI patterns, monorepo impact, migration risks
-  7. **ADR Conformity** (conditional) — If `PROJECT_ADRS` is loaded: verify the implementation follows all active ADRs. Check new patterns, services, or architectural choices against decided approaches. If a violation is found → BLOCKER. If a new ADR should exist but doesn't → flag as QUESTION.
+  7. **ADR Conformity** (conditional) — If `PROJECT_ADRS` is loaded: verify the implementation follows all active ADRs. Check new patterns, services, or architectural choices against decided approaches. If a violation is found → BLOCKER. If a new ADR should exist but doesn't → QUESTION with suggestion to invoke `skill:bmad-create-adr` before or after merge.
   8. **Performance Verification** (conditional) — If the feature touches latency-sensitive paths, batch processing, large data, startup time, or binary size: add temporary timing instrumentation, run the code path, capture real measurements. Include results in MR description if meaningful. Remove instrumentation after measurement. Skip if no performance implications.
 
   If `.claude/workflow-knowledge/review-perspectives.md` exists at project root, load and apply project-specific checklists.

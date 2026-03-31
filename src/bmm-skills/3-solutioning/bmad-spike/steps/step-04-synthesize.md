@@ -73,6 +73,7 @@ For each KAC, gather all evidence from Step 3:
 Fill the template following its structure. Key rules per format:
 
 **If ADR (MADR format):**
+- **Check existing ADRs:** if `PROJECT_ADRS` is loaded (from step-01 prior attempts search or workflow-context), verify whether this ADR supersedes or conflicts with any existing ADR. If it does, explicitly state: "This ADR supersedes ADR-{N}: {title}" in the context section.
 - Context describes the problem and forces, not the solution
 - At least 2 options considered (including "do nothing" if applicable)
 - Each option has evidence-based pros/cons (not speculation)

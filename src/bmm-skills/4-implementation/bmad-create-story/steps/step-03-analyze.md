@@ -62,6 +62,14 @@ Check `adr_location` from workflow-context.md.
   - If an ADR violation or gap is detected, add it as a guardrail in the enriched story description.
 
   Store relevant ADRs as `RELEVANT_ADRS` for inclusion in the enriched story.
+
+  If the story introduces a new service, integration pattern, data store, or deviates from decided architecture without a covering ADR → flag and ask user:
+  "This story involves {X} which should be recorded as an ADR. Options:
+  [A] Create ADR now (invoke `bmad-create-adr`)
+  [S] Skip — will create ADR later (add as guardrail in story)
+  [N] Not needed"
+  If [A]: invoke `skill:bmad-create-adr` with the decision context, then resume.
+  If [S]: add a guardrail to the enriched story: "ADR required for {X} before or during implementation."
 </check>
 
 ### 5. Previous stories extraction

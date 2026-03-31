@@ -68,6 +68,11 @@ Create tables/entities ONLY when needed by the story:
 - ❌ WRONG: Epic 1 Story 1 creates all 50 database tables
 - ✅ RIGHT: Each story creates/alters ONLY the tables it needs
 
+**📋 ADR NEED DETECTION:**
+When a story introduces a significant architectural decision (new service, new data store, new integration pattern, deviation from established patterns), flag it:
+- If the project uses ADRs (`adr_location` in workflow-context.md is not "none"), add a guardrail to the story: "Requires ADR: {decision description} — invoke `bmad-create-adr` before implementation."
+- If no ADRs are configured, note the decision in the story's technical notes section.
+
 **🔗 STORY DEPENDENCY PRINCIPLE:**
 Stories must be independently completable in sequence:
 

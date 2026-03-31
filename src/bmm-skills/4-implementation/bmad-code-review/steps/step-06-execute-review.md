@@ -174,7 +174,7 @@ For each finding, provide `file:line` of the correct pattern reference.
   - For each ADR, check if the MR touches the domain or component covered by that ADR
   - If it does, verify the implementation follows the decided approach
   - If the MR introduces a new pattern, service, or architectural choice that contradicts an ADR → BLOCKER
-  - If the MR introduces something that SHOULD have an ADR but doesn't (new service, new integration pattern, new data store, deviation from established architecture) → QUESTION: "This change introduces {X} which may warrant a new ADR."
+  - If the MR introduces something that SHOULD have an ADR but doesn't (new service, new integration pattern, new data store, deviation from established architecture) → QUESTION: "This change introduces {X} which may warrant a new ADR. Consider invoking `bmad-create-adr` to document this decision."
 
   **Conflict resolution:** when multiple ADRs exist on the same topic, the most recent one takes precedence.
 </check>

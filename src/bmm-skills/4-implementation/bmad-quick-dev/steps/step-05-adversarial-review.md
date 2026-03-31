@@ -50,7 +50,7 @@ Review the `{diff_output}` from these perspectives:
 5. **Testing**: Adequate coverage? Missing edge case tests?
 6. **Performance**: N+1 queries, unnecessary allocations, missing indexes?
 7. **Fact-check**: Do all code comments accurately describe what the code does? Are all function/variable names semantically correct? Would a PR description based on these names and comments be truthful?
-8. **ADR conformity** (if ADRs loaded): Does the implementation follow all active Architecture Decision Records? Any new patterns that contradict decided approaches? Any architectural choices that should have an ADR but don't?
+8. **ADR conformity** (if ADRs loaded): Does the implementation follow all active Architecture Decision Records? Any new patterns that contradict decided approaches? Any architectural choices that should have an ADR but don't? If a gap is found, suggest invoking `skill:bmad-create-adr`.
 
 If `.claude/workflow-knowledge/review-perspectives.md` exists, load it and apply those review perspectives instead.
 

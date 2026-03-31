@@ -187,7 +187,20 @@ Search the web: "{{technology}} production readiness"
 - Affects: {{components_or_epics}}
 - Provided by Starter: {{yes_if_from_starter}}
 
-### 4. Check for Cascading Implications
+### 4. ADR Trigger Check
+
+After each critical or important decision, check if the project uses ADRs (check `adr_location` from workflow-context.md if available).
+
+<check if="adr_location is set and not 'none'">
+  For each critical decision, ask the user:
+  "This decision ({decision_name}) is a significant architectural choice. Should we record it as an ADR?
+  [A] Create ADR now (invoke `bmad-create-adr`)
+  [S] Skip — will create ADR later
+  [N] Not needed — already covered by architecture doc"
+  If [A]: invoke `skill:bmad-create-adr` with the decision context, then resume.
+</check>
+
+### 5. Check for Cascading Implications
 
 After each major decision, identify related decisions:
 
@@ -196,7 +209,7 @@ After each major decision, identify related decisions:
 - {{related_decision_1}}
 - {{related_decision_2}}"
 
-### 5. Generate Decisions Content
+### 6. Generate Decisions Content
 
 After facilitating all decision categories, prepare the content to append:
 
@@ -245,7 +258,7 @@ After facilitating all decision categories, prepare the content to append:
 {{how_decisions_affect_each_other}}
 ```
 
-### 6. Present Content and Menu
+### 7. Present Content and Menu
 
 Show the generated decisions content and present choices:
 
@@ -260,7 +273,7 @@ Show the generated decisions content and present choices:
 [P] Party Mode - Review decisions from multiple perspectives
 [C] Continue - Save these decisions and move to implementation patterns"
 
-### 7. Handle Menu Selection
+### 8. Handle Menu Selection
 
 #### If 'A' (Advanced Elicitation):
 
