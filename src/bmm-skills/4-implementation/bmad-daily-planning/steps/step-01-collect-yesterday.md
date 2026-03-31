@@ -70,11 +70,13 @@ Store as `YESTERDAY_ISSUES`.
 
 If a daily-log file exists for `{LAST_DAILY_DATE}`:
 - Read it
+- **Re-sync planned_issues estimates:** for each issue in `planned_issues` that has `points: null`, query the tracker for its current estimate. If it now has points, update the `planned_issues` entry. This catches issues that were estimated after the daily planning session.
+- Recalculate `velocity_planned` = sum of all `planned_issues` points (after re-sync)
 - Populate the `completed_issues` field with the issues found in step 3 that match the `planned_issues`
 - Calculate `velocity_actual` = sum of completed issue points
 - Write the updated file back
 
-This closes the feedback loop — yesterday's plan now has actual completion data.
+This closes the feedback loop — yesterday's plan now has actual completion data, and planned estimates are corrected retroactively.
 
 ### 5. Present summary
 
