@@ -166,7 +166,20 @@ Use reference code directories from `.claude/workflow-knowledge/stack.md` if loa
 
 For each finding, provide `file:line` of the correct pattern reference.
 
-### Perspective 7: Design Decisions Audit
+### Perspective 7: ADR Conformity (conditional)
+
+<check if="PROJECT_ADRS is loaded and non-empty">
+  Verify the changes don't violate active Architecture Decision Records:
+
+  - For each ADR, check if the MR touches the domain or component covered by that ADR
+  - If it does, verify the implementation follows the decided approach
+  - If the MR introduces a new pattern, service, or architectural choice that contradicts an ADR → BLOCKER
+  - If the MR introduces something that SHOULD have an ADR but doesn't (new service, new integration pattern, new data store, deviation from established architecture) → QUESTION: "This change introduces {X} which may warrant a new ADR."
+
+  **Conflict resolution:** when multiple ADRs exist on the same topic, the most recent one takes precedence.
+</check>
+
+### Perspective 8: Design Decisions Audit
 
 Identify design decisions in the code that are NOT documented in the tracker issue, MR description, or code comments:
 

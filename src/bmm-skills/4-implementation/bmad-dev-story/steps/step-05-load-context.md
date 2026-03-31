@@ -41,7 +41,16 @@ For each file found, read and extract:
 
 Store as `CONTRIBUTION_CONVENTIONS`. These rules apply to step-13 (push/MR creation).
 
-### 4. Check for Progress Recovery
+### 4. Load Architecture Decision Records (if available)
+
+Check `adr_location` from workflow-context.md.
+
+<check if="adr_location is set and not 'none'">
+  Load all ADRs from the configured location. When multiple ADRs on the same topic, the most recent takes precedence.
+  Store as `PROJECT_ADRS` — the plan (step-07) must not violate active ADRs, and the self-review (step-11) must verify conformity.
+</check>
+
+### 5. Check for Progress Recovery
 
 ```bash
 ls {WORKTREE_PATH}/agent-progress.md 2>/dev/null && cat {WORKTREE_PATH}/agent-progress.md
@@ -53,7 +62,7 @@ ls {WORKTREE_PATH}/agent-progress.md 2>/dev/null && cat {WORKTREE_PATH}/agent-pr
   Skip ahead to the step indicated by current_step.
 </check>
 
-### 5. Check for Review Continuation
+### 6. Check for Review Continuation
 
 Check issue comments for "Action Items" or "Review Findings" from a previous code review.
 
@@ -62,7 +71,7 @@ Check issue comments for "Action Items" or "Review Findings" from a previous cod
   Log: "Resuming after code review — addressing action items"
 </check>
 
-### 6. Proceed
+### 7. Proceed
 
 Load and execute {nextStepFile}.
 

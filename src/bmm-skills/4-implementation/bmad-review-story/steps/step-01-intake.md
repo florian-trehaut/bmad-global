@@ -120,7 +120,16 @@ All subsequent file reads and code analysis MUST use the worktree path.
 - From the story description, determine which services, modules, and data flows are involved
 - List: services, packages, libs, infra modules, DB schemas
 
-### 6. Create intermediate output file
+### 6. Load Architecture Decision Records (if available)
+
+Check `adr_location` from workflow-context.md.
+
+<check if="adr_location is set and not 'none'">
+  Load all ADRs from the configured location inside {WORKTREE_PATH}. When multiple ADRs on the same topic, the most recent takes precedence.
+  Store as `PROJECT_ADRS` — the spec review must verify the story doesn't violate active ADRs and flags any need for new ADRs.
+</check>
+
+### 7. Create intermediate output file
 
 Create a local intermediate file at `{OUTPUT_FOLDER}/review-story-{issue_number}.md`:
 
@@ -153,6 +162,6 @@ findings: []
 - Infra modules: {list}
 ```
 
-### 7. Proceed
+### 8. Proceed
 
 Load and execute `./steps/step-02-access-verification.md`.

@@ -60,7 +60,13 @@ ls CONTRIBUTING.md .github/CONTRIBUTING.md .github/pull_request_template.md dang
 
 If found, note PR requirements, CI linter rules, commit message rules. These apply when presenting the final output.
 
-### 5. Note Dependencies
+### 5. Load Architecture Decision Records (if available)
+
+Check `adr_location` from workflow-context.md (if loaded).
+
+If ADRs exist, load them. When multiple ADRs on the same topic, the most recent takes precedence. Note which ADRs are relevant to the task.
+
+### 6. Note Dependencies
 
 Identify:
 - External libraries used
@@ -68,7 +74,7 @@ Identify:
 - Configuration files that may need updates
 - Related files that might be affected
 
-### 6. Create Plan
+### 7. Create Plan
 
 Synthesize gathered context into:
 - List of tasks to complete

@@ -67,6 +67,10 @@ format_fix_command: "{format_fix_command}"
 typecheck_command: "{typecheck_command}"
 quality_gate: "{quality_gate}"
 
+# --- Architecture Decision Records ---
+adr_location: "{adr_location}"  # path to ADR directory, tracker document ID, or "none"
+adr_format: "{adr_format}"      # madr, nygard, custom, unknown
+
 # --- Communication platform ---
 comm_platform: {comm_platform_type}  # slack, teams, discord, none
 comm_mcp_prefix: "{comm_mcp_prefix}" # MCP prefix if detected, empty if none

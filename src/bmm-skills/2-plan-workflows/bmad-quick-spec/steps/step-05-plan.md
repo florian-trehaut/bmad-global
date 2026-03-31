@@ -144,7 +144,21 @@ This ensures performance claims in the MR description are backed by evidence. Sk
 - External libraries or services needed
 - High-risk items, known limitations
 
-### 6. Verify READY FOR DEVELOPMENT
+### 6. ADR Conformity Check (if applicable)
+
+<check if="PROJECT_ADRS is loaded and non-empty">
+  Verify the implementation plan doesn't violate active ADRs:
+  - Cross-reference each task's architectural approach against relevant ADRs
+  - If a task introduces a new service, integration pattern, data store, or deviates from decided architecture → flag and discuss with user
+  - If the feature introduces an architectural decision that should be recorded → HALT and ask user:
+    "This feature introduces {X} which should be recorded as an Architecture Decision Record. Options:
+    [A] Create ADR now (invoke `bmad-create-adr`)
+    [S] Skip — will create ADR later
+    [N] Not needed — this doesn't warrant an ADR"
+    If [A]: invoke `skill:bmad-create-adr` with the decision context, then resume this step.
+</check>
+
+### 7. Verify READY FOR DEVELOPMENT
 
 Verify the spec meets this standard:
 

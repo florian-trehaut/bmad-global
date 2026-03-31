@@ -130,7 +130,17 @@ Present the parsed structure to the user for confirmation:
   HALT: "This text does not appear to be an ADR — no context, options, or decision sections found. Verify the source contains an architecture decision record."
 </check>
 
-### 6. Create Worktree
+### 6. Load Existing ADRs for Conflict Check
+
+Check `adr_location` from workflow-context.md.
+
+<check if="adr_location is set and not 'none'">
+  Load all existing ADRs from the configured location.
+  Store as `EXISTING_ADRS` — Step 3 (evaluate) will check if the reviewed ADR conflicts with or supersedes any existing ADR.
+  When multiple ADRs on the same topic, the most recent takes precedence.
+</check>
+
+### 7. Create Worktree
 
 Derive slug from ADR title or source:
 ```bash
@@ -145,7 +155,7 @@ git worktree add {WORKTREE_PATH} origin/main --detach
 
 Store `WORKTREE_PATH`. From this point, all codebase investigation runs inside the worktree.
 
-### 7. Save WIP
+### 8. Save WIP
 
 Create WIP file at `/tmp/bmad-wip-adr-review-{SLUG}.md`:
 
@@ -162,7 +172,7 @@ adr_source_reference: "{source_reference}"
 ---
 ```
 
-### 8. Proceed
+### 9. Proceed
 
 Load, read entire file, execute {nextStepFile}.
 

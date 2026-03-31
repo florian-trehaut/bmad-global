@@ -98,11 +98,36 @@ If `environment-config.md` in TARGET_FILES:
 - Read deployment configs for environment URLs
 - Check for feature flag systems
 
-### 9. Compile Results
+### 9. ADR Discovery Scan
+
+Detect Architecture Decision Records in the project. ADRs constrain how all workflows make decisions — their location must be known.
+
+**Scan conventional locations:**
+
+```bash
+# Common ADR directory patterns
+ls -d docs/adr/ docs/adrs/ docs/decisions/ docs/architecture/decisions/ adr/ adrs/ doc/adr/ .adr/ 2>/dev/null
+# Search for ADR-like files by naming pattern
+find . -maxdepth 4 -name "ADR-*" -o -name "adr-*" -o -name "[0-9][0-9][0-9][0-9]-*.md" | grep -i "adr\|decision" | grep -v node_modules | head -20
+```
+
+**If files found:** note the location, count, and format (MADR, Nygard, custom). Read one sample to classify the format. Store as `ADR_LOCATION` and `ADR_FORMAT`.
+
+**If no files found in code:** check the tracker for ADR documents (if tracker is configured):
+- Search tracker documents for "ADR" or "Architecture Decision" in the title
+- If found, note tracker as the ADR source
+
+**If no ADRs found anywhere:** store `ADR_LOCATION = "none"`. This is valid — not all projects use ADRs.
+
+**Conflict resolution rule:** when multiple ADRs exist on the same topic, the most recent one (by date or sequence number) takes precedence.
+
+Update `workflow-context.md` with `adr_location` and `adr_format` values.
+
+### 10. Compile Results
 
 For each TARGET_FILE, compile the relevant scan data into a structured format for step 06.
 
-### 10. Proceed
+### 11. Proceed
 
 Load and execute {nextStepFile}.
 

@@ -70,11 +70,21 @@ For each relevant file/directory **inside {SPEC_WORKTREE_PATH}**:
 - Identify standard project utilities or boilerplate that SHOULD be used
 - Document as "Confirmed Clean Slate"
 
-### 3. Cross-Reference with Standards
+### 3. Load Architecture Decision Records (if available)
+
+Check `adr_location` from workflow-context.md.
+
+<check if="adr_location is set and not 'none'">
+  Load all ADRs from the configured location. When multiple ADRs on the same topic, the most recent takes precedence.
+  Store as `PROJECT_ADRS` — the spec must not violate active ADRs, and the plan (step-05) must verify conformity.
+  Note which ADRs are relevant to the feature being specified.
+</check>
+
+### 4. Cross-Reference with Standards
 
 If `.claude/workflow-knowledge/stack.md` exists at project root, load and cross-reference investigation results with project dev standards. Note any deviations or patterns the implementation must follow.
 
-### 4. Document Technical Context
+### 5. Document Technical Context
 
 Confirm with user:
 
@@ -83,11 +93,11 @@ Confirm with user:
 - **Files to Modify/Create**: Specific files that will need changes
 - **Test Patterns**: How tests are structured, test frameworks used
 
-### 5. Update WIP File
+### 6. Update WIP File
 
 Append technical context section to WIP file. Set `stepsCompleted: [1, 2, 2b, 3]`.
 
-### 6. Present MENU OPTIONS
+### 7. Present MENU OPTIONS
 
 Display: "**Select:** [A] Advanced Elicitation [P] Party Mode [C] Continue to Data & Infra Modeling (Step 4)"
 

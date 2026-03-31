@@ -49,7 +49,22 @@ From `EPIC_PRD`, extract:
 - Edge cases and error scenarios
 - User journey for this story's scope
 
-### 4. Previous stories extraction
+### 4. ADR Conformity Analysis (if available)
+
+Check `adr_location` from workflow-context.md.
+
+<check if="adr_location is set and not 'none'">
+  Load all ADRs from the configured location. When multiple ADRs on the same topic, the most recent takes precedence.
+
+  Cross-reference the story scope against active ADRs:
+  - Does the story's architecture align with decided approaches?
+  - Does the story introduce patterns, services, or integrations that would require a new ADR?
+  - If an ADR violation or gap is detected, add it as a guardrail in the enriched story description.
+
+  Store relevant ADRs as `RELEVANT_ADRS` for inclusion in the enriched story.
+</check>
+
+### 5. Previous stories extraction
 
 From `COMPLETED_STORIES`, extract:
 
@@ -57,7 +72,7 @@ From `COMPLETED_STORIES`, extract:
 - Infrastructure already created (services, migrations, secrets, config)
 - Regressions to watch for
 
-### 5. Deployment chain audit
+### 6. Deployment chain audit
 
 Load `~/.claude/skills/bmad-shared/data/infra-assessment-template.md` for structured output format.
 
@@ -74,7 +89,7 @@ Classify each layer as:
 - **MISSING** — does not exist, must be created as part of this story
 - **PARTIAL** — exists but needs modification
 
-### 6. External interface detection
+### 7. External interface detection
 
 Proactively ask the user:
 
@@ -111,7 +126,7 @@ For EVERY field in the data mapping:
 
 If NO external interfaces: document "No external data interfaces identified."
 
-### 7. AC production viability audit
+### 8. AC production viability audit
 
 For EACH acceptance criterion, trace the **complete production chain**:
 
@@ -124,14 +139,14 @@ For each link, verify it exists in the codebase or is planned as a task. Common 
 - Endpoint created but no Cloud Scheduler / webhook to call it
 - Config value in code but not in the deployment template or secrets manager (see workflow-knowledge/infrastructure.md)
 
-### 8. Zero Fallback / Zero False Data audit
+### 9. Zero Fallback / Zero False Data audit
 
 For every data mapping in the story (source -> DTO -> DB -> external API):
 - Verify the source field contains the EXACT data expected by the target
 - If source data is unavailable, flag as MISSING — never propose a fallback
 - If a field mapping seems "close enough", verify it actually matches
 
-### 9. Impact analysis
+### 10. Impact analysis
 
 Systematically verify that planned code modifications have no unplanned side effects.
 
@@ -170,7 +185,7 @@ For each impacted consumer NOT marked trivially compatible, add a non-regression
 - `VM-NR-N *(Impact IN)* : {concrete business test verifying the impacted flow still works}`
 - Rules: concrete, executable, from business perspective, trace to the impact that generated them
 
-### 10. CHECKPOINT — Audit presentation
+### 11. CHECKPOINT — Audit presentation
 
 Present the full audit to the user:
 
