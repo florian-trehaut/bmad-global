@@ -2,15 +2,16 @@
 
 ## STEP GOAL
 
-Execute the git merge from upstream/main into our branch. Resolve conflicts using our fork's conventions as the structural authority while integrating upstream's content additions.
+Execute the git merge from upstream/main. Resolve conflicts using fork-identity.md rules: our structure is authoritative, upstream content additions are integrated.
 
 ## RULES
 
-- Our file structure and organization is authoritative
+- Refer to `../references/fork-identity.md` for every conflict resolution decision
+- Our file structure, naming, and organization is authoritative
 - Upstream content additions (new features, bugfixes) are integrated into our structure
-- When a file was restructured by us and modified by them: keep our structure, integrate their content changes
-- When a file was deleted/moved by us but modified by them: apply their content change to the file at its new location in our tree
-- NEVER silently drop upstream changes — every conflict resolution must be explained
+- Our enhancements (ADR checks, estimation, shared rules, worktree lifecycle) are preserved
+- NEVER silently drop upstream changes — every resolution must be logged
+- Fork-protected files are NEVER overwritten (package identity, CHANGELOG, README, .claude/)
 
 ## SEQUENCE
 
@@ -24,7 +25,7 @@ git merge {UPSTREAM_REMOTE}/main --no-edit
 
 **If clean merge (no conflicts):**
 - Log: "Clean merge — no conflicts."
-- Proceed to step 3.
+- Proceed to section 4.
 
 **If conflicts:**
 - List all conflicted files:
@@ -35,69 +36,85 @@ git diff --name-only --diff-filter=U
 
 ### 3. Resolve Each Conflict
 
-For EACH conflicted file:
+For EACH conflicted file, follow this process:
 
-#### 3a. Analyze the Conflict
+#### 3a. Check Fork-Identity Category
+
+Consult `fork-identity.md`:
+- Is this file fork-protected? → Keep ours entirely: `git checkout --ours {file} && git add {file}`
+- Is this a file we enhanced? → Keep our enhancements, integrate their content additions
+- Is this a file only they changed? → Should have auto-merged — investigate
+
+#### 3b. Analyze the Conflict
 
 ```bash
-# Show the conflict markers
+# Show conflict markers
 git diff {file}
 
-# Show what upstream changed
+# What upstream changed (intent)
 git diff {MERGE_BASE}..{UPSTREAM_REMOTE}/main -- {file}
 
-# Show what we changed
+# What we changed (our enhancements)
 git diff {MERGE_BASE}..HEAD -- {file}
 ```
 
-#### 3b. Determine Resolution Strategy
+#### 3c. Apply Resolution per Category
 
 | Situation | Strategy |
 |-----------|----------|
-| We restructured, they added content | Keep our structure, integrate their additions |
-| We restructured, they fixed a bug | Apply their bugfix to our version of the file |
-| We deleted/moved, they modified | Apply their changes to the file at its new location |
-| We added content, they added content | Merge both additions |
-| Both modified same lines | Present to user for decision |
-| They restructured, we restructured | Our structure wins — integrate any new content from theirs |
+| **Fork-protected file** (package.json name, CHANGELOG, README) | Keep ours: `git checkout --ours {file}` |
+| **We enhanced, they added content** | Keep our enhancements, integrate their new content |
+| **We enhanced, they fixed a bug** | Apply their bugfix to our enhanced version |
+| **We restructured (step dirs, naming), they modified** | Keep our structure, apply their content to our version |
+| **They added new skill with non-standard dirs** | Accept content, rename dirs to our convention |
+| **We added shared rule references, they didn't have them** | Keep our references |
+| **Both modified same lines** | Present to user for decision |
 
-#### 3c. Apply Resolution
+#### 3d. Log Resolution
 
-For each conflict:
-
-1. Read both versions carefully
-2. Apply the resolution strategy
-3. Edit the file to resolve
-4. Log the resolution: "Resolved {file}: {strategy applied}. {what was kept/integrated/dropped}"
+For each resolved file:
+```
+Resolved {file}: {strategy}
+  - Kept: {what we preserved}
+  - Integrated: {what we took from upstream}
+  - Dropped: {what we didn't take, and why}
+```
 
 ```bash
 git add {file}
 ```
 
-#### 3d. Escalate if Ambiguous
+#### 3e. Escalate Ambiguous Conflicts
 
-If a conflict cannot be resolved by the strategies above:
-
+If a conflict cannot be resolved by fork-identity.md rules:
 - Present both versions to the user
-- Explain what each side did and why they conflict
-- Ask the user which approach to take
+- Explain what each side did
+- Reference which fork-identity rule applies (or none)
 - WAIT for user decision
 
-### 4. Verify No Remaining Conflicts
+### 4. Post-Merge Adaptation
+
+After all conflicts are resolved, check if any RESTRUCTURE items from step-01 need manual adaptation:
+
+- New upstream skills with `domain-steps/`, `technical-steps/`, or `steps-c/` directories → rename to `steps/`
+- New upstream workflows missing shared rule references → add references to our shared rules
+- New upstream skills missing worktree lifecycle guard → add guard if the skill creates worktrees
+
+### 5. Verify No Remaining Conflicts
 
 ```bash
 git diff --name-only --diff-filter=U
 ```
 
-If any remain → loop back to step 3 for remaining files.
+If any remain → loop back to step 3.
 
-### 5. Complete the Merge Commit
+### 6. Complete the Merge Commit
 
 ```bash
 git commit --no-edit
 ```
 
-Log: "Merge commit created. {N} conflicts resolved."
+Log: "Merge commit created. {N} conflicts resolved. {M} files adapted to fork conventions."
 
 ---
 

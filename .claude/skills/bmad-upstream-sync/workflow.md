@@ -1,6 +1,6 @@
 # Upstream Sync — Workflow
 
-**BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, HALT checkpoints.**
+**Fork-aware synchronization with upstream BMAD-METHOD.**
 
 ---
 
@@ -8,9 +8,11 @@
 
 This is a **project-local skill** — it operates on the current git repository which must be a fork of BMAD-METHOD.
 
-### 1. Verify Fork Setup
+### 1. Load Fork Identity
 
-Check that the git remotes are correctly configured:
+Read `./references/fork-identity.md` BEFORE any other action. This file defines what makes our fork different and how to handle each category of upstream change.
+
+### 2. Verify Fork Setup
 
 ```bash
 git remote -v
@@ -21,18 +23,18 @@ Verify:
 - `upstream` points to `bmad-code-org/BMAD-METHOD`
 
 **HALT if:**
-- No `upstream` remote exists → "No `upstream` remote found. Add it with: `git remote add upstream https://github.com/bmad-code-org/BMAD-METHOD`"
+- No `upstream` remote → "No `upstream` remote found. Add it with: `git remote add upstream https://github.com/bmad-code-org/BMAD-METHOD`"
 - `origin` points to `bmad-code-org` → "origin points to upstream, not your fork. Fix remotes first."
 
-### 2. Verify Clean State
+### 3. Verify Clean State
 
 ```bash
 git status
 ```
 
-**HALT if:** uncommitted changes or untracked files in working tree. "Working tree must be clean before sync. Commit or stash changes first."
+**HALT if:** uncommitted changes or untracked files. "Working tree must be clean before sync. Commit or stash changes first."
 
-### 3. Set Variables
+### 4. Set Variables
 
 | Variable | Source |
 |----------|--------|
@@ -44,9 +46,9 @@ git status
 
 ## YOUR ROLE
 
-You are a **fork synchronization assistant**. You fetch upstream changes, analyze them, present a clear summary to the user, execute the merge, and resolve conflicts by applying our fork's conventions and structure as the authority.
+Fork synchronization specialist. Fetch upstream changes, analyze each commit individually, present a clear plan, execute the merge adapting upstream additions to our fork's conventions, and verify the result.
 
-**Tone:** factual, direct. Present data, not opinions. Let the user decide on ambiguous conflicts.
+**Key principle:** Our fork has its own identity. Upstream provides the base product. We follow their direction but restructure everything to fit our conventions. Every upstream commit must exist in our history, but the content may be adapted.
 
 **Communication language:** use the same language as the user.
 
@@ -54,11 +56,12 @@ You are a **fork synchronization assistant**. You fetch upstream changes, analyz
 
 ## CRITICAL RULES
 
-- NEVER force-push to main without explicit user approval
-- NEVER auto-resolve conflicts by blindly picking one side — analyze and present
-- Our fork's structure is authoritative for organization (file layout, naming, conventions)
-- Upstream's content is authoritative for new features and bugfixes
-- When both sides modified the same file: our structure wins, their content additions are integrated
+- NEVER force-push without explicit user approval
+- NEVER auto-resolve conflicts — analyze each one against fork-identity.md rules
+- Our structure is authoritative (file layout, naming, step directories, shared rules)
+- Upstream content is valuable (features, bugfixes, improved prompts) — integrate it, don't discard it
+- When both sides modified the same file: our enhancements are preserved, their additions are integrated
+- Fork-only files (.claude/, CHANGELOG.md, package identity) are NEVER overwritten
 - ALL steps in exact order — NO skipping
 
 ---
@@ -67,9 +70,9 @@ You are a **fork synchronization assistant**. You fetch upstream changes, analyz
 
 | Step | File | Goal |
 |------|------|------|
-| 1 | `step-01-analyze.md` | Fetch upstream, analyze divergence, present summary |
-| 2 | `step-02-merge.md` | Execute merge, handle conflicts |
-| 3 | `step-03-verify.md` | Verify merge result, run quality checks |
+| 1 | `step-01-analyze.md` | Fetch upstream, analyze each commit, classify impact, predict conflicts |
+| 2 | `step-02-merge.md` | Execute merge, resolve conflicts per fork-identity rules |
+| 3 | `step-03-verify.md` | Verify merge, run quality gate, check fork identity preserved |
 | 4 | `step-04-complete.md` | Push and report |
 
 ---
@@ -82,6 +85,8 @@ Load and execute `./steps/step-01-analyze.md`.
 
 ## HALT CONDITIONS (GLOBAL)
 
-- Merge produces unresolvable conflicts that require architectural decisions → HALT
+- Upstream introduced a major architectural restructuring → HALT, present analysis before proceeding
+- A fork-only file would be overwritten → HALT
 - Quality gate fails after merge → HALT
+- Conflict requires an architectural decision (not just content merge) → HALT
 - User explicitly requests stop → HALT

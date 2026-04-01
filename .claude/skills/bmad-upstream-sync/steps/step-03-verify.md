@@ -2,12 +2,13 @@
 
 ## STEP GOAL
 
-Verify that the merge result is correct — no broken files, no lost content, quality checks pass.
+Verify the merge is correct: no broken files, no lost content, fork identity preserved, quality gate passes.
 
 ## RULES
 
 - Do NOT skip verification even if the merge was clean
-- Any verification failure must be reported and fixed before proceeding
+- Fork identity checks are MANDATORY — verify our enhancements survived
+- Any quality gate failure must be fixed before proceeding
 
 ## SEQUENCE
 
@@ -20,49 +21,77 @@ git log --oneline -3
 
 Confirm: merge commit exists, working tree clean.
 
-### 2. Check for Unintended Deletions
+### 2. Fork Identity Verification
 
-Compare files that existed before merge in both branches:
+These checks verify our fork's distinctiveness survived the merge:
 
 ```bash
-# Files that existed in our branch before merge but are now gone
+# Package name preserved
+grep '"name"' package.json
+
+# Our shared rules still exist
+ls src/core-skills/bmad-shared/worktree-lifecycle.md
+ls src/core-skills/bmad-shared/project-root-resolution.md
+ls src/core-skills/bmad-shared/no-fallback-no-false-data.md
+
+# Our workflow-context not overwritten
+ls .claude/workflow-context.md
+
+# Step directories use our convention (no domain-steps/, steps-c/, technical-steps/)
+find src/ -type d \( -name "domain-steps" -o -name "steps-c" -o -name "technical-steps" \) 2>/dev/null
+```
+
+**HALT if:**
+- Package name changed from `@florian-trehaut/bmad-global`
+- Any shared rule file is missing
+- Non-standard step directories exist (upstream convention leaked through)
+
+### 3. Check for Unintended Deletions
+
+```bash
 git diff --name-only --diff-filter=D HEAD~1..HEAD
 ```
 
-If any files were deleted by the merge that we had in our branch → flag for review. These could be legitimate upstream deletions or accidental conflict resolution errors.
+For each deleted file:
+- Was it a fork-only file? → **HALT** — this should not have been deleted
+- Was it deleted by upstream intentionally? → Acceptable if not a fork-only file
+- Flag any unexpected deletions for user review
 
-### 3. Run Quality Gate
-
-If available in the project, run the quality checks:
-
-```bash
-# Check markdownlint on src/ skills
-npx markdownlint-cli2 "src/**/*.md" 2>&1 || true
-
-# Check file reference validator if available
-node tools/validate-file-refs.js 2>&1 || true
-
-# Check skill validator if available
-node tools/validate-skills.js 2>&1 || true
-```
-
-Report results. Failures related to pre-existing issues (upstream) vs. introduced by the merge must be distinguished.
-
-### 4. Spot-Check Conflict Resolutions
-
-For each file that had a conflict in step 2:
+### 4. Check for Conflict Markers
 
 ```bash
-git show HEAD -- {file} | head -30
+grep -rn "<<<<<<< " src/ .claude/ tools/ docs/ 2>/dev/null || echo "No conflict markers found"
 ```
 
-Quick verification: no conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) left in any file.
+**HALT if** any conflict markers remain.
+
+### 5. Run Quality Gate
 
 ```bash
-grep -rn "<<<<<<< " src/ .claude/ 2>/dev/null || echo "No conflict markers found"
+npm run quality
 ```
 
-### 5. CHECKPOINT — Present Verification Report
+Report full results. If it fails:
+- Identify whether the failure is from upstream content or from merge resolution
+- Fix merge-introduced issues
+- Do NOT dismiss failures as "pre-existing" without verification
+
+### 6. Spot-Check Enhanced Files
+
+For files that had conflicts and contain our enhancements, verify the enhancements are intact:
+
+```bash
+# ADR HALT checks still present in workflow steps
+grep -l "ADR" src/bmm-skills/*/steps/*.md | head -5
+
+# Worktree lifecycle references
+grep -rl "worktree-lifecycle" src/ | head -5
+
+# Shared rule loading in workflows
+grep -rl "bmad-shared" src/bmm-skills/*/workflow.md | head -5
+```
+
+### 7. CHECKPOINT — Present Verification Report
 
 ```
 ## Merge Verification
@@ -70,22 +99,33 @@ grep -rn "<<<<<<< " src/ .claude/ 2>/dev/null || echo "No conflict markers found
 ### Merge commit: {hash}
 ### Upstream commits integrated: {N}
 ### Conflicts resolved: {M}
+### Files adapted to fork conventions: {K}
 
-### Quality checks
-- markdownlint: {PASS/FAIL/N/A}
-- file-refs: {PASS/FAIL/N/A}
-- skill-validator: {PASS/FAIL/N/A}
-- conflict markers: {CLEAN}
+### Fork Identity
+- Package name: {OK/FAIL}
+- Shared rules: {OK/FAIL}
+- Step directory convention: {OK/FAIL}
+- Workflow-context: {OK/FAIL}
+- Fork-only files: {OK/FAIL}
+
+### Quality Gate
+- npm run quality: {PASS/FAIL}
+- Conflict markers: {CLEAN/FOUND}
 
 ### Deleted files: {list or "none"}
 
-### Conflict resolution log
-{For each resolved conflict: file, strategy, what was done}
+### Enhancement preservation
+- ADR checks: {present in N files}
+- Worktree lifecycle: {referenced in N files}
+- Shared rules: {loaded by N workflows}
+
+### Conflict Resolution Log
+{For each resolved conflict: file, strategy, what was kept/integrated/dropped}
 ```
 
 WAIT for user confirmation.
 
-If user identifies issues → fix them and amend the merge commit.
+If user identifies issues → fix them before proceeding.
 
 ---
 
