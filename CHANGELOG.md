@@ -1,5 +1,41 @@
 # Changelog
 
+## v1.3.0 - 2026-04-01
+
+### Worktree Lifecycle & ADR Improvements
+
+This release centralizes worktree management across all workflows, makes worktrees optional for solo projects, and improves ADR decision clarity with visual diagrams and smarter stakeholder discovery.
+
+#### Worktree Lifecycle — Centralized shared rule (NEW)
+
+New `bmad-shared/worktree-lifecycle.md` shared rule loaded by all workflows. Addresses the chronic issue of Claude forgetting to install dependencies after creating worktrees.
+
+- **`worktree_enabled` flag** — Projects can now opt out of worktrees by setting `worktree_enabled: false` in `workflow-context.md`. Solo projects working on `main` skip worktree creation entirely, using branch-based fallbacks instead. Knowledge-bootstrap now asks about worktree strategy during project detection.
+- **Mandatory post-creation setup** — Every worktree creation now triggers: `{install_command}` (HALT on failure) → `{build_command}` (HALT on failure) → `{typecheck_command}` (WARN on failure). Previously only 2 of 7 workflows ran install, and none ran build.
+- **All 7 workflows updated** — bmad-dev-story, bmad-code-review, bmad-quick-spec, bmad-create-story, bmad-spike, bmad-adr-review, bmad-validation-desktop now reference the shared rule instead of ad-hoc setup logic.
+- **4 cleanup steps updated** — Worktree removal guarded by `worktree_enabled` check.
+
+#### ADR Decision-Maker Discovery & Visual Clarity
+
+- **Git-based stakeholder discovery** — ADR creation step-02 now analyzes `git log` (30-day general + 3-month scope-targeted) to identify active contributors and domain experts. Presents a contributor table with commit counts and domain relevance, instead of defaulting to just the current user.
+- **Mermaid decision flow diagram** — Step-05 and both ADR templates (MADR, Nygard) now include a mermaid diagram showing chosen vs rejected options with color-coded status.
+- **Y-statement preview** — The one-line decision summary is now generated at step-05 (decision time) instead of step-06 (composition), so users validate coherence before moving to drafting.
+- **Trade-off radar chart** — When 4+ decision drivers exist, a mermaid quadrant chart visualizes the chosen option's performance across dimensions.
+- **Visual callout for verdict** — Decision outcome uses blockquote emphasis to make the chosen option instantly identifiable.
+
+#### Worktree-Aware Knowledge Resolution
+
+All workflows now resolve the main project root using `git rev-parse --git-common-dir` before accessing `.claude/` files. This foundational change ensures workflows function correctly in git worktrees where knowledge files live in the main repo, not the worktree.
+
+#### Story Point Estimation
+
+Quick-spec and create-story workflows now autonomously estimate Fibonacci story points (1, 2, 3, 5, 8, 13) based on scope, uncertainty, and risk. Estimation is automatic with no user prompting. Review-story readiness gate checks for estimates and sets one if missing.
+
+#### Bug Fixes
+
+- **Quick-spec WIP scoping** — WIP resume check now happens after slug derivation and only checks for the current topic's slug, allowing parallel spec work on different topics.
+- **Mandatory ADR detection HALT** — All 7 workflows with ADR checks now use explicit HALT + menu + WAIT to force actual user decisions on architectural concerns. Previously soft language allowed Claude to skip the ADR decision menu.
+
 ## v1.2.0 - 2026-03-31
 
 ### ADR Ecosystem Complete
