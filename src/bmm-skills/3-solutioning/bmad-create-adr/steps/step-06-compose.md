@@ -56,7 +56,7 @@ Based on `ADR_FORMAT`:
 Fill the template with all accumulated state:
 
 **MADR format fields:**
-- YAML frontmatter: status `proposed`, date, decision-makers
+- YAML frontmatter: status `proposed`, date, decision-makers (from `DECISION_MAKERS` list captured in step-02)
 - Title: `{NEXT_ADR_NUMBER}. {title}`
 - Context and Problem Statement: from step-02 `PROBLEM_STATEMENT`
 - If `SUPERSEDES_ADR`: add supersession note in context

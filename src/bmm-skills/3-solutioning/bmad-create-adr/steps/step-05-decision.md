@@ -127,21 +127,79 @@ Verify the consequences cover all dimensions:
 
 ### 6. Present Decision Summary
 
-> **Decision Summary:**
+Present the decision with strong visual emphasis. The reader must instantly understand what was decided and why.
+
+#### 6a. Decision Verdict (visual callout)
+
+> ---
 >
-> **Chosen option:** "{name}"
+> **DECISION**
 >
-> **Justification:** {specific reasoning referencing drivers and evidence}
+> > **{option_name}**
+> >
+> > {justification — 1-2 sentences referencing key drivers and evidence}
 >
+> ---
+
+#### 6b. Y-Statement (one-line sanity check)
+
+Generate and present the Y-statement now (not at step-06) so the user validates coherence before composition:
+
+> **Y-Statement:** "In the context of {functional context}, facing {quality concern}, we decided for **{chosen option}** and against {rejected alternatives}, to achieve {benefits}, accepting that {trade-offs}."
+
+If the Y-statement doesn't read naturally, the decision logic has a coherence problem — revisit.
+
+#### 6c. Options Outcome Diagram
+
+Generate a mermaid diagram showing the decision flow:
+
+````markdown
+```mermaid
+graph LR
+    subgraph Considered
+        A["{Option 1}"]
+        B["{Option 2}"]
+        C["{Do Nothing}"]
+    end
+    A -->|"CHOSEN"| D["✔ {Option 1}"]
+    B -->|"rejected: {short reason}"| E["✘"]
+    C -->|"rejected: {short reason}"| F["✘"]
+    style D fill:#2d6a4f,color:#fff,stroke:#1b4332
+    style E fill:#d32f2f,color:#fff
+    style F fill:#d32f2f,color:#fff
+```
+````
+
+#### 6d. Consequences & Risks Summary
+
 > **Positive consequences:**
-> - {list}
+> - {consequence with evidence ref}
 >
 > **Negative consequences:**
-> - {list}
+> - {consequence with evidence ref}
 >
-> **Risks:** {count} identified with mitigations
+> **Risks:** {count} identified — all with actionable mitigations
 >
 > **Dimension coverage:** {all addressed / gaps remaining}
+
+#### 6e. Trade-Off Radar (if 4+ drivers)
+
+When there are 4 or more decision drivers, generate a radar/comparison diagram to visualize how the chosen option performs across dimensions:
+
+````markdown
+```mermaid
+quadrantChart
+    title Trade-Off Profile — {chosen option}
+    x-axis "Low fit" --> "High fit"
+    y-axis "Low priority" --> "High priority"
+    {driver 1}: [{x}, {y}]
+    {driver 2}: [{x}, {y}]
+    {driver 3}: [{x}, {y}]
+    {driver 4}: [{x}, {y}]
+```
+````
+
+Use the driver weights (H/M/L) for the y-axis and the option ratings (++/+/0/-/--) for the x-axis. This gives an instant visual of where the chosen option is strong and where it accepts trade-offs.
 
 ### 7. Update WIP
 

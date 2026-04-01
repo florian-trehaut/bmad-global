@@ -14,7 +14,7 @@ Use ADR format when the spike investigates a **choice between architecture or te
 **Date:** {date}
 **Status:** Accepted
 **Spike:** {spike_slug}
-**Deciders:** {USER_NAME}
+**Deciders:** {DECISION_MAKERS — active contributors from git log + user confirmation}
 
 ## Context and Problem Statement
 

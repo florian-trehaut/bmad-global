@@ -12,7 +12,7 @@ Reference: <https://adr.github.io/madr/>
 ---
 status: {proposed | accepted | deprecated | superseded by ADR-NNNN}
 date: {YYYY-MM-DD}
-decision-makers: [{USER_NAME}]
+decision-makers: [{DECISION_MAKERS — from git contributor analysis + user confirmation in step-02}]
 ---
 
 # {NEXT_ADR_NUMBER}. {title}
@@ -38,7 +38,26 @@ decision-makers: [{USER_NAME}]
 
 ## Decision Outcome
 
-Chosen option: "{option_name}", because {justification connecting to decision drivers and evidence}.
+> **Chosen option: "{option_name}"**
+>
+> {justification connecting to decision drivers and evidence — 2-3 sentences.}
+
+**Y-Statement:** "In the context of {context}, facing {concern}, we decided for **{chosen option}** and against {rejected alternatives}, to achieve {benefits}, accepting that {trade-offs}."
+
+```mermaid
+graph LR
+    subgraph Considered
+        A["{Option 1}"]
+        B["{Option 2}"]
+        C["Do Nothing"]
+    end
+    A -->|"CHOSEN"| D["✔ {Option 1}"]
+    B -->|"rejected"| E["✘"]
+    C -->|"rejected"| F["✘"]
+    style D fill:#2d6a4f,color:#fff,stroke:#1b4332
+    style E fill:#d32f2f,color:#fff
+    style F fill:#d32f2f,color:#fff
+```
 
 ### Consequences
 

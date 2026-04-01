@@ -59,7 +59,44 @@ Search the main repo for relevant context:
 
 Present findings: "Here's what I found in the codebase relevant to this decision: {findings}"
 
-### 3. Elicit Decision Drivers
+### 3. Identify Decision-Makers
+
+Discover who should be listed as decision-makers — do NOT default to just the current user.
+
+**Step A — Git contributor analysis:**
+
+```bash
+git log --since="1 month ago" --format="%aN" | sort | uniq -c | sort -rn | head -10
+```
+
+This gives the active contributors over the last month, ranked by commit count.
+
+**Step B — Scope-targeted analysis (if the decision topic maps to specific directories):**
+
+```bash
+git log --since="3 months ago" --format="%aN" -- {relevant_directories} | sort | uniq -c | sort -rn | head -5
+```
+
+This identifies domain experts for the specific area the ADR affects.
+
+**Step C — Present and ask:**
+
+> **Suggested decision-makers** (based on recent git activity):
+>
+> | Contributor | Commits (30d) | Domain relevance |
+> |-------------|:---:|----------------|
+> | {name 1} | {N} | {all / specific dirs} |
+> | {name 2} | {N} | ... |
+> | ... | ... | ... |
+>
+> Current user: **{USER_NAME}**
+>
+> Who should be listed as decision-makers for this ADR?
+> Include anyone whose input or approval matters for this decision.
+
+WAIT for user input. Store `DECISION_MAKERS` as a list.
+
+### 4. Elicit Decision Drivers
 
 Help the user articulate explicit criteria. Adapt to skill level:
 
@@ -82,7 +119,7 @@ Each driver should be specific and measurable where possible:
 
 WAIT for input.
 
-### 4. Existing ADR Conflict Check
+### 5. Existing ADR Conflict Check
 
 Cross-reference with `EXISTING_ADRS` (loaded in step-01):
 
@@ -110,7 +147,7 @@ Cross-reference with `EXISTING_ADRS` (loaded in step-01):
   Proceed without supersession check.
 </check>
 
-### 5. Present Context Summary
+### 6. Present Context Summary
 
 Present the structured context for validation:
 
@@ -132,13 +169,15 @@ Present the structured context for validation:
 >
 > **Supersedes:** {ADR-N: title | none}
 >
+> **Decision-makers:** {DECISION_MAKERS list}
+>
 > **Codebase context:** {key findings}
 
-### 6. Update WIP
+### 7. Update WIP
 
 Append context data to WIP file. Update `stepsCompleted: [1, 2]`.
 
-### 7. Present Menu
+### 8. Present Menu
 
 > **[C]** Continue to options discovery (Step 3)
 > **[E]** Edit — modify context, forces, or drivers

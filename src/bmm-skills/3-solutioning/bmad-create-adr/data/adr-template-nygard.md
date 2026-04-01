@@ -27,11 +27,23 @@ Supersedes ADR-{N}: {old_title}
 {If SUPERSEDES_ADR:}
 This decision revisits ADR-{N}: {old_title} because {reason for supersession}.
 
+Decision-makers: {DECISION_MAKERS — from git contributor analysis + user confirmation}
+
 ## Decision
 
-We will {chosen_option_description}.
+> **We will {chosen_option_description}.**
 
 {Justification with evidence references. Full sentences, active voice. Reference specific decision drivers and evidence that support this choice.}
+
+```mermaid
+graph LR
+    A["{chosen option}"] -->|"CHOSEN"| B["✔ Implementation"]
+    C["{rejected 1}"] -->|"rejected"| D["✘"]
+    E["Do Nothing"] -->|"rejected"| F["✘"]
+    style B fill:#2d6a4f,color:#fff,stroke:#1b4332
+    style D fill:#d32f2f,color:#fff
+    style F fill:#d32f2f,color:#fff
+```
 
 We considered and rejected:
 - **{rejected_option_1}**: {reason with evidence reference}
