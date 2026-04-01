@@ -81,24 +81,41 @@ WAIT for user selection.
 
 **If no WIP file for this slug:** Continue below.
 
-### 5. Create Worktree
+### 5. Setup Working Environment
 
-Create a temporary worktree for investigation:
+**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+
+<check if="worktree_enabled == true (or absent)">
+  Create a temporary worktree for investigation:
 
 ```bash
 git fetch origin main
 git worktree add {WORKTREE_TEMPLATE_SPEC} origin/main -b spec/{slug}
 ```
 
-Where `{WORKTREE_TEMPLATE_SPEC}` is resolved from `workflow-context.md` `worktree_templates.quick_spec`, replacing `{slug}` with the derived slug.
+  Where `{WORKTREE_TEMPLATE_SPEC}` is resolved from `workflow-context.md` `worktree_templates.quick_spec`, replacing `{slug}` with the derived slug.
 
-**If worktree creation fails:** HALT -- report error to user. Investigation requires a worktree.
+  **If worktree creation fails:** HALT -- report error to user. Investigation requires a worktree.
 
-Store `SPEC_WORKTREE_PATH` = resolved worktree path.
+  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
+
+```bash
+cd {SPEC_WORKTREE_PATH}
+{install_command}      # HALT on failure
+{build_command}        # HALT on failure, skip if empty
+{typecheck_command}    # WARN on failure, skip if empty
+```
+
+  Store `SPEC_WORKTREE_PATH` = resolved worktree path.
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree — investigate in the current project directory.
+
+  Store `SPEC_WORKTREE_PATH` = current project directory.
+</check>
 
 **From this point on, ALL code investigation runs inside {SPEC_WORKTREE_PATH}.**
-
-Log: "Worktree created: {SPEC_WORKTREE_PATH} (synced with main)"
 
 ### 6. Save WIP File
 

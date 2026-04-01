@@ -31,21 +31,30 @@ Clean up the temporary worktree and WIP file, then present a summary with next s
 
 ### 1. Cleanup Worktree
 
+**Apply cleanup rules from `bmad-shared/worktree-lifecycle.md`.**
+
+<check if="worktree_enabled == true">
+
 ```bash
 cd {project-root}
 git worktree remove {SPEC_WORKTREE_PATH} --force
 ```
 
-**If worktree removal fails:** Warn user but do NOT halt. Worktree cleanup is non-critical.
+  **If worktree removal fails:** Warn user but do NOT halt. Worktree cleanup is non-critical.
 
-> The temporary worktree could not be removed: {SPEC_WORKTREE_PATH}
-> You can remove it manually: `git worktree remove {SPEC_WORKTREE_PATH} --force`
+  > The temporary worktree could not be removed: {SPEC_WORKTREE_PATH}
+  > You can remove it manually: `git worktree remove {SPEC_WORKTREE_PATH} --force`
 
-Also remove the local branch if it was created:
+  Also remove the local branch if it was created:
 
 ```bash
 git branch -D spec/{slug} 2>/dev/null || true
 ```
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree to remove — skip this step.
+</check>
 
 ### 2. Delete WIP File
 

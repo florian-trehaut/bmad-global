@@ -140,7 +140,9 @@ Check `adr_location` from workflow-context.md.
   When multiple ADRs on the same topic, the most recent takes precedence.
 </check>
 
-### 7. Create Worktree
+### 7. Setup Working Environment
+
+**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
 
 Derive slug from ADR title or source:
 ```bash
@@ -148,12 +150,30 @@ SLUG={kebab-case of ADR title, max 30 chars}
 WORKTREE_PATH="../{WORKTREE_PREFIX}-review-adr-{SLUG}"
 ```
 
+<check if="worktree_enabled == true (or absent)">
+
 ```bash
 git fetch origin
 git worktree add {WORKTREE_PATH} origin/main --detach
 ```
 
-Store `WORKTREE_PATH`. From this point, all codebase investigation runs inside the worktree.
+  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
+
+```bash
+cd {WORKTREE_PATH}
+{install_command}      # HALT on failure
+{build_command}        # HALT on failure, skip if empty
+{typecheck_command}    # WARN on failure, skip if empty
+```
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree — investigate in the current project directory.
+
+  Store `WORKTREE_PATH` = current project directory.
+</check>
+
+From this point, all codebase investigation runs inside `{WORKTREE_PATH}`.
 
 ### 8. Save WIP
 

@@ -42,6 +42,9 @@ forge_mr_list: "{mr_list_cmd}"       # MUST include --repo
 forge_mr_approve: "{mr_approve_cmd}" # MUST include --repo
 forge_api_base: "{api_base_cmd}"
 
+# --- Worktree strategy ---
+worktree_enabled: {worktree_enabled}   # true = use worktrees for isolation | false = work on branches in main repo
+
 # --- Worktree naming ---
 worktree_prefix: {project_name}
 worktree_templates:

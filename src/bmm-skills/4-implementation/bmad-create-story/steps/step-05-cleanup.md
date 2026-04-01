@@ -8,11 +8,20 @@ Remove the investigation worktree and present completion summary.
 
 ### 1. Remove worktree
 
+**Apply cleanup rules from `bmad-shared/worktree-lifecycle.md`.**
+
+<check if="worktree_enabled == true">
+
 ```bash
 git worktree remove {SPEC_WORKTREE_PATH} --force
 ```
 
-If removal fails, log a warning but do not HALT — the worktree can be cleaned up manually.
+  If removal fails, log a warning but do not HALT — the worktree can be cleaned up manually.
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree to remove — skip this step.
+</check>
 
 ### 2. Completion
 

@@ -48,12 +48,21 @@ WAIT for input. Default to **K** if user just presses enter or says "keep".
 
 ### 2. Remove Worktree
 
+**Apply cleanup rules from `bmad-shared/worktree-lifecycle.md`.**
+
+<check if="worktree_enabled == true">
+
 ```bash
 cd {project-root}
 git worktree remove {SPIKE_WORKTREE_PATH} --force
 ```
 
-**If removal fails:** Warn but do NOT HALT. The worktree can be cleaned up manually.
+  **If removal fails:** Warn but do NOT HALT. The worktree can be cleaned up manually.
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree to remove — skip this step.
+</check>
 
 ### 3. Handle Branch
 

@@ -35,18 +35,27 @@ Clean up worktree (with user consent), delete WIP file, and present final summar
 
 ### 1. Worktree Cleanup
 
-> **Worktree cleanup:**
-> Path: `{WORKTREE_PATH}`
->
-> **[R]** Remove worktree | **[K]** Keep worktree
+**Apply cleanup rules from `bmad-shared/worktree-lifecycle.md`.**
 
-WAIT for user selection.
+<check if="worktree_enabled == true">
 
-- **R**: Remove worktree:
-  ```bash
-  git worktree remove {WORKTREE_PATH}
-  ```
-- **K**: Keep worktree. Log: "Worktree kept at {WORKTREE_PATH}"
+  > **Worktree cleanup:**
+  > Path: `{WORKTREE_PATH}`
+  >
+  > **[R]** Remove worktree | **[K]** Keep worktree
+
+  WAIT for user selection.
+
+  - **R**: Remove worktree:
+    ```bash
+    git worktree remove {WORKTREE_PATH}
+    ```
+  - **K**: Keep worktree. Log: "Worktree kept at {WORKTREE_PATH}"
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree to remove — skip this step.
+</check>
 
 ### 2. Delete WIP File
 

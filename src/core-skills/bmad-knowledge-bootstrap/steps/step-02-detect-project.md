@@ -124,6 +124,16 @@ worktree_templates:
 branch_template: "feat/{issue_number}-{short_description}"
 ```
 
+**Worktree strategy:**
+
+Ask user: "Does this project use git worktrees for branch isolation?
+- **[Y]** Yes — each feature/review/spec gets its own worktree (recommended for team projects)
+- **[N]** No — I work directly on branches in the main repo (solo projects, simple workflows)"
+
+Store `worktree_enabled` = `true` (Y) or `false` (N). Default: `true`.
+
+If `worktree_enabled: false`, worktree templates are still generated (for documentation and potential future use) but will not be used by workflows.
+
 ### 4. Ask User for Non-Inferrable Values
 
 - **user_name**: ask
@@ -141,6 +151,7 @@ Package manager:  {pm}
 Commands:         install={cmd} test={cmd} lint={cmd} ...
 Tracker:          {type} (team: {team}, states: {N} mapped)
 Forge:            {type} ({project_path}, CLI: {cli})
+Worktrees:        {enabled/disabled}
 Comm platform:    {type} (handle: {handle}) or none
 User:             {user_name} ({skill_level}, {language})
 ```

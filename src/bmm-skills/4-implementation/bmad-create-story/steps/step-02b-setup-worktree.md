@@ -7,24 +7,45 @@ Create a temporary worktree synced with origin/main for code verification in ste
 ## RULES
 
 - The worktree is READ-ONLY — no code changes, only investigation
-- If worktree creation fails, HALT — code verification requires a worktree
+- If worktree creation fails and `worktree_enabled: true`, HALT — code verification requires a worktree
 
 ## SEQUENCE
 
-### 1. Create worktree
+### 1. Setup Working Environment
+
+**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+
+<check if="worktree_enabled == true (or absent)">
+  Create a temporary worktree for investigation:
 
 ```bash
 git fetch origin main
 git worktree add {WORKTREE_TEMPLATE_SPEC} origin/main -b create-story/{EPIC_SLUG}-{ISSUE_IDENTIFIER}
 ```
 
-Where `{WORKTREE_TEMPLATE_SPEC}` is resolved from `workflow-context.md` `worktree_templates.quick_spec`, replacing `{slug}` with `{ISSUE_IDENTIFIER}`.
+  Where `{WORKTREE_TEMPLATE_SPEC}` is resolved from `workflow-context.md` `worktree_templates.quick_spec`, replacing `{slug}` with `{ISSUE_IDENTIFIER}`.
 
-**If worktree creation fails:** HALT — report error to user. Analysis requires a worktree for code verification.
+  **If worktree creation fails:** HALT — report error to user. Analysis requires a worktree for code verification.
 
-Store `SPEC_WORKTREE_PATH` = resolved worktree path.
+  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
 
-Log: "Worktree created: {SPEC_WORKTREE_PATH} (synced with origin/main)"
+```bash
+cd {SPEC_WORKTREE_PATH}
+{install_command}      # HALT on failure
+{build_command}        # HALT on failure, skip if empty
+{typecheck_command}    # WARN on failure, skip if empty
+```
+
+  Store `SPEC_WORKTREE_PATH` = resolved worktree path.
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree — investigate in the current project directory.
+
+  Store `SPEC_WORKTREE_PATH` = current project directory.
+</check>
+
+Log: "Working environment ready: {SPEC_WORKTREE_PATH}"
 
 ### 2. Proceed
 

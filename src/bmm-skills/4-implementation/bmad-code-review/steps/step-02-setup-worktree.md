@@ -6,24 +6,30 @@ nextStepFile: './step-03-load-context.md'
 
 ## STEP GOAL:
 
-Create a review worktree checked out to the MR branch. All review work MUST happen inside this worktree.
+Create a review worktree checked out to the MR branch. All review work MUST happen inside this worktree (or on the MR branch if worktrees are disabled).
 
 ## MANDATORY SEQUENCE
 
-### 1. Derive Worktree Path
+### 1. Setup Working Environment
 
-Use the `{WORKTREE_TEMPLATE_REVIEW}` template with `{MR_IID}` substituted.
+**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
 
-Example: `../MyProject-review-{MR_IID}`
+<check if="worktree_enabled == true (or absent)">
 
-### 2. Check for Existing Review Worktree
+  #### Derive Worktree Path
+
+  Use the `{WORKTREE_TEMPLATE_REVIEW}` template with `{MR_IID}` substituted.
+
+  Example: `../MyProject-review-{MR_IID}`
+
+  #### Check for Existing Review Worktree
 
 ```bash
 git worktree list | grep "review-{MR_IID}"
 ```
 
-<check if="worktree exists">
-  Safely remove existing worktree before recreation:
+  <check if="worktree exists">
+    Safely remove existing worktree before recreation:
 
 ```bash
 git fetch origin
@@ -32,20 +38,20 @@ git worktree remove {REVIEW_WORKTREE_PATH} --force 2>/dev/null || true
 # Also prune stale worktree entries
 git worktree prune
 ```
-</check>
+  </check>
 
-### 3. Fetch All Refs
+  #### Fetch All Refs
 
-**CRITICAL:** Always fetch ALL refs before any comparison -- stale `origin/main` produces inflated diffs.
+  **CRITICAL:** Always fetch ALL refs before any comparison -- stale `origin/main` produces inflated diffs.
 
 ```bash
 git fetch origin
 git worktree prune
 ```
 
-### 4. Create Review Worktree
+  #### Create Review Worktree
 
-**CRITICAL:** `git worktree add PATH origin/BRANCH` creates a detached HEAD. ALWAYS use `-B` to create a local branch tracking the remote.
+  **CRITICAL:** `git worktree add PATH origin/BRANCH` creates a detached HEAD. ALWAYS use `-B` to create a local branch tracking the remote.
 
 ```bash
 # Remove any existing worktree that holds the branch name
@@ -64,16 +70,30 @@ echo "On branch: $CURRENT_BRANCH"
 git log -1 --oneline
 ```
 
-**HALT if detached HEAD:** The worktree MUST NOT be in detached HEAD state. Detached HEAD prevents commits and causes errors during fix application. If `git branch --show-current` returns empty, the worktree was created incorrectly.
+  **HALT if detached HEAD:** The worktree MUST NOT be in detached HEAD state. Detached HEAD prevents commits and causes errors during fix application. If `git branch --show-current` returns empty, the worktree was created incorrectly.
 
-### 5. Install Dependencies
+  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
 
 ```bash
 cd {REVIEW_WORKTREE_PATH}
-{INSTALL_COMMAND}
+{install_command}      # HALT on failure
+{build_command}        # HALT on failure, skip if empty
+{typecheck_command}    # WARN on failure, skip if empty
+```
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree — checkout MR branch in the current repo:
+
+```bash
+git fetch origin
+git checkout {MR_SOURCE_BRANCH}
 ```
 
-### 6. Store Path
+  Store `REVIEW_WORKTREE_PATH` = current project directory.
+</check>
+
+### 2. Store Path
 
 Store `REVIEW_WORKTREE_PATH`.
 
@@ -90,7 +110,7 @@ Proceed to {nextStepFile}.
 All steps from step-03 onward MUST verify this at entry:
 - `REVIEW_WORKTREE_PATH` is set and non-empty
 - The directory exists
-- `git branch --show-current` inside the worktree returns a branch name
+- `git branch --show-current` inside the worktree returns a branch name (unless `worktree_enabled: false` and the check was done at checkout)
 
 **If any check fails → HALT: "No valid worktree. Step 02 must complete successfully before continuing."**
 
@@ -98,5 +118,6 @@ This invariant exists because: skipping the worktree causes all file reads to ta
 
 ## SUCCESS/FAILURE:
 
-### SUCCESS: Worktree created on MR branch (not detached), tracking origin/{MR_SOURCE_BRANCH}, deps installed, REVIEW_WORKTREE_PATH stored
-### FAILURE: Detached HEAD, working outside worktree, skipping install, REVIEW_WORKTREE_PATH not set
+### SUCCESS: Worktree created on MR branch (not detached), tracking origin/{MR_SOURCE_BRANCH}, deps installed, build run, REVIEW_WORKTREE_PATH stored
+
+### FAILURE: Detached HEAD, working outside worktree, skipping install/build, REVIEW_WORKTREE_PATH not set

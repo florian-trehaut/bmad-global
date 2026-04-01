@@ -119,24 +119,41 @@ WAIT for input. Store `SPIKE_ISSUE_ID` if linked to an existing issue, or `null`
 
 Get the spike question as a clear statement. Derive a URL-safe slug (lowercase, hyphens, e.g., `auth-provider-feasibility`, `message-queue-comparison`).
 
-### 7. Create Worktree
+### 7. Setup Working Environment
 
-Create a temporary worktree for investigation:
+**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+
+<check if="worktree_enabled == true (or absent)">
+  Create a temporary worktree for investigation:
 
 ```bash
 git fetch origin main
 git worktree add {WORKTREE_TEMPLATE_SPIKE} origin/main -b spike/{slug}
 ```
 
-Where `{WORKTREE_TEMPLATE_SPIKE}` is resolved from `workflow-context.md` `worktree_templates.spike`, replacing `{slug}` with the derived slug.
+  Where `{WORKTREE_TEMPLATE_SPIKE}` is resolved from `workflow-context.md` `worktree_templates.spike`, replacing `{slug}` with the derived slug.
 
-**If worktree creation fails:** HALT — report error to user. Investigation requires a worktree.
+  **If worktree creation fails:** HALT — report error to user. Investigation requires a worktree.
 
-Store `SPIKE_WORKTREE_PATH` = resolved worktree path.
+  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
+
+```bash
+cd {SPIKE_WORKTREE_PATH}
+{install_command}      # HALT on failure
+{build_command}        # HALT on failure, skip if empty
+{typecheck_command}    # WARN on failure, skip if empty
+```
+
+  Store `SPIKE_WORKTREE_PATH` = resolved worktree path.
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree — investigate and write PoC code in the current project directory.
+
+  Store `SPIKE_WORKTREE_PATH` = current project directory.
+</check>
 
 **From this point on, ALL code investigation and PoC work runs inside {SPIKE_WORKTREE_PATH}.**
-
-Log: "Worktree created: {SPIKE_WORKTREE_PATH} (synced with main) — PoC code will live here."
 
 ### 8. Save WIP File
 
