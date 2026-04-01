@@ -11,6 +11,7 @@ Use command-line flags to install BMad non-interactively. This is useful for:
 
 - Automated deployments and CI/CD pipelines
 - Scripted installations
+- Batch installations across multiple projects
 - Quick installations with known configurations
 
 :::note[Prerequisites]
@@ -19,30 +20,69 @@ Requires [Node.js](https://nodejs.org) v20+ and `npx` (included with npm).
 
 ## Available Flags
 
+### Installation Options
+
+| Flag | Description | Example |
+|------|-------------|---------|
+| `--directory <path>` | Installation directory | `--directory ~/projects/myapp` |
+| `--modules <modules>` | Comma-separated module IDs | `--modules bmm,bmb` |
+| `--tools <tools>` | Comma-separated tool/IDE IDs (use `none` to skip) | `--tools claude-code,cursor` or `--tools none` |
+| `--custom-content <paths>` | Comma-separated paths to custom modules | `--custom-content ~/my-module,~/another-module` |
+| `--action <type>` | Action for existing installations: `install` (default), `update`, or `quick-update` | `--action quick-update` |
+
+### Core Configuration
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--user-name <name>` | Name for agents to use | System username |
+| `--communication-language <lang>` | Agent communication language | English |
+| `--document-output-language <lang>` | Document output language | English |
+| `--output-folder <path>` | Output folder path (see resolution rules below) | `_bmad-output` |
+
+#### Output Folder Path Resolution
+
+The value passed to `--output-folder` (or entered interactively) is resolved according to these rules:
+
+| Input type | Example | Resolved as |
+|------------|---------|-------------|
+| Relative path (default) | `_bmad-output` | `<project-root>/_bmad-output` |
+| Relative path with traversal | `../../shared-outputs` | Normalized absolute path — e.g. `/Users/me/shared-outputs` |
+| Absolute path | `/Users/me/shared-outputs` | Used as-is — project root is **not** prepended |
+
+The resolved path is what agents and workflows use at runtime when writing output files. Using an absolute path or a traversal-based relative path lets you direct all generated artifacts to a directory outside your project tree — useful for shared or monorepo setups.
+
+### Other Options
+
 | Flag | Description |
 |------|-------------|
-| `--force` | Overwrite existing installation |
-| `--debug` | Enable debug output during installation |
+| `-y, --yes` | Accept all defaults and skip prompts |
+| `-d, --debug` | Enable debug output for manifest generation |
 
-## Installation
+## Module IDs
 
-BMad installs globally to `~/.claude/skills/bmad/` with zero prompts:
+Available module IDs for the `--modules` flag:
 
-```bash
-bmad install
-```
+- `bmm` — BMad Method Master
+- `bmb` — BMad Builder
 
-Or with flags:
+Check the [BMad registry](https://github.com/bmad-code-org) for available external modules.
 
-```bash
-bmad install --force --debug
-```
+## Tool/IDE IDs
 
-If you haven't installed the package globally, use npx:
+Available tool IDs for the `--tools` flag:
 
-```bash
-npx bmad-method install --force
-```
+**Preferred:** `claude-code`, `cursor`
+
+Run `npx bmad-method install` interactively once to see the full current list of supported tools, or check the [platform codes configuration](https://github.com/bmad-code-org/BMAD-METHOD/blob/main/tools/installer/ide/platform-codes.yaml).
+
+## Installation Modes
+
+| Mode | Description | Example |
+|------|-------------|---------|
+| Fully non-interactive | Provide all flags to skip all prompts | `npx bmad-method install --directory . --modules bmm --tools claude-code --yes` |
+| Semi-interactive | Provide some flags; BMad prompts for the rest | `npx bmad-method install --directory . --modules bmm` |
+| Defaults only | Accept all defaults with `-y` | `npx bmad-method install --yes` |
+| Without tools | Skip tool/IDE configuration | `npx bmad-method install --modules bmm --tools none` |
 
 ## Examples
 
@@ -52,50 +92,93 @@ npx bmad-method install --force
 #!/bin/bash
 # install-bmad.sh
 
-npm install -g bmad-method
-bmad install --force
+npx bmad-method install \
+  --directory "${GITHUB_WORKSPACE}" \
+  --modules bmm \
+  --tools claude-code \
+  --user-name "CI Bot" \
+  --communication-language English \
+  --document-output-language English \
+  --output-folder _bmad-output \
+  --yes
 ```
 
 ### Update Existing Installation
 
 ```bash
-bmad install --force
+npx bmad-method install \
+  --directory ~/projects/myapp \
+  --action update \
+  --modules bmm,bmb,custom-module
+```
+
+### Quick Update (Preserve Settings)
+
+```bash
+npx bmad-method install \
+  --directory ~/projects/myapp \
+  --action quick-update
+```
+
+### Installation with Custom Content
+
+```bash
+npx bmad-method install \
+  --directory ~/projects/myapp \
+  --modules bmm \
+  --custom-content ~/my-custom-module,~/another-module \
+  --tools claude-code
 ```
 
 ## What You Get
 
-- A fully configured `~/.claude/skills/bmad/` directory with agents, workflows, and modules
-- A `~/.claude/skills/bmad/manifest.yaml` tracking the installation
-- A project-local `_bmad-output/` folder is created by workflows when you run them (not by the installer)
+- A fully configured `_bmad/` directory in your project
+- Agents and workflows configured for your selected modules and tools
+- A `_bmad-output/` folder for generated artifacts
 
-## Uninstallation
+## Validation and Error Handling
 
-To remove BMad entirely:
+BMad validates all provided flags:
 
-```bash
-bmad uninstall
-```
+- **Directory** — Must be a valid path with write permissions
+- **Modules** — Warns about invalid module IDs (but won't fail)
+- **Tools** — Warns about invalid tool IDs (but won't fail)
+- **Custom Content** — Each path must contain a valid `module.yaml` file
+- **Action** — Must be one of: `install`, `update`, `quick-update`
 
-To skip confirmation:
-
-```bash
-bmad uninstall --force
-```
-
-This removes `~/.claude/skills/bmad/` entirely.
+Invalid values will either:
+1. Show an error and exit (for critical options like directory)
+2. Show a warning and skip (for optional items like custom content)
+3. Fall back to interactive prompts (for missing required values)
 
 :::tip[Best Practices]
-- Use `--force` for truly unattended installations
+- Use absolute paths for `--directory` to avoid ambiguity
+- Use an absolute path for `--output-folder` when you want artifacts written outside the project tree (e.g. a shared monorepo outputs directory)
+- Test flags locally before using in CI/CD pipelines
+- Combine with `-y` for truly unattended installations
 - Use `--debug` if you encounter issues during installation
 :::
 
 ## Troubleshooting
 
-### Installation fails
+### Installation fails with "Invalid directory"
 
-- Ensure you have write permissions to `~/.claude/skills/bmad/`
-- Run with `--debug` for detailed output
+- The directory path must exist (or its parent must exist)
+- You need write permissions
+- The path must be absolute or correctly relative to the current directory
+
+### Module not found
+
+- Verify the module ID is correct
+- External modules must be available in the registry
+
+### Custom content path invalid
+
+Ensure each custom content path:
+- Points to a directory
+- Contains a `module.yaml` file in the root
+- Has a `code` field in the `module.yaml`
 
 :::note[Still stuck?]
-Run with `--debug` for detailed output, or report at <https://github.com/bmad-code-org/BMAD-METHOD/issues>.
+Run with `--debug` for detailed output, try interactive mode to isolate the issue, or report at <https://github.com/bmad-code-org/BMAD-METHOD/issues>.
 :::
