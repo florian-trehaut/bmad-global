@@ -49,9 +49,45 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
 
-### 4. Set defaults
+### 4. Setup working environment
 
-- `WORKTREE_PATH = null` (populated by step-02)
+**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+
+The worktree MUST be created BEFORE any code investigation. Without it, code searches and git log target the main repo working tree, which may be stale or on a different branch.
+
+<check if="worktree_enabled == true (or absent)">
+
+```bash
+git fetch origin main
+git worktree add ../{WORKTREE_PREFIX}-troubleshoot origin/main -b troubleshoot/{date}
+```
+
+Where `{date}` is today in `YYYY-MM-DD` format.
+
+**If worktree creation fails:** HALT — report error.
+
+**Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
+
+```bash
+cd {WORKTREE_PATH}
+{install_command}      # HALT on failure
+{build_command}        # HALT on failure, skip if empty
+{typecheck_command}    # WARN on failure, skip if empty
+```
+
+Store `WORKTREE_PATH` = resolved worktree path.
+
+</check>
+
+<check if="worktree_enabled == false">
+  No worktree — investigate in the current project directory.
+  Store `WORKTREE_PATH` = current project directory.
+</check>
+
+**From this point on, ALL code investigation runs inside {WORKTREE_PATH}.**
+
+### 5. Set defaults
+
 - `ISSUE_ID = null` (populated by step-05)
 - `ISSUE_IDENTIFIER = null` (populated by step-05)
 - `MR_IID = null` (populated by step-07)
@@ -93,7 +129,7 @@ You are a **systematic bug hunter**. You aggressively investigate problems witho
 | Step | File | Goal |
 | ---- | ---- | ---- |
 | 1 | `step-01-understand.md` | Comprendre le symptôme, classifier sévérité et blast radius |
-| 2 | `step-02-map.md` | Charger contexte, découvrir skills, créer worktree, identifier infra |
+| 2 | `step-02-map.md` | Charger contexte, découvrir skills, identifier infra (worktree already created) |
 | 3 | `step-03-investigate.md` | Investigation agressive autonome — logs, DB, code, deploys |
 | 4 | `step-04-diagnose.md` | Corréler preuves, diagnostic + plan de fix |
 | 5 | `step-05-create-issue.md` | Créer l'issue tracker avec diagnostic, ACs, VM |

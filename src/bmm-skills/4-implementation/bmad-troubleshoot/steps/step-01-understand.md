@@ -40,7 +40,7 @@ Query the tracker (using CRUD patterns from tracker.md):
 
 **c. Logs** — check production/staging logs for the affected service. Use GCP observability tools if available, or the project's log access skills.
 
-**d. Code search** — grep the codebase for the affected component to understand its current state, recent changes (`git log --oneline -20 -- <paths>`).
+**d. Code search** — in `{WORKTREE_PATH}`, grep the codebase for the affected component to understand its current state, recent changes (`git log --oneline -20 -- <paths>`).
 
 ### 4. Targeted questions (ONLY for gaps)
 

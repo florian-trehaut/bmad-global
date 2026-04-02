@@ -46,34 +46,16 @@ Store the relevant skill list as `LOCAL_SKILLS`.
 
 ### 3. Identify affected service files
 
-In the project root, search for the affected service:
+In `{WORKTREE_PATH}`, search for the affected service:
 - Look for directories matching the service name under `apps/`, `services/`, `src/`, or similar
 - Identify the service's source directory, test directory, and configuration files
 - Note the ORM (Prisma, Drizzle, TypeORM, etc.) and database schema location
 
 Store as `SERVICE_FILES`.
 
-### 4. Create investigation worktree
+**Note:** The worktree was already created during workflow INITIALIZATION. `{WORKTREE_PATH}` is set and dependencies are installed. All file searches in this step use `{WORKTREE_PATH}`.
 
-```bash
-git fetch origin main
-git worktree add ../{WORKTREE_PREFIX}-troubleshoot-{AFFECTED_SERVICE} origin/main -b troubleshoot/{AFFECTED_SERVICE}-{DATE}
-```
-
-Where `{DATE}` is today's date in `YYYY-MM-DD` format.
-
-**If worktree creation fails:** HALT — report error.
-
-Store `WORKTREE_PATH` = resolved worktree path.
-
-Install dependencies in the worktree:
-```bash
-cd {WORKTREE_PATH} && {INSTALL_COMMAND}
-```
-
-Log: "Worktree created: {WORKTREE_PATH}"
-
-### 5. Check recent deployments
+### 4. Check recent deployments
 
 If a CI/CD skill exists in `LOCAL_SKILLS`:
 - Check the last deployment to `{TARGET_ENV}`
@@ -87,7 +69,7 @@ If no CI/CD skill, use forge CLI:
 
 Store as `DEPLOY_CONTEXT` — was a deploy close to the symptom start time?
 
-### 6. Auto-proceed
+### 5. Auto-proceed
 
 All context loaded. Proceed to investigation.
 
