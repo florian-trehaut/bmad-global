@@ -185,7 +185,40 @@ class ModuleManager {
 
     const cloneDir = await this.cloneExternalModule(moduleCode, options);
     const moduleDefinitionPath = moduleInfo.moduleDefinition;
-    return path.dirname(path.join(cloneDir, moduleDefinitionPath));
+    const configuredPath = path.join(cloneDir, moduleDefinitionPath);
+
+    if (await fs.pathExists(configuredPath)) {
+      return path.dirname(configuredPath);
+    }
+
+    // Fallback: search skills/ and src/ (root level and one level deep)
+    for (const dir of ['skills', 'src']) {
+      const rootCandidate = path.join(cloneDir, dir, 'module.yaml');
+      if (await fs.pathExists(rootCandidate)) {
+        return path.dirname(rootCandidate);
+      }
+      const dirPath = path.join(cloneDir, dir);
+      if (await fs.pathExists(dirPath)) {
+        const entries = await fs.readdir(dirPath, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.isDirectory()) {
+            const subCandidate = path.join(dirPath, entry.name, 'module.yaml');
+            if (await fs.pathExists(subCandidate)) {
+              return path.dirname(subCandidate);
+            }
+          }
+        }
+      }
+    }
+
+    // Check repo root as last fallback
+    const rootCandidate = path.join(cloneDir, 'module.yaml');
+    if (await fs.pathExists(rootCandidate)) {
+      return path.dirname(rootCandidate);
+    }
+
+    // Nothing found: return configured path (preserves behavior for error messaging)
+    return path.dirname(configuredPath);
   }
 
   /**
