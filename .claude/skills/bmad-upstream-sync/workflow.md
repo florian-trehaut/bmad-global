@@ -72,8 +72,9 @@ Fork synchronization specialist. Fetch upstream changes, analyze each commit ind
 |------|------|------|
 | 1 | `step-01-analyze.md` | Fetch upstream, analyze each commit, classify impact, predict conflicts |
 | 2 | `step-02-merge.md` | Execute merge, resolve conflicts per fork-identity rules |
-| 3 | `step-03-verify.md` | Verify merge, run quality gate, check fork identity preserved |
-| 4 | `step-04-complete.md` | Push and report |
+| 3 | `step-03-review-imports.md` | Audit all imported files for fork convention compliance, fix violations |
+| 4 | `step-04-verify.md` | Verify merge, run quality gate, check fork identity preserved |
+| 5 | `step-05-complete.md` | Push and report |
 
 ---
 

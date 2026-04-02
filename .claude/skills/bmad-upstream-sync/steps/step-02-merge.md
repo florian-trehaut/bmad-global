@@ -92,15 +92,7 @@ If a conflict cannot be resolved by fork-identity.md rules:
 - Reference which fork-identity rule applies (or none)
 - WAIT for user decision
 
-### 4. Post-Merge Adaptation
-
-After all conflicts are resolved, check if any RESTRUCTURE items from step-01 need manual adaptation:
-
-- New upstream skills with `domain-steps/`, `technical-steps/`, or `steps-c/` directories → rename to `steps/`
-- New upstream workflows missing shared rule references → add references to our shared rules
-- New upstream skills missing worktree lifecycle guard → add guard if the skill creates worktrees
-
-### 5. Verify No Remaining Conflicts
+### 4. Verify No Remaining Conflicts
 
 ```bash
 git diff --name-only --diff-filter=U
@@ -108,7 +100,7 @@ git diff --name-only --diff-filter=U
 
 If any remain → loop back to step 3.
 
-### 6. Complete the Merge Commit
+### 5. Complete the Merge Commit
 
 ```bash
 git commit --no-edit
@@ -118,4 +110,4 @@ Log: "Merge commit created. {N} conflicts resolved. {M} files adapted to fork co
 
 ---
 
-**Next:** Read fully and follow `./step-03-verify.md`
+**Next:** Read fully and follow `./step-03-review-imports.md`

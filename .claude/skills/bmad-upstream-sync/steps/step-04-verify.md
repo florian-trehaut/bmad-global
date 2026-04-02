@@ -129,4 +129,4 @@ If user identifies issues → fix them before proceeding.
 
 ---
 
-**Next:** Read fully and follow `./step-04-complete.md`
+**Next:** Read fully and follow `./step-05-complete.md`
