@@ -1,6 +1,6 @@
 # Spike-Informed Story Template
 
-Template for stories created from spike investigation findings. These are backlog seeds — enough context for prioritization and for quick-spec to build on, NOT full implementation specs.
+Template for stories created from spike investigation findings. These are backlog seeds — enough context for prioritization and for create-story to build on, NOT full implementation specs.
 
 ## Structure
 
@@ -45,14 +45,14 @@ Limitations and dependencies found during investigation:
 
 ## Initial Acceptance Criteria
 
-To be refined by quick-spec — these are rough criteria from the spike:
+To be refined by create-story — these are rough criteria from the spike:
 
 - [ ] {AC-1 — from spike findings}
 - [ ] {AC-2 — from spike findings}
 
 ## Notes
 
-- This story needs full specification via **quick-spec** before implementation
+- This story needs full specification via **create-story** before implementation
 - The spike provides investigation context; the spec provides the implementation plan
 - Reference the PoC branch `spike/{slug}` for code examples (if branch was kept)
 ```
@@ -61,15 +61,15 @@ To be refined by quick-spec — these are rough criteria from the spike:
 
 ### What to Include
 - Enough context for a product owner to prioritize the story
-- Enough technical context for quick-spec to build on without re-investigating
+- Enough technical context for create-story to build on without re-investigating
 - Concrete decisions that must be honored (not re-debated)
 - Known constraints that affect implementation
 
 ### What NOT to Include
-- Full implementation plan (that's quick-spec's job)
-- Detailed technical acceptance criteria (that's quick-spec's job)
+- Full implementation plan (that's create-story's job)
+- Detailed technical acceptance criteria (that's create-story's job)
 - Task breakdown (that's create-story's job)
-- Test strategy (that's test-design's job)
+- Detailed test strategy (that's create-story's job)
 
 ### Tracker-Specific Notes
 

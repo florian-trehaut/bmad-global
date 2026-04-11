@@ -60,8 +60,7 @@ Any `switch/case default` on a domain value (status, enum, mapping) MUST either:
 
 | Workflow | How to apply |
 |----------|-------------|
-| **quick-spec** | Verify story ACs don't rely on fallback assumptions |
-| **create-story** | Audit each AC for production viability — trace the complete production chain |
+| **create-story** | Verify story ACs don't rely on fallback assumptions. Audit each AC for production viability — trace the complete production chain |
 | **review-story** | Every "existant" or "scheduled" assumption must be verified in codebase |
 | **dev-story** | Code must throw on unexpected values, never silently degrade |
 | **code-review** | Flag any new fallback pattern as BLOCKER severity |

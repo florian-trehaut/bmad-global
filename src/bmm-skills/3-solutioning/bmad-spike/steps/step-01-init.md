@@ -93,7 +93,7 @@ Validate this is a genuine spike, not disguised implementation:
 > This sounds like implementation work rather than an investigation. The spike workflow produces knowledge artifacts (ADR, trade-off analysis, PoC findings) — not production code.
 >
 > Would you prefer:
-> - **quick-spec** — to write an implementation-ready specification
+> - **create-story** — to write an implementation-ready specification
 > - **dev-story** — to implement a story directly
 
 WAIT for user decision. If they confirm it's a spike, continue. If they want spec/dev, exit and redirect.

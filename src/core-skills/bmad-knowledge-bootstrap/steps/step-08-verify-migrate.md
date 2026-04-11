@@ -23,7 +23,8 @@ for file in \
   "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md" \
   "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/conventions.md" \
   "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain-glossary.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api-surface.md"; do
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api-surface.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/validation.md"; do
   if [ -s "$file" ]; then
     lines=$(wc -l < "$file")
     echo "OK  $file ($lines lines)"
@@ -67,11 +68,12 @@ grep -rn "TODO" {MAIN_PROJECT_ROOT}/.claude/workflow-context.md {MAIN_PROJECT_RO
 
 | Skill | Status | Requirements |
 |-------|--------|-------------|
-| `bmad-quick-spec` | {READY/NOT} | tracker + tracker_states.todo |
+| `bmad-create-story` | {READY/NOT} | tracker + tracker_states.todo |
 | `bmad-dev-story` | {READY/NOT} | tracker + forge + forge_cli + states (todo, in_progress, in_review) |
 | `bmad-code-review` | {READY/NOT} | forge + forge_cli |
 | `bmad-review-story` | {READY/NOT} | tracker + tracker_states.todo |
 | `bmad-validation-metier` | {READY/NOT} | environment-config has actual URLs (no TODOs) |
+| `bmad-validation-frontend` | {READY/NOT} | validation.md has E2E or component framework detected |
 
 ### 5. Present Summary
 
@@ -87,11 +89,12 @@ Files:
 TODOs remaining:    {count}
 
 Workflow readiness:
-  bmad-quick-spec:        {READY / NOT READY}
+  bmad-create-story:      {READY / NOT READY}
   bmad-dev-story:         {READY / NOT READY}
   bmad-code-review:       {READY / NOT READY}
   bmad-review-story:      {READY / NOT READY}
   bmad-validation-metier: {READY / NOT READY}
+  bmad-validation-frontend: {READY / NOT READY}
 ============================================================
 ```
 
@@ -151,7 +154,7 @@ After:  {remaining} legacy, {new_percentage}% coverage
 ### 7. Suggest Next Steps
 
 1. **If TODOs > 0**: "Fill in the remaining {count} TODOs."
-2. **If all READY**: "Try `/bmad-quick-spec`, `/bmad-dev-story`, or `/bmad-code-review`."
+2. **If all READY**: "Try `/bmad-create-story`, `/bmad-dev-story`, or `/bmad-code-review`."
 3. **If some NOT READY**: "To unlock {skill}, you need: {missing}."
 
 ### 8. Gitignore Reminder

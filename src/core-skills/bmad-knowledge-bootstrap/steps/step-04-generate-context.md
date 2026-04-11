@@ -113,13 +113,13 @@ The following knowledge files are available in `{MAIN_PROJECT_ROOT}/.claude/work
 |------|---------|-----------|
 | `tracker.md` | Tracker tool interface, concept mapping, CRUD operations | All tracker workflows |
 | `comm-platform.md` | Communication platform tool interface, CRUD operations | daily-planning |
-| `stack.md` | Tech stack, frameworks, forbidden patterns, test rules | dev-story, code-review, review-story, quick-spec |
+| `stack.md` | Tech stack, frameworks, forbidden patterns, test rules | dev-story, code-review, review-story, create-story |
 | `infrastructure.md` | Cloud infra, CI/CD, deployment, IaC | dev-story, code-review, review-story |
 | `environment-config.md` | Environment URLs, DB proxy config | validation-metier, review-story |
 | `investigation-checklist.md` | Domain-specific investigation guides | review-story |
 | `review-perspectives.md` | Code review perspectives, severity rules | code-review |
 | `conventions.md` | Commit format, branch strategy, code style | dev-story, code-review |
-| `domain-glossary.md` | Ubiquitous language, bounded contexts | review-story, quick-spec |
+| `domain-glossary.md` | Ubiquitous language, bounded contexts | review-story, create-story |
 | `api-surface.md` | Endpoints, schemas, auth, integrations | review-story, dev-story |
 
 ## Project-Specific Skills

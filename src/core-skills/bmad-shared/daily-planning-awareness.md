@@ -48,7 +48,7 @@ This is **optional** — the workflow must function without it. It only enriches
 | Workflow | How it uses daily plan |
 |----------|----------------------|
 | **dev-story** | Confirm the story being implemented is in today's plan |
-| **quick-spec** | Know what's already planned to avoid duplicating spec work |
+| **create-story** | Know what's already planned to avoid duplicating spec work |
 | **code-review** | See if the MR being reviewed maps to a planned issue |
 | **troubleshoot** | Context about what the user was working on when the bug appeared |
 | **sprint-status** | Compare plan vs actual progress |

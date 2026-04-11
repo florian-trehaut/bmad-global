@@ -113,7 +113,7 @@ Delete `{wip_file}`.
 
 The informed stories are in the backlog:
 1. **Prioritize** — schedule stories for an upcoming sprint
-2. **Specify** — use `quick-spec` to write full implementation specs for each story
+2. **Specify** — use `create-story` to write full implementation specs for each story
 3. **Implement** — use `dev-story` for TDD implementation
 
 The spike deliverable document is available in the tracker for reference

@@ -72,7 +72,7 @@ Use holistic judgment, not mechanical keyword matching.
 
 Display: "**Select:** [P] Plan first (tech-spec) [E] Execute directly"
 
-- IF P: Direct user to `/bmad-quick-spec`. **EXIT Quick Dev.**
+- IF P: Direct user to `/bmad-create-story`. **EXIT Quick Dev.**
 - IF E: Ask for any additional guidance, then **NEXT:** Read fully and follow: `step-02-context-gathering.md`
 
 ALWAYS halt and wait for user input after presenting menu.
@@ -85,7 +85,7 @@ Present: "This looks like a focused feature with multiple components."
 **[W] Seems bigger than quick-dev** - Recommend the full PRD process
 **[E] Execute directly**
 
-- IF P: Direct to `/bmad-quick-spec`. **EXIT Quick Dev.**
+- IF P: Direct to `/bmad-create-story`. **EXIT Quick Dev.**
 - IF W: Direct user to `/bmad-create-prd`. **EXIT Quick Dev.**
 - IF E: Ask for guidance, then **NEXT:** Read fully and follow: `step-02-context-gathering.md`
 
@@ -97,7 +97,7 @@ Present: "This sounds like platform/system work."
 **[P] Plan first (tech-spec)** (lighter planning)
 **[E] Execute directly** - feeling lucky
 
-- IF P: Direct to `/bmad-quick-spec`. **EXIT Quick Dev.**
+- IF P: Direct to `/bmad-create-story`. **EXIT Quick Dev.**
 - IF W: Direct user to `/bmad-create-prd`. **EXIT Quick Dev.**
 - IF E: Ask for guidance, then **NEXT:** Read fully and follow: `step-02-context-gathering.md`
 

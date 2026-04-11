@@ -81,13 +81,13 @@ The following knowledge files are available in `.claude/workflow-knowledge/` and
 | File | Content | Loaded by |
 |------|---------|-----------|
 | `tracker.md` | File-based tracker patterns, sprint-status.yaml conventions, story file naming | All tracker workflows |
-| `stack.md` | Tech stack (Markdown/YAML skills + JS tooling), forbidden patterns, test rules | dev-story, code-review, review-story, quick-spec |
+| `stack.md` | Tech stack (Markdown/YAML skills + JS tooling), forbidden patterns, test rules | dev-story, code-review, review-story, create-story |
 | `infrastructure.md` | GitHub Actions CI/CD, npm publish distribution, no cloud infra | dev-story, code-review, review-story |
 | `environment-config.md` | N/A — no deployed environments (distributed as npm package) | — |
 | `investigation-checklist.md` | Domain-specific investigation guides for skill system, CLI, docs, validators | review-story |
 | `review-perspectives.md` | Code review perspectives, severity rules | code-review |
 | `conventions.md` | Commit format, branch strategy, code style, skill naming rules | dev-story, code-review |
-| `domain-glossary.md` | BMAD ubiquitous language: skills, modules, phases, workflows, steps | review-story, quick-spec |
+| `domain-glossary.md` | BMAD ubiquitous language: skills, modules, phases, workflows, steps | review-story, create-story |
 | `api-surface.md` | CLI commands, module.yaml schema, skill validation rules | review-story, dev-story |
 
 ## Project Nature

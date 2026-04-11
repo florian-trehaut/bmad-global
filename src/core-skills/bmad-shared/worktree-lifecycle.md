@@ -32,7 +32,7 @@ Skip worktree creation entirely. Use a fallback strategy based on the workflow t
 
 | Workflow type | Fallback behavior |
 |---------------|-------------------|
-| **Read-only** (quick-spec, create-story, adr-review, validation-desktop) | Set `{WORKTREE_PATH}` = current project directory. Investigate in-place. |
+| **Read-only** (create-story, adr-review, validation-desktop) | Set `{WORKTREE_PATH}` = current project directory. Investigate in-place. |
 | **Read-write** (dev-story) | Create branch in current repo: `git fetch origin main && git checkout -b {BRANCH_NAME} origin/main`. Set `{WORKTREE_PATH}` = current project directory. |
 | **Review** (code-review) | Checkout MR branch in current repo: `git fetch origin && git checkout {MR_SOURCE_BRANCH}`. Set `{WORKTREE_PATH}` = current project directory. |
 | **Investigation** (spike) | Set `{WORKTREE_PATH}` = current project directory. PoC code lives in the current repo. |
@@ -111,7 +111,6 @@ No worktree to remove. If the workflow created a branch for its work:
 |----------|---------------|:--:|------------------------|
 | bmad-dev-story | Read-write | YES | Branch in current repo |
 | bmad-code-review | Read-write (MR branch) | YES | Checkout MR branch in-place |
-| bmad-quick-spec | Read-only | YES | Investigate in current dir |
 | bmad-create-story | Read-only | YES | Investigate in current dir |
 | bmad-spike | Read-write (PoC) | YES | Work in current dir |
 | bmad-adr-review | Read-only (detached) | YES | Investigate in current dir |

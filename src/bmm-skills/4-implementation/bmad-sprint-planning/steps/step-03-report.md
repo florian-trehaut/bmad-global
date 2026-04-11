@@ -59,7 +59,7 @@ Display the report to `{USER_NAME}`:
 
 Based on workflow results, suggest relevant next actions:
 
-- If issues were created: suggest reviewing/refining specs with the quick-spec or review-story workflows
+- If issues were created: suggest reviewing/refining specs with the create-story or review-story workflows
 - If issues were assigned to cycle: suggest starting development with the dev-story workflow
 - If no action was taken: note that everything was already synchronized
 

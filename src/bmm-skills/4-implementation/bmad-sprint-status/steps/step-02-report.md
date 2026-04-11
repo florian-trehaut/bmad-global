@@ -63,7 +63,7 @@ From the current cycle issues, determine the recommended next workflow using thi
 1. If any issue is **In Progress** → recommend `dev-story` for the first in-progress issue (sorted by project, then identifier)
 2. Else if any issue is **In Review** → recommend `code-review` for the first review issue
 3. Else if any issue is **Todo** → recommend `dev-story` for the first todo issue
-4. Else if any issue is **Backlog** (in cycle) → recommend `quick-spec` for the first backlog issue
+4. Else if any issue is **Backlog** (in cycle) → recommend `create-story` for the first backlog issue
 5. Else → all cycle items are done or canceled
 
 Store: `NEXT_ISSUE_IDENTIFIER`, `NEXT_ISSUE_TITLE`, `NEXT_WORKFLOW`.

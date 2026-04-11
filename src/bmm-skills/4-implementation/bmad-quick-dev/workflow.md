@@ -49,7 +49,7 @@ Load project context from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` (if 
 
 ### 4. Related Workflows
 
-- Escalation to planning: `/bmad-quick-spec` (tech-spec creation)
+- Escalation to planning: `/bmad-create-story` (story creation/enrichment)
 - Escalation to full method: `/bmad-create-prd` (PRD workflow)
 
 ---

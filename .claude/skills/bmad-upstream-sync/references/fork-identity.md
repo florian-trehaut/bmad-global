@@ -115,7 +115,7 @@ Meta-tools for creating, editing, validating skills and modules. Not in upstream
 ### Workflow Enhancements — 7 cross-cutting features
 These are not separate skills but enhancements woven into existing workflows:
 1. **ADR awareness** — All workflows check for ADR implications with HALT + menu
-2. **Story point estimation** — quick-spec and create-story auto-estimate Fibonacci points
+2. **Story point estimation** — create-story auto-estimates Fibonacci points
 3. **Worktree lifecycle** — Shared rule for optional worktrees + mandatory post-creation setup
 4. **Agent Teams integration** — team-router, spawn-protocol, task-contract-schema
 5. **Retrospective step** — Conditional friction analysis at workflow end

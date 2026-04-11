@@ -1,6 +1,6 @@
 # Tracker Issue Description Template
 
-Template for composing the enriched tracker issue description in Step 4.
+Template for composing the tracker issue description in Step 7/9.
 
 ## Structure
 
@@ -17,11 +17,11 @@ Template for composing the enriched tracker issue description in Step 4.
 
 ## Problem
 
-{problem_statement_from_PRD}
+{problem_statement}
 
 ## Proposed Solution
 
-{solution_from_architecture}
+{solution}
 
 ## Scope
 
@@ -32,7 +32,7 @@ Template for composing the enriched tracker issue description in Step 4.
 
 ### User Journey E2E
 
-{user_journey — primary actor, numbered steps, from existing business context or synthesized from PRD}
+{user_journey — primary actor, numbered steps, from conversation or PRD}
 
 ### Business Acceptance Criteria
 
@@ -47,7 +47,7 @@ Template for composing the enriched tracker issue description in Step 4.
 
 ### Codebase Patterns
 
-{patterns_from_architecture}
+{patterns_from_investigation}
 
 ### Relevant Files
 
@@ -64,23 +64,23 @@ Template for composing the enriched tracker issue description in Step 4.
 
 ## Data Model
 
-{data_model_from_analysis — schema delta, migration plan, indexes, DTO/Domain/DB mapping}
+{data_model — schema delta, migration plan, indexes, DTO/Domain/DB mapping}
 
 ## API Contracts
 
-{api_contracts_from_analysis}
+{api_contracts}
 
 ## Infrastructure
 
-{infra_assessment_from_analysis — deployment chain status, IaC changes}
+{infra_assessment — deployment chain status, IaC changes}
 
 ## External Data Interface Contracts
 
-{interface_contracts_from_analysis}
+{interface_contracts}
 
 ## Data Mapping
 
-{data_mapping_from_analysis — DTO -> Domain -> DB with transformations}
+{data_mapping — DTO -> Domain -> DB with transformations}
 
 ## Implementation Plan
 
@@ -102,8 +102,9 @@ Tests to execute in production after deployment. The story moves to the testing 
 
 {validation_metier_checklist}
 
-> Each VM item traces to one or more BACs. Format: `VM-N *(BAC-X,Y)* : description`
-> Non-regression VMs trace to impacts: `VM-NR-N *(Impact IN)* : description`
+> Each VM item declares its type and traces to BACs. Format: `VM-N [type] *(BAC-X,Y)* : description`
+> Non-regression VMs trace to impacts: `VM-NR-N [type] *(Impact IN)* : description`
+> Types: `[api]`, `[db]`, `[e2e]`, `[component]`, `[visual]`, `[responsive]`, `[accessibility]`, `[error-handling]`, `[performance]`, `[cloud_log]`, `[state]`
 
 ## Previous Story Learnings
 
@@ -132,6 +133,7 @@ Tests to execute in production after deployment. The story moves to the testing 
 - **Validation Metier**: ALWAYS present (mandatory). Each VM must trace to its BACs
 - **Business Context**: ALWAYS present
 - **Technical Context**: ALWAYS present but inside a `<details>` collapsible
+- **Guardrails**: ALWAYS present (mandatory guardrails + story-specific)
 - **Previous Story Learnings**: present if completed stories exist in the epic
 - **Data Model**: omit if "No data changes identified"
 - **API Contracts**: omit if no endpoint impacted

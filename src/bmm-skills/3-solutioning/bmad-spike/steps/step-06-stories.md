@@ -20,7 +20,7 @@ Extract implementation stories from the spike findings. Create tracker issues th
 
 - Stories are seeds, not full specs — they carry the spike context into the backlog
 - Each story must be grounded in spike evidence, not invented
-- Stories go through quick-spec for full specification before implementation
+- Stories go through create-story for full specification before implementation
 
 ### Step-Specific Rules:
 
@@ -59,7 +59,7 @@ Present candidates:
 > | 2 | {title} | {type} | {rationale} |
 > | 3 | {title} | {type} | {rationale} |
 >
-> **Note:** These are backlog seeds. Each will need full specification via quick-spec before implementation.
+> **Note:** These are backlog seeds. Each will need full specification via create-story before implementation.
 
 ### 2. User Selection
 
@@ -81,9 +81,9 @@ For each selected story, load `../templates/spike-story-template.md` and compose
 - **Decisions made during spike**: Concrete decisions this story must honor
 - **Constraints discovered**: Limitations, dependencies, caveats from the investigation
 - **Initial scope**: In/out boundaries from spike findings
-- **Initial acceptance criteria**: Rough ACs to be refined by quick-spec
+- **Initial acceptance criteria**: Rough ACs to be refined by create-story
 
-**Important:** These are NOT full specs. They carry enough context for backlog prioritization and for quick-spec to build on. Do not duplicate the full spec workflow here.
+**Important:** These are NOT full specs. They carry enough context for backlog prioritization and for create-story to build on. Do not duplicate the full spec workflow here.
 
 ### 4. Create Tracker Issues
 
@@ -135,5 +135,5 @@ Load, read entire file, then execute {nextStepFile}.
 - Creating stories not grounded in spike findings
 - Creating issues without user confirmation
 - Silent fallback on API failure
-- Stories that are full specs (that's quick-spec's job)
+- Stories that are full specs (that's create-story's job)
 - Missing spike reference in story description
