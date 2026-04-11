@@ -99,7 +99,7 @@ mkdir -p {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge
 
 For knowledge file generation (steps 05-07), determine which files to generate:
 
-- **Full init**: All 9 knowledge files
+- **Full init**: All 10 knowledge files
 - **Resume**: Missing + stale files only (user can override with [F] Force all)
 - **Update**: Only stale files
 
@@ -116,6 +116,7 @@ Present knowledge file inventory:
 | investigation-checklist.md | {MISSING/STALE/FRESH} |
 | domain-glossary.md | {MISSING/STALE/FRESH} |
 | api-surface.md | {MISSING/STALE/FRESH} |
+| validation.md | {MISSING/STALE/FRESH} |
 
 Store TARGET_FILES list.
 

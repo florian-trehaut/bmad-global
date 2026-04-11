@@ -33,7 +33,7 @@ When you are in this persona and the user calls a skill, this persona must carry
 | Code | Description | Skill |
 |------|-------------|-------|
 | CA | Guided workflow to document technical decisions to keep implementation on track | bmad-create-architecture |
-| IR | Ensure the PRD, UX, Architecture and Epics and Stories List are all aligned | bmad-check-implementation-readiness |
+| IR | Ensure the PRD, UX, Architecture and Epics and Stories List are all aligned | bmad-check-readiness |
 
 ## On Activation
 

@@ -1,40 +1,25 @@
-# Step 1: UX Design Workflow Initialization
+---
+nextStepFile: './step-02-discovery.md'
+---
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+# Step 1: Initialize
 
-- 🛑 NEVER generate content without user input
+## STEP GOAL
 
-- 📖 CRITICAL: ALWAYS read the complete step file before taking any action - partial understanding leads to incomplete decisions
-- 🔄 CRITICAL: When loading next step with 'C', ensure the entire file is read and understood before proceeding
-- ✅ ALWAYS treat this as collaborative discovery between UX facilitator and stakeholder
-- 📋 YOU ARE A UX FACILITATOR, not a content generator
-- 💬 FOCUS on initialization and setup only - don't look ahead to future steps
-- 🚪 DETECT existing workflow state and handle continuation properly
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
+Detect existing workflow state, discover input documents, and create the UX design specification document from template.
 
-## EXECUTION PROTOCOLS:
+## RULES
 
-- 🎯 Show your analysis before taking any action
-- 💾 Initialize document and update frontmatter
-- 📖 Set up frontmatter `stepsCompleted: [1]` before loading next step
-- 🚫 FORBIDDEN to load next step until setup is complete
+- Focus on initialization and setup only -- no design questions yet
+- Confirm discovered documents with the user before loading
+- FORBIDDEN: proceeding to step-02 without a saved output file
+- Detect existing workflow and delegate to step-01b if continuation is needed
 
-## CONTEXT BOUNDARIES:
-
-- Variables from workflow.md are available in memory
-- Previous context = what's in output document + frontmatter
-- Don't assume knowledge from other steps
-- Input document discovery happens in this step
-
-## YOUR TASK:
-
-Initialize the UX design workflow by detecting continuation state and setting up the design specification document.
-
-## INITIALIZATION SEQUENCE:
+## SEQUENCE
 
 ### 1. Check for Existing Workflow
 
-First, check if the output document already exists:
+Check if the output document already exists:
 
 - Look for file at `{planning_artifacts}/*ux-design-specification*.md`
 - If exists, read the complete file including frontmatter
@@ -60,7 +45,7 @@ Discover and load context documents using smart discovery. Documents can be in t
 - {product_knowledge}/**
 - {project-root}/docs/**
 
-Also - when searching - documents can be a single markdown file, or a folder with an index and multiple files. For Example, if searching for `*foo*.md` and not found, also search for a folder called *foo*/index.md (which indicates sharded content)
+Also -- when searching -- documents can be a single markdown file, or a folder with an index and multiple files. For example, if searching for `*foo*.md` and not found, also search for a folder called *foo*/index.md (which indicates sharded content).
 
 Try to discover the following:
 - Product Brief (`*brief*.md`)
@@ -68,7 +53,7 @@ Try to discover the following:
 - Project Documentation (generally multiple documents might be found for this in the `{product_knowledge}` or `docs` folder.)
 - Project Context (`**/project-context.md`)
 
-<critical>Confirm what you have found with the user, along with asking if the user wants to provide anything else. Only after this confirmation will you proceed to follow the loading rules</critical>
+Confirm what you have found with the user, along with asking if the user wants to provide anything else. Only after this confirmation will you proceed to follow the loading rules.
 
 **Loading Rules:**
 
@@ -80,21 +65,13 @@ Try to discover the following:
 
 #### B. Create Initial Document
 
-Copy the template from `../ux-design-template.md` to `{planning_artifacts}/ux-design-specification.md`
-Initialize frontmatter in the template.
+Copy the template from `../ux-design-template.md` to `{planning_artifacts}/ux-design-specification.md`. Initialize frontmatter in the template.
 
 #### C. Complete Initialization and Report
 
 Complete setup and report to user:
 
-**Document Setup:**
-
-- Created: `{planning_artifacts}/ux-design-specification.md` from template
-- Initialized frontmatter with workflow state
-
-**Input Documents Discovered:**
-Report what was found:
-"Welcome {{user_name}}! I've set up your UX design workspace for {{project_name}}.
+"Welcome {user_name}! I've set up your UX design workspace for {project_name}.
 
 **Documents Found:**
 
@@ -108,28 +85,10 @@ Do you have any other documents you'd like me to include, or shall we continue t
 
 [C] Continue to UX discovery"
 
-## NEXT STEP:
+### 4. Save State
 
-After user selects [C] to continue, ensure the file `{planning_artifacts}/ux-design-specification.md` has been created and saved, and then load `./step-02-discovery.md` to begin the UX discovery phase.
+Update frontmatter with `stepsCompleted: [1]` and `inputDocuments` array before presenting menu.
 
-Remember: Do NOT proceed to step-02 until output file has been updated and user explicitly selects [C] to continue!
+### 5. Proceed
 
-## SUCCESS METRICS:
-
-✅ Existing workflow detected and handed off to step-01b correctly
-✅ Fresh workflow initialized with template and frontmatter
-✅ Input documents discovered and loaded using sharded-first logic
-✅ All discovered files tracked in frontmatter `inputDocuments`
-✅ User confirmed document setup and can proceed
-
-## FAILURE MODES:
-
-❌ Proceeding with fresh initialization when existing workflow exists
-❌ Not updating frontmatter with discovered input documents
-❌ Creating document without proper template
-❌ Not checking sharded folders first before whole files
-❌ Not reporting what documents were found to user
-
-❌ **CRITICAL**: Reading only partial step file - leads to incomplete understanding and poor decisions
-❌ **CRITICAL**: Proceeding with 'C' without fully reading and understanding the next step file
-❌ **CRITICAL**: Making decisions without complete understanding of step requirements and protocols
+After user selects [C], load {nextStepFile}.

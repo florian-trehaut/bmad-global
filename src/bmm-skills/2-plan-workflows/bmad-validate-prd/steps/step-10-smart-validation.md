@@ -1,61 +1,21 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-11-holistic-quality-validation.md'
-prdFile: '{prd_file_path}'
-validationReportPath: '{validation_report_path}'
 ---
 
 # Step 10: SMART Requirements Validation
 
-## STEP GOAL:
+## STEP GOAL
 
 Validate Functional Requirements meet SMART quality criteria (Specific, Measurable, Attainable, Relevant, Traceable), ensuring high-quality requirements.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Focus ONLY on FR quality assessment using SMART framework
+- Score each FR on all 5 criteria using 1-5 scale
+- Flag any FR with score < 3 in any category
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-- ✅ YOU MUST ALWAYS WRITE all artifact and document content in `{document_output_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring requirements engineering expertise and quality assessment
-- ✅ This step runs autonomously - no user input needed
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on FR quality assessment using SMART framework
-- 🚫 FORBIDDEN to validate other aspects in this step
-- 💬 Approach: Score each FR on SMART criteria (1-5 scale)
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Extract all FRs from PRD
-- 🎯 Score each FR on SMART criteria (Specific, Measurable, Attainable, Relevant, Traceable)
-- 💾 Flag FRs with score < 3 in any category
-- 📖 Append scoring table and suggestions to validation report
-- 📖 Display "Proceeding to next check..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: PRD file, validation report
-- Focus: FR quality assessment only using SMART framework
-- Limits: Don't validate NFRs or other aspects, don't pause for user input
-- Dependencies: Steps 2-9 completed - comprehensive validation checks done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Extract All Functional Requirements
 
@@ -65,7 +25,7 @@ From the PRD's Functional Requirements section, extract:
 
 ### 2. Attempt Sub-Process Validation
 
-**Try to use Task tool to spawn a subprocess:**
+Try to use Task tool to spawn a subprocess:
 
 "Perform SMART requirements validation on these Functional Requirements:
 
@@ -103,10 +63,7 @@ From the PRD's Functional Requirements section, extract:
 
 Return scoring table with all FR scores and improvement suggestions for low-scoring FRs."
 
-**Graceful degradation (if no Task tool):**
-- Manually score each FR on SMART criteria
-- Note FRs with low scores
-- Provide improvement suggestions
+If no Task tool, manually score each FR on SMART criteria, note low scores, provide improvement suggestions.
 
 ### 3. Build Scoring Table
 
@@ -120,9 +77,9 @@ For each FR:
 - Average score
 - Flag if any category < 3
 
-**Calculate overall FR quality:**
-- Percentage of FRs with all scores ≥ 3
-- Percentage of FRs with all scores ≥ 4
+Calculate overall FR quality:
+- Percentage of FRs with all scores >= 3
+- Percentage of FRs with all scores >= 4
 - Average score across all FRs and categories
 
 ### 4. Report SMART Findings to Validation Report
@@ -136,8 +93,8 @@ Append to validation report:
 
 ### Scoring Summary
 
-**All scores ≥ 3:** {percentage}% ({count}/{total})
-**All scores ≥ 4:** {percentage}% ({count}/{total})
+**All scores >= 3:** {percentage}% ({count}/{total})
+**All scores >= 4:** {percentage}% ({count}/{total})
 **Overall Average Score:** {average}/5.0
 
 ### Scoring Table
@@ -176,31 +133,4 @@ FR Quality: {percentage}% with acceptable scores ({severity})
 
 **Proceeding to next validation check...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-11-holistic-quality-validation.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- All FRs extracted from PRD
-- Each FR scored on all 5 SMART criteria (1-5 scale)
-- FRs with scores < 3 flagged for improvement
-- Improvement suggestions provided for low-scoring FRs
-- Scoring table built with all FR scores
-- Overall quality assessment calculated
-- Findings reported to validation report
-- Auto-proceeds to next validation step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not scoring all FRs on all SMART criteria
-- Missing improvement suggestions for low-scoring FRs
-- Not building scoring table
-- Not calculating overall quality metrics
-- Not reporting findings to validation report
-- Not auto-proceeding
-
-**Master Rule:** FRs should be high-quality, not just present. SMART framework provides objective quality measure.
+Without delay, read fully and follow: {nextStepFile}

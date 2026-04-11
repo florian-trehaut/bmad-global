@@ -1,63 +1,25 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-08-domain-compliance-validation.md'
-prdFile: '{prd_file_path}'
-validationReportPath: '{validation_report_path}'
 ---
 
 # Step 7: Implementation Leakage Validation
 
-## STEP GOAL:
+## STEP GOAL
 
-Ensure Functional Requirements and Non-Functional Requirements don't include implementation details - they should specify WHAT, not HOW.
+Ensure Functional Requirements and Non-Functional Requirements don't include implementation details -- they should specify WHAT, not HOW.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Focus ONLY on implementation leakage detection
+- Distinguish capability-relevant terms from actual leakage
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
+- Attempt subprocess first, fall back to direct analysis if unavailable
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring analytical rigor and separation of concerns expertise
-- ✅ This step runs autonomously - no user input needed
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on implementation leakage detection
-- 🚫 FORBIDDEN to validate other aspects in this step
-- 💬 Approach: Systematic scanning for technology and implementation terms
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Scan FRs and NFRs for implementation terms
-- 💾 Distinguish capability-relevant vs leakage
-- 📖 Append findings to validation report
-- 📖 Display "Proceeding to next check..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: PRD file, validation report
-- Focus: Implementation leakage detection only
-- Limits: Don't validate other aspects, don't pause for user input
-- Dependencies: Steps 2-6 completed - initial validations done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Attempt Sub-Process Validation
 
-**Try to use Task tool to spawn a subprocess:**
+Try to use Task tool to spawn a subprocess:
 
 "Perform implementation leakage validation on this PRD:
 
@@ -76,43 +38,36 @@ Document violations with line numbers and explanation.
 
 Return structured findings with leakage counts and examples."
 
-### 2. Graceful Degradation (if Task tool unavailable)
+### 2. Direct Analysis (if Task tool unavailable)
 
 If Task tool unavailable, perform analysis directly:
 
 **Implementation leakage terms to scan for:**
 
-**Frontend Frameworks:**
-React, Vue, Angular, Svelte, Solid, Next.js, Nuxt, etc.
+**Frontend Frameworks:** React, Vue, Angular, Svelte, Solid, Next.js, Nuxt, etc.
 
-**Backend Frameworks:**
-Express, Django, Rails, Spring, Laravel, FastAPI, etc.
+**Backend Frameworks:** Express, Django, Rails, Spring, Laravel, FastAPI, etc.
 
-**Databases:**
-PostgreSQL, MySQL, MongoDB, Redis, DynamoDB, Cassandra, etc.
+**Databases:** PostgreSQL, MySQL, MongoDB, Redis, DynamoDB, Cassandra, etc.
 
-**Cloud Platforms:**
-AWS, GCP, Azure, Cloudflare, Vercel, Netlify, etc.
+**Cloud Platforms:** AWS, GCP, Azure, Cloudflare, Vercel, Netlify, etc.
 
-**Infrastructure:**
-Docker, Kubernetes, Terraform, Ansible, etc.
+**Infrastructure:** Docker, Kubernetes, Terraform, Ansible, etc.
 
-**Libraries:**
-Redux, Zustand, axios, fetch, lodash, jQuery, etc.
+**Libraries:** Redux, Zustand, axios, fetch, lodash, jQuery, etc.
 
-**Data Formats:**
-JSON, XML, YAML, CSV (unless capability-relevant)
+**Data Formats:** JSON, XML, YAML, CSV (unless capability-relevant)
 
 **For each term found in FRs/NFRs:**
 - Determine if it's capability-relevant or implementation leakage
 - Example: "API consumers can access data via REST endpoints" - API/REST is capability
 - Example: "React components fetch data using Redux" - implementation leakage
 
-**Count violations and note line numbers**
+Count violations and note line numbers.
 
 ### 3. Tally Implementation Leakage
 
-**By category:**
+By category:
 - Frontend framework leakage: count
 - Backend framework leakage: count
 - Database leakage: count
@@ -175,28 +130,4 @@ Total Violations: {count} ({severity})
 
 **Proceeding to next validation check...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-08-domain-compliance-validation.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- Scanned FRs and NFRs for all implementation term categories
-- Distinguished capability-relevant from implementation leakage
-- Violations documented with line numbers and explanations
-- Severity assessed correctly
-- Findings reported to validation report
-- Auto-proceeds to next validation step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not scanning all implementation term categories
-- Not distinguishing capability-relevant from leakage
-- Missing line numbers for violations
-- Not reporting findings to validation report
-- Not auto-proceeding
-
-**Master Rule:** Requirements specify WHAT, not HOW. Implementation details belong in architecture documents, not PRDs.
+Without delay, read fully and follow: {nextStepFile}

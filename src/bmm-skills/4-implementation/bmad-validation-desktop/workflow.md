@@ -32,9 +32,13 @@ Extract the following from the YAML frontmatter:
 
 ### 2. Load shared rules
 
-Read `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`.
+Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
 
-Apply these rules for the entire workflow execution. Key rule for this workflow: **real execution output only — code analysis is NEVER proof.**
+Apply these rules for the entire workflow execution. Key rules for this workflow:
+- **Real execution output only — code analysis is NEVER proof** (from no-fallback-no-false-data.md)
+- **Universal proof principles** (from validation-proof-principles.md)
+- **Intake protocol** (from validation-intake-protocol.md)
+- **Verdict protocol** (from validation-verdict-protocol.md)
 
 ### 3. Load stack knowledge (optional)
 

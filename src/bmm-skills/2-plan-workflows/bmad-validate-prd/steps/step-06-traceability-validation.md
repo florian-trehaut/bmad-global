@@ -1,63 +1,25 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-07-implementation-leakage-validation.md'
-prdFile: '{prd_file_path}'
-validationReportPath: '{validation_report_path}'
 ---
 
 # Step 6: Traceability Validation
 
-## STEP GOAL:
+## STEP GOAL
 
-Validate the traceability chain from Executive Summary → Success Criteria → User Journeys → Functional Requirements is intact, ensuring every requirement traces back to a user need or business objective.
+Validate the traceability chain from Executive Summary to Success Criteria to User Journeys to Functional Requirements is intact, ensuring every requirement traces back to a user need or business objective.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Focus ONLY on traceability chain validation
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
+- Identify orphan requirements (FRs with no traceable source)
+- Build traceability matrix as evidence
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring analytical rigor and traceability matrix expertise
-- ✅ This step runs autonomously - no user input needed
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on traceability chain validation
-- 🚫 FORBIDDEN to validate other aspects in this step
-- 💬 Approach: Systematic chain validation and orphan detection
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Build and validate traceability matrix
-- 💾 Identify broken chains and orphan requirements
-- 📖 Append findings to validation report
-- 📖 Display "Proceeding to next check..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: PRD file, validation report
-- Focus: Traceability chain validation only
-- Limits: Don't validate other aspects, don't pause for user input
-- Dependencies: Steps 2-5 completed - initial validations done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Attempt Sub-Process Validation
 
-**Try to use Task tool to spawn a subprocess:**
+Try to use Task tool to spawn a subprocess:
 
 "Perform traceability validation on this PRD:
 
@@ -68,10 +30,10 @@ Validate the traceability chain from Executive Summary → Success Criteria → 
 5. Extract Product Scope (in-scope items)
 
 **Validate chains:**
-- Executive Summary → Success Criteria: Does vision align with defined success?
-- Success Criteria → User Journeys: Are success criteria supported by user journeys?
-- User Journeys → Functional Requirements: Does each FR trace back to a user journey?
-- Scope → FRs: Do MVP scope FRs align with in-scope items?
+- Executive Summary to Success Criteria: Does vision align with defined success?
+- Success Criteria to User Journeys: Are success criteria supported by user journeys?
+- User Journeys to Functional Requirements: Does each FR trace back to a user journey?
+- Scope to FRs: Do MVP scope FRs align with in-scope items?
 
 **Identify orphans:**
 - FRs not traceable to any user journey or business objective
@@ -82,37 +44,37 @@ Build traceability matrix and identify broken chains and orphan FRs.
 
 Return structured findings with chain status and orphan list."
 
-### 2. Graceful Degradation (if Task tool unavailable)
+### 2. Direct Analysis (if Task tool unavailable)
 
 If Task tool unavailable, perform analysis directly:
 
-**Step 1: Extract key elements**
+**Extract key elements:**
 - Executive Summary: Note vision, goals, objectives
 - Success Criteria: List all criteria
 - User Journeys: List user types and their flows
 - Functional Requirements: List all FRs
 - Product Scope: List in-scope items
 
-**Step 2: Validate Executive Summary → Success Criteria**
+**Validate Executive Summary to Success Criteria:**
 - Does Executive Summary mention the success dimensions?
 - Are Success Criteria aligned with vision?
 - Note any misalignment
 
-**Step 3: Validate Success Criteria → User Journeys**
+**Validate Success Criteria to User Journeys:**
 - For each success criterion, is there a user journey that achieves it?
 - Note success criteria without supporting journeys
 
-**Step 4: Validate User Journeys → FRs**
+**Validate User Journeys to FRs:**
 - For each user journey/flow, are there FRs that enable it?
 - List FRs with no clear user journey origin
 - Note orphan FRs (requirements without traceable source)
 
-**Step 5: Validate Scope → FR Alignment**
+**Validate Scope to FR Alignment:**
 - Does MVP scope align with essential FRs?
 - Are in-scope items supported by FRs?
 - Note misalignments
 
-**Step 6: Build traceability matrix**
+**Build traceability matrix:**
 - Map each FR to its source (journey or business objective)
 - Note orphan FRs
 - Identify broken chains
@@ -120,10 +82,10 @@ If Task tool unavailable, perform analysis directly:
 ### 3. Tally Traceability Issues
 
 **Broken chains:**
-- Executive Summary → Success Criteria gaps: count
-- Success Criteria → User Journeys gaps: count
-- User Journeys → FRs gaps: count
-- Scope → FR misalignments: count
+- Executive Summary to Success Criteria gaps: count
+- Success Criteria to User Journeys gaps: count
+- User Journeys to FRs gaps: count
+- Scope to FR misalignments: count
 
 **Orphan elements:**
 - Orphan FRs (no traceable source): count
@@ -141,16 +103,16 @@ Append to validation report:
 
 ### Chain Validation
 
-**Executive Summary → Success Criteria:** [Intact/Gaps Identified]
+**Executive Summary to Success Criteria:** [Intact/Gaps Identified]
 {If gaps: List specific misalignments}
 
-**Success Criteria → User Journeys:** [Intact/Gaps Identified]
+**Success Criteria to User Journeys:** [Intact/Gaps Identified]
 {If gaps: List unsupported success criteria}
 
-**User Journeys → Functional Requirements:** [Intact/Gaps Identified]
+**User Journeys to Functional Requirements:** [Intact/Gaps Identified]
 {If gaps: List journeys without supporting FRs}
 
-**Scope → FR Alignment:** [Intact/Misaligned]
+**Scope to FR Alignment:** [Intact/Misaligned]
 {If misaligned: List specific issues}
 
 ### Orphan Elements
@@ -186,29 +148,4 @@ Total Issues: {count} ({severity})
 
 **Proceeding to next validation check...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-07-implementation-leakage-validation.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- All traceability chains validated systematically
-- Orphan FRs identified with numbers
-- Broken chains documented
-- Traceability matrix built
-- Severity assessed correctly
-- Findings reported to validation report
-- Auto-proceeds to next validation step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not validating all traceability chains
-- Missing orphan FR detection
-- Not building traceability matrix
-- Not reporting findings to validation report
-- Not auto-proceeding
-
-**Master Rule:** Every requirement should trace to a user need or business objective. Orphan FRs indicate broken traceability that must be fixed.
+Without delay, read fully and follow: {nextStepFile}

@@ -1,63 +1,25 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-06-traceability-validation.md'
-prdFile: '{prd_file_path}'
-validationReportPath: '{validation_report_path}'
 ---
 
 # Step 5: Measurability Validation
 
-## STEP GOAL:
+## STEP GOAL
 
 Validate that all Functional Requirements (FRs) and Non-Functional Requirements (NFRs) are measurable, testable, and follow proper format without implementation details.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Focus ONLY on FR and NFR measurability
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
+- Validate each requirement individually, not in aggregate
+- Attempt subprocess first, fall back to direct analysis if unavailable
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring analytical rigor and requirements engineering expertise
-- ✅ This step runs autonomously - no user input needed
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on FR and NFR measurability
-- 🚫 FORBIDDEN to validate other aspects in this step
-- 💬 Approach: Systematic requirement-by-requirement analysis
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Extract all FRs and NFRs from PRD
-- 💾 Validate each for measurability and format
-- 📖 Append findings to validation report
-- 📖 Display "Proceeding to next check..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: PRD file, validation report
-- Focus: FR and NFR measurability only
-- Limits: Don't validate other aspects, don't pause for user input
-- Dependencies: Steps 2-4 completed - initial validation checks done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Attempt Sub-Process Validation
 
-**Try to use Task tool to spawn a subprocess:**
+Try to use Task tool to spawn a subprocess:
 
 "Perform measurability validation on this PRD:
 
@@ -80,7 +42,7 @@ Validate that all Functional Requirements (FRs) and Non-Functional Requirements 
 
 Return structured findings with violation counts and examples."
 
-### 2. Graceful Degradation (if Task tool unavailable)
+### 2. Direct Analysis (if Task tool unavailable)
 
 If Task tool unavailable, perform analysis directly:
 
@@ -198,28 +160,4 @@ Total Violations: {count} ({severity})
 
 **Proceeding to next validation check...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-06-traceability-validation.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- All FRs extracted and analyzed for measurability
-- All NFRs extracted and analyzed for measurability
-- Violations documented with line numbers
-- Severity assessed correctly
-- Findings reported to validation report
-- Auto-proceeds to next validation step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not analyzing all FRs and NFRs
-- Missing line numbers for violations
-- Not reporting findings to validation report
-- Not assessing severity
-- Not auto-proceeding
-
-**Master Rule:** Requirements must be testable to be useful. Validate every requirement for measurability, document violations, auto-proceed.
+Without delay, read fully and follow: {nextStepFile}

@@ -28,6 +28,7 @@ Read the corresponding template from `../templates/{name}-template.md`.
 | investigation-checklist.md | investigation-checklist-template.md |
 | domain-glossary.md | domain-glossary-template.md |
 | api-surface.md | api-surface-template.md |
+| validation.md | validation-template.md |
 
 #### b. Compute Source Hash
 
@@ -45,6 +46,7 @@ Identify key source files for this knowledge type:
 | conventions.md | .editorconfig, lint configs, git log patterns |
 | domain-glossary.md | entity/model files, schema files |
 | api-surface.md | route/controller files, OpenAPI specs |
+| validation.md | playwright.config.*, cypress.config.*, vitest.config.*, Cargo.toml (test deps) |
 
 ```bash
 cat {source_files} 2>/dev/null | md5 | cut -c1-8

@@ -6,6 +6,7 @@ Compile the final verdict, compose a structured tracker comment, post the commen
 
 ## RULES
 
+- Load `~/.claude/skills/bmad-shared/validation-verdict-protocol.md` and apply its protocol as baseline rules for this step
 - The verdict is BINARY: ALL PASS = PASS / ANY FAIL = FAIL
 - Load `../data/tracker-comment-template.md` for the comment format
 - NEVER move to "Done" an issue with a failed VM item

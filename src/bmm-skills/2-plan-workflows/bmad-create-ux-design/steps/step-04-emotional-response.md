@@ -1,58 +1,33 @@
+---
+nextStepFile: './step-05-inspiration.md'
+---
+
 # Step 4: Desired Emotional Response
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## STEP GOAL
 
-- 🛑 NEVER generate content without user input
+Define the desired emotional responses users should feel when using the product. Map emotional goals to specific UX design choices.
 
-- 📖 CRITICAL: ALWAYS read the complete step file before taking any action - partial understanding leads to incomplete decisions
-- 🔄 CRITICAL: When loading next step with 'C', ensure the entire file is read and understood before proceeding
-- ✅ ALWAYS treat this as collaborative discovery between UX facilitator and stakeholder
-- 📋 YOU ARE A UX FACILITATOR, not a content generator
-- 💬 FOCUS on defining desired emotional responses and user feelings
-- 🎯 COLLABORATIVE discovery, not assumption-based design
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-- ✅ YOU MUST ALWAYS WRITE all artifact and document content in `{document_output_language}`
+## RULES
 
-## EXECUTION PROTOCOLS:
+- Build on core experience definition from step 3
+- FORBIDDEN: generating content without user input or confirmation
+- Present A/P/C menu after content generation
+- Write document content in `{DOCUMENT_OUTPUT_LANGUAGE}`
 
-- 🎯 Show your analysis before taking any action
-- ⚠️ Present A/P/C menu after generating emotional response content
-- 💾 ONLY save when user chooses C (Continue)
-- 📖 Update output file frontmatter, adding this step to the end of the list of stepsCompleted.
-- 🚫 FORBIDDEN to load next step until C is selected
+## COLLABORATION MENU (A/P/C)
 
-## COLLABORATION MENUS (A/P/C):
+- **A (Advanced Elicitation)**: Invoke `bmad-advanced-elicitation` for deeper emotional insights
+- **P (Party Mode)**: Invoke `bmad-party-mode` for multiple perspectives on emotional needs
+- **C (Continue)**: Save content and proceed to next step
 
-This step will generate content and present choices:
+Protocols always return to this step's A/P/C menu. User accepts/rejects protocol changes before proceeding.
 
-- **A (Advanced Elicitation)**: Use discovery protocols to develop deeper emotional insights
-- **P (Party Mode)**: Bring multiple perspectives to define optimal emotional responses
-- **C (Continue)**: Save the content to the document and proceed to next step
-
-## PROTOCOL INTEGRATION:
-
-- When 'A' selected: Invoke the `bmad-advanced-elicitation` skill
-- When 'P' selected: Invoke the `bmad-party-mode` skill
-- PROTOCOLS always return to this step's A/P/C menu
-- User accepts/rejects protocol changes before proceeding
-
-## CONTEXT BOUNDARIES:
-
-- Current document and frontmatter from previous steps are available
-- Core experience definition from step 3 informs emotional response
-- No additional data files needed for this step
-- Focus on user feelings and emotional design goals
-
-## YOUR TASK:
-
-Define the desired emotional responses users should feel when using the product.
-
-## EMOTIONAL RESPONSE DISCOVERY SEQUENCE:
+## SEQUENCE
 
 ### 1. Explore Core Emotional Goals
 
-Start by understanding the emotional objectives:
-"Now let's think about how {{project_name}} should make users feel.
+"Now let's think about how {project_name} should make users feel.
 
 **Emotional Response Questions:**
 
@@ -65,18 +40,16 @@ Common emotional goals: Empowered and in control? Delighted and surprised? Effic
 
 ### 2. Identify Emotional Journey Mapping
 
-Explore feelings at different stages:
 "**Emotional Journey Considerations:**
 
 - How should users feel when they first discover the product?
 - What emotion during the core experience/action?
 - How should they feel after completing their task?
-- What if something goes wrong - what emotional response do we want?
+- What if something goes wrong -- what emotional response do we want?
 - How should they feel when returning to use it again?"
 
 ### 3. Define Micro-Emotions
 
-Surface subtle but important emotional states:
 "**Micro-Emotions to Consider:**
 
 - Confidence vs. Confusion
@@ -90,7 +63,6 @@ Which of these emotional states are most critical for your product's success?"
 
 ### 4. Connect Emotions to UX Decisions
 
-Link feelings to design implications:
 "**Design Implications:**
 
 - If we want users to feel [emotional state], what UX choices support this?
@@ -99,15 +71,13 @@ Link feelings to design implications:
 - How do we build trust and confidence through design?
 
 **Emotion-Design Connections:**
-
-- [Emotion 1] → [UX design approach]
-- [Emotion 2] → [UX design approach]
-- [Emotion 3] → [UX design approach]"
+- [Emotion 1] -> [UX design approach]
+- [Emotion 2] -> [UX design approach]
+- [Emotion 3] -> [UX design approach]"
 
 ### 5. Validate Emotional Goals
 
-Check if emotional goals align with product vision:
-"Let me make sure I understand the emotional vision for {{project_name}}:
+"Let me make sure I understand the emotional vision for {project_name}:
 
 **Primary Emotional Goal:** [Summarize main emotional response]
 **Secondary Feelings:** [List supporting emotional states]
@@ -117,11 +87,7 @@ Does this capture the emotional experience you want to create? Any adjustments n
 
 ### 6. Generate Emotional Response Content
 
-Prepare the content to append to the document:
-
-#### Content Structure:
-
-When saving to document, append these Level 2 and Level 3 sections:
+Prepare content to append to the document:
 
 ```markdown
 ## Desired Emotional Response
@@ -149,72 +115,18 @@ When saving to document, append these Level 2 and Level 3 sections:
 
 ### 7. Present Content and Menu
 
-Show the generated emotional response content and present choices:
-"I've defined the desired emotional responses for {{project_name}}. These emotional goals will guide our design decisions to create the right user experience.
+"I've defined the desired emotional responses for {project_name}. These emotional goals will guide our design decisions.
 
 **Here's what I'll add to the document:**
-
-[Show the complete markdown content from step 6]
+[Show the complete markdown content]
 
 **What would you like to do?**
-[A] Advanced Elicitation - Let's refine the emotional response definition
+[A] Advanced Elicitation - Refine the emotional response definition
 [P] Party Mode - Bring different perspectives on user emotional needs
-[C] Continue - Save this to the document and move to inspiration analysis"
+[C] Continue - Save this and move to inspiration analysis"
 
 ### 8. Handle Menu Selection
 
-#### If 'A' (Advanced Elicitation):
-
-- Invoke the `bmad-advanced-elicitation` skill with the current emotional response content
-- Process the enhanced emotional insights that come back
-- Ask user: "Accept these improvements to the emotional response definition? (y/n)"
-- If yes: Update content with improvements, then return to A/P/C menu
-- If no: Keep original content, then return to A/P/C menu
-
-#### If 'P' (Party Mode):
-
-- Invoke the `bmad-party-mode` skill with the current emotional response definition
-- Process the collaborative emotional insights that come back
-- Ask user: "Accept these changes to the emotional response definition? (y/n)"
-- If yes: Update content with improvements, then return to A/P/C menu
-- If no: Keep original content, then return to A/P/C menu
-
-#### If 'C' (Continue):
-
-- Append the final content to `{planning_artifacts}/ux-design-specification.md`
-- Update frontmatter: append step to end of stepsCompleted array
-- Load `./step-05-inspiration.md`
-
-## APPEND TO DOCUMENT:
-
-When user selects 'C', append the content directly to the document using the structure from step 6.
-
-## SUCCESS METRICS:
-
-✅ Primary emotional goals clearly defined
-✅ Emotional journey mapped across user experience
-✅ Micro-emotions identified and addressed
-✅ Design implications connected to emotional responses
-✅ Emotional design principles established
-✅ A/P/C menu presented and handled correctly
-✅ Content properly appended to document when C selected
-
-## FAILURE MODES:
-
-❌ Missing core emotional goals or being too generic
-❌ Not considering emotional journey across different stages
-❌ Overlooking micro-emotions that impact user satisfaction
-❌ Not connecting emotional goals to specific UX design choices
-❌ Emotional principles too vague or not actionable
-❌ Not presenting A/P/C menu after content generation
-❌ Appending content without user selecting 'C'
-
-❌ **CRITICAL**: Reading only partial step file - leads to incomplete understanding and poor decisions
-❌ **CRITICAL**: Proceeding with 'C' without fully reading and understanding the next step file
-❌ **CRITICAL**: Making decisions without complete understanding of step requirements and protocols
-
-## NEXT STEP:
-
-After user selects 'C' and content is saved to document, load `./step-05-inspiration.md` to analyze UX patterns from inspiring products.
-
-Remember: Do NOT proceed to step-05 until user explicitly selects 'C' from the A/P/C menu and content is saved!
+- **A**: Invoke `bmad-advanced-elicitation`, process insights, confirm with user, return to menu
+- **P**: Invoke `bmad-party-mode`, process insights, confirm with user, return to menu
+- **C**: Append content to `{planning_artifacts}/ux-design-specification.md`, update frontmatter `stepsCompleted`, load {nextStepFile}

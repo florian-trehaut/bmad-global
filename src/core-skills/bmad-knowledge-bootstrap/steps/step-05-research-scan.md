@@ -98,6 +98,33 @@ If `environment-config.md` in TARGET_FILES:
 - Read deployment configs for environment URLs
 - Check for feature flag systems
 
+### 9. Validation Scan (for validation.md)
+
+If `validation.md` in TARGET_FILES:
+
+- Read E2E config files (playwright.config, cypress.config) → baseURL, projects, webServer config
+- Read component test config → test roots, environment, reporters
+- Scan for stack-specific test helper patterns:
+
+Use `source_extensions` from step 03 to scope searches:
+
+```bash
+# WASM hydration / Tauri / framework-specific patterns
+grep -rn "gotoAndHydrate\|waitForHydration\|mockIPC\|wasm_bindgen_test\|tauri_driver" --include="{source_ext}" . | grep -v node_modules | head -10
+
+# Test factories and fixtures
+find . -maxdepth 4 -type d \( -name "fixtures" -o -name "factories" -o -name "helpers" \) -path "*/test*" 2>/dev/null | head -10
+
+# Accessibility test patterns
+grep -rn "checkA11y\|axe\|pa11y\|getByRole\|getByLabel" --include="{source_ext}" . | grep -v node_modules | head -10
+```
+
+- If Rust+WASM detected: check for `wasm-pack test` configuration, `wasm-bindgen-test` usage
+- If Tauri detected: check for `tauri-driver` setup, WebDriver config files
+- If Leptos/Yew/Dioxus detected: check for hydration-aware test patterns
+- Identify test file naming and location patterns from existing test files
+- Extract dev server command from package.json scripts or Cargo config
+
 ### 9. ADR Discovery Scan
 
 Detect Architecture Decision Records in the project. ADRs constrain how all workflows make decisions — their location must be known.

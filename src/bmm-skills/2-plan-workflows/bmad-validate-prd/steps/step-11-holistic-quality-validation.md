@@ -1,65 +1,25 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-12-completeness-validation.md'
-prdFile: '{prd_file_path}'
-validationReportPath: '{validation_report_path}'
 ---
 
 # Step 11: Holistic Quality Assessment
 
-## STEP GOAL:
+## STEP GOAL
 
-Assess the PRD as a cohesive, compelling document - evaluating document flow, dual audience effectiveness (humans and LLMs), BMAD PRD principles compliance, and overall quality rating.
+Assess the PRD as a cohesive, compelling document -- evaluating document flow, dual audience effectiveness (humans and LLMs), BMAD PRD principles compliance, and overall quality rating.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Evaluate the WHOLE document, not individual components (done in previous steps)
+- Use Advanced Elicitation for multi-perspective evaluation when available
+- Assign overall quality rating on 1-5 scale
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-- ✅ YOU MUST ALWAYS WRITE all artifact and document content in `{document_output_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring analytical rigor and document quality expertise
-- ✅ This step runs autonomously - no user input needed
-- ✅ Uses Advanced Elicitation for multi-perspective evaluation
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on holistic document quality assessment
-- 🚫 FORBIDDEN to validate individual components (done in previous steps)
-- 💬 Approach: Multi-perspective evaluation using Advanced Elicitation
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Use Advanced Elicitation for multi-perspective assessment
-- 🎯 Evaluate document flow, dual audience, BMAD principles
-- 💾 Append comprehensive assessment to validation report
-- 📖 Display "Proceeding to next check..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: Complete PRD file, validation report with findings from steps 1-10
-- Focus: Holistic quality - the WHOLE document
-- Limits: Don't re-validate individual components, don't pause for user input
-- Dependencies: Steps 1-10 completed - all systematic checks done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Attempt Sub-Process with Advanced Elicitation
 
-**Try to use Task tool to spawn a subprocess using Advanced Elicitation:**
+Try to use Task tool to spawn a subprocess using Advanced Elicitation:
 
 "Perform holistic quality assessment on this PRD using multi-perspective evaluation:
 
@@ -70,10 +30,10 @@ Invoke the `bmad-advanced-elicitation` skill
 
 **1. Document Flow & Coherence:**
 - Read entire PRD
-- Evaluate narrative flow - does it tell a cohesive story?
+- Evaluate narrative flow -- does it tell a cohesive story?
 - Check transitions between sections
-- Assess consistency - is it coherent throughout?
-- Evaluate readability - is it clear and well-organized?
+- Assess consistency -- is it coherent throughout?
+- Evaluate readability -- is it clear and well-organized?
 
 **2. Dual Audience Effectiveness:**
 
@@ -111,18 +71,11 @@ Identify the 3 most impactful improvements to make this a great PRD
 
 Return comprehensive assessment with all perspectives, rating, and top 3 improvements."
 
-**Graceful degradation (if no Task tool or Advanced Elicitation unavailable):**
-- Perform holistic assessment directly in current context
-- Read complete PRD
-- Evaluate document flow, coherence, transitions
-- Assess dual audience effectiveness
-- Check BMAD principles compliance
-- Assign overall quality rating
-- Identify top 3 improvements
+If no Task tool or Advanced Elicitation unavailable, perform holistic assessment directly: read complete PRD, evaluate document flow, assess dual audience effectiveness, check BMAD principles, assign quality rating, identify top 3 improvements.
 
 ### 2. Synthesize Assessment
 
-**Compile findings from multi-perspective evaluation:**
+Compile findings from multi-perspective evaluation:
 
 **Document Flow & Coherence:**
 - Overall assessment: [Excellent/Good/Adequate/Needs Work/Problematic]
@@ -229,33 +182,4 @@ Overall Rating: {rating}/5 - {label}
 
 **Proceeding to final validation checks...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-12-completeness-validation.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- Advanced Elicitation used for multi-perspective evaluation (or graceful degradation)
-- Document flow & coherence assessed
-- Dual audience effectiveness evaluated (humans and LLMs)
-- BMAD PRD principles compliance checked
-- Overall quality rating assigned (1-5 scale)
-- Top 3 improvements identified
-- Comprehensive assessment reported to validation report
-- Auto-proceeds to next validation step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not using Advanced Elicitation for multi-perspective evaluation
-- Missing document flow assessment
-- Missing dual audience evaluation
-- Not checking all BMAD principles
-- Not assigning overall quality rating
-- Missing top 3 improvements
-- Not reporting comprehensive assessment to validation report
-- Not auto-proceeding
-
-**Master Rule:** This evaluates the WHOLE document, not just components. Answers "Is this a good PRD?" and "What would make it great?"
+Without delay, read fully and follow: {nextStepFile}

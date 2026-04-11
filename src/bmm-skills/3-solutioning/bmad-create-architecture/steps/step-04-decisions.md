@@ -1,104 +1,64 @@
+---
+nextStepFile: './step-05-patterns.md'
+---
+
 # Step 4: Core Architectural Decisions
 
-## MANDATORY EXECUTION RULES (READ FIRST):
-
-- 🛑 NEVER generate content without user input
-
-- 📖 CRITICAL: ALWAYS read the complete step file before taking any action - partial understanding leads to incomplete decisions
-- 🔄 CRITICAL: When loading next step with 'C', ensure the entire file is read and understood before proceeding
-- ✅ ALWAYS treat this as collaborative discovery between architectural peers
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- 💬 FOCUS on making critical architectural decisions collaboratively
-- 🌐 ALWAYS search the web to verify current technology versions
-- ⚠️ ABSOLUTELY NO TIME ESTIMATES - AI development speed has fundamentally changed
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Show your analysis before taking any action
-- 🌐 Search the web to verify technology versions and options
-- ⚠️ Present A/P/C menu after each major decision category
-- 💾 ONLY save when user chooses C (Continue)
-- 📖 Update frontmatter `stepsCompleted: [1, 2, 3, 4]` before loading next step
-- 🚫 FORBIDDEN to load next step until C is selected
-
-## COLLABORATION MENUS (A/P/C):
-
-This step will generate content and present choices for each decision category:
-
-- **A (Advanced Elicitation)**: Use discovery protocols to explore innovative approaches to specific decisions
-- **P (Party Mode)**: Bring multiple perspectives to evaluate decision trade-offs
-- **C (Continue)**: Save the current decisions and proceed to next decision category
-
-## PROTOCOL INTEGRATION:
-
-- When 'A' selected: Invoke the `bmad-advanced-elicitation` skill
-- When 'P' selected: Invoke the `bmad-party-mode` skill
-- PROTOCOLS always return to display this step's A/P/C menu after the A or P have completed
-- User accepts/rejects protocol changes before proceeding
-
-## CONTEXT BOUNDARIES:
-
-- Project context from step 2 is available
-- Starter template choice from step 3 is available
-- Project context file may contain technical preferences and rules
-- Technical preferences discovered in step 3 are available
-- Focus on decisions not already made by starter template or existing preferences
-- Collaborative decision making, not recommendations
-
-## YOUR TASK:
+## STEP GOAL
 
 Facilitate collaborative architectural decision making, leveraging existing technical preferences and starter template decisions, focusing on remaining choices critical to the project's success.
 
-## DECISION MAKING SEQUENCE:
+## RULES
 
-### 1. Load Decision Framework & Check Existing Preferences
+- Read the complete step file before taking any action
+- ALWAYS search the web to verify current technology versions
+- You are a facilitator -- collaborative decision making, not recommendations
+- Focus on decisions not already made by starter template or existing preferences
+- NEVER generate content without user input
+- Present A/P/C menu after each major decision category
+- Communicate in `{COMMUNICATION_LANGUAGE}`
 
-**Review Technical Preferences from Step 3:**
-"Based on our technical preferences discussion in step 3, let's build on those foundations:
+## COLLABORATION MENU (A/P/C)
 
-**Your Technical Preferences:**
-{{user_technical_preferences_from_step_3}}
+After generating content, present:
 
-**Starter Template Decisions:**
-{{starter_template_decisions}}
+- **A (Advanced Elicitation)**: invoke `bmad-advanced-elicitation` to explore innovative approaches to specific decisions
+- **P (Party Mode)**: invoke `bmad-party-mode` to evaluate decision trade-offs from multiple perspectives
+- **C (Continue)**: save content to document and proceed
 
-**Project Context Technical Rules:**
-{{project_context_technical_rules}}"
+Protocols always return to this step's A/P/C menu after completion. User accepts/rejects protocol changes before proceeding.
 
-**Identify Remaining Decisions:**
-Based on technical preferences, starter template choice, and project context, identify remaining critical decisions:
+## SEQUENCE
 
-**Already Decided (Don't re-decide these):**
+### 1. Load Decision Framework and Check Existing Preferences
 
-- {{starter_template_decisions}}
-- {{user_technology_preferences}}
-- {{project_context_technical_rules}}
+Review and present:
+- User technical preferences from Step 3
+- Starter template decisions already made
+- Project context technical rules
 
-**Critical Decisions:** Must be decided before implementation can proceed
-**Important Decisions:** Shape the architecture significantly
-**Nice-to-Have:** Can be deferred if needed
+Identify remaining critical decisions. Categorize as:
+- **Critical Decisions:** must be decided before implementation can proceed
+- **Important Decisions:** shape the architecture significantly
+- **Nice-to-Have:** can be deferred if needed
 
 ### 2. Decision Categories by Priority
 
 #### Category 1: Data Architecture
-
 - Database choice (if not determined by starter)
 - Data modeling approach
 - Data validation strategy
 - Migration approach
 - Caching strategy
 
-#### Category 2: Authentication & Security
-
+#### Category 2: Authentication and Security
 - Authentication method
 - Authorization patterns
 - Security middleware
 - Data encryption approach
 - API security strategy
 
-#### Category 3: API & Communication
-
+#### Category 3: API and Communication
 - API design patterns (REST, GraphQL, etc.)
 - API documentation approach
 - Error handling standards
@@ -106,15 +66,13 @@ Based on technical preferences, starter template choice, and project context, id
 - Communication between services
 
 #### Category 4: Frontend Architecture (if applicable)
-
 - State management approach
 - Component architecture
 - Routing strategy
 - Performance optimization
 - Bundle optimization
 
-#### Category 5: Infrastructure & Deployment
-
+#### Category 5: Infrastructure and Deployment
 - Hosting strategy
 - CI/CD pipeline approach
 - Environment configuration
@@ -123,105 +81,56 @@ Based on technical preferences, starter template choice, and project context, id
 
 ### 3. Facilitate Each Decision Category
 
-For each category, facilitate collaborative decision making:
+For each category, facilitate collaborative decision making.
 
-**Present the Decision:**
-Based on user skill level and project context:
+**Present the Decision** adapted to user skill level:
 
-**Expert Mode:**
-"{{Decision_Category}}: {{Specific_Decision}}
+**Expert:** Concise option list with tradeoffs, ask for preference.
+**Intermediate:** Options with brief explanations, lean toward a recommendation with reasoning.
+**Beginner:** Educational context, real-world analogy, friendly options with pros/cons, clear suggestion.
 
-Options: {{concise_option_list_with_tradeoffs}}
+**Verify Technology Versions:** Search the web for latest stable/LTS versions when decisions involve specific technology.
 
-What's your preference for this decision?"
-
-**Intermediate Mode:**
-"Next decision: {{Human_Friendly_Category}}
-
-We need to choose {{Specific_Decision}}.
-
-Common options:
-{{option_list_with_brief_explanations}}
-
-For your project, I'd lean toward {{recommendation}} because {{reason}}. What are your thoughts?"
-
-**Beginner Mode:**
-"Let's talk about {{Human_Friendly_Category}}.
-
-{{Educational_Context_About_Why_This_Matters}}
-
-Think of it like {{real_world_analogy}}.
-
-Your main options:
-{{friendly_options_with_pros_cons}}
-
-My suggestion: {{recommendation}}
-This is good for you because {{beginner_friendly_reason}}.
-
-What feels right to you?"
-
-**Verify Technology Versions:**
-If decision involves specific technology:
-
-```
-Search the web: "{{technology}} latest stable version"
-Search the web: "{{technology}} current LTS version"
-Search the web: "{{technology}} production readiness"
-```
-
-**Get User Input:**
-"What's your preference? (or 'explain more' for details)"
+**Get User Input:** "What is your preference? (or 'explain more' for details)"
 
 **Handle User Response:**
-
-- If user wants more info: Provide deeper explanation
-- If user has preference: Discuss implications and record decision
-- If user wants alternatives: Explore other options
+- If user wants more info: provide deeper explanation
+- If user has preference: discuss implications and record decision
+- If user wants alternatives: explore other options
 
 **Record the Decision:**
-
-- Category: {{category}}
-- Decision: {{user_choice}}
-- Version: {{verified_version_if_applicable}}
-- Rationale: {{user_reasoning_or_default}}
-- Affects: {{components_or_epics}}
-- Provided by Starter: {{yes_if_from_starter}}
+- Category, Decision, Version (if applicable), Rationale, Affected components, Provided by Starter (yes/no)
 
 ### 4. ADR Trigger Check
 
 After each critical or important decision, check if the project uses ADRs (check `adr_location` from workflow-context.md if available).
 
-<check if="adr_location is set and not 'none'">
-  For each critical decision — **HALT.** Present the menu:
+If `adr_location` is set and not 'none', for each critical decision -- HALT and present:
 
-  > This decision (**{decision_name}**) is a significant architectural choice that should be recorded as an Architecture Decision Record.
-  >
-  > **[A]** Create ADR now (invoke `bmad-create-adr`)
-  > **[S]** Skip — will create ADR later
-  > **[N]** Not needed — already covered by architecture doc
+> This decision ({decision_name}) is a significant architectural choice that should be recorded as an Architecture Decision Record.
+>
+> **[A]** Create ADR now (invoke `bmad-create-adr`)
+> **[S]** Skip -- will create ADR later
+> **[N]** Not needed -- already covered by architecture doc
 
-  WAIT for user selection.
+WAIT for user selection.
 
-  - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume.
-  - **IF S or N:** Log the user's choice and proceed to the next decision.
+- **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume.
+- **IF S or N:** Log the user's choice and proceed to the next decision.
 
-  **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
-</check>
+NEVER silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
 ### 5. Check for Cascading Implications
 
 After each major decision, identify related decisions:
 
-"This choice means we'll also need to decide:
-
-- {{related_decision_1}}
-- {{related_decision_2}}"
+"This choice means we will also need to decide:
+- {related_decision_1}
+- {related_decision_2}"
 
 ### 6. Generate Decisions Content
 
-After facilitating all decision categories, prepare the content to append:
-
-#### Content Structure:
+After facilitating all decision categories, prepare content to append:
 
 ```markdown
 ## Core Architectural Decisions
@@ -229,111 +138,67 @@ After facilitating all decision categories, prepare the content to append:
 ### Decision Priority Analysis
 
 **Critical Decisions (Block Implementation):**
-{{critical_decisions_made}}
+{critical_decisions_made}
 
 **Important Decisions (Shape Architecture):**
-{{important_decisions_made}}
+{important_decisions_made}
 
 **Deferred Decisions (Post-MVP):**
-{{decisions_deferred_with_rationale}}
+{decisions_deferred_with_rationale}
 
 ### Data Architecture
 
-{{data_related_decisions_with_versions_and_rationale}}
+{data_related_decisions_with_versions_and_rationale}
 
-### Authentication & Security
+### Authentication and Security
 
-{{security_related_decisions_with_versions_and_rationale}}
+{security_related_decisions_with_versions_and_rationale}
 
-### API & Communication Patterns
+### API and Communication Patterns
 
-{{api_related_decisions_with_versions_and_rationale}}
+{api_related_decisions_with_versions_and_rationale}
 
 ### Frontend Architecture
 
-{{frontend_related_decisions_with_versions_and_rationale}}
+{frontend_related_decisions_with_versions_and_rationale}
 
-### Infrastructure & Deployment
+### Infrastructure and Deployment
 
-{{infrastructure_related_decisions_with_versions_and_rationale}}
+{infrastructure_related_decisions_with_versions_and_rationale}
 
 ### Decision Impact Analysis
 
 **Implementation Sequence:**
-{{ordered_list_of_decisions_for_implementation}}
+{ordered_list_of_decisions_for_implementation}
 
 **Cross-Component Dependencies:**
-{{how_decisions_affect_each_other}}
+{how_decisions_affect_each_other}
 ```
 
 ### 7. Present Content and Menu
 
-Show the generated decisions content and present choices:
+"I have documented all the core architectural decisions we made together.
 
-"I've documented all the core architectural decisions we've made together.
+**Here is what I will add to the document:**
 
-**Here's what I'll add to the document:**
-
-[Show the complete markdown content from step 5]
+[Show the complete markdown content from step 6]
 
 **What would you like to do?**
-[A] Advanced Elicitation - Explore innovative approaches to any specific decisions
-[P] Party Mode - Review decisions from multiple perspectives
-[C] Continue - Save these decisions and move to implementation patterns"
+[A] Advanced Elicitation - explore innovative approaches to any specific decisions
+[P] Party Mode - review decisions from multiple perspectives
+[C] Continue - save these decisions and move to implementation patterns"
 
 ### 8. Handle Menu Selection
 
-#### If 'A' (Advanced Elicitation):
+**If 'A':** Invoke `bmad-advanced-elicitation` with specific decision categories. Process enhanced insights. Ask user to accept/reject, then return to A/P/C menu.
 
-- Invoke the `bmad-advanced-elicitation` skill with specific decision categories
-- Process enhanced insights about particular decisions
-- Ask user: "Accept these enhancements to the architectural decisions? (y/n)"
-- If yes: Update content, then return to A/P/C menu
-- If no: Keep original content, then return to A/P/C menu
+**If 'P':** Invoke `bmad-party-mode` with architectural decisions context. Process collaborative insights. Ask user to accept/reject, then return to A/P/C menu.
 
-#### If 'P' (Party Mode):
-
-- Invoke the `bmad-party-mode` skill with architectural decisions context
-- Process collaborative insights about decision trade-offs
-- Ask user: "Accept these changes to the architectural decisions? (y/n)"
-- If yes: Update content, then return to A/P/C menu
-- If no: Keep original content, then return to A/P/C menu
-
-#### If 'C' (Continue):
-
-- Append the final content to `{planning_artifacts}/architecture.md`
+**If 'C':**
+- Append final content to `{planning_artifacts}/architecture.md`
 - Update frontmatter: `stepsCompleted: [1, 2, 3, 4]`
-- Load `./step-05-patterns.md`
+- Load and execute `{nextStepFile}`
 
-## APPEND TO DOCUMENT:
+## NEXT STEP
 
-When user selects 'C', append the content directly to the document using the structure from step 5.
-
-## SUCCESS METRICS:
-
-✅ All critical architectural decisions made collaboratively
-✅ Technology versions verified using web search
-✅ Decision rationale clearly documented
-✅ Cascading implications identified and addressed
-✅ User provided appropriate level of explanation for skill level
-✅ A/P/C menu presented and handled correctly for each category
-✅ Content properly appended to document when C selected
-
-## FAILURE MODES:
-
-❌ Making recommendations instead of facilitating decisions
-❌ Not verifying technology versions with web search
-❌ Missing cascading implications between decisions
-❌ Not adapting explanations to user skill level
-❌ Forgetting to document decisions made by starter template
-❌ Not presenting A/P/C menu after content generation
-
-❌ **CRITICAL**: Reading only partial step file - leads to incomplete understanding and poor decisions
-❌ **CRITICAL**: Proceeding with 'C' without fully reading and understanding the next step file
-❌ **CRITICAL**: Making decisions without complete understanding of step requirements and protocols
-
-## NEXT STEP:
-
-After user selects 'C' and content is saved to document, load `./step-05-patterns.md` to define implementation patterns that ensure consistency across AI agents.
-
-Remember: Do NOT proceed to step-05 until user explicitly selects 'C' from the A/P/C menu and content is saved!
+After user selects 'C' and content is saved, load and execute `{nextStepFile}`.

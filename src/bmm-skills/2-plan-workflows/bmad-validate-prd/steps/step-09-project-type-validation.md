@@ -1,114 +1,53 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-10-smart-validation.md'
-prdFile: '{prd_file_path}'
-prdFrontmatter: '{prd_frontmatter}'
-validationReportPath: '{validation_report_path}'
 projectTypesData: '../data/project-types.csv'
 ---
 
 # Step 9: Project-Type Compliance Validation
 
-## STEP GOAL:
+## STEP GOAL
 
-Validate project-type specific requirements are properly documented - different project types (api_backend, web_app, mobile_app, etc.) have different required and excluded sections.
+Validate project-type specific requirements are properly documented -- different project types (api_backend, web_app, mobile_app, etc.) have different required and excluded sections.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Load project types data from CSV before validation
+- Validate both required sections (must be present) and excluded sections (must be absent)
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
+- Attempt subprocess first, fall back to direct analysis if unavailable
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring project type expertise and architectural knowledge
-- ✅ This step runs autonomously - no user input needed
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on project-type compliance
-- 🚫 FORBIDDEN to validate other aspects in this step
-- 💬 Approach: Validate required sections present, excluded sections absent
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Check classification.projectType from PRD frontmatter
-- 🎯 Validate required sections for that project type are present
-- 🎯 Validate excluded sections for that project type are absent
-- 💾 Append compliance findings to validation report
-- 📖 Display "Proceeding to next check..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: PRD file with frontmatter classification, validation report
-- Focus: Project-type compliance only
-- Limits: Don't validate other aspects, don't pause for user input
-- Dependencies: Steps 2-8 completed - domain and requirements validation done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Load Project Types Data
 
-Load and read the complete file at:
-`{projectTypesData}` (../data/project-types.csv)
+Load and read the complete file at `{projectTypesData}`.
 
-This CSV contains:
-- Detection signals for each project type
-- Required sections for each project type
-- Skip/excluded sections for each project type
-- Innovation signals
-
-Internalize this data - it drives what sections must be present or absent for each project type.
+This CSV contains detection signals, required sections, skip/excluded sections, and innovation signals for each project type. Internalize this data -- it drives what sections must be present or absent.
 
 ### 2. Extract Project Type Classification
 
-From PRD frontmatter, extract:
-- `classification.projectType` - what type of project is this?
+From PRD frontmatter, extract `classification.projectType`.
 
-**Common project types:**
-- api_backend
-- web_app
-- mobile_app
-- desktop_app
-- data_pipeline
-- ml_system
-- library_sdk
-- infrastructure
-- other
+Common project types: api_backend, web_app, mobile_app, desktop_app, data_pipeline, ml_system, library_sdk, infrastructure, other.
 
-**If no projectType classification found:**
-Assume "web_app" (most common) and note in findings
+If no projectType classification found, assume "web_app" (most common) and note in findings.
 
 ### 3. Determine Required and Excluded Sections from CSV Data
 
-**From loaded project-types.csv data, for this project type:**
+From loaded project-types.csv data, for this project type:
 
-**Required sections:** (from required_sections column)
-These MUST be present in the PRD
+**Required sections:** (from required_sections column) -- these MUST be present in the PRD.
 
-**Skip sections:** (from skip_sections column)
-These MUST NOT be present in the PRD
+**Skip sections:** (from skip_sections column) -- these MUST NOT be present in the PRD.
 
-**Example mappings from CSV:**
+Example mappings from CSV:
 - api_backend: Required=[endpoint_specs, auth_model, data_schemas], Skip=[ux_ui, visual_design]
 - mobile_app: Required=[platform_reqs, device_permissions, offline_mode], Skip=[desktop_features, cli_commands]
 - cli_tool: Required=[command_structure, output_formats, config_schema], Skip=[visual_design, ux_principles, touch_interactions]
-- etc.
 
 ### 4. Validate Against CSV-Based Requirements
 
-**Based on project type, determine:**
+Based on project type:
 
 **api_backend:**
 - Required: Endpoint Specs, Auth Model, Data Schemas, API Versioning
@@ -142,7 +81,7 @@ These MUST NOT be present in the PRD
 - Required: Infrastructure Components, Deployment, Monitoring, Scaling
 - Excluded: Feature requirements (this is infrastructure, not product)
 
-### 4. Attempt Sub-Process Validation
+### 5. Attempt Sub-Process Validation
 
 "Perform project-type compliance validation for {projectType}:
 
@@ -160,12 +99,9 @@ Build compliance table showing:
 
 Return compliance table with findings."
 
-**Graceful degradation (if no Task tool):**
-- Manually check PRD for required sections
-- Manually check PRD for excluded sections
-- Build compliance table
+If no Task tool, manually check PRD for required and excluded sections.
 
-### 5. Build Compliance Table
+### 6. Build Compliance Table
 
 **Required sections check:**
 - For each required section: Present / Missing / Incomplete
@@ -179,7 +115,7 @@ Return compliance table with findings."
 - Required: {present}/{total}
 - Excluded violations: {count}
 
-### 6. Report Project-Type Compliance Findings to Validation Report
+### 7. Report Project-Type Compliance Findings to Validation Report
 
 Append to validation report:
 
@@ -200,10 +136,10 @@ Append to validation report:
 
 ### Excluded Sections (Should Not Be Present)
 
-**{Section 1}:** [Absent/Present] ✓
+**{Section 1}:** [Absent/Present]
 {If present: This section should not be present for {projectType}}
 
-**{Section 2}:** [Absent/Present] ✓
+**{Section 2}:** [Absent/Present]
 {If present: This section should not be present for {projectType}}
 
 [Continue for all excluded sections]
@@ -222,7 +158,7 @@ Append to validation report:
 [If Pass] "All required sections for {projectType} are present. No excluded sections found."
 ```
 
-### 7. Display Progress and Auto-Proceed
+### 8. Display Progress and Auto-Proceed
 
 Display: "**Project-Type Compliance Validation Complete**
 
@@ -231,30 +167,4 @@ Compliance: {score}%
 
 **Proceeding to next validation check...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-10-smart-validation.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- Project type extracted correctly (or default assumed)
-- Required sections validated for presence and completeness
-- Excluded sections validated for absence
-- Compliance table built with status for all sections
-- Severity assessed correctly
-- Findings reported to validation report
-- Auto-proceeds to next validation step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not checking project type before proceeding
-- Missing required section checks
-- Missing excluded section checks
-- Not building compliance table
-- Not reporting findings to validation report
-- Not auto-proceeding
-
-**Master Rule:** Different project types have different requirements. API PRDs don't need UX sections - validate accordingly.
+Without delay, read fully and follow: {nextStepFile}

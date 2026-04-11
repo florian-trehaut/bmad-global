@@ -105,7 +105,44 @@ find . -maxdepth 4 -type d -name "migrations" -not -path "*/node_modules/*" 2>/d
 grep -i "DATABASE_URL\|DB_HOST\|MONGO_URI\|REDIS_URL" .env.example 2>/dev/null
 ```
 
-### 11. Ask User
+### 11. Detect Validation Tooling
+
+```bash
+# E2E frameworks
+ls playwright.config.* cypress.config.* 2>/dev/null
+grep -l "tauri-driver\|tauri-plugin-playwright" Cargo.toml 2>/dev/null
+
+# Component test frameworks (beyond what step 5 detects — validation-specific)
+ls vitest.config.* jest.config.* 2>/dev/null
+
+# Accessibility testing
+grep -l "axe-core\|pa11y" package.json Cargo.toml 2>/dev/null
+
+# Visual regression
+grep -l "percy\|chromatic" package.json 2>/dev/null
+
+# BDD/Acceptance
+grep -l "cucumber" package.json Cargo.toml 2>/dev/null
+
+# Property-based testing
+grep -l "proptest\|quickcheck\|fast-check" Cargo.toml package.json 2>/dev/null
+
+# Performance
+grep -l "lighthouse\|@lhci" package.json 2>/dev/null
+
+# WASM testing
+grep -l "wasm-pack\|wasm-bindgen-test" Cargo.toml 2>/dev/null
+
+# WASM frontend frameworks (Leptos, Yew, Dioxus)
+grep -l "leptos\|yew\|dioxus" Cargo.toml 2>/dev/null
+
+# Tauri
+ls src-tauri/tauri.conf.json tauri.conf.json 2>/dev/null
+```
+
+Store as `detected_validation_stack`.
+
+### 12. Ask User
 
 Present findings and ask:
 1. **Reference code**: Which directories represent good patterns? Which are legacy/forbidden?
@@ -115,7 +152,7 @@ Present findings and ask:
 5. **Database rules**: Any prohibitions? (never db:push, never manual DDL)
 6. **Env var policy**: Must crash on missing, or fallbacks allowed?
 
-### 12. Present Combined Summary
+### 13. Present Combined Summary
 
 ```
 Stack:
@@ -143,7 +180,7 @@ HALT — ask: "Does this look correct? Anything to add or correct?"
 
 Store all confirmed values.
 
-### 13. Proceed
+### 14. Proceed
 
 Load and execute {nextStepFile}.
 

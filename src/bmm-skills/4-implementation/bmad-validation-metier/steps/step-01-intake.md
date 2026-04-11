@@ -6,6 +6,7 @@ Identify the issue to validate (provided by the user or discovered via tracker),
 
 ## RULES
 
+- Load `~/.claude/skills/bmad-shared/validation-intake-protocol.md` and apply its protocol as baseline rules for this step
 - HALT if the issue is not in the "to test" status (using `TRACKER_STATES.to_test`)
 - HALT if the VM and DoD sections are absent (propose to infer ONLY with explicit user authorization)
 - NEVER invent VM items — they come from the issue or the user

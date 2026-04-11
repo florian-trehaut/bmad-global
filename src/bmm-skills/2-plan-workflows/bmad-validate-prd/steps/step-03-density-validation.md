@@ -1,62 +1,25 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-04-brief-coverage-validation.md'
-prdFile: '{prd_file_path}'
-validationReportPath: '{validation_report_path}'
 ---
 
 # Step 3: Information Density Validation
 
-## STEP GOAL:
+## STEP GOAL
 
 Validate PRD meets BMAD information density standards by scanning for conversational filler, wordy phrases, and redundant expressions that violate conciseness principles.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Focus ONLY on information density anti-patterns
+- FORBIDDEN to validate other aspects in this step
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
+- Attempt subprocess first, fall back to direct analysis if unavailable
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring analytical rigor and attention to detail
-- ✅ This step runs autonomously - no user input needed
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on information density anti-patterns
-- 🚫 FORBIDDEN to validate other aspects in this step
-- 💬 Approach: Systematic scanning and categorization
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Scan PRD for density anti-patterns systematically
-- 💾 Append density findings to validation report
-- 📖 Display "Proceeding to next check..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: PRD file, validation report with format findings
-- Focus: Information density validation only
-- Limits: Don't validate other aspects, don't pause for user input
-- Dependencies: Step 2 completed - format classification done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Attempt Sub-Process Validation
 
-**Try to use Task tool to spawn a subprocess:**
+Try to use Task tool to spawn a subprocess:
 
 "Perform information density validation on this PRD:
 
@@ -70,7 +33,7 @@ Validate PRD meets BMAD information density standards by scanning for conversati
 
 Return structured findings with counts and examples."
 
-### 2. Graceful Degradation (if Task tool unavailable)
+### 2. Direct Analysis (if Task tool unavailable)
 
 If Task tool unavailable, perform analysis directly:
 
@@ -98,13 +61,13 @@ If Task tool unavailable, perform analysis directly:
 
 ### 3. Classify Severity
 
-**Calculate total violations:**
+Calculate total violations:
 - Conversational filler count
 - Wordy phrases count
 - Redundant phrases count
 - Total = sum of all categories
 
-**Determine severity:**
+Determine severity:
 - **Critical:** Total > 10 violations
 - **Warning:** Total 5-10 violations
 - **Pass:** Total < 5 violations
@@ -145,27 +108,4 @@ Severity: {Critical/Warning/Pass}
 
 **Proceeding to next validation check...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-04-brief-coverage-validation.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- PRD scanned for all three anti-pattern categories
-- Violations counted with line numbers
-- Severity classified correctly
-- Findings reported to validation report
-- Auto-proceeds to next validation step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not scanning all anti-pattern categories
-- Missing severity classification
-- Not reporting findings to validation report
-- Pausing for user input (should auto-proceed)
-- Not attempting subprocess architecture
-
-**Master Rule:** Information density validation runs autonomously. Scan, classify, report, auto-proceed. No user interaction needed.
+Without delay, read fully and follow: {nextStepFile}

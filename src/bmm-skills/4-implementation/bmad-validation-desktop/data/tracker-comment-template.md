@@ -20,7 +20,7 @@ Replace all `{placeholders}` with actual values.
 
 {dod_summary}
 
-### Validation Metier Results
+### Validation Desktop Results
 
 | VM | Description | Type | Verdict | Proof |
 |----|-------------|------|---------|-------|
@@ -28,7 +28,7 @@ Replace all `{placeholders}` with actual values.
 
 ### Conclusion
 
-All Validation Metier items are validated with tangible proof.
+All Validation Desktop items are validated with tangible proof.
 The issue can move to **Done**.
 ```
 
@@ -48,7 +48,7 @@ The issue can move to **Done**.
 
 {dod_summary}
 
-### Validation Metier Results
+### Validation Desktop Results
 
 | VM | Description | Type | Verdict | Proof / Failure reason |
 |----|-------------|------|---------|------------------------|
@@ -60,7 +60,7 @@ The issue can move to **Done**.
 
 ### Conclusion
 
-**{fail_count}/{total_count}** Validation Metier items failed.
+**{fail_count}/{total_count}** Validation Desktop items failed.
 The issue remains in its current status until fixes are applied and re-validated.
 ```
 

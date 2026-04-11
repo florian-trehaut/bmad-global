@@ -7,6 +7,7 @@ Execute each Validation Metier (VM) item one by one. For each VM: classify, exec
 ## RULES
 
 - Load `../data/vm-classification-rules.md` and `../data/proof-standards.md` BEFORE starting
+- Load `~/.claude/skills/bmad-shared/validation-proof-principles.md` and apply its universal rules
 - Each VM MUST have valid proof to pass — no exceptions
 - Code analysis is NEVER proof — see proof-standards.md
 - In production: every write action requires authorization BEFORE execution

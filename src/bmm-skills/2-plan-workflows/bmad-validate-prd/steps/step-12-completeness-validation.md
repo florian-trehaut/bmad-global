@@ -1,68 +1,27 @@
 ---
-# File references (ONLY variables used in this step)
 nextStepFile: './step-13-report-complete.md'
-prdFile: '{prd_file_path}'
-prdFrontmatter: '{prd_frontmatter}'
-validationReportPath: '{validation_report_path}'
 ---
 
 # Step 12: Completeness Validation
 
-## STEP GOAL:
+## STEP GOAL
 
-Final comprehensive completeness check - validate no template variables remain, each section has required content, section-specific completeness, and frontmatter is properly populated.
+Final comprehensive completeness check -- validate no template variables remain, each section has required content, section-specific completeness, and frontmatter is properly populated.
 
-## MANDATORY EXECUTION RULES (READ FIRST):
+## RULES
 
-### Universal Rules:
+- Focus ONLY on completeness verification, not quality (done in step 11)
+- Systematic checklist-style verification
+- This step runs autonomously -- no user input needed, auto-proceeds when complete
+- Attempt subprocess first, fall back to direct analysis if unavailable
 
-- 🛑 NEVER generate content without user input
-- 📖 CRITICAL: Read the complete step file before taking any action
-- 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
-- 📋 YOU ARE A FACILITATOR, not a content generator
-- ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-
-### Role Reinforcement:
-
-- ✅ You are a Validation Architect and Quality Assurance Specialist
-- ✅ If you already have been given communication or persona patterns, continue to use those while playing this new role
-- ✅ We engage in systematic validation, not collaborative dialogue
-- ✅ You bring attention to detail and completeness verification
-- ✅ This step runs autonomously - no user input needed
-
-### Step-Specific Rules:
-
-- 🎯 Focus ONLY on completeness verification
-- 🚫 FORBIDDEN to validate quality (done in step 11) or other aspects
-- 💬 Approach: Systematic checklist-style verification
-- 🚪 This is a validation sequence step - auto-proceeds when complete
-
-## EXECUTION PROTOCOLS:
-
-- 🎯 Check template completeness (no variables remaining)
-- 🎯 Validate content completeness (each section has required content)
-- 🎯 Validate section-specific completeness
-- 🎯 Validate frontmatter completeness
-- 💾 Append completeness matrix to validation report
-- 📖 Display "Proceeding to final step..." and load next step
-- 🚫 FORBIDDEN to pause or request user input
-
-## CONTEXT BOUNDARIES:
-
-- Available context: Complete PRD file, frontmatter, validation report
-- Focus: Completeness verification only (final gate)
-- Limits: Don't assess quality, don't pause for user input
-- Dependencies: Steps 1-11 completed - all validation checks done
-
-## MANDATORY SEQUENCE
-
-**CRITICAL:** Follow this sequence exactly. Do not skip, reorder, or improvise unless user explicitly requests a change.
+## SEQUENCE
 
 ### 1. Attempt Sub-Process Validation
 
-**Try to use Task tool to spawn a subprocess:**
+Try to use Task tool to spawn a subprocess:
 
-"Perform completeness validation on this PRD - final gate check:
+"Perform completeness validation on this PRD -- final gate check:
 
 **1. Template Completeness:**
 - Scan PRD for any remaining template variables
@@ -70,12 +29,12 @@ Final comprehensive completeness check - validate no template variables remain, 
 - List any found with line numbers
 
 **2. Content Completeness:**
-- Executive Summary: Has vision statement? ({key content})
-- Success Criteria: All criteria measurable? ({metrics present})
-- Product Scope: In-scope and out-of-scope defined? ({both present})
-- User Journeys: User types identified? ({users listed})
-- Functional Requirements: FRs listed with proper format? ({FRs present})
-- Non-Functional Requirements: NFRs with metrics? ({NFRs present})
+- Executive Summary: Has vision statement?
+- Success Criteria: All criteria measurable?
+- Product Scope: In-scope and out-of-scope defined?
+- User Journeys: User types identified?
+- Functional Requirements: FRs listed with proper format?
+- Non-Functional Requirements: NFRs with metrics?
 
 For each section: Is required content present? (Yes/No/Partial)
 
@@ -93,11 +52,7 @@ For each section: Is required content present? (Yes/No/Partial)
 
 Return completeness matrix with status for each check."
 
-**Graceful degradation (if no Task tool):**
-- Manually scan for template variables
-- Manually check each section for required content
-- Manually verify frontmatter fields
-- Build completeness matrix
+If no Task tool, manually scan for template variables, check each section for required content, verify frontmatter fields, build completeness matrix.
 
 ### 2. Build Completeness Matrix
 
@@ -141,7 +96,7 @@ Append to validation report:
 
 **Template Variables Found:** {count}
 {If count > 0, list variables with line numbers}
-{If count = 0, note: No template variables remaining ✓}
+{If count = 0, note: No template variables remaining}
 
 ### Content Completeness by Section
 
@@ -209,31 +164,4 @@ Overall Completeness: {percentage}% ({severity})
 
 **Proceeding to final step...**"
 
-Without delay, read fully and follow: {nextStepFile} (step-13-report-complete.md)
-
----
-
-## 🚨 SYSTEM SUCCESS/FAILURE METRICS
-
-### ✅ SUCCESS:
-
-- Scanned for template variables systematically
-- Validated each section for required content
-- Validated section-specific completeness (measurability, coverage, scope)
-- Validated frontmatter completeness
-- Completeness matrix built with all checks
-- Severity assessed correctly
-- Findings reported to validation report
-- Auto-proceeds to final step
-- Subprocess attempted with graceful degradation
-
-### ❌ SYSTEM FAILURE:
-
-- Not scanning for template variables
-- Missing section-specific completeness checks
-- Not validating frontmatter
-- Not building completeness matrix
-- Not reporting findings to validation report
-- Not auto-proceeding
-
-**Master Rule:** Final gate to ensure document is complete before presenting findings. Template variables or critical gaps must be fixed.
+Without delay, read fully and follow: {nextStepFile}
