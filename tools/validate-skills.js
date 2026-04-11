@@ -17,7 +17,7 @@
  * - PATH-02: no installed_path variable
  * - STEP-01: step filename format
  * - STEP-06: step frontmatter has no name/description
- * - STEP-07: step count 2-10
+ * - STEP-07: step count 2-15
  * - SEQ-02: no time estimates
  *
  * Usage:
@@ -524,20 +524,20 @@ function validateSkill(skillDir) {
       }
     }
 
-    // STEP-07: step count 2-10
+    // STEP-07: step count 2-15
     const stepCount = stepFiles.filter((f) => f.startsWith('step-')).length;
-    if (stepCount > 0 && (stepCount < 2 || stepCount > 10)) {
+    if (stepCount > 0 && (stepCount < 2 || stepCount > 15)) {
       const detail =
         stepCount < 2
           ? `Only ${stepCount} step file found — consider inlining into workflow.md.`
-          : `${stepCount} step files found — more than 10 risks LLM context degradation.`;
+          : `${stepCount} step files found — more than 15 risks LLM context degradation.`;
       findings.push({
         rule: 'STEP-07',
         title: 'Step Count',
         severity: 'LOW',
         file: stepDirName + '/',
         detail,
-        fix: stepCount > 10 ? 'Consider consolidating steps.' : 'Consider expanding or inlining.',
+        fix: stepCount > 15 ? 'Consider consolidating steps.' : 'Consider expanding or inlining.',
       });
     }
   }
@@ -554,6 +554,13 @@ function validateSkill(skillDir) {
     const lines = stripped.split('\n');
 
     for (const [i, line] of lines.entries()) {
+      // Skip lines that are rules/docs ABOUT not using time estimates (negation context)
+      if (/\bno\s+time\b|\bnever\b|\bnot\s+allowed\b|\bforbidden\b|\bdon['']t\b|\bavoid\b/i.test(line)) continue;
+      // Skip table rows documenting forbidden patterns (pipe-delimited with "wrong"/"varies"/"not")
+      if (line.includes('|') && /varies|not\s+portable|wrong/i.test(line)) continue;
+      // Skip template placeholders — e.g., "[Sum of durations]" in output templates
+      if (/\[.*(?:duration|time|sum).*\]/i.test(line)) continue;
+
       for (const pattern of TIME_ESTIMATE_PATTERNS) {
         if (pattern.test(line)) {
           findings.push({

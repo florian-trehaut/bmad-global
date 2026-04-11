@@ -105,6 +105,15 @@ const UNRESOLVABLE_VARS = [
   '{date}',
   '{outputFile}',
   '{nextStepFile}',
+  // Template/builder placeholders (substituted at build time, not statically resolvable)
+  '{skillName}',
+  '{module-code}',
+  '{base-module}',
+  '{sidecar-folder}',
+  '{capability}',
+  '{code}',
+  '{agent-name}',
+  '{extension-code}',
 ];
 
 // --- File Discovery ---
@@ -142,6 +151,12 @@ function stripJsonExampleBlocks(content) {
   // Strip bare JSON example blocks: { and } each on their own line.
   // These are example/template data (not real file references).
   return content.replaceAll(/^\{\s*\n(?:.*\n)*?^\}\s*$/gm, (m) => m.replaceAll(/[^\n]/g, ''));
+}
+
+function stripInlineCode(content) {
+  // Strip inline code spans (`...`) — these contain example paths, not real refs.
+  // Preserve newlines so line numbers remain accurate.
+  return content.replaceAll(/`[^`\n]+`/g, (m) => ' '.repeat(m.length));
 }
 
 // --- Path Mapping ---
@@ -256,7 +271,7 @@ function offsetToLine(content, offset) {
 
 function extractMarkdownRefs(filePath, content) {
   const refs = [];
-  const stripped = stripJsonExampleBlocks(stripCodeBlocks(content));
+  const stripped = stripInlineCode(stripJsonExampleBlocks(stripCodeBlocks(content)));
 
   function runPattern(regex, type) {
     regex.lastIndex = 0;
@@ -382,7 +397,7 @@ function resolveRef(ref) {
 
 function checkAbsolutePathLeaks(filePath, content) {
   const leaks = [];
-  const stripped = stripCodeBlocks(content);
+  const stripped = stripInlineCode(stripCodeBlocks(content));
   const lines = stripped.split('\n');
 
   for (const [i, line] of lines.entries()) {
