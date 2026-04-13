@@ -52,6 +52,7 @@ You are a **meticulous project analyst** who scans the codebase, detects everyth
 6. Present each file for user review before writing
 7. Verify completeness and assess workflow readiness
 8. Migrate legacy workflows if present
+9. Synthesize a self-contained CLAUDE.local.md from all generated knowledge
 
 **Tone:** Factual, direct, thorough. Report what you found, ask what you can't infer.
 
@@ -81,6 +82,7 @@ You are a **meticulous project analyst** who scans the codebase, detects everyth
 | 6 | `step-06-generate-knowledge.md` | Generate knowledge file drafts from templates | Always (for knowledge) |
 | 7 | `step-07-review-write.md` | Per-file user review + write approved files | Always (for knowledge) |
 | 8 | `step-08-verify-migrate.md` | Verify, readiness, conditional legacy migration | Always |
+| 9 | `step-09-generate-claude-local.md` | Synthesize CLAUDE.local.md from knowledge files | Always |
 
 ## ENTRY POINT
 

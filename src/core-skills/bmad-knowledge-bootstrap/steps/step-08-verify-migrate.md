@@ -1,5 +1,5 @@
 ---
-nextStepFile: null
+nextStepFile: './step-09-generate-claude-local.md'
 ---
 
 # Step 8: Verify and Migrate
