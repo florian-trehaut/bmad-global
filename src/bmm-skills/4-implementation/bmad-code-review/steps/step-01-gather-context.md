@@ -1,0 +1,265 @@
+---
+nextStepFile: './step-02-review.md'
+classificationRules: '../data/review-classification.md'
+regressionRiskSkill: '~/.claude/skills/bmad-review-regression-risk/workflow.md'
+---
+
+# Step 1: Gather Context
+
+## STEP GOAL:
+
+Collect everything the review needs in one pass: discover + classify the MR, set up the review worktree, load project context and standards, compute the diff, invoke regression-risk detection, and compute the trigger routing (which meta-perspectives will activate).
+
+Absorbs v1 step-01 (discover), step-02 (setup-worktree), step-03 (load-context), step-04 (discover-changes), step-05 (regression-risk invocation).
+
+## MANDATORY EXECUTION RULES
+
+- Execute ALL sections in exact order — NO skipping
+- Communicate in {COMMUNICATION_LANGUAGE} with {USER_NAME}
+- **Worktree invariant:** every subsequent step requires `REVIEW_WORKTREE_PATH` set and a valid directory
+
+---
+
+## 1. Discover & Classify the MR
+
+### 1.1 Pre-selected MR
+
+<check if="mr_iid is provided and not empty">
+  Use provided MR IID — skip discovery. Store `MR_IID` and proceed to §1.3 (Classify) after fetching MR metadata.
+</check>
+
+### 1.2 List Open MRs
+
+```bash
+CURRENT_USER=$({FORGE_API_BASE} user | jq -r '.username')
+{FORGE_MR_LIST}
+```
+
+For each MR, fetch detailed status (title, author, branches, draft, conflicts, approvals, threads):
+
+```bash
+PROJECT_ID=$({FORGE_API_BASE} "projects/{FORGE_PROJECT_PATH_ENCODED}" | jq -r '.id')
+{FORGE_API_BASE} "projects/$PROJECT_ID/merge_requests/{mr_iid}" \
+  | jq '{iid,title,author:.author.username,source_branch,target_branch,draft,has_conflicts}'
+
+# Approvals: team policy requires ≥1 EXPLICIT approval (approved_by non-empty)
+{FORGE_API_BASE} "projects/$PROJECT_ID/merge_requests/{mr_iid}/approvals" \
+  | jq '{approved_by:[(.approved_by // [])[]|.user.username], has_explicit_approval:(([(.approved_by // [])[]|.user.username]|length)>0)}'
+
+# Threads: use /notes (not /discussions) to catch standalone resolvable notes
+{FORGE_API_BASE} "projects/$PROJECT_ID/merge_requests/{mr_iid}/notes?per_page=100" \
+  | tr -d '\000-\011\013-\037' \
+  | jq '{threads_total:[.[]|select(.resolvable==true and .system==false)]|length, threads_resolved:[.[]|select(.resolvable==true and .resolved==true and .system==false)]|length, threads_unresolved:[.[]|select(.resolvable==true and .resolved==false and .system==false)]|length}'
+```
+
+Collect tracker issues in review state (CRUD patterns from `workflow-knowledge/tracker.md`): team = `{TRACKER_TEAM}`, status = `{TRACKER_STATES.in_review}`, limit 10.
+
+### 1.3 Classify
+
+Load classification rules from `{classificationRules}`. Categories:
+
+- **Colleague review:** `author != CURRENT_USER` AND NOT draft AND no explicit approval from CURRENT_USER
+- **Self-review:** `author == CURRENT_USER` AND NOT draft
+- **Already reviewed:** has explicit approval from CURRENT_USER (regardless of author)
+- **Draft / Non-reviewable:** `draft == true` OR `has_conflicts == true`
+
+### 1.4 Present & Select
+
+Cross-reference each MR with tracker issues (match by branch name `feat/{num}-*` or MR description mentioning `{ISSUE_PREFIX}-XXX`). Present the unified menu (colleague / self / already-reviewed / draft) and WAIT for the user choice.
+
+Store: `MR_IID`, `MR_URL`, `MR_AUTHOR`, `MR_SOURCE_BRANCH`, `MR_TARGET_BRANCH`, `LINKED_TRACKER_ISSUE` (if any), `ISSUE_IDENTIFIER`, `REVIEW_MODE` (`colleague` or `self`).
+
+---
+
+## 2. Setup Review Worktree
+
+**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+
+<check if="worktree_enabled == true (or absent)">
+
+  Derive `REVIEW_WORKTREE_PATH` from `{WORKTREE_TEMPLATE_REVIEW}` with `{MR_IID}` substituted.
+
+  ```bash
+  # Clean any existing worktree for this MR (review worktrees have no local changes to preserve)
+  git fetch origin
+  EXISTING_WT=$(git worktree list | grep "{MR_SOURCE_BRANCH}" | awk '{print $1}')
+  if [ -n "$EXISTING_WT" ]; then git worktree remove "$EXISTING_WT" --force 2>/dev/null || true; fi
+  git worktree prune
+
+  # CRITICAL: use -B to create a LOCAL branch tracking the remote — avoids detached HEAD
+  git worktree add -B review-{MR_IID} {REVIEW_WORKTREE_PATH} origin/{MR_SOURCE_BRANCH}
+  cd {REVIEW_WORKTREE_PATH}
+  CURRENT_BRANCH=$(git branch --show-current)
+  if [ -z "$CURRENT_BRANCH" ]; then echo "FATAL: detached HEAD — HALT" && exit 1; fi
+  echo "On branch: $CURRENT_BRANCH"
+  git log -1 --oneline
+  ```
+
+  Then run the mandatory post-creation setup from `bmad-shared/worktree-lifecycle.md`:
+
+  ```bash
+  cd {REVIEW_WORKTREE_PATH}
+  {install_command}      # HALT on failure
+  {build_command}        # HALT on failure, skip if empty
+  {typecheck_command}    # WARN on failure, skip if empty
+  ```
+
+</check>
+
+<check if="worktree_enabled == false">
+
+  No worktree — checkout the MR branch in the current repo:
+
+  ```bash
+  git fetch origin
+  git checkout {MR_SOURCE_BRANCH}
+  ```
+
+  Store `REVIEW_WORKTREE_PATH` = current project directory.
+</check>
+
+**From this point on, ALL analysis AND fixes run inside `{REVIEW_WORKTREE_PATH}`.** The worktree IS the MR branch — commits made here push directly to the MR branch. HALT if `REVIEW_WORKTREE_PATH` is unset or invalid at any subsequent step.
+
+---
+
+## 3. Load Project Context
+
+### 3.1 Shared rules
+
+Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. Load `bmad-shared/no-fallback-no-false-data.md` first (applied throughout the review).
+
+### 3.2 Project knowledge (optional)
+
+Read if present, otherwise skip:
+
+- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` — project-specific checklists overriding defaults
+- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` — reference code dirs, legacy dirs, forbidden patterns, test conventions, `ui` / `i18n` fields used by trigger routing (§5)
+
+### 3.3 Contribution conventions
+
+```bash
+cd {REVIEW_WORKTREE_PATH}
+ls CONTRIBUTING.md .github/CONTRIBUTING.md .github/pull_request_template.md dangerfile.js dangerfile.ts 2>/dev/null
+```
+
+Store as `CONTRIBUTION_CONVENTIONS` — PR format, CI linter rules, CLA requirements.
+
+### 3.4 ADRs (optional)
+
+Check `adr_location` in `workflow-context.md`. If set, load ADRs from the configured location. Most recent ADR wins on topic conflict. Store as `PROJECT_ADRS`.
+
+### 3.5 Prior closed MRs on same issue
+
+<check if="LINKED_TRACKER_ISSUE exists">
+  `{FORGE_CLI} mr list --state closed --search "{ISSUE_IDENTIFIER}"` → extract rejection reasons and prior approaches. Store as `PRIOR_MRS` — if current MR repeats a rejected approach, flag it.
+</check>
+
+### 3.6 Tracker issue
+
+<check if="LINKED_TRACKER_ISSUE exists">
+  Load full issue (CRUD patterns from `tracker.md`, include relations). Extract Acceptance Criteria, Gherkin scenarios, Test Plan, Validation Métier items. The issue description IS the specs compliance reference.
+</check>
+
+<check if="no LINKED_TRACKER_ISSUE">
+  Log: "No tracker issue linked — Specs Compliance perspective limited to MR description." Parse MR description for ACs.
+</check>
+
+---
+
+## 4. Discover Actual Changes
+
+### 4.1 Git diff
+
+```bash
+cd {REVIEW_WORKTREE_PATH}
+git diff --name-only origin/{MR_TARGET_BRANCH}...HEAD
+git diff --stat origin/{MR_TARGET_BRANCH}...HEAD
+```
+
+### 4.2 Forge API diff (for DiffNote line numbers)
+
+```bash
+PROJECT_ID=$({FORGE_API_BASE} "projects/{FORGE_PROJECT_PATH_ENCODED}" | jq -r '.id')
+{FORGE_API_BASE} "projects/$PROJECT_ID/merge_requests/{MR_IID}/changes" \
+  | jq -r '.changes[] | "\n=== \(.new_path) ===\n\(.diff)"'
+```
+
+### 4.3 Summarise
+
+Total files changed, lines added/removed, impacted services (paths matching `apps/*/`, `packages/*/`, `libs/*/`), types of change (domain, API, infra, tests, config, migrations).
+
+### 4.4 Attack plan
+
+<check if="LINKED_TRACKER_ISSUE exists">
+  Cross-reference AC list vs code changes: which ACs have visible implementation, which don't, which changes have no AC.
+</check>
+
+Store: `CHANGED_FILES`, `DIFF_STATS`, `IMPACTED_SERVICES`, `ATTACK_PLAN`.
+
+---
+
+## 5. Compute Trigger Routing (Active Metas)
+
+Based on `CHANGED_FILES` and `stack.md` — which meta-perspectives will the orchestrator dispatch in step-02?
+
+**Always-on:** M1 (Contract & Spec), M2 (Correctness & Reliability), M3 (Security & Privacy — at least 3a; 2 parallel reviewers S1/S2), M4 (Engineering Quality).
+
+**Conditional activations — scan `CHANGED_FILES`:**
+
+| Signal in diff | Activates |
+|---|---|
+| Dockerfile, `*.tf`, `k8s/**`, `.github/workflows/**`, new endpoints / jobs / alerts | **M5** |
+| UI globs (`*.tsx`, `*.vue`, `*.svelte`, `*.html`, `*.astro`, `src/components/**`) AND `stack.md: ui=web` | **M6** |
+| Imports from `@anthropic-ai/sdk`, `openai`, `langchain`, `llamaindex`, `ai`, `@modelcontextprotocol/sdk` | **M3.3b** (AI safety sub-axis) |
+| Manifest / lockfile diffs (`package*.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle*`) | **M3.3d** + **M5.5a** |
+| Entity / schema / migration diffs OR logging statement diffs | **M3.3c** + **M5.5b** |
+| Perf-sensitive paths (async code, DB query layer, rendering, cache, routes) | **M4.4e** |
+| Public API surface changes (`index.ts` exports, OpenAPI, `*.proto`, `*.graphql`, CLI argv, migrations) | already covered by always-on 1b |
+
+Store `ACTIVE_METAS` = list of `{meta_number, active_sub_axes}` entries. Used in step-02 to shape the parallel `Agent()` dispatch.
+
+---
+
+## 6. Invoke Regression-Risk Detection (persona-skill)
+
+Invoke the regression-risk persona-skill via `Agent()`:
+
+```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Regression risk detection (Phase 1 + Phase 2)',
+  prompt: |
+    Read and apply: {regressionRiskSkill}
+
+    inputs:
+      REVIEW_WORKTREE_PATH: '{REVIEW_WORKTREE_PATH}'
+      MR_TARGET_BRANCH: '{MR_TARGET_BRANCH}'
+      LINKED_TRACKER_ISSUE: {LINKED_TRACKER_ISSUE or null}
+      ISSUE_IDENTIFIER: '{ISSUE_IDENTIFIER or null}'
+
+    Return the YAML `regression_risk_report` as defined in the persona-skill contract.
+    CRITICAL: You are READ-ONLY.
+)
+```
+
+Parse the returned `regression_risk_report`. Store:
+
+- `REGRESSION_RISK_LEVEL` (HIGH / MEDIUM / LOW / NONE)
+- `OVERLAPPING_FILES`
+- `PHASE2_SUSPICIOUS_REMOVALS`
+- `REGRESSION_FINDINGS` — propagated to Meta-1 (Specs Compliance) in step-02 and surfaced in the final report
+
+If the persona-skill returns a parse error or HALTs → propagate the HALT to the orchestrator (no fallback).
+
+---
+
+## 7. Proceed
+
+All context collected. Invoke `{nextStepFile}` with:
+
+`REVIEW_WORKTREE_PATH`, `MR_IID`, `MR_SOURCE_BRANCH`, `MR_TARGET_BRANCH`, `LINKED_TRACKER_ISSUE`, `ISSUE_IDENTIFIER`, `REVIEW_MODE`, `CHANGED_FILES`, `DIFF_STATS`, `IMPACTED_SERVICES`, `ATTACK_PLAN`, `ACTIVE_METAS`, `REGRESSION_RISK_LEVEL`, `PHASE2_SUSPICIOUS_REMOVALS`, `REGRESSION_FINDINGS`, `PRIOR_MRS`, `PROJECT_ADRS`, `CONTRIBUTION_CONVENTIONS`.
+
+## SUCCESS/FAILURE:
+
+### SUCCESS: MR classified, worktree set up (not detached), context loaded, diff analysed, trigger routing computed, regression-risk report received
+### FAILURE: Skipping classification, detached worktree, missing tracker issue load, skipping regression-risk, proceeding without ACTIVE_METAS

@@ -98,23 +98,25 @@ The orchestration uses the Claude Code `Agent` tool directly — N calls in a SI
 
 | Step | File | Goal |
 | ---- | ---- | ---- |
-| 1 | `step-01-discover.md` | Discover reviewable MRs, classify, present options |
-| 2 | `step-02-setup-worktree.md` | Create review worktree on MR branch |
-| 3 | `step-03-load-context.md` | Load review checklists, dev standards, tracker issue |
-| 4 | `step-04-discover-changes.md` | Git diff, forge API diff |
-| 5 | `step-05-regression-risk.md` | Pre-rebase + post-rebase regression detection |
-| 6 | `step-06-execute-review.md` | Parallel `Agent()` dispatch (colleague: 5 agents; self: 2 agents) + judge-triage consolidation |
-| 7 | `step-07-present-findings.md` | Categorized by severity |
-| 8 | `step-08-post-findings.md` | Forge DiffNotes, tracker comment, approval |
+| 1 | `step-01-gather-context.md` | Discover + classify MR, setup worktree, load context, compute diff, invoke regression-risk persona-skill, compute trigger routing (ACTIVE_METAS) |
+| 2 | `step-02-review.md` | Parallel `Agent()` dispatch (colleague: 5-7 meta-agents; self: 2) in a SINGLE orchestrator message |
+| 3 | `step-03-triage.md` | Single `Agent()` invocation of `judge-triage` — deduplicate, apply security voting consensus (S1/S2), classify `action`, compute per-meta scores + verdict |
+| 4 | `step-04-present.md` | Present consolidated report, route actions (patch / decision_needed / defer / dismiss), post to forge + tracker, handle approval, run retrospective |
 
-Each step file contains its own `nextStepFile` frontmatter reference for sequential enforcement.
+Each step file contains its own `nextStepFile` frontmatter reference for sequential enforcement. Step 04 has no nextStepFile — it's the terminal step.
 
 ## SUBAGENT WORKFLOWS
 
 | Subagent | File | Used by |
 | -------- | ---- | ------- |
-| Review Perspectives | `subagent-workflows/review-perspectives.md` | Step 6 (all `Agent()` review workers) |
-| Judge-Triage | `subagent-workflows/judge-triage.md` | Step 6 (consolidates all worker reports) |
+| Meta-1 Contract & Spec Integrity | `subagent-workflows/meta-1-contract-spec.md` | Step 2 |
+| Meta-2 Correctness & Reliability | `subagent-workflows/meta-2-correctness-reliability.md` | Step 2 |
+| Meta-3 Security & Privacy (S1+S2) | `subagent-workflows/meta-3-security-privacy.md` | Step 2 |
+| Meta-4 Engineering Quality | `subagent-workflows/meta-4-engineering-quality.md` | Step 2 |
+| Meta-5 Operations & Deployment | `subagent-workflows/meta-5-operations-deployment.md` | Step 2 (conditional) |
+| Meta-6 User-facing Quality | `subagent-workflows/meta-6-user-facing-quality.md` | Step 2 (conditional) |
+| Judge-Triage | `subagent-workflows/judge-triage.md` | Step 3 (consolidation) |
+| Regression-Risk (persona-skill) | `~/.claude/skills/bmad-review-regression-risk/workflow.md` | Step 1 (via Agent() prompt reference) |
 
 ## DATA FILES
 
