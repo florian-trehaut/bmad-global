@@ -1,13 +1,16 @@
 ---
 nextStepFile: './step-07-present-findings.md'
 reviewPerspectives: '../subagent-workflows/review-perspectives.md'
+judgeTriage: '../subagent-workflows/judge-triage.md'
 ---
 
 # Step 6: Execute Review
 
 ## STEP GOAL:
 
-Execute the adversarial code review using the appropriate mode -- inline for self-review, parallel agents for colleague review.
+Execute the adversarial code review via parallel `Agent()` calls — 3 review-worker agents (A/B/C) + 2 asymmetric security agents (S1 attacker, S2 defender) — then consolidate via a dedicated `judge-triage` subagent.
+
+The orchestration primitive is the Claude Code `Agent` tool. All calls are issued in a SINGLE orchestrator message so the runtime executes them concurrently; results are returned synchronously when every agent has replied.
 
 ---
 
@@ -33,197 +36,68 @@ Code comments that justify shortcuts, casts, workarounds, or deviations are **ev
 
 ## SELF-REVIEW MODE (REVIEW_MODE == 'self')
 
-Execute 6 perspectives sequentially inline. Use project-specific checklists from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded, otherwise use the default checklists below.
+Same parallel-`Agent()` pattern as colleague mode, scaled to 2 workers covering 6 legacy perspectives inline. No Agent Teams orchestration primitives are used — every worker returns its report directly via the `Agent()` tool response.
 
-### Perspective 1: Specs Compliance
+### Orchestration message (self)
 
-<check if="LINKED_TRACKER_ISSUE exists">
-  "Does the code do what was asked -- **in production**, not just in tests?"
+Issue these 2 `Agent()` calls in a SINGLE orchestrator message so they execute in parallel:
 
-  For EACH acceptance criterion:
-  - Implemented? Where (file:line)?
-  - Tested? Where (file:line)?
-  - Works in production? (trace the complete production path)
-  - Status: COMPLIANT / PARTIAL / NOT_IMPLEMENTED
+```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Self-review A: specs + zero-fallback + code quality',
+  prompt: |
+    Read and apply: {reviewPerspectives}
+    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
 
-  An AC is NOT_IMPLEMENTED if ANY of these is true:
-  - Code exists but a dependency is disabled in production
-  - Code exists but nothing triggers it in production
-  - Code exists but the downstream service/template it calls does not exist
-  - Code exists but a required config/secret is missing from deployment config
-  - Code exists but a migration must run first and there is no migration
+    review_contract:
+      worktree_path: '{REVIEW_WORKTREE_PATH}'
+      mr_target_branch: '{MR_TARGET_BRANCH}'
+      mr_iid: {MR_IID}
+      group_id: 'SELF-A'
+      perspectives: ['specs_compliance', 'zero_fallback', 'code_quality']
+      linear_issue:
+        identifier: '{ISSUE_IDENTIFIER}'
+        description: |
+          {ISSUE_DESCRIPTION}
+        acceptance_criteria: {AC_LIST}
+      changed_files: {CHANGED_FILES_LIST}
+      diff_stats: '{DIFF_STATS}'
+      phase2_suspicious_removals: {PHASE2_SUSPICIOUS_REMOVALS}
 
-  Scope analysis: creep (MORE than asked -> QUESTION), missing (LESS -> BLOCKER), deviation (SOMETHING ELSE -> BLOCKER).
+    Report findings in the YAML `perspective_report` format defined in the subagent workflow. Return the YAML directly as your final tool response — no inter-agent messaging.
+    CRITICAL: You are READ-ONLY.
+)
 
-  Include regression risk findings from step-05 -- the specs reviewer must verify each suspicious removal against issue scope.
-</check>
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Self-review B: security + QA + tech-lead + patterns',
+  prompt: |
+    Read and apply: {reviewPerspectives}
+    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
 
-### Perspective 1.5: Zero Fallback / Zero False Data (MANDATORY)
+    review_contract:
+      worktree_path: '{REVIEW_WORKTREE_PATH}'
+      mr_target_branch: '{MR_TARGET_BRANCH}'
+      mr_iid: {MR_IID}
+      group_id: 'SELF-B'
+      perspectives: ['security', 'qa', 'tech_lead', 'patterns']
+      linear_issue: {SAME_AS_A_OR_NULL}
+      changed_files: {CHANGED_FILES_LIST}
+      diff_stats: '{DIFF_STATS}'
 
-**Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`**
-
-Grep for silent fallbacks on business-critical fields:
-
-```bash
-cd {REVIEW_WORKTREE_PATH}
-grep -rn "?? 0\|?? ''\||| 0\||| ''\|?? 'N/A'\|?? 'Unknown'" --include="*.ts" {changed_files_dirs} | grep -v "spec.ts" | grep -v "test.ts"
-grep -rn "/ 1\.2\|/ 1\.1\|\* 0\.8\|\* 1\.2" --include="*.ts" {changed_files_dirs} | grep -v "spec.ts"
+    Report findings in the YAML `perspective_report` format defined in the subagent workflow. Return the YAML directly.
+    CRITICAL: You are READ-ONLY.
+)
 ```
 
-Checks:
-- No fallback to wrong data (`??`/`||` on business-critical fields with semantically different fallback) -> BLOCKER
-- No computed substitutions (deriving value from wrong source) -> BLOCKER
-- No silent defaults (`0`, `''`, `'N/A'`, `'Unknown'`) on fields flowing to external systems -> BLOCKER
-- Null rejection present for business-critical fields with throw + alert -> missing = BLOCKER
-- **Data migrations that silently match zero rows are zero-fallback violations -> BLOCKER.** A `WHERE name = 'X'` that matches in one environment but not another is a migration that silently does nothing — the deployment succeeds, the data stays wrong, nobody gets alerted. "Documented for manual intervention" is NOT an acceptable mitigation. The migration must work in ALL target environments or explicitly fail (e.g., assert updated row count > 0). When DB access is available, verify WHERE clauses against real data in staging AND production before classifying.
+### Consolidation (self)
 
-### Perspective 2: Security
-
-Apply project security checklist if loaded, otherwise:
-
-- Injection: SQL raw concat, command exec/spawn, XSS
-- Auth/AuthZ: missing guards/decorators, privilege escalation
-- Input validation: missing DTOs, validation decorators
-- Sensitive data: secrets/PII in logs, hardcoded credentials
-- Crypto: weak MD5/SHA1, `Math.random()` for security
-- Race conditions: TOCTOU, missing transactions
-- Framework config: missing security headers, permissive CORS
-
-Grep scans:
-
-```bash
-cd {REVIEW_WORKTREE_PATH}
-grep -rn "exec\|spawn\|execSync" --include="*.ts" {changed_files_dirs} | grep -v node_modules | grep -v "spec.ts"
-grep -rn "queryRawUnsafe\|executeRawUnsafe" --include="*.ts" {changed_files_dirs}
-grep -rn "password\|secret\|api_key\|apiKey\|token" --include="*.ts" {changed_files_dirs} | grep -v "spec.ts" | grep -v ".d.ts"
-```
-
-Additional rules:
-- Secrets as CLI arguments instead of env vars -> BLOCKER
-- Differentiated error responses revealing account existence -> WARNING
-- SSRF: external URLs fetched without validation -> BLOCKER
-- DB operations not scoped by tenant/provider -> BLOCKER
-
-### Perspective 3: QA & Testing
-
-Apply project QA checklist if loaded.
-
-**Forbidden patterns (BLOCKER):**
-
-```bash
-cd {REVIEW_WORKTREE_PATH}
-grep -rn "jest\.mock\|vi\.mock" --include="*.spec.ts" --include="*.test.ts" {changed_files_dirs}
-grep -rn "expect(true)\.toBe(true)\|describe\.skip\|it\.skip\|xit\|xdescribe" --include="*.spec.ts" --include="*.test.ts" {changed_files_dirs}
-```
-
-Checks:
-- Every AC has at least one test
-- New source files have corresponding test files
-- Happy path, error paths, edge cases tested
-- In-memory fakes used (not mocks)
-- Tests are deterministic, isolated, < 300 lines
-
-### Perspective 4: Code Quality
-
-Apply project code quality checklist if loaded.
-
-- Architecture boundaries (domain never imports infrastructure -> BLOCKER)
-- Ports explicit in domain layer
-- Thin controllers, DDD patterns, clear naming
-- No `any` without justification, no `@ts-ignore` without reason
-- No `console.log` in production code
-- No duplication, no dead code
-- Database: N+1 queries (BLOCKER), missing transactions, unbounded queries
-
-Grep scans:
-
-```bash
-cd {REVIEW_WORKTREE_PATH}
-grep -rn "console\.log\|console\.error\|console\.warn" --include="*.ts" {changed_files_dirs} | grep -v "spec.ts" | grep -v "test.ts"
-grep -rn ": any\|as any" --include="*.ts" {changed_files_dirs} | grep -v "spec.ts"
-grep -rn "from.*infrastructure" {changed_files_dirs} | grep "/domain/"
-```
-
-### Perspective 5: Tech Lead
-
-Apply project tech lead checklist if loaded.
-
-- SOLID principles, N+1 queries, scalability
-- DI patterns, async handling
-- Monorepo impact, backward compatibility
-- Multi-service impact, migration risks
-- Data migration effectiveness: WHERE clauses in data migrations must match actual values in ALL target environments (dev, staging, production). If DB access is available, query real data to verify. A migration that silently updates 0 rows in any environment is a BLOCKER.
-- Changeset file present if packages/libs modified
-
-### Perspective 6: Pattern Consistency
-
-Use reference code directories from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` if loaded. NEVER reference legacy code.
-
-- DTO validation patterns, config access patterns
-- In-memory repository patterns, logger usage
-- Integration test setup patterns
-- Error handling patterns
-
-For each finding, provide `file:line` of the correct pattern reference.
-
-### Perspective 7: ADR Conformity (conditional)
-
-<check if="PROJECT_ADRS is loaded and non-empty">
-  Verify the changes don't violate active Architecture Decision Records:
-
-  - For each ADR, check if the MR touches the domain or component covered by that ADR
-  - If it does, verify the implementation follows the decided approach
-  - If the MR introduces a new pattern, service, or architectural choice that contradicts an ADR → BLOCKER
-
-  If the MR introduces something that SHOULD have an ADR but doesn't (new service, new integration pattern, new data store, deviation from established architecture):
-
-  **HALT the review.** Present the menu:
-
-  > This change introduces **{description}** which should be recorded as an Architecture Decision Record.
-  >
-  > **[A]** Create ADR now (invoke `bmad-create-adr`)
-  > **[S]** Skip — will create ADR later
-  > **[N]** Not needed — this doesn't warrant an ADR
-
-  WAIT for user selection.
-
-  - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume the review.
-  - **IF S or N:** Log the user's choice and resume the review.
-
-  **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
-
-  **Conflict resolution:** when multiple ADRs exist on the same topic, the most recent one takes precedence.
-</check>
-
-### Perspective 8: Design Decisions Audit
-
-Identify design decisions in the code that are NOT documented in the tracker issue, MR description, or code comments:
-
-- New patterns introduced without justification
-- Architectural choices (new modules, services, layers) not in the spec
-- Data model decisions (field types, naming, relationships) not specified
-- Error handling strategies chosen without spec guidance
-- Third-party library selections
-
-For each undocumented decision: classify as QUESTION (not a defect — but must be surfaced for reviewer awareness). Suggest the author add a "Design decisions" section to the MR description.
-
-### Conditional Perspectives (if applicable)
-
-**Commit History** (always for colleague review, optional for self):
-- Conventional commits format
-- No garbage commits ("fix", "wip", "typo")
-- Self-contained commits
-
-**Infra Deployability** (if infrastructure changes detected):
-- Build pipeline exists for impacted services
-- Database migrations generated for schema changes
-- Deployment config exists and is wired
-- New cloud resources have Terraform
-- Environment variables reference existing secrets
+The orchestrator parses both `perspective_report` YAMLs and invokes `judge-triage` via a single `Agent()` call (see §6.5 below). The judge emits the `consolidated_report` which replaces inline consensus logic.
 
 ### Self-Review: Fix Trivials
 
-After all perspectives, fix trivially fixable issues:
+Only the orchestrator applies trivially fixable issues — workers are strictly READ-ONLY:
 
 ```bash
 cd {REVIEW_WORKTREE_PATH}
@@ -234,7 +108,7 @@ Note files modified as `trivial_fixes_applied`.
 
 ### Self-Review: Commit Strategy — Minimal Commits
 
-**CRITICAL:** Review fixes must NOT create new commits on the branch. The goal is a minimal commit count relative to the target branch.
+Review fixes must NOT create new commits on the branch. The goal is a minimal commit count relative to the target branch.
 
 1. **Amend the last commit** when the fix is directly related to its scope:
    ```bash
@@ -243,16 +117,16 @@ Note files modified as `trivial_fixes_applied`.
    git commit --amend --no-edit
    ```
 
-2. **Create a separate commit** ONLY when the fix is unrelated to any existing commit (e.g., fixing a pre-existing zero-fallback violation discovered during review).
+2. **Create a separate commit** ONLY when the fix is unrelated to any existing commit.
 
 3. **Push with force-with-lease** (safe force push — aborts if someone else pushed):
    ```bash
    git push origin {LOCAL_BRANCH}:{MR_SOURCE_BRANCH} --force-with-lease
    ```
 
-**NEVER create a "review fix" commit** — amend the existing commit that the fix belongs to. The MR should look like the author got it right the first time.
+NEVER create a "review fix" commit — amend the existing commit that the fix belongs to.
 
-Then proceed to {nextStepFile} with all findings.
+Then proceed to {nextStepFile} with the `consolidated_report`.
 
 ---
 
@@ -260,22 +134,22 @@ Then proceed to {nextStepFile} with all findings.
 
 ### 6.1 Prepare Review Context
 
-Collect changed files list, diff stats (from step-04), and tracker issue context (from step-03).
+Collect the changed-files list, diff stats (from step-04), and tracker issue context (from step-03). These become the input contract fields referenced below.
 
-### 6.2 Create Review Team
+### 6.2 Orchestration message (colleague)
+
+Issue the 5 `Agent()` calls below in a SINGLE orchestrator message. The Claude Code runtime executes them in parallel; results return synchronously in the tool response block.
+
+#### Agent A — Specs Compliance
 
 ```
-TeamCreate(team_name: "review-{MR_IID}", description: "Code review for !{MR_IID}")
-```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Review group A: specs compliance',
+  prompt: |
+    Read and apply: {reviewPerspectives}
+    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
 
-### 6.3 Create 5 Review Tasks (self-service, NO owners)
-
-**Task A -- Specs Compliance:**
-
-```yaml
-TaskCreate(
-  subject: "Review Group A: Specs Compliance",
-  description: |
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
       mr_target_branch: '{MR_TARGET_BRANCH}'
@@ -286,182 +160,190 @@ TaskCreate(
         identifier: '{ISSUE_IDENTIFIER}'
         description: |
           {ISSUE_DESCRIPTION}
-        acceptance_criteria:
-          {AC_LIST}
+        acceptance_criteria: {AC_LIST}
       changed_files: {CHANGED_FILES_LIST}
       diff_stats: '{DIFF_STATS}'
       phase2_suspicious_removals: {PHASE2_SUSPICIOUS_REMOVALS}
-  activeForm: "Reviewing specs compliance"
+
+    Return a YAML `perspective_report` as defined in the subagent workflow.
+    CRITICAL: You are READ-ONLY.
 )
 ```
 
-**Task B -- QA & Code Quality:**
+#### Agent B — QA & Code Quality
 
-```yaml
-TaskCreate(
-  subject: "Review Group B: QA & Code Quality",
-  description: |
+```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Review group B: QA and code quality',
+  prompt: |
+    Read and apply: {reviewPerspectives}
+    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
       mr_target_branch: '{MR_TARGET_BRANCH}'
       mr_iid: {MR_IID}
       group_id: 'B'
       perspectives: ['qa', 'code_quality']
-      linear_issue: {SAME_AS_TASK_A_OR_NULL}
+      linear_issue: {SAME_AS_A_OR_NULL}
       changed_files: {CHANGED_FILES_LIST}
       diff_stats: '{DIFF_STATS}'
-  activeForm: "Reviewing QA & code quality"
+
+    Return a YAML `perspective_report` as defined in the subagent workflow.
+    CRITICAL: You are READ-ONLY.
 )
 ```
 
-**Task C -- Architecture & Infra:**
+#### Agent C — Tech Lead + Patterns + Commits + Infra
 
-```yaml
-TaskCreate(
-  subject: "Review Group C: Tech Lead + Patterns + Commits + Infra",
-  description: |
+```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Review group C: architecture and infra',
+  prompt: |
+    Read and apply: {reviewPerspectives}
+    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
       mr_target_branch: '{MR_TARGET_BRANCH}'
       mr_iid: {MR_IID}
       group_id: 'C'
       perspectives: ['tech_lead', 'patterns', 'commit_history', 'infra_deployability']
-      linear_issue: {SAME_AS_TASK_A_OR_NULL}
+      linear_issue: {SAME_AS_A_OR_NULL}
       changed_files: {CHANGED_FILES_LIST}
       diff_stats: '{DIFF_STATS}'
-  activeForm: "Reviewing architecture & infra"
+
+    Return a YAML `perspective_report` as defined in the subagent workflow.
+    CRITICAL: You are READ-ONLY.
 )
 ```
 
-**Task S1 -- Security Review (voting instance 1):**
+#### Agent S1 — Security (Attacker POV, low creativity)
 
-```yaml
-TaskCreate(
-  subject: "Security Review S1 (voting instance 1 of 2)",
-  description: |
+```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Security S1: attacker POV (voting 1/2)',
+  prompt: |
+    Read and apply: {reviewPerspectives}
+    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+
+    POV_FRAMING: attacker
+    CREATIVITY: low (emulate temperature 0.2 — deterministic, focused)
+    DIRECTIVE: |
+      Assume an adversary is reading this code looking for exploit paths.
+      Enumerate concrete attack vectors, prefer depth on known CVE classes
+      over breadth. Only report findings with a plausible exploit chain.
+
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
       mr_target_branch: '{MR_TARGET_BRANCH}'
       mr_iid: {MR_IID}
       group_id: 'S1'
       perspectives: ['security']
-      linear_issue: {SAME_AS_TASK_A_OR_NULL}
+      pov: 'attacker'
+      temperature_hint: 0.2
+      linear_issue: {SAME_AS_A_OR_NULL}
       changed_files: {CHANGED_FILES_LIST}
       diff_stats: '{DIFF_STATS}'
-  activeForm: "Security review (instance 1)"
+
+    Return a YAML `perspective_report` as defined in the subagent workflow.
+    CRITICAL: You are READ-ONLY. Do NOT coordinate with S2.
 )
 ```
 
-**Task S2 -- Security Review (voting instance 2):**
+#### Agent S2 — Security (Defender POV, medium creativity)
 
-```yaml
-TaskCreate(
-  subject: "Security Review S2 (voting instance 2 of 2)",
-  description: |
+```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Security S2: defender POV (voting 2/2)',
+  prompt: |
+    Read and apply: {reviewPerspectives}
+    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+
+    POV_FRAMING: defender
+    CREATIVITY: medium (emulate temperature 0.5 — creative, coverage-oriented)
+    DIRECTIVE: |
+      Assume this code is in production and you are designing defense-in-depth.
+      Enumerate classes of risk that could emerge under load, misuse, or
+      edge-case inputs. Prefer breadth — surface latent risks even without a
+      confirmed exploit chain.
+
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
       mr_target_branch: '{MR_TARGET_BRANCH}'
       mr_iid: {MR_IID}
       group_id: 'S2'
       perspectives: ['security']
-      linear_issue: {SAME_AS_TASK_A_OR_NULL}
+      pov: 'defender'
+      temperature_hint: 0.5
+      linear_issue: {SAME_AS_A_OR_NULL}
       changed_files: {CHANGED_FILES_LIST}
       diff_stats: '{DIFF_STATS}'
-  activeForm: "Security review (instance 2)"
+
+    Return a YAML `perspective_report` as defined in the subagent workflow.
+    CRITICAL: You are READ-ONLY. Do NOT coordinate with S1.
 )
 ```
 
-All 5 tasks created with `owner=null`, no `addBlockedBy` -- all groups are independent and parallel.
+All 5 `Agent()` calls run concurrently. Wait for all replies in the tool response block.
 
-### 6.4 Spawn 5 Worker Teammates
+### 6.3 Handle Agent Failures
 
-**3 review-workers** (self-claim tasks A, B, C):
+For each agent that returns empty/timeout/parse-error: record in `failed_layers`. Do NOT retry silently — per `bmad-shared/no-fallback-no-false-data.md`, a failed layer must be surfaced to the user rather than substituted with an empty report. The judge step will carry the `failed_layers` field through to the consolidated report.
 
-```
-for n in [1, 2, 3]:
-  Task(
-    subagent_type: 'review-worker',
-    team_name: 'review-{MR_IID}',
-    name: 'reviewer-{n}',
-    prompt: |
-      You are a code review worker in a self-service team.
-      Read and follow the subagent workflow: {reviewPerspectives}
-      Workflow:
-      1. TaskList -> find pending tasks (owner=null)
-      2. Claim the lowest ID task that is NOT a security task (group_id != S1 and != S2)
-      3. Extract review_contract from task description
-      4. Execute perspectives listed in the contract
-      5. Report findings via SendMessage to team lead
-      6. Mark task completed via TaskUpdate(status: "completed")
-      7. Loop back to Step 1
-      CRITICAL: Do NOT claim security tasks (S1, S2).
-      CRITICAL: You are READ-ONLY.
-      Team lead name: "{lead_name}"
-  )
-```
+### 6.4 Collect Reports
 
-**2 security-reviewers** (claim tasks S1 and S2 independently):
+Parse the YAML `perspective_report` returned by each agent. Validate each report contains:
+
+- `group_id` matching the dispatched agent
+- `perspectives_completed` covering the contract's perspectives
+- `findings[]` with `{severity, perspective, file, line, issue, fix}` per finding
+- `summary` with severity counts
+
+If validation fails → record in `failed_layers` with the parse error.
+
+### 6.5 Invoke Judge-Triage
+
+Issue a single `Agent()` call — AFTER all reviewer reports have returned — to consolidate:
 
 ```
-for n in [1, 2]:
-  Task(
-    subagent_type: 'security-reviewer',
-    team_name: 'review-{MR_IID}',
-    name: 'security-{n}',
-    prompt: |
-      You are a security reviewer in a self-service team. Security ONLY.
-      Claim a security task (group_id = S1 or S2) from TaskList.
-      Execute the security review independently -- do NOT coordinate with the other security reviewer.
-      Report findings via SendMessage to team lead.
-      Team lead name: "{lead_name}"
-  )
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Judge-triage: consolidate review reports',
+  prompt: |
+    Read and apply: {judgeTriage}
+
+    input_reports:
+      - group_id: 'A'
+        {PERSPECTIVE_REPORT_A}
+      - group_id: 'B'
+        {PERSPECTIVE_REPORT_B}
+      - group_id: 'C'
+        {PERSPECTIVE_REPORT_C}
+      - group_id: 'S1'
+        {PERSPECTIVE_REPORT_S1}
+      - group_id: 'S2'
+        {PERSPECTIVE_REPORT_S2}
+
+    linear_issue: {SAME_AS_A_OR_NULL}
+    regression_risk: {REGRESSION_RISK_FROM_STEP_05}
+    model_tier: '{ORCHESTRATOR_MODEL_TIER}'
+
+    Return the YAML `consolidated_report` as defined in the judge-triage subagent workflow.
+    CRITICAL: Enforce model parity — you MUST run at the same model tier as the orchestrator.
+    CRITICAL: You are READ-ONLY. Do not re-read source files.
+)
 ```
 
-### 6.5 Collect Reports and Consolidate
-
-Wait for all 5 workers to report via message delivery.
-
-For each `perspective_report` received:
-- Collect all findings into a unified list
-- If a worker fails or times out: report "Perspective group {X}: review incomplete (agent timeout)"
-
-**Security Voting Consensus (CRITICAL):**
-
-```
-# Separate security findings from S1 and S2
-s1_findings = findings where group_id == 'S1'
-s2_findings = findings where group_id == 'S2'
-
-# Cross-validate each finding
-for finding in s1_findings + s2_findings:
-    # Same file:line flagged by BOTH? -> CONFIRMED BLOCKER
-    counterpart = find_matching(finding, other_group_findings)
-    if counterpart exists:
-        finding.consensus = 'CONFIRMED'
-        finding.severity = 'BLOCKER'  # Retain or upgrade
-    elif finding.grep_based == True:
-        finding.consensus = 'CONFIRMED'  # Grep findings always confirmed
-    else:
-        finding.consensus = 'SINGLE_REVIEWER'
-        finding.severity = 'WARNING'  # Downgrade from BLOCKER to WARNING
-
-# Log consensus decisions
-for finding with consensus == 'SINGLE_REVIEWER':
-    log: "Security finding {id} downgraded: flagged by only 1 reviewer"
-for finding with consensus == 'CONFIRMED':
-    log: "Security finding {id} CONFIRMED by both reviewers"
-```
-
-**Consolidation rules:**
-- Apply security consensus rules above
-- Deduplicate non-security findings with same `file:line:issue` (keep highest severity, merge perspective labels)
-- Sort by severity: BLOCKER > WARNING > RECOMMENDATION > QUESTION
-- Merge `specs_compliance.ac_coverage` from Group A
-- Compute per-perspective scores and overall weighted score
+Parse the returned `consolidated_report`. If the judge returns `verdict: REJECTED` with `error: judge_unable_to_consolidate` → HALT (per G1, no fallback).
 
 ### 6.6 Apply Trivial Fixes (orchestrator only)
 
-Only the orchestrator runs format/lint -- workers are read-only. This prevents concurrent file edit conflicts.
+Only the orchestrator runs format/lint — workers are strictly read-only. This prevents concurrent file-edit conflicts.
 
 ```bash
 cd {REVIEW_WORKTREE_PATH}
@@ -470,29 +352,17 @@ cd {REVIEW_WORKTREE_PATH}
 
 Note files modified as `trivial_fixes_applied`.
 
-### 6.7 Cleanup Team
+### 6.7 Proceed
 
-Send shutdown request to each worker.
-After all workers confirm shutdown: `TeamDelete`.
-
-### 6.8 Build Consolidated Report
-
-Categorize unified findings by severity and perspective. The consolidated report is used by step-07 for presentation and step-08 for posting.
-
-Proceed to {nextStepFile}.
+Pass the `consolidated_report` to `{nextStepFile}`. No team cleanup needed — parallel `Agent()` calls have no lifecycle beyond their single invocation.
 
 ---
 
 ## SCORING
 
-**Deduction rules per finding:**
+All scoring is performed inside `judge-triage` per the matrix in the judge-triage subagent workflow. The orchestrator does NOT re-compute scores — it consumes the `consolidated_report.score_overall`, `scores_per_meta`, and `verdict` directly.
 
-- BLOCKER: -0.25
-- MAJOR: -0.10
-- WARNING: -0.05
-- Min score: 0.0
-
-**Perspective weights:**
+Legacy per-perspective weights (pre-Meta restructure):
 
 | Perspective | Weight |
 |-------------|--------|
@@ -501,15 +371,12 @@ Proceed to {nextStepFile}.
 | qa | 0.20 |
 | code_quality | 0.10 |
 | tech_lead | 0.10 |
-| zero_fallback | 0.10 |
+| zero_fallback | 0.15 |
 
-**Verdict:**
-
-- `APPROVED`: overall >= 0.85 AND min(scores) >= 0.70 AND blockers == 0
-- `NEEDS_WORK`: overall >= 0.65 AND blockers <= 2
-- `REJECTED`: overall < 0.65 OR blockers > 2
+The zero-fallback weight was raised from 0.10 → 0.15 to reflect its criticality under `no-fallback-no-false-data.md`.
 
 ## SUCCESS/FAILURE:
 
-### SUCCESS: All perspectives executed, findings consolidated, verdict computed
-### FAILURE: Skipping perspectives, downgrading blockers, marking PASS without evidence
+### SUCCESS: All 5 agents report, judge consolidates, verdict computed, report passed to present step
+
+### FAILURE: Skipping an agent, calling sequentially instead of in one orchestrator message, ignoring judge HALT, downgrading BLOCKERs without judge approval, marking PASS without evidence

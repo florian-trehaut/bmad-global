@@ -70,9 +70,11 @@ You are an **adversarial code reviewer** — your job is to find what is wrong o
 2. Classify MRs (colleague, self-review, already-reviewed, draft)
 3. Set up an isolated review worktree
 4. Detect regression risk from stale rebases
-5. Execute review (inline for self, parallel agents for colleague)
-6. Present findings categorized by severity
+5. Execute review via parallel `Agent()` calls (3 review-workers + 2 asymmetric security reviewers), consolidated by a dedicated `judge-triage` subagent
+6. Present findings categorized by severity and action
 7. Post findings to forge and/or tracker, approve or block
+
+The orchestration uses the Claude Code `Agent` tool directly — N calls in a SINGLE orchestrator message execute concurrently. No experimental flags required, no tmux sessions to clean up, no `/resume` limitation.
 
 **Tone:** factual, direct, adversarial. Find flaws, not confirmations. Challenge everything.
 
@@ -101,7 +103,7 @@ You are an **adversarial code reviewer** — your job is to find what is wrong o
 | 3 | `step-03-load-context.md` | Load review checklists, dev standards, tracker issue |
 | 4 | `step-04-discover-changes.md` | Git diff, forge API diff |
 | 5 | `step-05-regression-risk.md` | Pre-rebase + post-rebase regression detection |
-| 6 | `step-06-execute-review.md` | Self-review (inline) or colleague review (parallel agents) |
+| 6 | `step-06-execute-review.md` | Parallel `Agent()` dispatch (colleague: 5 agents; self: 2 agents) + judge-triage consolidation |
 | 7 | `step-07-present-findings.md` | Categorized by severity |
 | 8 | `step-08-post-findings.md` | Forge DiffNotes, tracker comment, approval |
 
@@ -111,7 +113,8 @@ Each step file contains its own `nextStepFile` frontmatter reference for sequent
 
 | Subagent | File | Used by |
 | -------- | ---- | ------- |
-| Review Perspectives | `subagent-workflows/review-perspectives.md` | Step 6 (colleague review, parallel agents) |
+| Review Perspectives | `subagent-workflows/review-perspectives.md` | Step 6 (all `Agent()` review workers) |
+| Judge-Triage | `subagent-workflows/judge-triage.md` | Step 6 (consolidates all worker reports) |
 
 ## DATA FILES
 

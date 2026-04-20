@@ -13,7 +13,7 @@ parent_workflow: 'bmad-code-review'
 
 ## ANTI-DEVIATION CONTRACT
 
-You received a `review_contract` in your task description (claimed from TaskList). This is your SOLE source of truth.
+You received a `review_contract` embedded in the `Agent()` prompt from the orchestrator. This is your SOLE source of truth.
 
 **Rules:**
 
@@ -34,7 +34,7 @@ You received a `review_contract` in your task description (claimed from TaskList
 
 ---
 
-## INPUT FORMAT (provided in task description)
+## INPUT FORMAT (provided in Agent prompt by the orchestrator)
 
 ```yaml
 review_contract:
@@ -395,9 +395,9 @@ Deductions:
 
 Report the score for each perspective executed. DO NOT compute the overall score -- the orchestrator aggregates all groups.
 
-### Report via SendMessage
+### Return YAML report as the Agent tool response
 
-Send structured YAML report to the team lead:
+Return the structured YAML `perspective_report` as your final response to the orchestrator. No inter-agent messaging primitives are used — the runtime collects each Agent's response synchronously in the orchestrator's tool response block.
 
 ```yaml
 perspective_report:
@@ -447,8 +447,7 @@ perspective_report:
 - Always execute `zero_fallback` regardless of contract
 - Provide file:line for every finding
 - Provide pattern references from non-legacy code
-- Return structured YAML report via SendMessage
-- Mark task completed after reporting
+- Return the structured YAML `perspective_report` as the Agent tool response
 
 ### DO NOT
 
