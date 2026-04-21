@@ -7,6 +7,10 @@ test/
 coverage/
 test-output/
 
+# Project-local Claude Code tooling (not part of the distributed skill package)
+.claude/
+_bmad-output/
+
 # Documentation site (users access docs online)
 docs/
 website/
