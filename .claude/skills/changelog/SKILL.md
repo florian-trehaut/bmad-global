@@ -1,11 +1,11 @@
 ---
 name: changelog
-description: "Generate a user-facing changelog from git history between the two most recent version bumps, then bump version, commit, push, publish to npm, and optionally post to Slack. This skill should be used when the user asks to 'generate changelog', 'write changelog', 'post changelog', 'release notes', 'what changed since last version', 'publish', 'release', 'bump version', or mentions 'changelog to Slack'."
+description: "Generate a user-facing changelog from git history between the two most recent version bumps, then bump version, commit, tag, push. npm publish + GitHub Release are handled by the `Publish` GitHub Actions workflow on tag push. Optionally post to Slack. This skill should be used when the user asks to 'generate changelog', 'write changelog', 'post changelog', 'release notes', 'what changed since last version', 'publish', 'release', 'bump version', or mentions 'changelog to Slack'."
 ---
 
 # Changelog & Release
 
-Generate a themed, user-facing changelog from git commits since the last version bump, write it to CHANGELOG.md, bump version, commit, push, publish to npm, and optionally post to Slack.
+Generate a themed, user-facing changelog from git commits since the last version bump, write it to CHANGELOG.md, bump version, commit, tag, push. The `Publish` workflow (`.github/workflows/publish.yaml`) takes over on the tag push and runs `npm publish` via OIDC trusted publishing plus `gh release create`. Optionally post to Slack.
 
 ## Workflow
 
@@ -116,11 +116,11 @@ Update `package.json` version field:
 npm version {bump_type} --no-git-tag-version
 ```
 
-`--no-git-tag-version` because we create the commit ourselves with a meaningful message.
+`--no-git-tag-version` because we create the commit and tag ourselves with a meaningful commit message.
 
 ### 8. Commit, tag, and push
 
-Create a single commit with both changes:
+Create a single commit with both changes, then tag it:
 
 ```bash
 git add package.json package-lock.json CHANGELOG.md
@@ -128,7 +128,7 @@ git commit -m "chore: bump version to {new_version}"
 git tag "v{new_version}"
 ```
 
-HALT — present commit summary and ask: "Push to origin and publish to npm? `[Y]es / [N]o`"
+HALT — present commit summary and ask: "Push to origin? The `Publish` workflow will run on the tag and release to npm. `[Y]es / [N]o`"
 
 If **Y**:
 
@@ -136,23 +136,27 @@ If **Y**:
 git push origin main --follow-tags
 ```
 
-If **N**: inform user the commit and tag are local, they can push manually later. Skip step 9.
+The tag push triggers `.github/workflows/publish.yaml`, which runs tests, publishes to npm via OIDC trusted publishing, and creates the GitHub Release from the CHANGELOG section.
 
-### 9. Publish to npm
+If **N**: inform user the commit and tag are local, they can push manually later (`git push origin main --follow-tags`). Skip step 9.
+
+### 9. Watch the publish workflow
 
 ```bash
-npm publish --tag latest
+gh run watch --repo florian-trehaut/bmad-global --exit-status
 ```
 
-Verify publication:
+This blocks until the latest workflow run finishes. Exit status is non-zero if the run failed.
+
+If it fails: HALT — report the run URL. The tag is already pushed; the user can replay the workflow via `gh workflow run publish.yaml --ref v{new_version}` after fixing the root cause, or re-run from the GitHub UI.
+
+If it succeeds, verify publication:
 
 ```bash
 npm view @florian-trehaut/bmad-global@{new_version} version
 ```
 
-If publish fails: HALT — report the error. The commit and tag are already pushed, so the user may need to retry `npm publish` manually.
-
-Log: "Published @florian-trehaut/bmad-global@{new_version} to npm."
+Log: "Published @florian-trehaut/bmad-global@{new_version} to npm via CI."
 
 ### 10. Post to Slack (optional)
 
@@ -183,6 +187,6 @@ Release complete:
   Version:   {previous_version} → {new_version}
   Commit:    {short_hash}
   Tag:       v{new_version}
-  npm:       {published / skipped}
+  npm:       published via CI (run: {run_url})
   Slack:     {posted to #channel / skipped}
 ```
