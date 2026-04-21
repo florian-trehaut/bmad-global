@@ -73,50 +73,20 @@ Store: `MR_IID`, `MR_URL`, `MR_AUTHOR`, `MR_SOURCE_BRANCH`, `MR_TARGET_BRANCH`, 
 
 ## 2. Setup Review Worktree
 
-**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+Derive `REVIEW_WORKTREE_PATH_EXPECTED` from `{WORKTREE_TEMPLATE_REVIEW}` with `{MR_IID}` substituted.
 
-<check if="worktree_enabled == true (or absent)">
+**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
 
-  Derive `REVIEW_WORKTREE_PATH` from `{WORKTREE_TEMPLATE_REVIEW}` with `{MR_IID}` substituted.
+| Parameter | Value |
+|-----------|-------|
+| `worktree_purpose` | `review` |
+| `worktree_path_expected` | `{REVIEW_WORKTREE_PATH_EXPECTED}` |
+| `worktree_base_ref` | `origin/{MR_SOURCE_BRANCH}` |
+| `worktree_branch_name` | `review-{MR_IID}` |
+| `worktree_branch_strategy` | `match-remote` |
+| `worktree_alignment_check` | `CURRENT_BRANCH == {MR_SOURCE_BRANCH}` OR `CURRENT_BRANCH == review-{MR_IID}` |
 
-  ```bash
-  # Clean any existing worktree for this MR (review worktrees have no local changes to preserve)
-  git fetch origin
-  EXISTING_WT=$(git worktree list | grep "{MR_SOURCE_BRANCH}" | awk '{print $1}')
-  if [ -n "$EXISTING_WT" ]; then git worktree remove "$EXISTING_WT" --force 2>/dev/null || true; fi
-  git worktree prune
-
-  # CRITICAL: use -B to create a LOCAL branch tracking the remote — avoids detached HEAD
-  git worktree add -B review-{MR_IID} {REVIEW_WORKTREE_PATH} origin/{MR_SOURCE_BRANCH}
-  cd {REVIEW_WORKTREE_PATH}
-  CURRENT_BRANCH=$(git branch --show-current)
-  if [ -z "$CURRENT_BRANCH" ]; then echo "FATAL: detached HEAD — HALT" && exit 1; fi
-  echo "On branch: $CURRENT_BRANCH"
-  git log -1 --oneline
-  ```
-
-  Then run the mandatory post-creation setup from `bmad-shared/worktree-lifecycle.md`:
-
-  ```bash
-  cd {REVIEW_WORKTREE_PATH}
-  {install_command}      # HALT on failure
-  {build_command}        # HALT on failure, skip if empty
-  {typecheck_command}    # WARN on failure, skip if empty
-  ```
-
-</check>
-
-<check if="worktree_enabled == false">
-
-  No worktree — checkout the MR branch in the current repo:
-
-  ```bash
-  git fetch origin
-  git checkout {MR_SOURCE_BRANCH}
-  ```
-
-  Store `REVIEW_WORKTREE_PATH` = current project directory.
-</check>
+After the protocol completes, set `REVIEW_WORKTREE_PATH = WORKTREE_PATH` (the protocol sets `WORKTREE_PATH`; the rest of this workflow uses `REVIEW_WORKTREE_PATH` by convention).
 
 **From this point on, ALL analysis AND fixes run inside `{REVIEW_WORKTREE_PATH}`.** The worktree IS the MR branch — commits made here push directly to the MR branch. HALT if `REVIEW_WORKTREE_PATH` is unset or invalid at any subsequent step.
 

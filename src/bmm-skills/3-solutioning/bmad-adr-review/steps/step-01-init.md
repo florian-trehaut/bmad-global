@@ -142,38 +142,24 @@ Check `adr_location` from workflow-context.md.
 
 ### 7. Setup Working Environment
 
-**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
-
-Derive slug from ADR title or source:
-```bash
-SLUG={kebab-case of ADR title, max 30 chars}
-WORKTREE_PATH="../{WORKTREE_PREFIX}-review-adr-{SLUG}"
-```
-
-<check if="worktree_enabled == true (or absent)">
+Derive slug from ADR title or source (kebab-case, max 30 chars), then:
 
 ```bash
-git fetch origin
-git worktree add {WORKTREE_PATH} origin/main --detach
+WORKTREE_PATH_EXPECTED="../{WORKTREE_PREFIX}-review-adr-{SLUG}"
 ```
 
-  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
+**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
 
-```bash
-cd {WORKTREE_PATH}
-{install_command}      # HALT on failure
-{build_command}        # HALT on failure, skip if empty
-{typecheck_command}    # WARN on failure, skip if empty
-```
-</check>
+| Parameter | Value |
+|-----------|-------|
+| `worktree_purpose` | `read-only` |
+| `worktree_path_expected` | `{WORKTREE_PATH_EXPECTED}` |
+| `worktree_base_ref` | `origin/main` |
+| `worktree_branch_name` | `null` |
+| `worktree_branch_strategy` | `detached` |
+| `worktree_alignment_check` | `CURRENT_BRANCH == main` OR `CURRENT_BRANCH == master` OR `CURRENT_BRANCH == ""` (detached) |
 
-<check if="worktree_enabled == false">
-  No worktree — investigate in the current project directory.
-
-  Store `WORKTREE_PATH` = current project directory.
-</check>
-
-From this point, all codebase investigation runs inside `{WORKTREE_PATH}`.
+After the protocol completes, `WORKTREE_PATH` is set. From this point, all codebase investigation runs inside `{WORKTREE_PATH}`.
 
 ### 8. Save WIP
 

@@ -52,6 +52,43 @@
 <!-- ALWAYS INCLUDED. Scan ~/.claude/skills/bmad-*/SKILL.md at generation time. -->
 <!-- List as: `/skill-name` — one-line description (from SKILL.md frontmatter). Exclude utility skills (bmad-shared, bmad-help). Group by purpose if >10 skills. -->
 
+## Knowledge Maintenance Policy
+
+<!-- ALWAYS INCLUDED. Static content emitted verbatim by step-09. Tells Claude to keep the knowledge base in sync with every session's changes. -->
+
+**This project's knowledge files and workflow context are alive — keep them in sync with the code.**
+
+When a change made during this session affects the project's ground truth (stack, conventions, domain, infra, API surface, tracker, review rules, investigation patterns, workflow configuration), update the corresponding knowledge file **before ending the session**. Do not defer. Do not leave `TODO: update knowledge` comments.
+
+### Triggers → Updates
+
+| If your change introduces or modifies… | Update this file |
+|----------------------------------------|------------------|
+| A language, framework, database, or major library | `.claude/workflow-knowledge/stack.md` |
+| A test framework, test-pyramid rule, or forbidden test pattern | `.claude/workflow-knowledge/stack.md` (Test section) |
+| A commit format, branch naming rule, or code-style convention | `.claude/workflow-knowledge/conventions.md` |
+| A domain entity, ubiquitous term, or bounded context | `.claude/workflow-knowledge/domain-glossary.md` |
+| A CI workflow, deployed environment, alerting channel, or secret | `.claude/workflow-knowledge/infrastructure.md` |
+| A public CLI command, module, or schema field | `.claude/workflow-knowledge/api-surface.md` |
+| A tracker state, label, or issue template | `.claude/workflow-knowledge/tracker.md` AND `.claude/workflow-context.md` |
+| A review perspective or severity rule | `.claude/workflow-knowledge/review-perspectives.md` |
+| An investigation checkpoint or debug pattern | `.claude/workflow-knowledge/investigation-checklist.md` |
+| The package manager, install/build/test/quality-gate command | `.claude/workflow-context.md` (frontmatter) |
+| The worktree templates, branch template, or forge configuration | `.claude/workflow-context.md` (frontmatter) |
+| The communication language, user name, or user skill level | `.claude/workflow-context.md` (frontmatter) |
+
+### Update Protocol
+
+1. **Identify** the affected file(s) via the table above.
+2. **Read** the current file to understand structure and existing content.
+3. **Edit in-place** — add, modify, or remove lines as needed. Preserve YAML frontmatter syntactic validity.
+4. **Escalate if non-trivial**: if the change rewrites > 5 lines, alters the file's purpose, or spans > 2 knowledge files, STOP editing blindly and run `/bmad-knowledge-refresh` instead. That skill uses source-hash detection + per-file diff review — the correct tool for large or cross-cutting updates.
+5. **Mention the update** in your session summary (e.g., `"Updated stack.md to add Redis 7 as new dependency"`). Make the knowledge delta explicit for the user's review.
+
+### When in Doubt
+
+If you are unsure whether a change triggers a knowledge update, ASK the user before ending the session. Over-updating is cheap; silent drift is expensive — stale knowledge files are the #1 cause of workflow failures.
+
 ## Deep Knowledge
 
 <!-- ALWAYS INCLUDED. List only files that actually exist in {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/. -->

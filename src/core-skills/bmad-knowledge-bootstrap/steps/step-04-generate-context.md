@@ -44,6 +44,7 @@ forge_api_base: "{api_base_cmd}"
 
 # --- Worktree strategy ---
 worktree_enabled: {worktree_enabled}   # true = use worktrees for isolation | false = work on branches in main repo
+worktree_reuse_current: auto           # auto = detect + prompt on mismatch (default) | always = reuse without prompt | never = always create conventional sibling
 
 # --- Worktree naming ---
 worktree_prefix: {project_name}

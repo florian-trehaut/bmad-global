@@ -1,6 +1,6 @@
-# BMAD-METHOD
+# bmad-global
 
-Open source framework for structured, agent-assisted software delivery.
+Personal fork of [BMad Method](https://github.com/bmad-code-org/BMAD-METHOD) — a skill distribution framework for structured, agent-assisted software delivery.
 
 ## Rules
 

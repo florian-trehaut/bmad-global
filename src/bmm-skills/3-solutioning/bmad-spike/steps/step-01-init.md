@@ -121,37 +121,20 @@ Get the spike question as a clear statement. Derive a URL-safe slug (lowercase, 
 
 ### 7. Setup Working Environment
 
-**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+Derive `WORKTREE_PATH_EXPECTED` from `{WORKTREE_TEMPLATE_SPIKE}` (resolved from `workflow-context.md` `worktree_templates.spike`), replacing `{slug}` with the derived slug.
 
-<check if="worktree_enabled == true (or absent)">
-  Create a temporary worktree for investigation:
+**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
 
-```bash
-git fetch origin main
-git worktree add {WORKTREE_TEMPLATE_SPIKE} origin/main -b spike/{slug}
-```
+| Parameter | Value |
+|-----------|-------|
+| `worktree_purpose` | `write` |
+| `worktree_path_expected` | `{WORKTREE_PATH_EXPECTED}` |
+| `worktree_base_ref` | `origin/main` |
+| `worktree_branch_name` | `spike/{slug}` |
+| `worktree_branch_strategy` | `feature-branch` |
+| `worktree_alignment_check` | `CURRENT_BRANCH == spike/{slug}` |
 
-  Where `{WORKTREE_TEMPLATE_SPIKE}` is resolved from `workflow-context.md` `worktree_templates.spike`, replacing `{slug}` with the derived slug.
-
-  **If worktree creation fails:** HALT — report error to user. Investigation requires a worktree.
-
-  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
-
-```bash
-cd {SPIKE_WORKTREE_PATH}
-{install_command}      # HALT on failure
-{build_command}        # HALT on failure, skip if empty
-{typecheck_command}    # WARN on failure, skip if empty
-```
-
-  Store `SPIKE_WORKTREE_PATH` = resolved worktree path.
-</check>
-
-<check if="worktree_enabled == false">
-  No worktree — investigate and write PoC code in the current project directory.
-
-  Store `SPIKE_WORKTREE_PATH` = current project directory.
-</check>
+After the protocol completes, set `SPIKE_WORKTREE_PATH = WORKTREE_PATH`.
 
 **From this point on, ALL code investigation and PoC work runs inside {SPIKE_WORKTREE_PATH}.**
 

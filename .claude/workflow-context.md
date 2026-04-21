@@ -35,6 +35,9 @@ forge_api_base: "gh api"
 fork_remote: origin
 upstream_remote: upstream
 
+# --- Worktree strategy ---
+worktree_reuse_current: auto           # auto = detect + prompt on mismatch (default) | always = reuse without prompt | never = always create conventional sibling
+
 # --- Worktree naming ---
 worktree_prefix: bmad-method
 worktree_templates:

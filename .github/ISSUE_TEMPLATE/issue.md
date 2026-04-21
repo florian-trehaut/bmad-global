@@ -19,14 +19,14 @@ A clear and concise description of what you expected to happen.
 **Environment (if relevant)**
 - Model(s) used:
 - Agentic IDE used:
-- BMad version:
+- bmad-global version:
 - Project language:
 
 **Screenshots or links**
 If applicable, add screenshots or links to help explain the problem.
 
 **PR**
-If you'd like to contribute a fix, please indicate you're working on it or link to your PR. See [CONTRIBUTING.md](../../CONTRIBUTING.md) — contributions are always welcome!
+If you'd like to contribute a fix, please indicate you're working on it or link to your PR. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 **Additional context**
 Add any other context about the problem here. The more information you provide, the easier it is to help.

@@ -13,13 +13,18 @@ Clean up the temporary worktree, then present a summary with next steps.
 
 ### 1. Cleanup Worktree
 
-**Apply cleanup rules from `bmad-shared/worktree-lifecycle.md`.**
+**Apply §3 Cleanup from `bmad-shared/worktree-lifecycle.md`.**
 
-<check if="worktree_enabled == true">
+<check if="REUSED_CURRENT_WORKTREE == true">
+  The workflow reused the user's current worktree. Do NOT remove it — log "Worktree reused — cleanup skipped (user's worktree)." and skip branch deletion.
+</check>
+
+<check if="REUSED_CURRENT_WORKTREE != true AND worktree_enabled == true">
 
 ```bash
-cd {project-root}
+cd {MAIN_PROJECT_ROOT}
 git worktree remove {SPEC_WORKTREE_PATH} --force
+git worktree prune
 ```
 
   **If worktree removal fails:** Warn user but do NOT halt. Worktree cleanup is non-critical.
@@ -34,7 +39,7 @@ git branch -D create-story/{slug_or_identifier} 2>/dev/null || true
 ```
 </check>
 
-<check if="worktree_enabled == false">
+<check if="REUSED_CURRENT_WORKTREE != true AND worktree_enabled == false">
   No worktree to remove — skip.
 </check>
 

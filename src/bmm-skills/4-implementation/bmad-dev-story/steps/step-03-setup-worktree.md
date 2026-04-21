@@ -6,105 +6,40 @@ nextStepFile: './step-04-check-mr.md'
 
 ## STEP GOAL:
 
-Create or enter the git worktree for this issue. All implementation work MUST happen inside the worktree (or on a dedicated branch if worktrees are disabled) — NEVER on the main branch.
+Set up the working environment for this story by applying the unified worktree lifecycle protocol from `bmad-shared/worktree-lifecycle.md`. All implementation work MUST happen inside `WORKTREE_PATH`.
 
 ## MANDATORY SEQUENCE
 
 ### 1. Derive Paths
 
-- WORKTREE_PATH: from `{WORKTREE_TEMPLATE_DEV}` with `{ISSUE_NUMBER}` and `{SHORT_DESCRIPTION}` substituted
-- BRANCH_NAME: from `{BRANCH_TEMPLATE}` with `{ISSUE_NUMBER}` and `{SHORT_DESCRIPTION}` substituted
+- `WORKTREE_PATH_EXPECTED`: substitute `{ISSUE_NUMBER}` and `{SHORT_DESCRIPTION}` into `{WORKTREE_TEMPLATE_DEV}` from `workflow-context.md`.
+- `BRANCH_NAME`: substitute `{ISSUE_NUMBER}` and `{SHORT_DESCRIPTION}` into `{BRANCH_TEMPLATE}` from `workflow-context.md`.
 
-### 2. Setup Working Environment
+### 2. Apply the Worktree Lifecycle Protocol
 
-**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
 
-<check if="worktree_enabled == true (or absent)">
+| Parameter | Value |
+|-----------|-------|
+| `worktree_purpose` | `write` |
+| `worktree_path_expected` | `{WORKTREE_PATH_EXPECTED}` |
+| `worktree_base_ref` | `origin/main` |
+| `worktree_branch_name` | `{BRANCH_NAME}` |
+| `worktree_branch_strategy` | `feature-branch` (or `match-remote` if remote branch `origin/{BRANCH_NAME}` already exists) |
+| `worktree_alignment_check` | `CURRENT_BRANCH == {BRANCH_NAME}` |
 
-  #### Check for Existing Worktree
-
-```bash
-git worktree list | grep "{WORKTREE_PREFIX}-{ISSUE_NUMBER}"
-```
-
-  <check if="worktree exists">
-    Enter existing worktree and update:
-
-```bash
-cd {WORKTREE_PATH}
-git fetch origin
-git rebase origin/main
-```
-
-    <check if="rebase conflict">
-      HALT — report conflict to user, do NOT force resolve
-    </check>
-    Verify clean state: `git status`
-  </check>
-
-  <check if="no worktree exists">
-    Fetch and check for remote branch:
+**Remote branch pre-check (write workflows only):** before invoking the protocol, check whether `origin/{BRANCH_NAME}` exists. If it does, switch `worktree_branch_strategy` to `match-remote` so the protocol reuses the remote branch. Otherwise keep `feature-branch`.
 
 ```bash
 git fetch origin
-git branch -r | grep "origin/{BRANCH_NAME}"
+if git branch -r | grep -q "origin/{BRANCH_NAME}$"; then
+  BRANCH_STRATEGY=match-remote
+else
+  BRANCH_STRATEGY=feature-branch
+fi
 ```
 
-    <check if="remote branch exists">
-```bash
-# CRITICAL: use -B to create a LOCAL branch tracking the remote — avoids detached HEAD
-git worktree add -B {BRANCH_NAME} {WORKTREE_PATH} origin/{BRANCH_NAME}
-cd {WORKTREE_PATH}
-# Verify NOT detached — if this prints empty, HALT
-CURRENT_BRANCH=$(git branch --show-current)
-if [ -z "$CURRENT_BRANCH" ]; then echo "FATAL: detached HEAD in worktree" && exit 1; fi
-echo "On branch: $CURRENT_BRANCH"
-git rebase origin/main
-```
-    </check>
-
-    <check if="no remote branch">
-```bash
-git worktree add -b {BRANCH_NAME} {WORKTREE_PATH} origin/main
-cd {WORKTREE_PATH}
-# Verify NOT detached
-CURRENT_BRANCH=$(git branch --show-current)
-if [ -z "$CURRENT_BRANCH" ]; then echo "FATAL: detached HEAD in worktree" && exit 1; fi
-echo "On branch: $CURRENT_BRANCH"
-```
-    </check>
-  </check>
-
-  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
-
-```bash
-cd {WORKTREE_PATH}
-{install_command}      # HALT on failure
-{build_command}        # HALT on failure, skip if empty
-{typecheck_command}    # WARN on failure, skip if empty
-```
-</check>
-
-<check if="worktree_enabled == false">
-  No worktree — create a branch in the current repo:
-
-```bash
-git fetch origin main
-git checkout -b {BRANCH_NAME} origin/main
-```
-
-  <check if="branch already exists">
-```bash
-git checkout {BRANCH_NAME}
-git rebase origin/main
-```
-    <check if="rebase conflict">
-      HALT — report conflict to user, do NOT force resolve
-    </check>
-  </check>
-
-  Store `WORKTREE_PATH` = current project directory.
-</check>
+The protocol sets `WORKTREE_PATH` and may set `REUSED_CURRENT_WORKTREE=true`.
 
 ### 3. Initialize Progress Tracker
 
@@ -121,6 +56,7 @@ timestamp: {date}
 worktree_path: {WORKTREE_PATH}
 branch: {BRANCH_NAME}
 issue_identifier: {ISSUE_IDENTIFIER}
+reused_current_worktree: {REUSED_CURRENT_WORKTREE or false}
 
 ## Step Log
 - [x] Step 1-2: Issue discovered and loaded
@@ -142,6 +78,6 @@ Load and execute {nextStepFile}.
 
 ## SUCCESS/FAILURE:
 
-### SUCCESS: Worktree created/entered (or branch checked out), deps installed, build run, progress tracker initialized
+### SUCCESS: Worktree protocol applied (create or reuse), WORKTREE_PATH set, deps installed, build run, progress tracker initialized
 
-### FAILURE: Working outside worktree/branch, skipping install/build, ignoring rebase conflicts
+### FAILURE: Inlining `git worktree add` outside the shared rule, skipping the protocol, ignoring rebase conflicts

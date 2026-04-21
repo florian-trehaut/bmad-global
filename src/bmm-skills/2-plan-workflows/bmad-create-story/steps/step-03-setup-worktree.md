@@ -2,54 +2,38 @@
 
 ## STEP GOAL
 
-Create a temporary worktree synced with origin/main for code investigation. All code verification in subsequent steps must happen on the latest main.
+Set up a read-only working environment synced with `origin/main` for code investigation. All code verification in subsequent steps must happen on the latest main. Apply the unified worktree lifecycle protocol from `bmad-shared/worktree-lifecycle.md`.
 
 ## RULES
 
 - The worktree is READ-ONLY — no code changes, only investigation
-- If worktree creation fails and `worktree_enabled: true`, HALT — code verification requires a worktree
+- If the protocol fails, HALT — code verification requires a working environment
 
 ## SEQUENCE
 
-### 1. Setup Working Environment
+### 1. Derive Paths
 
-**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
-
-<check if="worktree_enabled == true (or absent)">
-  Create a temporary worktree for investigation:
-
-```bash
-git fetch origin main
-git worktree add {WORKTREE_TEMPLATE_SPEC} origin/main -b create-story/{slug_or_identifier}
-```
-
-  Where `{WORKTREE_TEMPLATE_SPEC}` is resolved from `workflow-context.md` `worktree_templates.quick_spec`, replacing `{slug}` with:
+- `WORKTREE_PATH_EXPECTED`: substitute into `{WORKTREE_TEMPLATE_SPEC}` from `workflow-context.md` (`worktree_templates.quick_spec`), replacing `{slug}` with:
   - **Discovery mode:** the derived slug
   - **Enrichment mode:** `{EPIC_SLUG}-{ISSUE_IDENTIFIER}`
+- `BRANCH_NAME`: `create-story/{slug_or_identifier}`
 
-  **If worktree creation fails:** HALT — report error to user. Investigation requires a worktree.
+### 2. Apply the Worktree Lifecycle Protocol
 
-  **Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
+**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
 
-```bash
-cd {SPEC_WORKTREE_PATH}
-{install_command}      # HALT on failure
-{build_command}        # HALT on failure, skip if empty
-{typecheck_command}    # WARN on failure, skip if empty
-```
+| Parameter | Value |
+|-----------|-------|
+| `worktree_purpose` | `read-only` |
+| `worktree_path_expected` | `{WORKTREE_PATH_EXPECTED}` |
+| `worktree_base_ref` | `origin/main` |
+| `worktree_branch_name` | `{BRANCH_NAME}` |
+| `worktree_branch_strategy` | `feature-branch` |
+| `worktree_alignment_check` | `CURRENT_BRANCH == main` OR `CURRENT_BRANCH == master` OR `CURRENT_BRANCH == ""` (detached) |
 
-  Store `SPEC_WORKTREE_PATH` = resolved worktree path.
-</check>
+After the protocol completes, set `SPEC_WORKTREE_PATH = WORKTREE_PATH`. Log: "Working environment ready: {SPEC_WORKTREE_PATH}"
 
-<check if="worktree_enabled == false">
-  No worktree — investigate in the current project directory.
-
-  Store `SPEC_WORKTREE_PATH` = current project directory.
-</check>
-
-Log: "Working environment ready: {SPEC_WORKTREE_PATH}"
-
-### 2. Proceed
+### 3. Proceed
 
 **From this point on, ALL code investigation runs inside {SPEC_WORKTREE_PATH}.**
 

@@ -1,21 +1,21 @@
 {
-  "name": "bmad-method",
+  "name": "bmad-global",
   "owner": {
-    "name": "Brian (BMad) Madison"
+    "name": "Florian Trehaut"
   },
-  "description": "Breakthrough Method of Agile AI-driven Development — a full-lifecycle framework with agents and workflows for analysis, planning, architecture, and implementation.",
+  "description": "Personal fork of BMad Method with global flat install, Agent Teams, and workflow improvements.",
   "license": "MIT",
-  "homepage": "https://github.com/bmad-code-org/BMAD-METHOD",
-  "repository": "https://github.com/bmad-code-org/BMAD-METHOD",
+  "homepage": "https://github.com/florian-trehaut/bmad-global",
+  "repository": "https://github.com/florian-trehaut/bmad-global",
   "keywords": ["bmad", "agile", "ai", "orchestrator", "development", "methodology", "agents"],
   "plugins": [
     {
       "name": "bmad-pro-skills",
       "source": "./",
       "description": "Next level skills for power users — advanced prompting techniques, agent management, and more.",
-      "version": "6.3.0",
+      "version": "1.5.0",
       "author": {
-        "name": "Brian (BMad) Madison"
+        "name": "Florian Trehaut"
       },
       "skills": [
         "./src/core-skills/bmad-help",
@@ -35,9 +35,9 @@
       "name": "bmad-method-lifecycle",
       "source": "./",
       "description": "Full-lifecycle AI development framework — agents and workflows for product analysis, planning, architecture, and implementation.",
-      "version": "6.3.0",
+      "version": "1.5.0",
       "author": {
-        "name": "Brian (BMad) Madison"
+        "name": "Florian Trehaut"
       },
       "skills": [
         "./src/bmm-skills/1-analysis/bmad-product-brief",

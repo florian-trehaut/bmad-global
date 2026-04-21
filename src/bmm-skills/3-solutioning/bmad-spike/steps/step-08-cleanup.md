@@ -48,19 +48,24 @@ WAIT for input. Default to **K** if user just presses enter or says "keep".
 
 ### 2. Remove Worktree
 
-**Apply cleanup rules from `bmad-shared/worktree-lifecycle.md`.**
+**Apply §3 Cleanup from `bmad-shared/worktree-lifecycle.md`.**
 
-<check if="worktree_enabled == true">
+<check if="REUSED_CURRENT_WORKTREE == true">
+  The workflow reused the user's current worktree. Do NOT remove it — log "Worktree reused — cleanup skipped (user's worktree)." and skip branch deletion below (the user owns the branch lifecycle).
+</check>
+
+<check if="REUSED_CURRENT_WORKTREE != true AND worktree_enabled == true">
 
 ```bash
-cd {project-root}
+cd {MAIN_PROJECT_ROOT}
 git worktree remove {SPIKE_WORKTREE_PATH} --force
+git worktree prune
 ```
 
   **If removal fails:** Warn but do NOT HALT. The worktree can be cleaned up manually.
 </check>
 
-<check if="worktree_enabled == false">
+<check if="REUSED_CURRENT_WORKTREE != true AND worktree_enabled == false">
   No worktree to remove — skip this step.
 </check>
 

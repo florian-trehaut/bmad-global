@@ -1,5 +1,5 @@
 name: Bug Report
-description: File a bug report to help us improve BMad Method
+description: File a bug report for bmad-global (this fork)
 title: "[BUG] "
 labels: bug
 assignees: []
@@ -8,6 +8,8 @@ body:
     attributes:
       value: |
         Thanks for filing a bug report! Please fill out the information below to help us reproduce and fix the issue.
+
+        For bugs in the core BMad Method framework (not specific to this fork), please report them to the [upstream repository](https://github.com/bmad-code-org/BMAD-METHOD/issues).
 
   - type: textarea
     id: description
@@ -24,7 +26,7 @@ body:
       label: Steps to reproduce
       description: Step-by-step instructions to reproduce the behavior
       placeholder: |
-        1. Run 'npx bmad-method install'
+        1. Run 'npx @florian-trehaut/bmad-global install'
         2. Select option X
         3. Run workflow Y
         4. See error
@@ -57,16 +59,16 @@ body:
       placeholder: Paste any relevant screenshots here
 
   - type: dropdown
-    id: module
+    id: area
     attributes:
-      label: Which module is this for?
-      description: Select the BMad module this issue relates to
+      label: Which area is this for?
+      description: Select the area this issue relates to
       options:
-        - BMad Method (BMM) - Core Framework
-        - BMad Builder (BMB) - Agent Builder Tool
-        - Test Architect (TEA) - Test Strategy Module
-        - Game Dev Studio (BMGD) - Game Development Module
-        - Creative Intelligence Suite (CIS) - Innovation Module
+        - Skill (core-skills)
+        - Skill (bmm-skills)
+        - CLI installer
+        - Agent Teams infrastructure
+        - Upstream sync workflow
         - Not sure / Other
     validations:
       required: true
@@ -74,9 +76,9 @@ body:
   - type: input
     id: version
     attributes:
-      label: BMad Version
-      description: "Check with: npx bmad-method --version or check package.json"
-      placeholder: e.g., 6.0.0-Beta.4
+      label: bmad-global Version
+      description: "Check with: npx @florian-trehaut/bmad-global --version or check package.json"
+      placeholder: e.g., 1.5.0
     validations:
       required: true
 
@@ -86,10 +88,6 @@ body:
       label: Which AI IDE are you using?
       options:
         - Claude Code
-        - Cursor
-        - Windsurf
-        - Copilot CLI / GitHub Copilot
-        - Kilo Code
         - Other
     validations:
       required: true

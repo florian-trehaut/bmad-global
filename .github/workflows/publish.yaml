@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "src/**"
-      - "tools/installer/**"
+      - "tools/cli/**"
       - "package.json"
   workflow_dispatch:
     inputs:
@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   publish:
-    if: github.repository == 'bmad-code-org/BMAD-METHOD' && (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main')
+    if: github.repository == 'florian-trehaut/bmad-global' && (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App token
@@ -80,8 +80,8 @@ jobs:
       - name: Derive next prerelease version
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.channel == 'next')
         run: |
-          NEXT_VER=$(npm view bmad-method@next version 2>/dev/null || echo "")
-          LATEST_VER=$(npm view bmad-method@latest version 2>/dev/null || echo "")
+          NEXT_VER=$(npm view @florian-trehaut/bmad-global@next version 2>/dev/null || echo "")
+          LATEST_VER=$(npm view @florian-trehaut/bmad-global@latest version 2>/dev/null || echo "")
 
           # Determine the best base version for the next prerelease.
           BASE=$(node -e "
@@ -134,19 +134,3 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Notify Discord
-        if: github.event_name == 'workflow_dispatch' && inputs.channel == 'latest'
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          source .github/scripts/discord-helpers.sh
-          [ -z "$WEBHOOK" ] && exit 0
-
-          VERSION=$(node -p 'require("./package.json").version')
-          RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/v${VERSION}"
-          MSG=$(printf '📦 **[bmad-method v%s released](<%s>)**' "$VERSION" "$RELEASE_URL" | esc)
-
-          jq -n --arg content "$MSG" '{content: $content}' | curl -sf --retry 2 -X POST "$WEBHOOK" -H "Content-Type: application/json" -d @-
-        env:
-          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}

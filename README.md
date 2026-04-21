@@ -1,5 +1,3 @@
-![BMad Method](banner-bmad-method.png)
-
 # bmad-global — Personal BMad Fork
 
 [![Upstream](https://img.shields.io/badge/upstream-bmad--code--org%2FBMAD--METHOD-blue)](https://github.com/bmad-code-org/BMAD-METHOD)

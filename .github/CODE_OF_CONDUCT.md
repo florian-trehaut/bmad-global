@@ -59,8 +59,9 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-the official BMAD Discord server (<https://discord.com/invite/gk8jAdXWmj>) - DM a moderator or flag a post.
+reported to the maintainer by opening a confidential GitHub Security Advisory
+at <https://github.com/florian-trehaut/bmad-global/security/advisories/new>
+or by contacting [@florian-trehaut](https://github.com/florian-trehaut) directly.
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

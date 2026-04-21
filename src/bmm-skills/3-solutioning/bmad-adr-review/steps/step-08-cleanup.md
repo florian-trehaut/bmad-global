@@ -35,9 +35,13 @@ Clean up worktree (with user consent), delete WIP file, and present final summar
 
 ### 1. Worktree Cleanup
 
-**Apply cleanup rules from `bmad-shared/worktree-lifecycle.md`.**
+**Apply §3 Cleanup from `bmad-shared/worktree-lifecycle.md`.**
 
-<check if="worktree_enabled == true">
+<check if="REUSED_CURRENT_WORKTREE == true">
+  The workflow reused the user's current worktree. Do NOT remove it — log "Worktree reused — cleanup skipped (user's worktree)." and skip the prompt below.
+</check>
+
+<check if="REUSED_CURRENT_WORKTREE != true AND worktree_enabled == true">
 
   > **Worktree cleanup:**
   > Path: `{WORKTREE_PATH}`
@@ -48,12 +52,14 @@ Clean up worktree (with user consent), delete WIP file, and present final summar
 
   - **R**: Remove worktree:
     ```bash
-    git worktree remove {WORKTREE_PATH}
+    cd {MAIN_PROJECT_ROOT}
+    git worktree remove {WORKTREE_PATH} --force
+    git worktree prune
     ```
   - **K**: Keep worktree. Log: "Worktree kept at {WORKTREE_PATH}"
 </check>
 
-<check if="worktree_enabled == false">
+<check if="REUSED_CURRENT_WORKTREE != true AND worktree_enabled == false">
   No worktree to remove — skip this step.
 </check>
 

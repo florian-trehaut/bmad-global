@@ -51,38 +51,25 @@ If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. Th
 
 ### 4. Setup working environment
 
-**Apply the worktree lifecycle rules from `bmad-shared/worktree-lifecycle.md`.**
+The worktree MUST be set up BEFORE any code investigation. Without it, code searches and git log target the main repo working tree, which may be stale or on a different branch.
 
-The worktree MUST be created BEFORE any code investigation. Without it, code searches and git log target the main repo working tree, which may be stale or on a different branch.
+Derive paths:
 
-<check if="worktree_enabled == true (or absent)">
+- `WORKTREE_PATH_EXPECTED`: `../{WORKTREE_PREFIX}-troubleshoot`
+- `BRANCH_NAME`: `troubleshoot/{date}` where `{date}` is today in `YYYY-MM-DD` format
 
-```bash
-git fetch origin main
-git worktree add ../{WORKTREE_PREFIX}-troubleshoot origin/main -b troubleshoot/{date}
-```
+**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
 
-Where `{date}` is today in `YYYY-MM-DD` format.
+| Parameter | Value |
+|-----------|-------|
+| `worktree_purpose` | `write` |
+| `worktree_path_expected` | `{WORKTREE_PATH_EXPECTED}` |
+| `worktree_base_ref` | `origin/main` |
+| `worktree_branch_name` | `{BRANCH_NAME}` |
+| `worktree_branch_strategy` | `feature-branch` |
+| `worktree_alignment_check` | `CURRENT_BRANCH == {BRANCH_NAME}` OR `CURRENT_BRANCH` matches `troubleshoot/.*` |
 
-**If worktree creation fails:** HALT — report error.
-
-**Run post-creation setup** (MANDATORY — from `bmad-shared/worktree-lifecycle.md`):
-
-```bash
-cd {WORKTREE_PATH}
-{install_command}      # HALT on failure
-{build_command}        # HALT on failure, skip if empty
-{typecheck_command}    # WARN on failure, skip if empty
-```
-
-Store `WORKTREE_PATH` = resolved worktree path.
-
-</check>
-
-<check if="worktree_enabled == false">
-  No worktree — investigate in the current project directory.
-  Store `WORKTREE_PATH` = current project directory.
-</check>
+After the protocol completes, `WORKTREE_PATH` is set.
 
 **From this point on, ALL code investigation runs inside {WORKTREE_PATH}.**
 

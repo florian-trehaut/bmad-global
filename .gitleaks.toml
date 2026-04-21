@@ -1,0 +1,35 @@
+# gitleaks configuration for bmad-global
+#
+# Extends the default ruleset and documents known false positives that would
+# otherwise be flagged as "generic-api-key" by the built-in heuristics.
+#
+# Re-run: gitleaks detect --no-banner --redact --log-opts="--all"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "JWT example in API-testing documentation (expired token literal used as a textbook example, not a real secret)."
+paths = [
+  '''src/bmm-skills/4-implementation/bmad-test-design/data/knowledge/api-testing-patterns.md''',
+]
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9[^"']*''',
+]
+
+[[allowlists]]
+description = "Adversarial-review sample content (fabricated JWT literal used as fixture input)."
+paths = [
+  '''test/adversarial-review-tests/sample-content.md''',
+]
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIs[^"']*''',
+]
+
+[[allowlists]]
+description = "Historical upstream files-manifest CSV entries — last column is a SHA-256 integrity hash, not an API key. These commits come from the upstream BMad Method history."
+paths = [
+  '''bmad/_cfg/files-manifest\.csv''',
+  '''\.bmad/_cfg/files-manifest\.csv''',
+  '''src/modules/bmm/testarch/knowledge/api-testing-patterns\.md''',
+]

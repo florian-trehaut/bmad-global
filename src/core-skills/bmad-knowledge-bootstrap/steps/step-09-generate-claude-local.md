@@ -193,6 +193,16 @@ Scan `~/.claude/skills/bmad-*/SKILL.md`:
 
 If no skills found: replace with "No BMAD skills installed. Run `npx @bmad-code-org/bmad-method install` to install."
 
+#### Section: Knowledge Maintenance Policy (ALWAYS, static content)
+
+Emit the static `## Knowledge Maintenance Policy` block verbatim from `../templates/claude-local-template.md` (strip HTML comments). This section instructs Claude to keep `.claude/workflow-knowledge/*.md` and `.claude/workflow-context.md` in sync with any change it makes during a session. Do not customize per-project — the mapping of triggers to knowledge files is universal across BMAD projects.
+
+The emitted block MUST include:
+- The opening commitment line ("**This project's knowledge files and workflow context are alive — keep them in sync with the code.**")
+- The `### Triggers → Updates` table with all 12 rows
+- The `### Update Protocol` numbered list (5 steps, including the escalation to `/bmad-knowledge-refresh`)
+- The `### When in Doubt` closing paragraph
+
 #### Section: Deep Knowledge (ALWAYS)
 
 List only files that **actually exist** in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`.
