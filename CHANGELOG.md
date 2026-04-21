@@ -1,5 +1,71 @@
 # Changelog
 
+## v1.5.0 - 2026-04-21
+
+### bmad-code-review — Rework complet (Phases 1-7)
+
+Refonte totale du skill de code review : abandon de l'orchestration expérimentale TeamCreate/TaskList/SendMessage au profit d'une dispatch parallèle `Agent()` dans un seul message orchestrateur, ajout d'un subagent `judge-triage` dédié à la consolidation, et restructuration en 6 méta-perspectives avec matrice severity×action.
+
+#### Architecture 4 steps + judge-triage
+
+- **steps/step-01-gather-context.md** — Absorbe les anciens steps 01-05 (discover, setup-worktree, load-context, discover-changes, regression-risk) en un seul step <400 lignes.
+- **steps/step-02-review.md** — Dispatch parallèle `Agent()` vers les 6 méta-perspectives en une seule tool call orchestrateur.
+- **steps/step-03-triage.md** — Un seul `Agent()` vers judge-triage pour dédup + voting + classification severity×action.
+- **steps/step-04-present.md** — Absorbe les anciens steps 07-08 (présentation + routing action).
+- **subagent-workflows/judge-triage.md** (NEW) — Déduplication, voting consensus asymétrique (S1 attacker POV temp 0.2 / S2 defender POV temp 0.5), classification severity×action, scoring per-meta, model-parity constraint.
+
+#### 6 méta-perspectives (weights sum 1.0)
+
+| Meta | Axes couverts | Weight |
+|------|---------------|--------|
+| **M1 — Contract & Spec** | 1a specs, 1b API contract, 1c decision_documentation (ADR + Design merged), 1d docs | 0.20 |
+| **M2 — Correctness & Reliability** | 2a zero-fallback (weight 0.10→0.15), 2b resilience, 2c rollback safety | 0.20 |
+| **M3 — Security & Privacy** | 3a OWASP Top 10 2025, 3b LLM Top 10, 3c/3d privacy stubs | 0.25 |
+| **M4 — Engineering Quality** | 4a code quality, 4b tech lead, 4c patterns, 4d QA, 4e performance | 0.20 |
+| **M5 — Operations & Deployment** | 5a infra, 5b observabilité, 5c commit history | 0.10 |
+| **M6 — User-Facing Quality** | 6a UX/accessibilité, 6b i18n | 0.05 |
+
+#### Primitives partagées + banque de greps par stack
+
+- **data/acceptable-fallback-rules.md** — Règle d'exception à 4 conditions + exception i18n translation-key (consommée par 2a, 2b, 2c, 6b).
+- **data/api-surface-detection.md** — Signaux de surface API publique par stack, tool dispatch (api-extractor / oasdiff / graphql-inspector / buf breaking / cargo-semver-checks), matrice severity, discipline expand/contract, règle deprecation 6 mois (consommée par 1b, 1d, 5c).
+- **data/owasp-top-10-2025.md** — Mapping A01-A10 (nouveau A10 Mishandling of Exceptional Conditions 2025), JWT algorithm-confusion (CVE-2024-54150), NoSQL operator-pollution (CVE-2024-53900), GraphQL depth/alias, CORS reflection, CNSA 2.0 post-quantum awareness (2027-01-01).
+- **data/owasp-llm-top-10.md** — LLM01-10 + ASI01-10 avec patterns défensifs concrets, incident Replit juillet 2025, MINJA >95% injection data.
+- **data/llm-detection.md** — Grep patterns d'import SDK par stack, tool trust-tier tagging, détection de patterns agentic.
+- **data/ui-detection.md** — Globs de fichiers UI, dirs framework-specific, schéma d'extension stack.md (ui, i18n.library, i18n.supported_locales, i18n.rtl_required).
+- **data/severity-action-matrix.md** — Documente la dimension orthogonale severity×action.
+- **data/stack-grep-bank/{typescript,python,go,rust,java,ruby}.md** — Patterns de grep dispatchés selon la stack détectée dans `stack.md` (couverture axes 2a, 3a, 3b, 4a, 4d, 4e, 6b + spécificités par langage).
+- **data/pattern-reference-schema.md** — Map `pattern_references` de stack.md, fallback gracieux vers scan `reference_code`, règle d'exclusion absolue `legacy_code`.
+
+#### bmad-review-regression-risk — Persona-skill extraite (NEW)
+
+Nouvelle persona-skill extraite du v1 step-05, invoquée depuis step-01 via Agent prompt reference. 2 steps : `step-01-phase-1-overlap.md`, `step-02-phase-2-removals.md`.
+
+#### Protection anti-régression
+
+Nouveau test `test/test-code-review-ac.js` avec 19 assertions grep-based couvrant toutes les phases (no TeamCreate, 6 meta files, stack-grep-bank présent, severity×action sur chaque finding, etc.). Wired into `npm test` — toute régression future sur les invariants d'architecture code-review est désormais bloquée au pre-commit.
+
+### bmad-knowledge-refresh — Nouveau core-skill (NEW)
+
+Workflow de rafraîchissement incrémental des knowledge files. Remplace le pattern "re-run knowledge-bootstrap on the whole project" par un refresh ciblé qui préserve les fichiers stables.
+
+- **step-01-detect-changes** — Compare les hashes des sources actuelles contre `source_hash` dans le frontmatter des `workflow-knowledge/*.md` existants.
+- **step-02-scan-and-generate** — Régénère uniquement les knowledge files obsolètes contre les sources actuelles.
+- **step-03-review-and-apply** — Présente les diffs per-file, attend les choix A/R/M avant écriture.
+
+### bmad-knowledge-bootstrap — step-09 CLAUDE.local.md generation
+
+Nouveau step 09 qui synthétise tous les knowledge files générés en un `CLAUDE.local.md` auto-contenu — guide de projet gitignored auto-chargé par Claude Code à chaque session. Inclut backup du fichier existant, analyse de couverture `CLAUDE.md` pour éviter la duplication, et review utilisateur avant écriture.
+
+### changelog skill — Release workflow complet
+
+Extension du skill changelog en workflow de release de bout en bout : pre-flight checks (clean + on main), identification du range de version, analyse des commits, proposition de bump type avec HALT, génération du changelog par thème, update CHANGELOG.md, `npm version --no-git-tag-version`, commit + tag + push `--follow-tags`, `npm publish --tag latest` + vérification via `npm view`, post Slack optionnel avec formatting mrkdwn.
+
+### bmad-create-story — Performance Measurement Plan
+
+- **step-02d-discover** — Référence `{businessContextTemplate}` dans la définition du VM checklist (B5) pour format d'output structuré + guidelines qualité VM.
+- **step-07-plan** — Nouveau §6 "Performance Measurement Plan" conditionnel (latency / batch / binary-size), exigeant instrumentation temporaire + mesures réelles avant removal — les claims de performance en MR sont désormais evidence-backed. Nouveau §7 "Identify Dependencies and Risks". Sections suivantes renumérotées 6→8, 7→9, 8→10, 9→11.
+
 ## v1.3.0 - 2026-04-01
 
 ### Worktree Lifecycle & ADR Improvements
