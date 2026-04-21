@@ -146,6 +146,8 @@ If none: document "No external dependencies identified."
 
 #### B5. Define Validation Metier Checklist
 
+Load {businessContextTemplate} for structured output format and VM quality guidelines.
+
 > When this story is deployed, what tests must be performed to confirm it works from the business perspective?
 
 ```markdown

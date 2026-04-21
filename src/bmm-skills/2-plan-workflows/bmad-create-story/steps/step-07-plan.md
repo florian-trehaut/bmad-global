@@ -109,7 +109,27 @@ Plus story-specific guardrails from analysis (ADR violations, prior MR rejection
 
 Expected files to create and modify, grouped by service/area.
 
-### 6. Compose Issue Description
+### 6. Performance Measurement Plan (if applicable)
+
+If the feature has performance implications (latency-sensitive paths, batch processing, large data, startup time, binary size), include a measurement task:
+
+```markdown
+- [ ] Task N: Performance measurement
+  - Add temporary timing instrumentation to {critical_paths}
+  - Run with realistic data, capture measurements
+  - Document results (include in MR description)
+  - Remove instrumentation before final commit
+```
+
+This ensures performance claims in the MR description are backed by evidence. Skip if no performance implications.
+
+### 7. Identify Dependencies and Risks
+
+- External libraries or services needed
+- High-risk items, known limitations
+- New runtime dependencies that must be approved or evaluated
+
+### 8. Compose Issue Description
 
 Load {trackerIssueTemplate} for the description structure and conditional rules.
 
@@ -125,7 +145,7 @@ Compose the full Markdown description filling in all accumulated content. Omit s
   - Non-regression VMs trace to impacts: `VM-NR-N [type] *(Impact IN)* : description`
   - Adapt VM types to the project's stack (from validation.md if loaded)
 
-### 7. Estimate Story Points
+### 9. Estimate Story Points
 
 Estimate complexity in Fibonacci (1, 2, 3, 5, 8, 13). Consider:
 
@@ -135,7 +155,7 @@ Estimate complexity in Fibonacci (1, 2, 3, 5, 8, 13). Consider:
 
 This is autonomous — do NOT ask the user.
 
-### 8. Verify READY FOR DEVELOPMENT
+### 10. Verify READY FOR DEVELOPMENT
 
 Verify the spec meets this standard:
 
@@ -149,7 +169,7 @@ Verify the spec meets this standard:
 - **Validation Metier**: Production test checklist defined with VM types
 - **Guardrails**: Mandatory guardrails + story-specific guardrails present
 
-### 9. Checkpoint & Menu
+### 11. Checkpoint & Menu
 
 **Discovery mode:** Present composed description summary, then A/P/C menu:
 
