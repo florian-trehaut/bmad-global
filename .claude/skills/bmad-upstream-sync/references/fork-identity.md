@@ -170,6 +170,37 @@ These are not separate skills but enhancements woven into existing workflows:
 6. **Shared rules** — Our additions to bmad-shared/
 7. **CLAUDE.md** — Our project-specific instructions
 8. **Test files** — Our test suite reflects our installer architecture
+9. **Extended TOML customization** — We extend upstream's TOML customization to 23 fork-specific workflow skills beyond upstream's 17 (see "TOML customization extension" below). These `customize.toml` files in fork-only skill directories must be preserved across syncs.
+
+---
+
+## TOML customization extension (fork-only)
+
+Our fork extends upstream's TOML customization system to **all workflow-type skills**, not just the 17 upstream covered. Total coverage: **46/71 skills** (6 agents + 40 workflow skills).
+
+**Fork-only customize.toml files** (23 skills beyond upstream's coverage):
+
+| Category | Skills |
+|---|---|
+| Workflow-conversational (9) | bmad-create-adr, bmad-adr-review, bmad-spike, bmad-nfr-assess, bmad-troubleshoot, bmad-daily-planning, bmad-knowledge-bootstrap, bmad-knowledge-refresh, bmad-brainstorming |
+| TEA testing framework (8) | bmad-tea-framework, bmad-tea-atdd, bmad-tea-automate, bmad-tea-ci, bmad-tea-test-review, bmad-tea-trace, bmad-qa-automate, bmad-test-design |
+| Validation (3) | bmad-validation-desktop, bmad-validation-frontend, bmad-validation-metier |
+| Agent orchestration (2) | bmad-party-mode, bmad-advanced-elicitation |
+| Fix-up (1) | bmad-create-story (upstream had it at `4-implementation/`; we renamed to `2-plan-workflows/`) |
+
+**Exclusions aligned with upstream** (no customize.toml in either tree):
+- Developer-execution (6): bmad-dev-story, bmad-code-review, bmad-review-story, bmad-checkpoint-preview, bmad-quick-dev, bmad-sprint-planning, bmad-sprint-status
+- Meta-tools (7): bmad-create-skill, bmad-edit-skill, bmad-validate-skill, bmad-agent-builder, bmad-workflow-builder, bmad-create-module, bmad-builder-setup
+- Utility-batch (4): bmad-distillator, bmad-index-docs, bmad-shard-doc, bmad-customize
+- Sub-skills programmatic (3): bmad-review-adversarial-general, bmad-review-edge-case-hunter, bmad-review-regression-risk
+- Editorial (2): bmad-editorial-review-prose, bmad-editorial-review-structure
+- Shared infrastructure (2): bmad-shared, bmad-help
+
+**Rule for future upstream syncs**:
+- If upstream adds `customize.toml` to a skill we already have → accept upstream's version, ours may need to be regenerated from the new upstream template
+- If upstream removes `customize.toml` from a skill → keep ours (we decided it's needed)
+- If upstream extends `customize.toml` to one of our excluded skills → **re-evaluate our exclusion** case-by-case via the skill-classification in `src/scripts/generate_customization.py` (BATCHES dict)
+- Generator script `src/scripts/generate_customization.py` encodes our classification and can regenerate all 23 fork-only files idempotently
 
 ---
 

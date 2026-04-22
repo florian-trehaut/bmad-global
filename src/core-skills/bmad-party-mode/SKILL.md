@@ -18,25 +18,64 @@ Party mode accepts optional arguments when invoked:
 - `--model <model>` — Force all subagents to use a specific model (e.g. `--model haiku`, `--model opus`). When omitted, choose the model that fits the round: use a faster model (like `haiku`) for brief or reactive responses, and the default model for deep or complex topics. Match model weight to the depth of thinking the round requires.
 - `--solo` — Run without subagents. Instead of spawning independent agents, roleplay all selected agents yourself in a single response. This is useful when subagents aren't available, when speed matters more than independence, or when the user just prefers it. Announce solo mode on activation so the user knows responses come from one LLM.
 
+## Conventions
+
+- Bare paths resolve from the skill root.
+- `{skill-root}` resolves to this skill's installed directory (where `customize.toml` lives).
+- `{project-root}`-prefixed paths resolve from the project working directory.
+- `{skill-name}` resolves to the skill directory's basename.
+
 ## On Activation
 
-1. **Parse arguments** — check for `--model` and `--solo` flags from the user's invocation.
+### Step 1: Parse Arguments
 
-2. Load config from `{project-root}/_bmad/core/config.yaml` and resolve:
-  - Use `{user_name}` for greeting
-  - Use `{communication_language}` for all communications
+Check for `--model` and `--solo` flags from the user's invocation.
 
-3. **Resolve the agent roster** by running:
+### Step 2: Resolve the Workflow Block
 
-    ```bash
-    python3 {project-root}/_bmad/scripts/resolve_config.py --project-root {project-root} --key agents
-    ```
+Run: `python3 {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --key workflow`
 
-    The resolver merges four layers in order: `_bmad/config.toml` (installer base, team-scoped), `_bmad/config.user.toml` (installer base, user-scoped), `_bmad/custom/config.toml` (team overrides), and `_bmad/custom/config.user.toml` (personal overrides). Each entry under `agents` is keyed by the agent's `code` and carries `name`, `title`, `icon`, `description`, `module`, and `team`. Build an internal roster of available agents from those fields.
+**If the script fails**, resolve the `workflow` block yourself by reading these three files in base → team → user order and applying the same structural merge rules as the resolver:
 
-4. **Load project context** — search for `**/project-context.md`. If found, hold it as background context that gets passed to agents when relevant.
+1. `{skill-root}/customize.toml` — defaults
+2. `{project-root}/_bmad/custom/{skill-name}.toml` — team overrides
+3. `{project-root}/_bmad/custom/{skill-name}.user.toml` — personal overrides
 
-5. **Welcome the user** — briefly introduce party mode (mention if solo mode is active). Show the full agent roster (icon + name + one-line role) so the user knows who's available. Ask what they'd like to discuss.
+Any missing file is skipped. Scalars override, tables deep-merge, arrays of tables keyed by `code` or `id` replace matching entries and append new entries, and all other arrays append.
+
+### Step 3: Execute Prepend Steps
+
+Execute each entry in `{workflow.activation_steps_prepend}` in order before proceeding.
+
+### Step 4: Load Persistent Facts
+
+Treat every entry in `{workflow.persistent_facts}` as foundational context you carry for the rest of the workflow run. Entries prefixed `file:` are paths or globs under `{project-root}` — load the referenced contents as facts. All other entries are facts verbatim.
+
+### Step 5: Load Project Workflow Context
+
+Resolve the main project root (worktree-aware): run `MAIN_PROJECT_ROOT=$(dirname "$(git rev-parse --git-common-dir)")`.
+
+Load `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and resolve from its YAML frontmatter:
+- Use `{user_name}` for greeting
+- Use `{communication_language}` for all communications
+
+If `workflow-context.md` is missing, ask the user for their name and preferred language, then continue.
+
+### Step 6: Resolve the Agent Roster
+
+Build an internal roster of available agents by reading the installed module rosters. For each installed module (e.g. `~/.claude/skills/bmm-skills/module.yaml` or equivalent in the install tree), read the `agents:` block. Each entry carries `code`, `name`, `title`, `icon`, `description`, and `team`. Fallback: if module rosters are unreadable, scan `~/.claude/skills/bmad-agent-*` directories for SKILL.md + customize.toml and extract persona fields.
+
+### Step 7: Execute Append Steps
+
+Execute each entry in `{workflow.activation_steps_append}` in order.
+
+### Step 8: Welcome the User
+
+Briefly introduce party mode (mention if `--solo` mode is active). Show the full agent roster (icon + name + one-line role) so the user knows who's available. Ask what they'd like to discuss.
+
+---
+
+**Activation complete.** Enter The Core Loop below for each user message.
 
 ## The Core Loop
 
