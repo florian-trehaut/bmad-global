@@ -50,7 +50,7 @@ jobs:
           echo "Publishing version: $TAG_VERSION"
 
       - name: Checkout (full history for CHANGELOG extraction)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
