@@ -1,5 +1,72 @@
 # Changelog
 
+## v1.6.0 - 2026-04-22
+
+### 🔥 Highlight: Upstream BMAD-METHOD v6.3.0 synced with extended TOML customization
+
+Full sync with upstream BMAD-METHOD v6.3.0 (78 commits integrated). Our fork extends the new TOML customization system to 23 additional workflow skills beyond upstream's coverage, bringing total coverage to **46/71 skills (65%)**.
+
+#### What's new from upstream (v6.2.2 → v6.3.0)
+
+- **TOML-based customization** — 6 agents + 17 workflow skills now read `customize.toml` at activation. Override persona, menu, principles, and persistent facts via `_bmad/custom/{skill}.toml` without forking the skill.
+- **Python stdlib resolver** — `src/scripts/resolve_customization.py`, `resolve_config.py`. No `uv`/`pip` required, just Python 3.11+ (stdlib `tomllib`).
+- **Agent consolidation** — Barry (quick-flow-solo-dev), Quinn (QA), Bob (SM) removed; capabilities migrated to Amelia (dev agent) menu as codes `QD`, `QA`, `CS`.
+- **`bmad-checkpoint-preview` (NEW skill)** — LLM-assisted human review walkthrough for significant changes. 5 steps: orientation → walkthrough → detail pass → testing → wrap-up.
+- **`bmad-customize` (NEW skill)** — guided TOML override authoring. Conversational flow, no hand-editing TOML required.
+- **quick-dev improvements** — planning artifact awareness, project-root anchor, previous-story continuity, epic context compilation, sprint-status sync on epic-story implementation.
+- **code-review improvements** — harmonized step-01 intent cascade, model-parity enforcement for review subagents, dead Batch-apply option removed from patch menu.
+- **bmad-help llms.txt support** — fetches live docs when answering general questions.
+- **PRD scoping fix** — explicit user confirmation required before de-scoping requirements or inventing phases.
+- **`team: software-development`** — 6 BMM agents now declare this field in module.yaml for cross-module collaboration (party-mode, retrospective).
+
+#### Our fork extension (+23 skills beyond upstream)
+
+Extends TOML customization to all semantically workflow-type skills in the fork:
+
+| Category | Count | Skills |
+|---|---|---|
+| Workflow-conversational | 9 | bmad-create-adr, bmad-adr-review, bmad-spike, bmad-nfr-assess, bmad-troubleshoot, bmad-daily-planning, bmad-knowledge-bootstrap, bmad-knowledge-refresh, bmad-brainstorming |
+| TEA testing framework | 8 | bmad-tea-framework, bmad-tea-atdd, bmad-tea-automate, bmad-tea-ci, bmad-tea-test-review, bmad-tea-trace, bmad-qa-automate, bmad-test-design |
+| Validation | 3 | bmad-validation-desktop, bmad-validation-frontend, bmad-validation-metier |
+| Agent orchestration | 2 | bmad-party-mode, bmad-advanced-elicitation |
+| Fix-up | 1 | bmad-create-story (customize.toml lost during upstream path rename) |
+
+Exclusions aligned with upstream's philosophy (25 skills): developer-execution (6), meta-tools (7), utility-batch (4), sub-skills programmatic (3), editorial (2), shared infrastructure (2).
+
+### 🔓 Public release — repository now open source
+
+- Removed upstream-only content (`docs/`, `website/`, `tools/installer/`, 223 files, -39k lines) — users reach upstream docs at github.com/bmad-code-org/BMAD-METHOD.
+- `npm install -g @florian-trehaut/bmad-global` publishes with OIDC provenance attestation.
+- Gitleaks secret scanning integrated; 11 false positives whitelisted in `.gitleaks.toml`.
+- `npm audit fix` applied — production dependencies have 0 vulnerabilities.
+- Dependabot configured — weekly updates for npm and github-actions.
+- Tag-triggered `Publish` workflow uses OIDC trusted publishing (no npm tokens stored in repo).
+
+### 🛠️ Release pipeline hardened
+
+Changelog skill generalized to handle edge cases encountered during v1.5.0:
+
+- **Gap detection (2.1)** — diffs all git tags against CHANGELOG entries, offers backfill for missing versions (`[B]ackfill / [I]gnore / [H]alt`).
+- **Post-upgrade commands discovery (3.1)** — surfaces commands downstream consumers run after install. Sources: `workflow-context.md` frontmatter → changed skills matching `*-bootstrap|*-refresh|*-migrate|*-init` → user prompt for breaking changes.
+- **Tarball sanity check (7.5)** — `npm pack --dry-run` before push catches `.npmignore` misconfigurations: worktrees, node_modules, large files, .git leaks.
+- **CI failure triage (9.5/9.6)** — matches failure signals to recovery modes (tag mismatch, EPUBLISHFAIL, OIDC errors, test regression), presents `[F]ix+force-retag / [P]atch bump / [W]orkflow replay / [A]bort` menu.
+- **Slack capability probe (10.0)** — detects write-tool availability before asking for channel (`SLACK_MCP_ADD_MESSAGE_TOOL` gate).
+- **Structured Slack post template (10.2)** — impact-weighted highlight + install commands + conditional post-upgrade section.
+
+### ⚙️ Other changes
+
+- **Fork identity extended** — `.claude/skills/bmad-upstream-sync/references/fork-identity.md` documents the TOML extension, exclusion rationale, and future-sync rules.
+- **Tag cleanup** — removed 153 upstream legacy tags from `origin`, retagged fork releases v1.0.0 → v1.4.0 with correct commits for historical accuracy.
+- **Installer** — `tools/cli/installers/lib/core/global-installer.js` installs 71 skills (verified via `test:install` 41/41).
+- **Worktree-aware config** — 135 `MAIN_PROJECT_ROOT` references across skills; all config loads resolve `.claude/workflow-context.md` via `git rev-parse --git-common-dir`.
+
+### Post-upgrade
+
+After `npm install -g @florian-trehaut/bmad-global@1.6.0`, run **one** of:
+
+1. `/bmad-knowledge-bootstrap` — **strongly recommended**. Regenerates `project-context.md`, `stack.md`, `conventions.md`, `api-surface.md`, `tracker.md`, `infrastructure.md`, `review-perspectives.md`, `investigation-checklist.md`, `environment-config.md`, `domain-glossary.md` with updated templates. The TOML activation changes how many skills load config; stale knowledge will not align with new semantics.
+2. `/bmad-knowledge-refresh` — alternative for **incremental** update if bootstrap was already run recently (detects stale files via source hash comparison).
+
 ## v1.5.0 - 2026-04-21
 
 ### bmad-code-review — Rework complet (Phases 1-7)
