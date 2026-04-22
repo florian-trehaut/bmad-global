@@ -143,7 +143,7 @@ class ModuleManager {
         fetchSpinner.stop(`Fetched ${moduleInfo.name}`);
       } catch (error) {
         fetchSpinner.error(`Failed to fetch ${moduleInfo.name}`);
-        throw new Error(`Failed to clone external module '${moduleCode}': ${error.message}`);
+        throw new Error(`Failed to clone external module '${moduleCode}': ${error.message}`, { cause: error });
       }
     }
 
