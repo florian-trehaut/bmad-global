@@ -73,17 +73,12 @@ test('AC-3: Knowledge Maintenance Policy precedes Deep Knowledge', () => {
   assert(maintIdx < deepIdx, 'Knowledge Maintenance Policy must appear before Deep Knowledge');
 });
 
-test('AC-4: template Triggers table covers the 12 canonical triggers', () => {
+test('AC-4: template Triggers table covers the 3-file consolidated layout (project.md / domain.md / api.md) plus workflow-context.md', () => {
   const content = fileContent(TEMPLATE);
   const canonicalTargets = [
-    'workflow-knowledge/stack.md',
-    'workflow-knowledge/conventions.md',
-    'workflow-knowledge/domain-glossary.md',
-    'workflow-knowledge/infrastructure.md',
-    'workflow-knowledge/api-surface.md',
-    'workflow-knowledge/tracker.md',
-    'workflow-knowledge/review-perspectives.md',
-    'workflow-knowledge/investigation-checklist.md',
+    'workflow-knowledge/project.md',
+    'workflow-knowledge/domain.md',
+    'workflow-knowledge/api.md',
     'workflow-context.md',
   ];
   for (const target of canonicalTargets) {

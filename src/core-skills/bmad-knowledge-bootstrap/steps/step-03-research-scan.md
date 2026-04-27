@@ -2,17 +2,87 @@
 nextStepFile: './step-04-generate-knowledge.md'
 ---
 
-# Step 5: Research and Deep Scan
+# Step 3: Research and Deep Scan (adaptive sources)
 
 ## STEP GOAL:
 
-Web research detected technologies for conventions, then deeply scan the codebase to extract concrete data for populating knowledge file templates. This step is automated — no user interaction.
+Read available sources adaptively per the SDD priority pyramid: planning artifacts (PRD, architecture, ADRs), phase 4 specs, and codebase. Optionally web-research detected technologies for conventions. Build structured `PLANNING_DATA`, `SPECS_DATA`, and `CODE_DATA` objects to feed step-04-generate-knowledge.
+
+This step is automated — no user interaction.
 
 ## MANDATORY SEQUENCE
 
-### 1. Web Research (for detected stack)
+### 1. Planning Artifacts Scan (skip if no planning sources)
 
-**Skip if:** TARGET_FILES contains only `tracker.md` or `environment-config.md`.
+If any of `PRD_PRESENT` / `ARCHITECTURE_PRESENT` / `BRIEF_PRESENT` / `ADRS_PRESENT` is true:
+
+#### a. PRD scan (if PRD_PRESENT)
+
+Read `{planning_artifacts}/prd.md`. Extract:
+
+| Section heading | Goes to | Notes |
+|---|---|---|
+| `## Vision` / `## Product Vision` | domain.md§"Bounded Contexts" preface | High-level purpose |
+| `## Domain` / `## Domain Model` / `## Ubiquitous Language` | domain.md§"Ubiquitous Language" + §"Bounded Contexts" | Direct merge |
+| `## Functional Requirements` | api.md§"Endpoints" hints + project.md§"Project Nature" | High-level features |
+| `## Non-functional Requirements` | project.md§"Review Perspectives" + §"Validation Tooling" | Quality attributes |
+| `## Success Criteria` | (informational, not in knowledge) | — |
+| `## Project Type` / `## Project Nature` | project.md§"Project Nature" | Direct merge |
+
+#### b. Product Brief scan (if BRIEF_PRESENT)
+
+Read `{planning_artifacts}/product-brief.md`. Extract domain terminology, vision, and target users → enrich domain.md.
+
+#### c. Architecture scan (if ARCHITECTURE_PRESENT)
+
+Read `{planning_artifacts}/architecture.md`. Extract:
+
+| Section heading | Goes to | Notes |
+|---|---|---|
+| `## Tech Stack` / `## Technology Stack` | project.md§"Tech Stack" | Direct merge |
+| `## Patterns` / `## Architecture Patterns` | project.md§"Architecture Patterns" + §"Conventions" | Direct merge |
+| `## Project Structure` / `## Directory Layout` | project.md§"Architecture" + §"Investigation Checklist" | Direct merge |
+| `## API Design` / `## API` | api.md (entire body) | Endpoints, schemas, auth |
+| `## Infrastructure` / `## Deployment` | project.md§"Infrastructure" | Direct merge |
+| `## Environments` | project.md§"Environments" | Direct merge |
+| `## Test Strategy` / `## Testing` | project.md§"Validation Tooling" + §"Test Rules" | Direct merge |
+| `## Observability` / `## Monitoring` | project.md§"Investigation Checklist"§"Observability" | Direct merge |
+
+#### d. ADRs scan (if ADRS_PRESENT)
+
+Read all ADR files at `{adr_location}/*.md` in chronological order (sort by filename or `date` frontmatter). For each ADR:
+
+- Extract the **decision** (typically in section "## Decision" or "## Outcome")
+- Extract **forbidden patterns** if any (typically in "## Constraints" or "## Implications")
+- Extract **status**: only ADRs with status "Accepted" / "Approved" are applied. "Deprecated" / "Superseded" ADRs are skipped (their successor handles the topic).
+
+Apply ADRs to relevant sections:
+- Tech stack changes → project.md§"Tech Stack"
+- Forbidden patterns → project.md§"Conventions"§"Code Style" + §"Review Perspectives"
+- API breaking changes → api.md
+- Infra changes → project.md§"Infrastructure"
+
+**Most recent wins**: if ADR-005 contradicts ADR-002 on the same topic, ADR-005's content goes into the knowledge file.
+
+Store structured `PLANNING_DATA` per knowledge file target.
+
+### 2. Phase 4 Specs Scan (if SPECS_PRESENT)
+
+For each `_bmad-output/implementation-artifacts/spec-*.md` (or tracker-resolved specs):
+
+- Extract **Technical Decisions** sections → overlay project.md§"Tech Stack" if any
+- Extract **Acceptance Criteria** mentioning APIs → enrich api.md§"Endpoints" hints
+- Extract **Forbidden Patterns** if any → project.md§"Conventions"
+
+Specs **override** ADRs/architecture/PRD for their feature scope. Mark each merge with the source spec for traceability.
+
+Store structured `SPECS_DATA` per knowledge file target.
+
+### 3. Code Scan (skip if CODE_PRESENT=false)
+
+This section runs only when `CODE_PRESENT=true` (codebase exists). It overlays factual data on top of planning intent.
+
+#### a. Web Research (for detected stack)
 
 For each technology detected in step 02 (detect-stack), research:
 1. **Conventions** — file naming, project structure, coding style
@@ -20,23 +90,21 @@ For each technology detected in step 02 (detect-stack), research:
 3. **Test conventions** — file organization, assertion patterns, mocking policies
 4. **Security** — OWASP-relevant patterns for this stack
 
-Store structured `research_findings` per technology.
+Store `research_findings` per technology. Used to enrich project.md§"Conventions" + §"Review Perspectives".
 
-### 2. Stack Scan (for stack.md)
+#### b. Stack Scan
 
-If `stack.md` in TARGET_FILES:
-
-- Read main package manifest → dependencies, scripts, metadata
+- Read main package manifest → dependencies (with versions), scripts, metadata
 - Read lint config files → active rules, severity, overrides
 - Read formatter config → key options
 - Read test config → test roots, coverage thresholds
 - Read pre-commit config → hook commands
-- **Source file patterns**: Use `source_extensions` and `test_file_patterns` from step 02 detection
-- **Architecture patterns**: Use classification from step 02
+- **Source file patterns**: use `source_extensions` and `test_file_patterns` from step 02 detection
+- **Architecture patterns**: use classification from step 02
 
-### 3. Infrastructure Scan (for infrastructure.md)
+Goes to project.md§"Tech Stack" + §"Source File Patterns" + §"Architecture Patterns" + §"Test Rules".
 
-If `infrastructure.md` in TARGET_FILES:
+#### c. Infrastructure Scan
 
 - Read all CI/CD workflow files → jobs, triggers, dependencies
 - Read Dockerfiles → base images, build stages, exposed ports
@@ -44,27 +112,35 @@ If `infrastructure.md` in TARGET_FILES:
 - Read .env.example → variable names (NOT values)
 - Identify cloud service references in code
 
-### 4. Domain Scan (for domain-glossary.md, api-surface.md, investigation-checklist.md)
+Goes to project.md§"Infrastructure" + §"Environments".
 
-If any of these in TARGET_FILES:
+#### d. Domain Scan (for domain.md)
 
-Use `source_extensions` from step 02 to scope searches (do NOT hardcode file extensions):
+Use `source_extensions` from step 02 to scope searches:
 
 ```bash
-# Entity/model definitions — use detected extensions
+# Entity/model definitions
 grep -rn "class.*Entity\|interface.*Model\|schema\|@Entity\|@Table\|struct " --include="{source_ext}" . | grep -v node_modules | grep -v vendor | grep -v test | head -30
 
-# Route/endpoint definitions
-grep -rn "@Get\|@Post\|@Put\|@Delete\|@Controller\|app\.get\|app\.post\|router\." --include="{source_ext}" . | grep -v node_modules | grep -v vendor | head -30
+# Domain exceptions/errors
+grep -rn "Exception\|class.*Error\|enum.*Error" --include="{source_ext}" . | grep -v node_modules | head -20
 ```
 
 - Scan DTOs/request-response schemas
-- Scan domain exceptions/errors
 - Identify bounded contexts from directory structure
 
-### 5. Conventions Scan (for conventions.md)
+Goes to domain.md.
 
-If `conventions.md` in TARGET_FILES:
+#### e. API Scan (for api.md)
+
+```bash
+# Route/endpoint definitions
+grep -rn "@Get\|@Post\|@Put\|@Delete\|@Controller\|app\.get\|app\.post\|router\." --include="{source_ext}" . | grep -v node_modules | head -30
+```
+
+Goes to api.md§"Endpoints".
+
+#### f. Conventions Scan
 
 ```bash
 git log --oneline -30
@@ -75,38 +151,37 @@ git log --oneline -30
 - Analyze import ordering patterns from a sample of source files
 - Check branch naming from `git branch -r | head -20`
 
-### 6. Review Perspectives Scan (for review-perspectives.md)
+Goes to project.md§"Conventions".
 
-If `review-perspectives.md` in TARGET_FILES:
+#### g. Review Perspectives Scan
 
 - Identify security-relevant patterns (auth middleware, input validation)
 - Identify forbidden patterns enforced by linter
-- Check existing review-perspectives.md format if present
+- Check existing review-perspectives content if present
 
-### 7. Tracker Scan (for tracker.md)
+Goes to project.md§"Review Perspectives".
 
-If `tracker.md` in TARGET_FILES:
+#### h. Tracker Scan
 
-- Read workflow-context.md for tracker configuration
+- Read workflow-context.md tracker configuration section
 - If file-based: check sprint-status.yaml structure
+- If MCP-based: probe MCP tools for entity types
 
-### 8. Environment Config Scan (for environment-config.md)
+Goes to project.md§"Tracker Patterns".
 
-If `environment-config.md` in TARGET_FILES:
+#### i. Environment Config Scan
 
 - Scan environment references in code
 - Read deployment configs for environment URLs
 - Check for feature flag systems
 
-### 9. Validation Scan (for validation.md)
+Goes to project.md§"Environments".
 
-If `validation.md` in TARGET_FILES:
+#### j. Validation Scan
 
 - Read E2E config files (playwright.config, cypress.config) → baseURL, projects, webServer config
 - Read component test config → test roots, environment, reporters
 - Scan for stack-specific test helper patterns:
-
-Use `source_extensions` from step 02 to scope searches:
 
 ```bash
 # WASM hydration / Tauri / framework-specific patterns
@@ -125,36 +200,52 @@ grep -rn "checkA11y\|axe\|pa11y\|getByRole\|getByLabel" --include="{source_ext}"
 - Identify test file naming and location patterns from existing test files
 - Extract dev server command from package.json scripts or Cargo config
 
-### 9. ADR Discovery Scan
+Goes to project.md§"Validation Tooling".
 
-Detect Architecture Decision Records in the project. ADRs constrain how all workflows make decisions — their location must be known.
+#### k. ADR Discovery Scan (additional code-side)
 
-**Scan conventional locations:**
+Already detected by step-01 (ADR_LOCATION from workflow-context.md). Re-verify and capture sample for hash:
 
 ```bash
-# Common ADR directory patterns
 ls -d docs/adr/ docs/adrs/ docs/decisions/ docs/architecture/decisions/ adr/ adrs/ doc/adr/ .adr/ 2>/dev/null
-# Search for ADR-like files by naming pattern
 find . -maxdepth 4 -name "ADR-*" -o -name "adr-*" -o -name "[0-9][0-9][0-9][0-9]-*.md" | grep -i "adr\|decision" | grep -v node_modules | head -20
 ```
 
-**If files found:** note the location, count, and format (MADR, Nygard, custom). Read one sample to classify the format. Store as `ADR_LOCATION` and `ADR_FORMAT`.
+Update `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` with `adr_location` and `adr_format` if newly detected.
 
-**If no files found in code:** check the tracker for ADR documents (if tracker is configured):
-- Search tracker documents for "ADR" or "Architecture Decision" in the title
-- If found, note tracker as the ADR source
+Store structured `CODE_DATA` per knowledge file target.
 
-**If no ADRs found anywhere:** store `ADR_LOCATION = "none"`. This is valid — not all projects use ADRs.
+### 4. Compile Results
 
-**Conflict resolution rule:** when multiple ADRs exist on the same topic, the most recent one (by date or sequence number) takes precedence.
+Build three accumulators per target file:
 
-Update `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` with `adr_location` and `adr_format` values.
+```yaml
+PLANNING_DATA:
+  project.md:
+    Tech Stack: { ... }
+    Architecture Patterns: { ... }
+    ...
+  domain.md:
+    Ubiquitous Language: { ... }
+    ...
+  api.md:
+    Endpoints: { ... }
+    ...
 
-### 10. Compile Results
+SPECS_DATA:
+  project.md: { ... }
+  domain.md: { ... }
+  api.md: { ... }
 
-For each TARGET_FILE, compile the relevant scan data into a structured format for step 04 (generate-knowledge).
+CODE_DATA:
+  project.md: { ... }
+  domain.md: { ... }
+  api.md: { ... }
+```
 
-### 11. Proceed
+These feed step-04-generate-knowledge merge logic.
+
+### 5. Proceed
 
 Load and execute {nextStepFile}.
 
@@ -164,13 +255,18 @@ Load and execute {nextStepFile}.
 
 ### SUCCESS:
 
-- All TARGET_FILES have corresponding scan data
+- Available planning artifacts read (PRD, architecture, ADRs) — skipped if absent
+- Available phase 4 specs read — skipped if absent
+- Code scanned — skipped if CODE_PRESENT=false
+- ADRs sorted chronologically; deprecated/superseded ones excluded
 - Source extensions used dynamically (not hardcoded)
 - Research findings sourced from web (not LLM memory)
-- Scan data includes file:line references
+- PLANNING_DATA / SPECS_DATA / CODE_DATA structured per target file
 
 ### FAILURE:
 
+- Reading code when CODE_PRESENT=false
 - Hardcoding file extensions in grep commands
 - Relying on LLM knowledge instead of web research
-- Skipping scan areas for TARGET_FILES
+- Mixing ADR sources without chronological order
+- Including deprecated ADRs in merge data

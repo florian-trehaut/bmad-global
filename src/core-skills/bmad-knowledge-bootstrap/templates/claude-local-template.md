@@ -1,6 +1,6 @@
 # Project Guide
 
-<!-- Template for bmad-knowledge-bootstrap step 09. Generates CLAUDE.local.md — a self-contained project guide auto-loaded by Claude Code every session. No BMAD jargon without explanation. Target: 150-250 lines. -->
+<!-- Template for bmad-knowledge-bootstrap step-07-generate-claude-local. Generates CLAUDE.local.md — a self-contained project guide auto-loaded by Claude Code every session. No BMAD jargon without explanation. Target: 150-250 lines. Sources: project.md / domain.md / api.md (consolidated 3-file layout). -->
 
 ## Project Quick Reference
 
@@ -10,32 +10,32 @@
 ## Stack & Architecture
 
 <!-- CONDITIONAL: Skip if CLAUDE.md already has a section with heading containing "architecture" or "structure". -->
-<!-- From stack.md: project nature (1 paragraph), architecture patterns table (scope | pattern | key rules), current stack table (top 6 entries), source file patterns table. Keep it actionable — what Claude needs to make correct decisions. -->
+<!-- From project.md§"Project Nature" + §"Architecture" + §"Tech Stack" + §"Source File Patterns" + §"Architecture Patterns". Keep it actionable — what Claude needs to make correct decisions. -->
 
 ## Code Conventions
 
 <!-- CONDITIONAL: Skip if CLAUDE.md already has a section with heading containing "convention", "style", or "commit". -->
-<!-- From conventions.md: commit format with allowed types as inline list, branch strategy (one line), key naming conventions (one line per category), import order (one line). Rules only, no explanations. -->
+<!-- From project.md§"Conventions": commit format with allowed types as inline list, branch strategy (one line), key naming conventions (one line per category), import order (one line). Rules only, no explanations. -->
 
 ## Test Rules
 
 <!-- CONDITIONAL: Skip if CLAUDE.md already has a section with heading containing "test". -->
-<!-- From stack.md test section: forbidden patterns as bullet list, test pyramid as compact table (type | framework | suffix | location), test commands. -->
+<!-- From project.md§"Test Rules" + §"Validation Tooling": forbidden patterns as bullet list, test pyramid as compact table (type | framework | suffix | location), test commands. -->
 
 ## Domain Vocabulary
 
-<!-- ALWAYS INCLUDED. From domain-glossary.md. -->
+<!-- ALWAYS INCLUDED. From domain.md§"Ubiquitous Language". -->
 <!-- Top 10-15 most important terms as: **Term** — one-line definition. No table format (too verbose). Only include terms that actively affect how Claude should write code or understand the project. -->
 
 ## Review Checklist
 
-<!-- ALWAYS INCLUDED. From review-perspectives.md. -->
+<!-- ALWAYS INCLUDED. From project.md§"Review Perspectives". -->
 <!-- Condensed to 2-3 actionable items per perspective. Format as grouped bullet list. Include severity classification (one line per level). -->
 
 ## Investigation Guides
 
-<!-- CONDITIONAL: Only if investigation-checklist.md exists and has real content (not just "No X detected"). -->
-<!-- From investigation-checklist.md: condensed key investigation points per domain area. Format as grouped bullet list with file:line references where available. -->
+<!-- CONDITIONAL: Only if project.md§"Investigation Checklist" has real content (not just "No X detected"). -->
+<!-- From project.md§"Investigation Checklist": condensed key investigation points per domain area. Format as grouped bullet list with file:line references where available. -->
 
 ## Personal Preferences
 
@@ -62,20 +62,22 @@ When a change made during this session affects the project's ground truth (stack
 
 ### Triggers → Updates
 
-| If your change introduces or modifies… | Update this file |
-|----------------------------------------|------------------|
-| A language, framework, database, or major library | `.claude/workflow-knowledge/stack.md` |
-| A test framework, test-pyramid rule, or forbidden test pattern | `.claude/workflow-knowledge/stack.md` (Test section) |
-| A commit format, branch naming rule, or code-style convention | `.claude/workflow-knowledge/conventions.md` |
-| A domain entity, ubiquitous term, or bounded context | `.claude/workflow-knowledge/domain-glossary.md` |
-| A CI workflow, deployed environment, alerting channel, or secret | `.claude/workflow-knowledge/infrastructure.md` |
-| A public CLI command, module, or schema field | `.claude/workflow-knowledge/api-surface.md` |
-| A tracker state, label, or issue template | `.claude/workflow-knowledge/tracker.md` AND `.claude/workflow-context.md` |
-| A review perspective or severity rule | `.claude/workflow-knowledge/review-perspectives.md` |
-| An investigation checkpoint or debug pattern | `.claude/workflow-knowledge/investigation-checklist.md` |
-| The package manager, install/build/test/quality-gate command | `.claude/workflow-context.md` (frontmatter) |
-| The worktree templates, branch template, or forge configuration | `.claude/workflow-context.md` (frontmatter) |
-| The communication language, user name, or user skill level | `.claude/workflow-context.md` (frontmatter) |
+**Source-of-truth principle**: knowledge files are derived views. Edit the **upstream source** (PRD, architecture, ADRs, specs, code) when possible — bootstrap/refresh will propagate. Edit knowledge files directly only for facts that have no upstream source.
+
+| If your change introduces or modifies… | Update upstream source | Or knowledge file directly |
+|----------------------------------------|------------------------|----------------------------|
+| A language, framework, database, or major library | `architecture.md`§"Tech Stack" or new ADR | `.claude/workflow-knowledge/project.md` (§"Tech Stack") |
+| A test framework, test-pyramid rule, or forbidden test pattern | `architecture.md`§"Test Strategy" or ADR | `.claude/workflow-knowledge/project.md` (§"Test Rules" / §"Validation Tooling") |
+| A commit format, branch naming rule, or code-style convention | ADR or `architecture.md`§"Conventions" | `.claude/workflow-knowledge/project.md` (§"Conventions") |
+| A domain entity, ubiquitous term, or bounded context | `prd.md`§"Domain" or specs | `.claude/workflow-knowledge/domain.md` |
+| A CI workflow, deployed environment, alerting channel, or secret | `architecture.md`§"Infrastructure" or `architecture.md`§"Environments" | `.claude/workflow-knowledge/project.md` (§"Infrastructure" / §"Environments") |
+| A public CLI command, module, or schema field | `architecture.md`§"API Design" or specs | `.claude/workflow-knowledge/api.md` |
+| A tracker state, label, or issue template | `.claude/workflow-context.md` (frontmatter) — bootstrap regenerates project.md tracker section | `.claude/workflow-knowledge/project.md` (§"Tracker Patterns") if needed |
+| A review perspective or severity rule | new ADR | `.claude/workflow-knowledge/project.md` (§"Review Perspectives") |
+| An investigation checkpoint or debug pattern | new ADR | `.claude/workflow-knowledge/project.md` (§"Investigation Checklist") |
+| The package manager, install/build/test/quality-gate command | `.claude/workflow-context.md` (frontmatter) | (no equivalent in knowledge — workflow-context.md is the source) |
+| The worktree templates, branch template, or forge configuration | `.claude/workflow-context.md` (frontmatter) | — |
+| The communication language, user name, or user skill level | `.claude/workflow-context.md` (frontmatter) | — |
 
 ### Update Protocol
 

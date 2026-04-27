@@ -1,6 +1,9 @@
-# API Surface — Knowledge
+# {Project Name} — API Surface
 
-<!-- Template for bmad-knowledge-bootstrap. Routes, endpoints, schemas, integration points. NEW knowledge file. -->
+<!-- Template for bmad-knowledge-bootstrap. Routes, endpoints, schemas, integration points. Derived primarily from architecture.md §"API Design", route files, OpenAPI specs, epics. -->
+
+<!-- Generated from {sources_used}. Manual edits supported but flagged on next refresh.
+     To change API surface: edit architecture.md / specs / route files and re-run /bmad-knowledge-refresh. -->
 
 ## API Style
 

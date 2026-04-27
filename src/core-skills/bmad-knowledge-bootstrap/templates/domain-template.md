@@ -1,6 +1,9 @@
-# Domain Glossary — Knowledge
+# {Project Name} — Domain Knowledge
 
-<!-- Template for bmad-knowledge-bootstrap. Domain entities, bounded contexts, ubiquitous language. NEW knowledge file. -->
+<!-- Template for bmad-knowledge-bootstrap. Domain entities, bounded contexts, ubiquitous language. Derived primarily from PRD §"Domain", product-brief.md, entity files, schema files. -->
+
+<!-- Generated from {sources_used}. Manual edits supported but flagged on next refresh.
+     To change domain semantics: edit PRD or domain entities and re-run /bmad-knowledge-refresh. -->
 
 ## Ubiquitous Language
 

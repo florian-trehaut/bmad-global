@@ -2,7 +2,7 @@
 nextStepFile: null
 ---
 
-# Step 9: Generate CLAUDE.local.md
+# Step 7: Generate CLAUDE.local.md
 
 ## STEP GOAL:
 
@@ -34,20 +34,12 @@ Read ALL of the following:
 **B. Existing CLAUDE.md (if present):**
 - `{MAIN_PROJECT_ROOT}/CLAUDE.md` — for coverage analysis (step 3)
 
-**C. Approved knowledge files:**
+**C. Approved knowledge files (3-file consolidated layout):**
 
 Read each file that exists in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`:
-- `stack.md`
-- `conventions.md`
-- `domain-glossary.md`
-- `review-perspectives.md`
-- `investigation-checklist.md`
-- `infrastructure.md`
-- `tracker.md`
-- `environment-config.md`
-- `api-surface.md`
-- `validation.md`
-- `comm-platform.md`
+- `project.md` (consolidated tech stack, conventions, infra, environments, validation, review, investigation, tracker, comm)
+- `domain.md` (ubiquitous language, bounded contexts, entity relationships)
+- `api.md` (endpoints, schemas, integrations)
 
 Skip files that do not exist — they were rejected or not generated.
 
@@ -106,7 +98,7 @@ From workflow-context.md frontmatter, format as:
 
 **Skip if** `architecture` is in `COVERED_BY_CLAUDE_MD`.
 
-From `stack.md`, extract and condense:
+From `project.md`§"Project Nature" + §"Architecture" + §"Tech Stack" + §"Source File Patterns" + §"Architecture Patterns", extract and condense:
 - Project nature: one paragraph
 - Architecture patterns: table (Scope | Pattern | Key Rules) — keep all rows
 - Current stack: table (Component | Technology) — top 6 entries only
@@ -116,7 +108,7 @@ From `stack.md`, extract and condense:
 
 **Skip if** `conventions` is in `COVERED_BY_CLAUDE_MD`.
 
-From `conventions.md`, extract rules only (no explanations):
+From `project.md`§"Conventions", extract rules only (no explanations):
 - Commit format: `type(scope): description` with allowed types as comma-separated inline list
 - Branch strategy: one line with format
 - Naming conventions: one line per category (skills, files, YAML, etc.)
@@ -126,22 +118,22 @@ From `conventions.md`, extract rules only (no explanations):
 
 **Skip if** `tests` is in `COVERED_BY_CLAUDE_MD`.
 
-From `stack.md` test section:
+From `project.md`§"Test Rules" + §"Validation Tooling":
 - Forbidden patterns: bullet list
 - Test pyramid: compact table (Type | Framework | Suffix | Location)
 - Test commands: code block
 
 #### Section: Domain Vocabulary (ALWAYS)
 
-From `domain-glossary.md`, select the **10-15 most important terms** — those that actively affect how Claude should write code or understand the project.
+From `domain.md`§"Ubiquitous Language", select the **10-15 most important terms** — those that actively affect how Claude should write code or understand the project.
 
 Format as: `**Term** — one-line definition`
 
-If domain-glossary.md does not exist or has no real content: replace section with "No domain-specific vocabulary documented for this project."
+If `domain.md` does not exist or has no real content: replace section with "No domain-specific vocabulary documented for this project."
 
 #### Section: Review Checklist (ALWAYS)
 
-From `review-perspectives.md`, condense each perspective to **2-3 actionable items**.
+From `project.md`§"Review Perspectives", condense each perspective to **2-3 actionable items**.
 
 Format as grouped bullets:
 
@@ -153,13 +145,13 @@ Format as grouped bullets:
 
 Include severity classification (one line per level).
 
-If review-perspectives.md does not exist: replace section with "No review perspectives documented for this project."
+If `project.md` does not have populated review perspectives: replace section with "No review perspectives documented for this project."
 
 #### Section: Investigation Guides (CONDITIONAL)
 
-**Skip if** `investigation-checklist.md` does not exist or contains only "No X detected" placeholders.
+**Skip if** `project.md`§"Investigation Checklist" does not exist or contains only "No X detected" placeholders.
 
-From `investigation-checklist.md`: condense key investigation points per domain area. Include file:line references where available.
+From `project.md`§"Investigation Checklist": condense key investigation points per domain area. Include file:line references where available.
 
 #### Section: Personal Preferences (ALWAYS)
 
@@ -199,7 +191,7 @@ Emit the static `## Knowledge Maintenance Policy` block verbatim from `../templa
 
 The emitted block MUST include:
 - The opening commitment line ("**This project's knowledge files and workflow context are alive — keep them in sync with the code.**")
-- The `### Triggers → Updates` table with all 12 rows
+- The `### Triggers → Updates` table mapping changes to upstream sources AND knowledge files (3-file layout: project.md / domain.md / api.md)
 - The `### Update Protocol` numbered list (5 steps, including the escalation to `/bmad-knowledge-refresh`)
 - The `### When in Doubt` closing paragraph
 
@@ -214,12 +206,12 @@ Format as:
 
 When you need detailed information beyond this summary, read files from `.claude/workflow-knowledge/`:
 
-- `stack.md` — Full tech stack, architecture details, test rules
-- `conventions.md` — Complete code style, PR standards, naming rules
-- ...
+- `project.md` — Tech stack, conventions, infrastructure, validation tooling, review perspectives, investigation checklist, tracker patterns, communication platform (consolidated config)
+- `domain.md` — Ubiquitous language, bounded contexts, entity relationships, domain rules, external systems
+- `api.md` — API style, endpoints, request/response schemas, authentication, error handling, integrations
 ```
 
-Use the "Content" column from workflow-context.md's Knowledge Files table if available, otherwise derive one-line descriptions from the file headings.
+Reference specific sections via anchor where workflows need granular access (e.g., `project.md#tech-stack`, `project.md#conventions`).
 
 ### 6. Self-Containment Verification
 

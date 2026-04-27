@@ -2,29 +2,22 @@
 nextStepFile: './step-07-generate-claude-local.md'
 ---
 
-# Step 8: Verify and Migrate
+# Step 6: Verify and Legacy Migration
 
 ## STEP GOAL:
 
-Validate all generated files, count TODOs, assess workflow readiness, suggest next steps. If legacy artifacts exist, execute migration.
+Validate all 3 generated knowledge files exist with proper frontmatter, count TODOs, assess workflow readiness, suggest next steps. If legacy `.claude/workflows/` exists, execute migration to global skills.
 
 ## MANDATORY SEQUENCE
 
-### 1. Verify Files Exist
+### 1. Verify Files Exist (3-file consolidated layout)
 
 ```bash
 for file in \
   "{MAIN_PROJECT_ROOT}/.claude/workflow-context.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/tracker.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/infrastructure.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/environment-config.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/conventions.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain-glossary.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api-surface.md" \
-  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/validation.md"; do
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md" \
+  "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md"; do
   if [ -s "$file" ]; then
     lines=$(wc -l < "$file")
     echo "OK  $file ($lines lines)"
@@ -34,6 +27,28 @@ for file in \
     echo "MISSING  $file"
   fi
 done
+```
+
+**Frontmatter sanity check** for each `workflow-knowledge/*.md`:
+- `generator: bmad-knowledge-bootstrap`
+- `sources_used: [...]` non-empty
+- `source_hash: { ... }` matches sources_used
+- `content_hash: ...` non-empty (8 chars)
+- `schema_version: 2`
+
+### 1b. Verify Legacy 10-File Layout is Cleaned (post-migration)
+
+If migration was performed in step-05, verify the 10 legacy files are no longer in `.claude/workflow-knowledge/`:
+
+```bash
+for legacy in stack.md conventions.md infrastructure.md environment-config.md validation.md review-perspectives.md investigation-checklist.md tracker.md comm-platform.md domain-glossary.md api-surface.md; do
+  if [ -f "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/$legacy" ]; then
+    echo "WARN: legacy file still present: $legacy"
+  fi
+done
+
+# Confirm backup exists
+ls -d {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge.backup-* 2>/dev/null && echo "Backup OK" || echo "WARN: no backup found"
 ```
 
 ### 2. Verify Required Keys in workflow-context.md
@@ -68,12 +83,12 @@ grep -rn "TODO" {MAIN_PROJECT_ROOT}/.claude/workflow-context.md {MAIN_PROJECT_RO
 
 | Skill | Status | Requirements |
 |-------|--------|-------------|
-| `bmad-create-story` | {READY/NOT} | tracker + tracker_states.todo |
+| `bmad-create-story` | {READY/NOT} | tracker + tracker_states.todo (workflow-context.md) |
 | `bmad-dev-story` | {READY/NOT} | tracker + forge + forge_cli + states (todo, in_progress, in_review) |
 | `bmad-code-review` | {READY/NOT} | forge + forge_cli |
 | `bmad-review-story` | {READY/NOT} | tracker + tracker_states.todo |
-| `bmad-validation-metier` | {READY/NOT} | environment-config has actual URLs (no TODOs) |
-| `bmad-validation-frontend` | {READY/NOT} | validation.md has E2E or component framework detected |
+| `bmad-validation-metier` | {READY/NOT} | project.md§"Environments" has actual URLs (no TODOs) |
+| `bmad-validation-frontend` | {READY/NOT} | project.md§"Validation Tooling" has E2E or component framework detected |
 
 ### 5. Present Summary
 
@@ -84,16 +99,23 @@ grep -rn "TODO" {MAIN_PROJECT_ROOT}/.claude/workflow-context.md {MAIN_PROJECT_RO
 
 Files:
   workflow-context.md              {OK/ISSUES}
-  workflow-knowledge/ files:       {N OK} / {N MISSING} / {N EMPTY}
+  workflow-knowledge/project.md    {OK/EMPTY/MISSING}
+  workflow-knowledge/domain.md     {OK/EMPTY/MISSING}
+  workflow-knowledge/api.md        {OK/EMPTY/MISSING}
+
+Sources used: {list — e.g., [planning, specs, code]}
 
 TODOs remaining:    {count}
 
+Migration:
+  Old 10-file layout migrated:  {YES (backup at ...) / NO / N/A}
+
 Workflow readiness:
-  bmad-create-story:      {READY / NOT READY}
-  bmad-dev-story:         {READY / NOT READY}
-  bmad-code-review:       {READY / NOT READY}
-  bmad-review-story:      {READY / NOT READY}
-  bmad-validation-metier: {READY / NOT READY}
+  bmad-create-story:        {READY / NOT READY}
+  bmad-dev-story:           {READY / NOT READY}
+  bmad-code-review:         {READY / NOT READY}
+  bmad-review-story:        {READY / NOT READY}
+  bmad-validation-metier:   {READY / NOT READY}
   bmad-validation-frontend: {READY / NOT READY}
 ============================================================
 ```
