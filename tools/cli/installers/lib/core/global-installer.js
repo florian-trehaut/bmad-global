@@ -112,11 +112,12 @@ class GlobalInstaller {
     );
     await prompts.log.info(`Location: ${skillsDir}`);
 
-    await prompts.log.warn(
-      'Next step: run /bmad-knowledge-bootstrap in each project to generate (or update) your workflow context and knowledge files.',
+    await prompts.log.warn('Next step: run /bmad-project-init in each project to set up workflow-context.md.');
+    await prompts.log.message(
+      'Then run /bmad-knowledge-bootstrap to generate workflow-knowledge files (project.md / domain.md / api.md) from planning artifacts and/or codebase.',
     );
     await prompts.log.message(
-      'This is required for all bmad-* workflows to function. Re-run it after each BMAD update to keep knowledge in sync.',
+      'Both are required for all bmad-* workflows to function. Re-run /bmad-knowledge-refresh after each BMAD update to keep knowledge in sync.',
     );
 
     return {

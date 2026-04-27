@@ -52,7 +52,8 @@ Options:
 Examples from existing skills:
 - bmad-dev-story: 'dev story', 'implement story', 'start development', 'lance le dev'
 - bmad-validation-metier: 'validation metier', 'validate ticket', 'tester en staging', 'VM'
-- bmad-knowledge-bootstrap: 'init bmad', 'setup workflows', 'bmad init', 'knowledge bootstrap'
+- bmad-project-init: 'bmad init', 'initialize project', 'setup bmad', 'configure project'
+- bmad-knowledge-bootstrap: 'knowledge bootstrap', 'bootstrap knowledge', 'generate knowledge', 'workflow knowledge'
 
 ### 5. Compile design brief
 

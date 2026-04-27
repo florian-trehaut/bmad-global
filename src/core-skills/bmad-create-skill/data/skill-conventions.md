@@ -82,7 +82,7 @@ Exception: read-only analysis workflows (like bmad-validate-skill) that don't mo
 
 Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` from the project root (the git repository root).
 
-**HALT if not found:** "No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it following the bmad-shared documentation."
+**HALT if not found:** "No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found at project root. This file is required for all bmad-* workflows. Create it with `/bmad-project-init`."
 
 Extract the following from the YAML frontmatter:
 

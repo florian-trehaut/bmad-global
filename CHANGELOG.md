@@ -1,5 +1,62 @@
 # Changelog
 
+## v1.7.0 - 2026-04-27
+
+### 🔥 Highlight: SDD-aligned knowledge lifecycle — split bootstrap, consolidate 10→3 files, drift detection
+
+Major refactor of the `workflow-context.md` and `workflow-knowledge/*.md` lifecycle. Aligns with Spec-Driven Development (SDD) practices and OpenSpec-inspired consolidation. Removes the previous coupling that forced users to scan code in order to get a project-config file.
+
+#### Skill split: project init vs knowledge bootstrap
+
+- **NEW `/bmad-project-init`** — creates `workflow-context.md` only. **Greenfield-safe**: requires only a git repository, no codebase or planning artifacts. Becomes the single entry point for all BMAD projects.
+- **Refactored `/bmad-knowledge-bootstrap`** — now focused on generating `workflow-knowledge/*.md` only. HALTs if `workflow-context.md` is missing (run `/bmad-project-init` first) or if NO knowledge sources at all (no PRD, no architecture, no ADRs, no specs, no code).
+
+#### Knowledge consolidation: 10 files → 3 files
+
+Replaces the legacy 10-file layout (stack/conventions/infrastructure/environment-config/validation/review-perspectives/investigation-checklist/tracker/comm-platform/domain-glossary/api-surface) with an OpenSpec-aligned 3-file layout:
+
+- **`project.md`** — 9 sections under H2 anchors (Tech Stack, Conventions, Infrastructure, Environments, Validation Tooling, Review Perspectives, Investigation Checklist, Tracker Patterns, Communication Platform). Workflows can target a specific section via `project.md#tech-stack` etc.
+- **`domain.md`** — domain entities, ubiquitous language, bounded contexts (was `domain-glossary.md`).
+- **`api.md`** — API surface, endpoints, integrations (was `api-surface.md`).
+
+Migration is automatic on first run of the new bootstrap: legacy files are read, content merged into the new layout, then backed up to `.claude/workflow-knowledge.backup-{YYYY-MM-DD-HHMM}/` before removal. User reviews the merged result before write.
+
+#### Adaptive multi-source derivation (SDD pyramid)
+
+Bootstrap and refresh now derive knowledge from up to 5 source types — adaptively, per the SDD priority pyramid: **specs > ADRs > architecture > PRD > code**. The pyramid is a guide, not a contract: ~80% of projects in the wild operate with only specs+code or only code, and the new logic supports those flows natively.
+
+- Frontmatter `sources_used: [...]` reflects exactly which sources were present at generation time.
+- Per-source-type `source_hash` enables granular drift detection: refresh can pinpoint which specific source changed (PRD vs architecture vs ADR vs spec vs code).
+- New `content_hash` (body content) detects manual edits between refreshes.
+
+#### Drift detection on 2 axes (BLOCK + ADR)
+
+`/bmad-knowledge-refresh` now detects two distinct kinds of drift and prompts the user to resolve them explicitly:
+
+- **Axe 1 — code vs spec**: when a phase 4 spec declares "ORM = Prisma" but `package.json` shows Drizzle. Refresh BLOCKs with `[U] Update spec / [F] Fix code / [I] Ignore / [Q] Quit`. The `[U]` path suggests `/bmad-create-adr` for traceability so the change history is captured in an ADR rather than silently propagated.
+- **Axe 2 — manual edit vs source change**: when the knowledge file's `content_hash` mismatches AND a source has changed. Refresh BLOCKs with `[M] Merge / [O] Overwrite / [K] Keep manual / [Q] Quit`. The `[K]` path sets `manual_override: true` to permanently exclude the file from future refreshes until reset.
+
+The `[I]` and `[K]` choices give users full control without forcing them to resolve drift before continuing other work.
+
+#### Workflow consumers (~65 files updated)
+
+All workflows that previously loaded one of the 10 legacy files now point at the new 3-file layout (`project.md`, `domain.md`, `api.md`). Spans phases 1-4: `bmad-create-prd`, `bmad-create-story`, `bmad-create-architecture`, `bmad-create-adr`, `bmad-spike`, `bmad-dev-story`, `bmad-quick-dev`, `bmad-code-review`, `bmad-review-story`, all validation skills, all TEA skills, sprint workflows, and more.
+
+#### Tests + infrastructure
+
+- `test-claude-local-ac.js` AC-4 updated: Triggers table asserts the 3-file canonical targets (project.md / domain.md / api.md) instead of the legacy 8.
+- `test-worktree-harmony-ac.js` updated: the `worktree_reuse_current: auto` content moved from bootstrap step-04 to project-init step-03 (verbatim).
+- Post-install message in `tools/cli/installers/lib/core/global-installer.js` now suggests both `/bmad-project-init` and `/bmad-knowledge-bootstrap` as sequential setup steps.
+- `marketplace.json` adds `bmad-project-init` to the plugin skill list.
+- `generate_customization.py` adds `bmad-project-init` to batch 2-workflow-conversational.
+
+#### References
+
+- [OpenSpec — Spec-Driven Development Knowledge Hub](https://intent-driven.dev/knowledge/openspec/) — single living specification, source of truth model
+- [GitHub spec-kit](https://github.com/github/spec-kit/blob/main/spec-driven.md) — PRD → implementation hierarchy, constitutional enforcement
+- [adr.github.io](https://adr.github.io/) — ADR append-only principle (most-recent-wins applied here)
+- [Anthropic — Claude Code Best Practices](https://code.claude.com/docs/en/best-practices) — ~400 tokens optimal context per file (informs the consolidated layout's size targets)
+
 ## v1.6.0 - 2026-04-22
 
 ### 🔥 Highlight: Upstream BMAD-METHOD v6.3.0 synced with extended TOML customization

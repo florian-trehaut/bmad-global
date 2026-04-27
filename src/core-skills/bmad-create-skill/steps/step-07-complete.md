@@ -54,12 +54,12 @@ List the trigger phrases from the SKILL.md description, showing both slash-comma
 ### 4. Dependency reminders
 
 **If the skill needs workflow-context.md:**
-"This skill requires `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` in the project root. If the project is not yet initialized, run `/bmad-knowledge-bootstrap` first."
+"This skill requires `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` in the project root. If the project is not yet initialized, run `/bmad-project-init` first."
 
 **If the skill needs specific workflow-knowledge files:**
-"This skill loads the following knowledge files JIT:
-{list files}
-Ensure these exist in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` (created by `/bmad-knowledge-bootstrap`)."
+"This skill loads sections from the consolidated knowledge layout:
+{list of project.md sections / domain.md / api.md}
+Ensure these exist in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` (created by `/bmad-knowledge-bootstrap` after `/bmad-project-init`)."
 
 ### 5. Suggest validation
 
