@@ -54,9 +54,15 @@ _KEYED_MERGE_FIELDS = ("code", "id")
 
 
 def find_project_root(start: Path):
+    """Walk up from `start` looking for a `_bmad/` marker.
+
+    Only `_bmad/` counts — `.git` is rejected because dotfiles repos
+    (e.g. `~/.claude/` under git) would otherwise hijack the lookup
+    and resolve to an unrelated ancestor.
+    """
     current = start.resolve()
     while True:
-        if (current / "_bmad").exists() or (current / ".git").exists():
+        if (current / "_bmad").exists():
             return current
         parent = current.parent
         if parent == current:
@@ -67,7 +73,9 @@ def find_project_root(start: Path):
 def load_toml(file_path: Path, required: bool = False) -> dict:
     if not file_path.exists():
         if required:
-            sys.stderr.write(f"error: required customization file not found: {file_path}\n")
+            sys.stderr.write(
+                f"error: required customization file not found: {file_path}\n"
+            )
             sys.exit(1)
         return {}
     try:
@@ -183,11 +191,16 @@ def main():
         add_help=True,
     )
     parser.add_argument(
-        "--skill", "-s", required=True,
+        "--skill",
+        "-s",
+        required=True,
         help="Absolute path to the skill directory (must contain customize.toml)",
     )
     parser.add_argument(
-        "--key", "-k", action="append", default=[],
+        "--key",
+        "-k",
+        action="append",
+        default=[],
         help="Dotted field path to resolve (repeatable). Omit for full dump.",
     )
     args = parser.parse_args()
@@ -198,11 +211,12 @@ def main():
 
     defaults = load_toml(defaults_path, required=True)
 
-    # Prefer the project that contains this skill. Only fall back to cwd if
-    # the skill isn't inside a recognizable project tree (unusual but possible
-    # for standalone skills invoked directly). Using cwd first is unsafe when
-    # an ancestor of cwd happens to have a stray _bmad/ from another project.
-    project_root = find_project_root(skill_dir) or find_project_root(Path.cwd())
+    # When the script lives globally (e.g. ~/.claude/skills/bmad-shared/scripts/),
+    # walking up from skill_dir never finds an `_bmad/`, so cwd is the real
+    # source of truth — that's the user project where the workflow runs.
+    # skill_dir is kept as a fallback for the legacy case where the script
+    # is invoked from inside a project tree.
+    project_root = find_project_root(Path.cwd()) or find_project_root(skill_dir)
 
     team = {}
     user = {}

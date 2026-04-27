@@ -14,9 +14,8 @@ When the target's `customize.toml` doesn't expose what the user wants, say so pl
 
 ## Preflight
 
-- No `{project-root}/_bmad/` → BMad isn't installed. Say so, stop.
-- `{project-root}/_bmad/scripts/resolve_customization.py` missing → continue, but Step 6 verify falls back to manual merge.
-- Both present → proceed.
+- `~/.claude/skills/bmad-shared/scripts/resolve_customization.py` missing → BMad isn't installed globally. Say so, stop. (Run `node tools/bmad-npx-wrapper.js install --force` from the BMAD-METHOD repo.)
+- `{project-root}/_bmad/custom/` will be created by Step 6 when writing the first override — its absence is not a blocker.
 
 ## Activation
 
@@ -88,7 +87,7 @@ Default by character (policy → team, personal → user), confirm before writin
 3. Write. Create `{project-root}/_bmad/custom/` if needed.
 4. Verify:
    ```
-   python3 {project-root}/_bmad/scripts/resolve_customization.py --skill <install-path> --key <agent-or-workflow>
+   python3 ~/.claude/skills/bmad-shared/scripts/resolve_customization.py --skill <install-path> --key <agent-or-workflow>
    ```
    Show the merged output, point out the changed fields.
 
