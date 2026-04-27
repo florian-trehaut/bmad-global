@@ -1,6 +1,6 @@
 ---
 name: bmad-knowledge-bootstrap
-description: "Initialize project configuration and generate knowledge files for BMAD workflows. Creates workflow-context.md and workflow-knowledge/ files from codebase detection. Use when 'bmad init', 'initialize project', 'setup bmad', 'configure project', 'knowledge bootstrap', 'bootstrap knowledge', 'generate knowledge', 'init knowledge', 'knowledge files', 'workflow knowledge', 'init bmad', 'setup workflows' is mentioned."
+description: "Generate workflow-knowledge files for BMAD workflows from planning artifacts (PRD, architecture, ADRs), phase 4 specs, and/or codebase. Requires workflow-context.md (run /bmad-project-init first). Use when 'knowledge bootstrap', 'bootstrap knowledge', 'generate knowledge', 'init knowledge', 'knowledge files', 'workflow knowledge', 'derive knowledge', 'sync knowledge' is mentioned."
 disable-model-invocation: true
 ---
 
@@ -8,7 +8,11 @@ disable-model-invocation: true
 
 ## Overview
 
-Initialize project configuration and generate knowledge files for BMAD workflows.
+Generate `workflow-knowledge/` files for BMAD workflows. Reads available planning artifacts (PRD, architecture, ADRs), phase 4 specs, and the codebase, then derives consolidated knowledge files (`project.md`, `domain.md`, `api.md`) per the SDD priority pyramid: specs > ADRs > architecture > PRD > code.
+
+**Prerequisite**: `workflow-context.md` must exist. If not, run `/bmad-project-init` first.
+
+**Greenfield-aware**: HALTs only if NO planning artifacts AND NO specs AND NO code are present (truly empty post-init project). Otherwise derives from whatever sources exist.
 
 ## Conventions
 
@@ -50,7 +54,7 @@ Load `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and resolve from its YAML
 - Use `{planning_artifacts}` for output location and artifact scanning
 - Use `{project_knowledge}` for additional context scanning
 
-If `workflow-context.md` is missing, ask the user for their name and preferred language, then continue.
+If `workflow-context.md` is missing, HALT and instruct the user to run `/bmad-project-init` first.
 
 ### Step 5: Greet the User
 

@@ -22,7 +22,7 @@ const colors = {
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const TEMPLATE = path.join(PROJECT_ROOT, 'src/core-skills/bmad-knowledge-bootstrap/templates/claude-local-template.md');
-const STEP_09 = path.join(PROJECT_ROOT, 'src/core-skills/bmad-knowledge-bootstrap/steps/step-09-generate-claude-local.md');
+const STEP_GEN_CLAUDE_LOCAL = path.join(PROJECT_ROOT, 'src/core-skills/bmad-knowledge-bootstrap/steps/step-07-generate-claude-local.md');
 
 let totalTests = 0;
 let passedTests = 0;
@@ -107,16 +107,19 @@ test('AC-6: template has "When in Doubt" guidance', () => {
 // step-09 generator — emits the policy section
 // ============================================================
 
-console.log(`\n${colors.cyan}step-09 generator — policy emission${colors.reset}`);
+console.log(`\n${colors.cyan}step-07-generate-claude-local — policy emission${colors.reset}`);
 
-test('AC-7: step-09 documents a Knowledge Maintenance Policy emission rule', () => {
-  assert(fs.existsSync(STEP_09), `Missing: ${STEP_09}`);
-  const content = fileContent(STEP_09);
-  assert(/Section:\s*Knowledge Maintenance Policy/.test(content), 'step-09 must declare a "Section: Knowledge Maintenance Policy" rule');
+test('AC-7: step-07-generate-claude-local documents a Knowledge Maintenance Policy emission rule', () => {
+  assert(fs.existsSync(STEP_GEN_CLAUDE_LOCAL), `Missing: ${STEP_GEN_CLAUDE_LOCAL}`);
+  const content = fileContent(STEP_GEN_CLAUDE_LOCAL);
+  assert(
+    /Section:\s*Knowledge Maintenance Policy/.test(content),
+    'step-07-generate-claude-local must declare a "Section: Knowledge Maintenance Policy" rule',
+  );
 });
 
-test('AC-8: step-09 places policy before Deep Knowledge', () => {
-  const content = fileContent(STEP_09);
+test('AC-8: step-07-generate-claude-local places policy before Deep Knowledge', () => {
+  const content = fileContent(STEP_GEN_CLAUDE_LOCAL);
   const policyIdx = content.indexOf('Section: Knowledge Maintenance Policy');
   const deepIdx = content.indexOf('Section: Deep Knowledge');
   assert(policyIdx !== -1, 'Missing policy section directive');
@@ -124,8 +127,8 @@ test('AC-8: step-09 places policy before Deep Knowledge', () => {
   assert(policyIdx < deepIdx, 'Policy emission must come before Deep Knowledge emission');
 });
 
-test('AC-9: step-09 marks policy as ALWAYS static content (not conditional per project)', () => {
-  const content = fileContent(STEP_09);
+test('AC-9: step-07-generate-claude-local marks policy as ALWAYS static content (not conditional per project)', () => {
+  const content = fileContent(STEP_GEN_CLAUDE_LOCAL);
   assert(
     /Section:\s*Knowledge Maintenance Policy[\s\S]{0,200}?ALWAYS/.test(content),
     'Policy section must be marked ALWAYS — it is universal across projects',

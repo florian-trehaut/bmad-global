@@ -1,5 +1,5 @@
 ---
-nextStepFile: './step-08-verify-migrate.md'
+nextStepFile: './step-06-verify.md'
 ---
 
 # Step 7: Review and Write

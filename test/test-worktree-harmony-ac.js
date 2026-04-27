@@ -26,7 +26,7 @@ const colors = {
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const SHARED_RULE = path.join(PROJECT_ROOT, 'src/core-skills/bmad-shared/worktree-lifecycle.md');
-const BOOTSTRAP_STEP = path.join(PROJECT_ROOT, 'src/core-skills/bmad-knowledge-bootstrap/steps/step-04-generate-context.md');
+const PROJECT_INIT_STEP = path.join(PROJECT_ROOT, 'src/core-skills/bmad-project-init/steps/step-03-generate-context.md');
 
 // 7 consumer step-files (the exact locations that invoke the protocol)
 const CONSUMER_STEPS = [
@@ -249,17 +249,17 @@ for (const consumer of CONSUMER_STEPS) {
 }
 
 // ============================================================
-// Bootstrap template — worktree_reuse_current emission (AC-last)
+// Project-init template — worktree_reuse_current emission (AC-last)
 // ============================================================
 
-console.log(`\n${colors.cyan}Bootstrap template${colors.reset}`);
+console.log(`\n${colors.cyan}Project-init template${colors.reset}`);
 
-test('AC: knowledge-bootstrap step-04 template emits worktree_reuse_current with default=auto', () => {
-  assert(fs.existsSync(BOOTSTRAP_STEP), `Missing: ${BOOTSTRAP_STEP}`);
-  const content = fileContent(BOOTSTRAP_STEP);
+test('AC: project-init step-03 template emits worktree_reuse_current with default=auto', () => {
+  assert(fs.existsSync(PROJECT_INIT_STEP), `Missing: ${PROJECT_INIT_STEP}`);
+  const content = fileContent(PROJECT_INIT_STEP);
   assert(
     /worktree_reuse_current:\s*auto/.test(content),
-    'Bootstrap template must include `worktree_reuse_current: auto` (with auto as default)',
+    'Project-init step-03 template must include `worktree_reuse_current: auto` (with auto as default)',
   );
 });
 

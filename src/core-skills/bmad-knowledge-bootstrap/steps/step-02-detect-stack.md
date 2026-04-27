@@ -1,12 +1,16 @@
 ---
-nextStepFile: './step-04-generate-context.md'
+nextStepFile: './step-03-research-scan.md'
 ---
 
-# Step 3: Detect Stack and Infrastructure
+# Step 2: Detect Stack and Infrastructure
 
 ## STEP GOAL:
 
-Auto-detect frameworks, ORMs, architecture patterns, test tools, code conventions, cloud provider, CI/CD, containers, IaC, and database setup. Build a structured `detected_stack` profile.
+Auto-detect frameworks, ORMs, architecture patterns, test tools, code conventions, cloud provider, CI/CD, containers, IaC, and database setup from the codebase. Build a structured `detected_stack` profile.
+
+## SKIP CONDITION
+
+If `CODE_PRESENT=false` (set by step-01-preflight when no codebase manifest or source files detected) — **SKIP this step entirely** and proceed directly to {nextStepFile}. Set `detected_stack = {}` (empty profile). Knowledge will be derived from planning artifacts and/or phase 4 specs in subsequent steps.
 
 ## MANDATORY SEQUENCE
 

@@ -1,12 +1,12 @@
 ---
-nextStepFile: './step-07-review-write.md'
+nextStepFile: './step-05-review-write.md'
 ---
 
 # Step 6: Generate Knowledge Files
 
 ## STEP GOAL:
 
-For each knowledge file in TARGET_FILES, load the corresponding template, populate it with data from detection (step 03), research and scan (step 05), and produce a complete draft with staleness-tracking frontmatter. Drafts are stored in memory — NOT written to disk yet.
+For each knowledge file in TARGET_FILES, load the corresponding template, populate it with data from detection (step 02 detect-stack) and research/scan (step 03 research-scan), and produce a complete draft with staleness-tracking frontmatter. Drafts are stored in memory — NOT written to disk yet.
 
 ## MANDATORY SEQUENCE
 
@@ -64,9 +64,9 @@ source_hash: {8-char hash}
 
 #### d. Populate Template Sections
 
-1. Find matching data from scan results (step 05)
-2. Enrich with research findings (step 05)
-3. Fill tables with concrete values from detection (step 03)
+1. Find matching data from scan results (step 03 research-scan)
+2. Enrich with research findings (step 03 research-scan)
+3. Fill tables with concrete values from detection (step 02 detect-stack)
 4. Remove HTML comment placeholders
 5. If no data for a section: replace with "No {topic} detected in this project."
 

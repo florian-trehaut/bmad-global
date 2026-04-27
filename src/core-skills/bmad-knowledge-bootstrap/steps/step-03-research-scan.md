@@ -1,5 +1,5 @@
 ---
-nextStepFile: './step-06-generate-knowledge.md'
+nextStepFile: './step-04-generate-knowledge.md'
 ---
 
 # Step 5: Research and Deep Scan
@@ -14,7 +14,7 @@ Web research detected technologies for conventions, then deeply scan the codebas
 
 **Skip if:** TARGET_FILES contains only `tracker.md` or `environment-config.md`.
 
-For each technology detected in step 03, research:
+For each technology detected in step 02 (detect-stack), research:
 1. **Conventions** — file naming, project structure, coding style
 2. **Forbidden patterns** — anti-patterns, security pitfalls, deprecated APIs
 3. **Test conventions** — file organization, assertion patterns, mocking policies
@@ -31,8 +31,8 @@ If `stack.md` in TARGET_FILES:
 - Read formatter config → key options
 - Read test config → test roots, coverage thresholds
 - Read pre-commit config → hook commands
-- **Source file patterns**: Use `source_extensions` and `test_file_patterns` from step 03 detection
-- **Architecture patterns**: Use classification from step 03
+- **Source file patterns**: Use `source_extensions` and `test_file_patterns` from step 02 detection
+- **Architecture patterns**: Use classification from step 02
 
 ### 3. Infrastructure Scan (for infrastructure.md)
 
@@ -48,7 +48,7 @@ If `infrastructure.md` in TARGET_FILES:
 
 If any of these in TARGET_FILES:
 
-Use `source_extensions` from step 03 to scope searches (do NOT hardcode file extensions):
+Use `source_extensions` from step 02 to scope searches (do NOT hardcode file extensions):
 
 ```bash
 # Entity/model definitions — use detected extensions
@@ -106,7 +106,7 @@ If `validation.md` in TARGET_FILES:
 - Read component test config → test roots, environment, reporters
 - Scan for stack-specific test helper patterns:
 
-Use `source_extensions` from step 03 to scope searches:
+Use `source_extensions` from step 02 to scope searches:
 
 ```bash
 # WASM hydration / Tauri / framework-specific patterns
@@ -152,7 +152,7 @@ Update `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` with `adr_location` and
 
 ### 10. Compile Results
 
-For each TARGET_FILE, compile the relevant scan data into a structured format for step 06.
+For each TARGET_FILE, compile the relevant scan data into a structured format for step 04 (generate-knowledge).
 
 ### 11. Proceed
 

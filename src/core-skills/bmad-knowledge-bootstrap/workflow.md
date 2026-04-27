@@ -2,7 +2,9 @@
 
 **BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, HALT checkpoints.**
 
-**Goal:** Set up a project to work with all bmad-* workflow skills by creating `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` files from automated codebase detection.
+**Goal:** Generate `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` files (`project.md`, `domain.md`, `api.md`) from available knowledge sources: planning artifacts (PRD, architecture, ADRs), phase 4 specs, and/or codebase. Derives knowledge per the SDD priority pyramid (specs > ADRs > architecture > PRD > code).
+
+**Prerequisite**: `workflow-context.md` must exist. Run `/bmad-project-init` first if missing.
 
 ---
 
@@ -12,12 +14,13 @@
 - **Just-In-Time Loading**: Only load the current step file
 - **Sequential Enforcement**: Complete steps in order, no skipping
 - **Interactive**: Each step presents findings and asks for confirmation/correction
+- **Adaptive**: Derives from whatever sources exist; HALTs only if NO source at all
 
 ### Step Processing Rules
 
 1. **READ COMPLETELY**: Read the entire step file before acting
 2. **FOLLOW SEQUENCE**: Execute sections in order
-3. **DETECT FIRST, ASK SECOND**: Always try to infer from codebase before asking the user
+3. **DETECT FIRST, ASK SECOND**: Always try to infer from sources before asking the user
 4. **CONFIRM, DON'T GUESS**: Present findings for user validation
 
 ---
@@ -32,7 +35,7 @@ Confirm we are in a git repository root (`git rev-parse --show-toplevel`). HALT 
 
 Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
 
-Apply these rules for the entire workflow execution. Key rule: **generated knowledge must be derived from real codebase data — never fabricate content from assumptions.**
+Apply these rules for the entire workflow execution. Key rule: **generated knowledge must be derived from real source data — never fabricate content from assumptions.**
 
 ### 3. Resolve project root
 
@@ -42,17 +45,16 @@ Run `MAIN_PROJECT_ROOT=$(dirname "$(git rev-parse --git-common-dir)")` to resolv
 
 ## YOUR ROLE
 
-You are a **meticulous project analyst** who scans the codebase, detects everything possible automatically, and asks the user only for what cannot be inferred. You:
+You are a **meticulous knowledge analyst** who reads available planning artifacts, phase 4 specs, and codebase, then derives consolidated knowledge files. You:
 
-1. Assess project state and determine what needs to be done
-2. Detect project identity, tracker, forge, tech stack, and infrastructure
-3. Generate workflow-context.md with all configuration
-4. Research conventions and deeply scan the codebase
-5. Generate structured knowledge files from templates
+1. Verify workflow-context.md exists (HALT to project-init if not)
+2. Detect available knowledge sources (planning, specs, code)
+3. Detect stack from codebase (if code present)
+4. Research conventions and deeply scan available sources
+5. Generate `project.md`, `domain.md`, `api.md` from templates, applying SDD priority
 6. Present each file for user review before writing
-7. Verify completeness and assess workflow readiness
-8. Migrate legacy workflows if present
-9. Synthesize a self-contained CLAUDE.local.md from all generated knowledge
+7. Verify completeness, migrate legacy workflows if present
+8. Synthesize a self-contained CLAUDE.local.md from generated knowledge
 
 **Tone:** Factual, direct, thorough. Report what you found, ask what you can't infer.
 
@@ -61,11 +63,12 @@ You are a **meticulous project analyst** who scans the codebase, detects everyth
 ## CRITICAL RULES
 
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
-- **NEVER fabricate knowledge** — every fact must trace to real files, configs, or scan results
-- **Templates define structure only** — scan + research provide content
+- **NEVER fabricate knowledge** — every fact must trace to real sources (planning artifacts, specs, code)
+- **Templates define structure only** — sources provide content
 - **User review mandatory** before writing any file
-- **Staleness tracking mandatory** — every knowledge file gets frontmatter with generation date + source hash
+- **Staleness tracking mandatory** — every knowledge file gets frontmatter with generation date + multi-source hash + content_hash
 - **ZERO FALLBACK / ZERO FALSE DATA** — apply shared rules loaded at initialization
+- **Adaptive sources** — derive from what's present; do NOT require all sources
 - Execute ALL steps in exact order — NO skipping
 
 ---
@@ -74,15 +77,13 @@ You are a **meticulous project analyst** who scans the codebase, detects everyth
 
 | Step | File | Goal | Condition |
 | ---- | ---- | ---- | --------- |
-| 1 | `step-01-preflight.md` | Assess state, inventory, routing | Always |
-| 2 | `step-02-detect-project.md` | Detect project identity, tracker, forge | Full/Resume |
-| 3 | `step-03-detect-stack.md` | Detect stack, frameworks, infra, source patterns | Full/Resume |
-| 4 | `step-04-generate-context.md` | Generate workflow-context.md | Full/Resume |
-| 5 | `step-05-research-scan.md` | Web research + deep codebase scan | Always (for knowledge) |
-| 6 | `step-06-generate-knowledge.md` | Generate knowledge file drafts from templates | Always (for knowledge) |
-| 7 | `step-07-review-write.md` | Per-file user review + write approved files | Always (for knowledge) |
-| 8 | `step-08-verify-migrate.md` | Verify, readiness, conditional legacy migration | Always |
-| 9 | `step-09-generate-claude-local.md` | Synthesize CLAUDE.local.md from knowledge files | Always |
+| 1 | `step-01-preflight.md` | Verify workflow-context.md, detect sources, classify mode, route | Always |
+| 2 | `step-02-detect-stack.md` | Detect stack, frameworks, infra, source patterns | Skip if CODE_PRESENT=false |
+| 3 | `step-03-research-scan.md` | Web research + deep scan of all available sources | Always |
+| 4 | `step-04-generate-knowledge.md` | Generate project.md / domain.md / api.md from sources | Always |
+| 5 | `step-05-review-write.md` | Per-file user review + write approved files | Always |
+| 6 | `step-06-verify.md` | Verify, readiness, conditional legacy workflow migration | Always |
+| 7 | `step-07-generate-claude-local.md` | Synthesize CLAUDE.local.md from knowledge files | Always |
 
 ## ENTRY POINT
 
@@ -93,8 +94,9 @@ Load and execute `./steps/step-01-preflight.md`.
 ## HALT CONDITIONS (GLOBAL)
 
 - Not in a git repository → HALT
+- `workflow-context.md` missing → HALT with message: "Run /bmad-project-init first to initialize project configuration."
+- No knowledge sources detected (NEITHER planning artifacts NOR phase 4 specs NOR codebase) → HALT with message: "Run phase 1-3 workflows OR phase 4 specs OR add code first."
 - User explicitly requests stop → HALT
-- Codebase scan produces no usable data and no fallback exists → HALT
 
 ---
 

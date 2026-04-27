@@ -1,5 +1,5 @@
 ---
-nextStepFile: './step-09-generate-claude-local.md'
+nextStepFile: './step-07-generate-claude-local.md'
 ---
 
 # Step 8: Verify and Migrate
@@ -98,9 +98,9 @@ Workflow readiness:
 ============================================================
 ```
 
-### 6. Legacy Migration (CONDITIONAL)
+### 6. Legacy Workflows Migration (CONDITIONAL)
 
-**Run only if project state from step 01 was MIGRATION_IN_PROGRESS.**
+**Run only if `LEGACY_WORKFLOWS_PRESENT=true` (set by step-01-preflight when `.claude/workflows/` directory contains files).**
 
 #### 6a. Build Coverage Map
 
