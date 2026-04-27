@@ -102,6 +102,7 @@ What NOT to do, common mistakes to avoid for THIS story.
 3. "Do not consider the story complete if a service is not deployable end-to-end via CI/CD"
 4. "Do not consider the story complete if schema changes have no documented data mapping (DTO <-> Domain <-> DB)"
 5. "Every new config access must have a corresponding env var in the project's configuration module AND deployment template"
+6. "Pipelines, batch jobs, scheduled tasks, or any flow that rebuilds shared persistent or in-memory state (relational tables, document collections, key-value stores, caches, indices, materialized views, search engines, shared files, configuration stores, in-memory registries) MUST use one of: atomic swap (write the new version to a parallel location and atomically switch the reference), versioned pointer (new version under a new identifier with an atomic active-version update), transactional batch (destructive and reconstructive steps in a single transaction so readers see only the old or new state), or idempotent merge/upsert (no destructive step at all). NEVER use an in-place destructive rebuild outside a transactional boundary — i.e. wipe-then-refill, drop-then-recreate, delete-all-then-insert, clear-then-load — when concurrent consumers exist. A flow that introduces a window of empty/missing data visible to consumers is a runtime regression even if the final state is correct and tests pass."
 
 Plus story-specific guardrails from analysis (ADR violations, prior MR rejections, etc.).
 

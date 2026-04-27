@@ -1,6 +1,6 @@
 # Stack Grep Bank — Go
 
-**Consumed by:** Meta-2 (2a), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: go`.
+**Consumed by:** Meta-2 (2a, 2d), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: go`.
 
 ---
 
@@ -71,4 +71,25 @@ grep -rn "t\.Skip(\|testing\.Short()" --include="*_test.go" {changed_files_dirs}
 ```bash
 # HTTP client without timeout (stdlib default is infinite)
 grep -rn "http\.Client{}\|http\.DefaultClient" --include="*.go" {changed_files_dirs} | grep -v "_test.go"
+```
+
+## Runtime State Continuity (sub-axis 2d)
+
+Detect destructive bulk operations on shared state that would create a window where consumers see empty/missing values during execution. Audit each match against concurrent readers and the surrounding pattern (transaction, atomic swap, versioned pointer, or idempotent merge/upsert).
+
+```bash
+# SQL bulk destructive (database/sql, sqlx, pgx)
+grep -rnE "Exec(Context)?\(.*(TRUNCATE|DELETE FROM)" --include="*.go" {changed_files_dirs} | grep -v "_test\.go\|/migrations/"
+
+# GORM bulk delete
+grep -rnE "\.Delete\(.*\{\}\)|\.Unscoped\(\)\.Delete" --include="*.go" {changed_files_dirs} | grep -v "_test\.go"
+
+# Redis (go-redis) bulk
+grep -rnE "FlushDB\(|FlushAll\(" --include="*.go" {changed_files_dirs} | grep -v "_test\.go"
+
+# Cache (go-cache, ristretto, bigcache) bulk invalidation
+grep -rnE "\.Flush\(\)|\.Clear\(\)|\.Reset\(\)" --include="*.go" {changed_files_dirs} | grep -v "_test\.go"
+
+# Map / shared structure full reassignment (Go 1.21+ clear builtin or nil reset)
+grep -rnE "\bclear\([a-zA-Z_]+\)|=\s*make\(map\[" --include="*.go" {changed_files_dirs} | grep -v "_test\.go"
 ```

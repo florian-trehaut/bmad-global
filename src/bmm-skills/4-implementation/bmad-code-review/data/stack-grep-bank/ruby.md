@@ -1,6 +1,6 @@
 # Stack Grep Bank — Ruby
 
-**Consumed by:** Meta-2 (2a), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: ruby`.
+**Consumed by:** Meta-2 (2a, 2d), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: ruby`.
 
 ---
 
@@ -73,4 +73,22 @@ grep -rn "xit\s\|xdescribe\s\|pending\s\|skip\s" --include="*_spec.rb" {changed_
 
 # Fake tests
 grep -rn "expect(true)\.to be\|expect(1)\.to eq" --include="*_spec.rb" {changed_files_dirs}
+```
+
+## Runtime State Continuity (sub-axis 2d)
+
+Detect destructive bulk operations on shared state that would create a window where consumers see empty/missing values during execution. Audit each match against concurrent readers and the surrounding pattern (transaction, atomic swap, versioned pointer, or idempotent merge/upsert).
+
+```bash
+# ActiveRecord bulk destructive
+grep -rnE "\.delete_all\b|\.destroy_all\b|connection\.execute\(.*(TRUNCATE|DELETE FROM)" --include="*.rb" {changed_files_dirs} | grep -v "_spec\.rb\|_test\.rb\|/db/migrate/"
+
+# Rails.cache bulk invalidation
+grep -rnE "Rails\.cache\.clear|Rails\.cache\.delete_matched" --include="*.rb" {changed_files_dirs} | grep -v "_spec\.rb\|_test\.rb"
+
+# Redis (redis-rb) bulk
+grep -rnE "\.flushdb\b|\.flushall\b" --include="*.rb" {changed_files_dirs} | grep -v "_spec\.rb\|_test\.rb"
+
+# Hash / Array / Set wipe on shared collections
+grep -rnE "\.clear\b" --include="*.rb" {changed_files_dirs} | grep -v "_spec\.rb\|_test\.rb"
 ```

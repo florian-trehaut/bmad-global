@@ -36,6 +36,7 @@ validation-rules:
 - [ ] **No Ambiguous Implementation:** Clear, unambiguous implementation that meets story requirements
 - [ ] **Edge Cases Handled:** Error conditions and edge cases appropriately addressed
 - [ ] **Dependencies Within Scope:** Only uses dependencies specified in story or project-context.md
+- [ ] **State Continuity:** If implementation rebuilds or refreshes shared persistent or in-memory state (relational table, document collection, key-value store, cache, index, materialized view, queue, shared file, config store, in-memory registry), it does NOT introduce a window where concurrent consumers see empty or missing values. Uses one of: atomic swap (parallel write + atomic switch), versioned pointer (new identifier + atomic active-version update), transactional batch (destructive + reconstructive in a single transaction), or idempotent merge/upsert. If a window is unavoidable, it is documented (duration, blast radius, mitigation: maintenance mode, read-only fallback, traffic drain) and the impacted consumers are listed.
 
 ## 🧪 Testing & Quality Assurance
 

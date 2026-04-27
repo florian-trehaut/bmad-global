@@ -140,6 +140,7 @@ Apply tech lead checklist from project knowledge if available, otherwise apply t
 - SOLID principles, N+1 queries, scalability, DI patterns, async handling
 - Monorepo impact, backward compatibility, idempotency
 - Multi-service impact, migration risks
+- **Runtime state continuity**: if the diff rebuilds or refreshes shared persistent or in-memory state (relational tables, document collections, key-value stores, caches, indices, materialized views, queues, shared files, config stores, in-memory registries) consumed by other components during execution, verify the pattern is safe — atomic swap, versioned pointer, transactional batch, or idempotent merge/upsert. **In-place destructive rebuild outside a transactional boundary = BLOCKER** when concurrent consumers exist (introduces a window where readers see empty/missing data, invisible to tests that check pre/post state only). For stack-specific grep patterns, dispatch the "Runtime State Continuity (sub-axis 2d)" section of the project's stack file under `~/.claude/skills/bmad-code-review/data/stack-grep-bank/{language}.md`. If the stack file lacks that section, walk the diff manually for destructive bulk operations on shared state and audit each against concurrent readers.
 
 ### P6: Pattern Consistency
 

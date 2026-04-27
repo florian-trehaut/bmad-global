@@ -1,6 +1,6 @@
 # Stack Grep Bank — Rust
 
-**Consumed by:** Meta-2 (2a), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: rust`.
+**Consumed by:** Meta-2 (2a, 2d), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: rust`.
 
 ---
 
@@ -75,3 +75,21 @@ cargo semver-checks check-release --manifest-path Cargo.toml
 ```
 
 Any breaking change output → BLOCKER.
+
+## Runtime State Continuity (sub-axis 2d)
+
+Detect destructive bulk operations on shared state that would create a window where consumers see empty/missing values during execution. Audit each match against concurrent readers and the surrounding pattern (transaction, atomic swap, versioned pointer, or idempotent merge/upsert).
+
+```bash
+# SQL bulk destructive (sqlx, sea-orm, tokio-postgres)
+grep -rnE "sqlx::query.*(TRUNCATE|DELETE FROM)|execute\(.*(TRUNCATE|DELETE FROM)" --include="*.rs" {changed_files_dirs} | grep -v "tests/\|/migrations/"
+
+# Diesel bulk delete
+grep -rnE "diesel::delete\(.*\)\.execute" --include="*.rs" {changed_files_dirs} | grep -v "tests/"
+
+# Redis (redis-rs) bulk
+grep -rnE "FLUSHDB|FLUSHALL|flushdb|flushall" --include="*.rs" {changed_files_dirs} | grep -v "tests/"
+
+# Collection wipe on shared structures (HashMap, Vec, HashSet)
+grep -rnE "\.clear\(\)|\.drain\(\.\.\)" --include="*.rs" {changed_files_dirs} | grep -v "tests/"
+```

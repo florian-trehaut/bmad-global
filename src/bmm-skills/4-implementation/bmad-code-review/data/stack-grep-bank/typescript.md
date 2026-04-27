@@ -1,6 +1,6 @@
 # Stack Grep Bank — TypeScript / JavaScript
 
-**Consumed by:** Meta-2 (2a zero-fallback), Meta-3 (3a security, 3b AI safety), Meta-4 (4a code quality, 4d QA).
+**Consumed by:** Meta-2 (2a zero-fallback, 2d runtime state continuity), Meta-3 (3a security, 3b AI safety), Meta-4 (4a code quality, 4d QA).
 
 Meta-agents dispatch these grep patterns when the tech-stack-lookup protocol with `language: typescript` or `javascript`. For other stacks, the Meta-agent dispatches `data/stack-grep-bank/{stack}.md` instead.
 
@@ -117,4 +117,25 @@ grep -rn "count\s*===\s*1\|count\s*==\s*1\|length\s*===\s*1" --include="*.tsx" -
 
 # Physical CSS (when rtl_required: true)
 grep -rn "margin-left\|margin-right\|padding-left\|padding-right" --include="*.css" --include="*.scss" --include="*.tsx" {changed_files_dirs}
+```
+
+## Runtime State Continuity (sub-axis 2d)
+
+Detect destructive bulk operations on shared state that would create a window where consumers see empty/missing values during execution. Audit each match against concurrent readers and the surrounding pattern (transaction, atomic swap, versioned pointer, or idempotent merge/upsert).
+
+```bash
+# SQL bulk destructive via raw helpers (Prisma, Knex, Sequelize, TypeORM)
+grep -rnE "executeRawUnsafe|queryRawUnsafe|knex\.raw\(.*(TRUNCATE|DELETE FROM)|sequelize\.query\(.*(TRUNCATE|DELETE FROM)|getConnection\(\)\.query\(.*(TRUNCATE|DELETE FROM)" --include="*.ts" --include="*.tsx" --include="*.js" {changed_files_dirs} | grep -v "spec\|test\|migration"
+
+# ORM bulk delete (Mongoose, TypeORM, Prisma)
+grep -rnE "\.deleteMany\s*\(\s*\{\s*\}|\.destroy\s*\(\s*\{\s*where:\s*\{\s*\}\s*\}|\.truncate\s*\(|\.drop\s*\(\s*\)" --include="*.ts" --include="*.js" {changed_files_dirs} | grep -v "spec\|test\|migration"
+
+# Redis bulk operations (ioredis, node-redis)
+grep -rnE "\.flushdb\s*\(|\.flushall\s*\(|FLUSHDB|FLUSHALL" --include="*.ts" --include="*.js" {changed_files_dirs} | grep -v "spec\|test"
+
+# In-memory cache bulk invalidation (lru-cache, node-cache, keyv)
+grep -rnE "cache\.(clear|reset|flushAll|invalidateAll)\s*\(" --include="*.ts" --include="*.js" {changed_files_dirs} | grep -v "spec\|test"
+
+# Generic in-memory wipe on shared collections
+grep -rnE "\.clear\s*\(\s*\)|\.length\s*=\s*0\b" --include="*.ts" --include="*.js" {changed_files_dirs} | grep -v "spec\|test"
 ```

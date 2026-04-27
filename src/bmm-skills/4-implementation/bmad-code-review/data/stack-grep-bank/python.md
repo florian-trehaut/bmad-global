@@ -1,6 +1,6 @@
 # Stack Grep Bank — Python
 
-**Consumed by:** Meta-2 (2a), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: python`.
+**Consumed by:** Meta-2 (2a, 2d), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: python`.
 
 ---
 
@@ -76,4 +76,25 @@ grep -rn "@pytest\.mark\.skip\|@unittest\.skip\|pytest\.skip\(" --include="test_
 
 # Fake tests
 grep -rn "assert True\|assert 1" --include="test_*.py" --include="*_test.py" {changed_files_dirs}
+```
+
+## Runtime State Continuity (sub-axis 2d)
+
+Detect destructive bulk operations on shared state that would create a window where consumers see empty/missing values during execution. Audit each match against concurrent readers and the surrounding pattern (transaction, atomic swap, versioned pointer, or idempotent merge/upsert).
+
+```bash
+# SQL bulk destructive via raw queries (asyncpg, psycopg, sqlalchemy.text)
+grep -rnE "execute\(.*(TRUNCATE|DELETE FROM)|TRUNCATE TABLE" --include="*.py" {changed_files_dirs} | grep -v "_test\.py\|/migrations/\|/alembic/"
+
+# Django ORM bulk delete
+grep -rnE "\.objects\.all\(\)\.delete\(\)|\.objects\.filter\(.*\)\.delete\(\)" --include="*.py" {changed_files_dirs} | grep -v "_test\.py"
+
+# SQLAlchemy bulk delete
+grep -rnE "session\.query\(.*\)\.delete\(\)|session\.execute\(.*(TRUNCATE|DELETE FROM)" --include="*.py" {changed_files_dirs} | grep -v "_test\.py"
+
+# Redis (redis-py, aioredis) bulk
+grep -rnE "\.flushdb\(\)|\.flushall\(\)" --include="*.py" {changed_files_dirs} | grep -v "_test\.py"
+
+# In-memory wipe on shared collections (dict / list / set / pandas)
+grep -rnE "\.clear\(\)|\.drop\(.*inplace\s*=\s*True" --include="*.py" {changed_files_dirs} | grep -v "_test\.py"
 ```

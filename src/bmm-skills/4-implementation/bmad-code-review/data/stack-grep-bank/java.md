@@ -1,6 +1,6 @@
 # Stack Grep Bank — Java
 
-**Consumed by:** Meta-2 (2a), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: java`.
+**Consumed by:** Meta-2 (2a, 2d), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: java`.
 
 ---
 
@@ -79,3 +79,21 @@ japicmp -o old.jar -n new.jar
 ```
 
 Breaking change → BLOCKER.
+
+## Runtime State Continuity (sub-axis 2d)
+
+Detect destructive bulk operations on shared state that would create a window where consumers see empty/missing values during execution. Audit each match against concurrent readers and the surrounding pattern (transaction, atomic swap, versioned pointer, or idempotent merge/upsert).
+
+```bash
+# SQL bulk destructive (JDBC, Spring JdbcTemplate)
+grep -rnE "executeUpdate\(.*(TRUNCATE|DELETE FROM)|createNativeQuery\(.*(TRUNCATE|DELETE FROM)|jdbcTemplate\.execute\(.*(TRUNCATE|DELETE FROM)" --include="*.java" --include="*.kt" {changed_files_dirs} | grep -v "Test\.java\|Test\.kt\|/migrations/"
+
+# JPA / Hibernate bulk delete
+grep -rnE "createQuery\(.*DELETE FROM|deleteAllInBatch\(\)|deleteAll\(\)" --include="*.java" --include="*.kt" {changed_files_dirs} | grep -v "Test\.java\|Test\.kt"
+
+# Redis (Lettuce, Jedis) bulk
+grep -rnE "\.flushdb\(\)|\.flushall\(\)|\.flushDB\(\)|\.flushAll\(\)" --include="*.java" --include="*.kt" {changed_files_dirs} | grep -v "Test"
+
+# Cache (Caffeine, Ehcache, Spring Cache) bulk invalidation
+grep -rnE "\.invalidateAll\(\)|\.removeAll\(\)|\.clear\(\)" --include="*.java" --include="*.kt" {changed_files_dirs} | grep -v "Test"
+```

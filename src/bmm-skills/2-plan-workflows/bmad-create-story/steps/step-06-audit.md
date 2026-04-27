@@ -137,6 +137,35 @@ For each impacted consumer NOT marked trivially compatible, add a non-regression
 
 Also update the **Definition of Done (product)** non-regression section with these VMs.
 
+**e. Runtime State Continuity Analysis**
+
+Detect changes that introduce a window of degraded availability for shared state during execution. This catches the class of bug where the final state is correct but consumers reading the state mid-execution see empty/missing values.
+
+**Triggering signal:** the story modifies code that rebuilds, refreshes, or replaces **shared persistent or in-memory state** read by other consumers during execution — relational tables, document collections, key-value stores, caches, message queues, search indices, materialized views, shared files, configuration stores, in-memory registries.
+
+For EACH such modification:
+
+1. **Lifecycle of the change**: classify the rebuild pattern, independent of storage technology.
+   - **In-place destructive rebuild outside a transactional boundary**: the destructive step (wipe / drop / clear / delete-all) and the reconstructive step (insert / load / refill) are separate operations; readers can observe the empty intermediate state
+   - **Transactional batch**: destructive and reconstructive steps enclosed in a single transaction so readers see the old state or the new state, never the empty one
+   - **Atomic swap**: full new version written to a parallel location, then atomically switched (rename / promote / pointer update)
+   - **Versioned pointer**: new version written under a new identifier, then the active-version reference is atomically updated
+   - **Idempotent merge / upsert**: no destructive step at all; reconciliation by insert-or-update on stable keys
+2. **Concurrent readers during execution**: list every consumer that reads this state while the operation runs (other services, dashboards, scheduled jobs, exports, downstream APIs, cross-repo systems). If consumers cannot be enumerated → BLOCKER, audit before proceeding.
+3. **Tolerance of readers**: are readers safe with empty/stale/missing values during the rebuild window? Default assumption: NO. Mark UNSAFE unless explicitly verified.
+4. **Pattern verdict**:
+
+   | Pattern | Consumers tolerant of empty? | Verdict |
+   |---------|-----------------------------|---------|
+   | In-place destructive rebuild outside a transaction | No / Unknown | **UNSAFE — must redesign** |
+   | In-place destructive rebuild outside a transaction | Yes (write-only sink, audit log) | Document the window |
+   | Transactional batch | Any | SAFE (verify lock / lease duration) |
+   | Atomic swap / versioned pointer | Any | SAFE |
+   | Idempotent merge / upsert | Any | SAFE |
+
+5. **Add VM-NR (continuity)**: if shared state is rebuilt during execution, generate a non-regression VM that asserts a downstream consumer continues to function during the operation: `VM-NR-N [state] *(Impact IN)* : during {pipeline/operation} execution, {consumer} continues to read {expected_state}`
+6. **Tasks for redesign**: if the verdict is UNSAFE, add tasks to convert to atomic swap, transactional batch, versioned pointer, or idempotent merge — these are mandatory, not optional.
+
 ### 6. PRD Extraction (Enrichment mode)
 
 **Enrichment mode only:** From `EPIC_PRD`, extract:
@@ -190,13 +219,22 @@ Present the full audit to the user:
 
 {schema drift findings, if any}
 
+### Continuite d'etat runtime
+
+| Etat partage modifie | Pattern | Consommateurs concurrents | Verdict |
+| -------------------- | ------- | ------------------------- | ------- |
+
+{state_continuity_findings or "Aucun etat partage modifie"}
+
 ### Perimetre de la story
 
 - Taches applicatives : {count}
 - Taches CI/CD & infra : {count}
+- Taches redesign continuite d'etat : {count}
 - Guardrails identifies : {count}
 - Edge cases identifies : {count}
 - Non-regression VMs : {count}
+- VMs continuite d'etat : {count}
 
 Approuvez-vous ce perimetre avant la composition de l'issue ?
 ```
