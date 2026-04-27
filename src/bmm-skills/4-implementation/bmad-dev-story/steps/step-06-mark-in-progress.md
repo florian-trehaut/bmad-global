@@ -12,7 +12,7 @@ Update tracker status and load or auto-generate the test strategy from the issue
 
 ### 1. Update Tracker Status
 
-Update the issue in the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+Update the issue in the tracker (using CRUD patterns from workflow-knowledge/project.md):
 - Operation: Update issue
 - Issue: {ISSUE_ID}
 - Status: {TRACKER_STATES.in_progress}

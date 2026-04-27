@@ -12,7 +12,7 @@ Load the selected issue details from the tracker and extract all identifiers nee
 
 ### 1. Load Issue Details
 
-Fetch the issue from the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+Fetch the issue from the tracker (using CRUD patterns from workflow-knowledge/project.md):
 - Operation: Get issue by ID
 - Issue: {ISSUE_IDENTIFIER}
 - Include: relations

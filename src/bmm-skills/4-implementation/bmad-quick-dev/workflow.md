@@ -37,7 +37,7 @@ Apply these rules for the entire workflow execution.
 Load project context from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` (if exists) and resolve:
 
 - `user_name`, `communication_language`, `user_skill_level`
-- Project conventions, forbidden patterns, test rules from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md`
+- Project conventions, forbidden patterns, test rules from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`
 
 **Communication:** Always speak in the configured `communication_language`.
 
@@ -45,7 +45,7 @@ Load project context from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` (if 
 
 - `wipFile` = `{implementation_artifacts}/spec-wip.md`
 
-- `project_context` = `**/project-context.md` OR `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` (load if exists)
+- `project_context` = `**/project-context.md` OR `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (load if exists)
 
 ### 4. Related Workflows
 

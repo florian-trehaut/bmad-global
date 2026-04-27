@@ -213,7 +213,7 @@ WAIT for selection. Process Q/D, redisplay menu. On C, continue.
 
 ### 6. Cross-Reference with Standards
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists:
 - Cross-reference findings against project standards
 - Note conflicts (e.g., "stack.md forbids library X, but it's the best option for this use case")
 - Note alignments (e.g., "consistent with existing pattern Y")

@@ -45,7 +45,7 @@ For EACH impacted service, verify:
 7. **Cloud resources** — any created outside IaC = BLOCKER
 8. **Changesets** — if shared packages/libs modified: changeset file exists
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/infrastructure.md` exists at project root, verify against it.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, verify against it.
 
 Report per service:
 

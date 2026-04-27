@@ -51,7 +51,7 @@ Determine:
 Search for documentation that can inform the scaffold:
 - `architecture.md`, `ARCHITECTURE.md`
 - `tech-spec*.md`
-- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md`
+- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`
 - `docs/` directory with relevant specs
 
 If found, note their locations for reference in later steps. Do not block if absent.

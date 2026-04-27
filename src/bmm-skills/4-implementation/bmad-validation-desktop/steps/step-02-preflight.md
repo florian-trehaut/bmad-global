@@ -15,9 +15,9 @@ Verify that the build environment and toolchain are operational before starting 
 
 ### 1. Load environment configuration
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` was loaded during initialization, extract relevant test and build conventions.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` was loaded during initialization, extract relevant test and build conventions.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/environment-config.md` exists and was loaded, extract desktop-specific parameters (binary path overrides, log directory, test fixture paths).
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists and was loaded, extract desktop-specific parameters (binary path overrides, log directory, test fixture paths).
 
 ### 2. Check build system availability
 

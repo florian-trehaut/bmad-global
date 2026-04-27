@@ -18,7 +18,7 @@ Create missing tracker projects (for epics) and issues (for stories), skip items
 
 For each epic that has NO matching tracker project:
 
-- Create Project in the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+- Create Project in the tracker (using CRUD patterns from workflow-knowledge/project.md):
   - Operation: Create project
   - Name: epic title (e.g., "Epic 1: Campaign Management")
   - Team: {TRACKER_TEAM_ID}

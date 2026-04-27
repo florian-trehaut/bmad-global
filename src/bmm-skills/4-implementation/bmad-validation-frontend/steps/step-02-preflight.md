@@ -15,11 +15,11 @@ Verify that the frontend toolchain, test runners, and target environment are ope
 
 ### 1. Load environment, stack, and validation knowledge
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` was loaded during initialization, extract relevant frontend framework, test toolchain, and build conventions.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` was loaded during initialization, extract relevant frontend framework, test toolchain, and build conventions.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/environment-config.md` exists and was loaded, extract frontend-specific parameters (staging URLs, dev server config, test fixture paths).
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists and was loaded, extract frontend-specific parameters (staging URLs, dev server config, test fixture paths).
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/validation.md` was loaded during initialization:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` was loaded during initialization:
 - Extract `Validation Stack` table → use as pre-detected test commands (skip auto-detection for components already known)
 - Extract `Stack-Specific Validation Notes` → store as `STACK_NOTES` for use in step-04
 - Extract `Test Discovery Patterns` → store as `TEST_DISCOVERY` for test file matching in step-04

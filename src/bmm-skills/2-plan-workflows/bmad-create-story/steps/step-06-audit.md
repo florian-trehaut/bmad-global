@@ -64,7 +64,7 @@ Load `~/.claude/skills/bmad-shared/data/infra-assessment-template.md` for struct
 
 1. **Build pipeline** — Does this service have a build step in CI/CD? Container config? If new service, is there a plan?
 2. **Database migrations** — If schema changes: is migration generation part of tasks? Integrated into CI/CD?
-3. **Deployment** — Does this service have a deployment configuration (see workflow-knowledge/infrastructure.md)?
+3. **Deployment** — Does this service have a deployment configuration (see workflow-knowledge/project.md)?
 4. **Infrastructure** — Are cloud resources provisioned AND coherent with application code?
 5. **Secrets and configuration** — Are required secrets and config values complete?
 

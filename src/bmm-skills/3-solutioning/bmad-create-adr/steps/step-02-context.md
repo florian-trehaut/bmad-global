@@ -54,7 +54,7 @@ WAIT for user input.
 
 Search the main repo for relevant context:
 - Grep for patterns related to the decision topic (e.g., if deciding on caching, search for existing cache usage)
-- Check architecture docs if they exist (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md`, architecture files)
+- Check architecture docs if they exist (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`, architecture files)
 - Note current state of the system relevant to the decision
 
 Present findings: "Here's what I found in the codebase relevant to this decision: {findings}"

@@ -8,7 +8,7 @@ Investigate real source data and trace the complete flux through the system. Thi
 
 - REAL DATA MANDATORY — code analysis is NEVER a substitute for real data (provider files, DB queries, cloud logs)
 - Load the generic investigation checklist from `../data/investigation-checklist.md`
-- Load the project-specific investigation checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md` (if exists) — extends the generic checklist
+- Load the project-specific investigation checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (if exists) — extends the generic checklist
 - Document ALL findings with file:line references and concrete evidence
 - Every external dependency claim in the story must be verified against real systems, not assumed
 
@@ -23,7 +23,7 @@ Read ../data/investigation-checklist.md
 
 Load the project-specific checklist (if exists):
 ```
-Read {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md
+Read {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md
 ```
 
 Combine both checklists. The project-specific one extends the generic — apply both.

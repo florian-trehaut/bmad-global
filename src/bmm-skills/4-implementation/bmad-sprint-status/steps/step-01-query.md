@@ -16,7 +16,7 @@ Retrieve all data needed for the sprint status report: the current cycle, all te
 
 ### 1. Get the current cycle
 
-Query the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+Query the tracker (using CRUD patterns from workflow-knowledge/project.md):
 - Operation: List cycles
 - Team: {TRACKER_TEAM_ID}
 - Filter: current (active) cycle

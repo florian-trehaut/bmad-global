@@ -30,11 +30,11 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load tracker knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/tracker.md` exists, read it. It provides tracker MCP tool patterns, document conventions, and project/issue creation details.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides tracker MCP tool patterns, document conventions, and project/issue creation details.
 
 ### 4. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. It provides the tech stack context needed to write technically accurate acceptance criteria and BDD scenarios.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides the tech stack context needed to write technically accurate acceptance criteria and BDD scenarios.
 
 ---
 

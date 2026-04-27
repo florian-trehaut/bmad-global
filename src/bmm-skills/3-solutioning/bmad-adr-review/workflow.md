@@ -35,7 +35,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. Contains tech stack details, project conventions, and skill structure patterns.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. Contains tech stack details, project conventions, and skill structure patterns.
 
 ### 4. Set defaults
 

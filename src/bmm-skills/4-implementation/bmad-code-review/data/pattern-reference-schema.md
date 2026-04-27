@@ -2,7 +2,7 @@
 
 **Consumed by:** sub-axis 4c (Pattern Consistency).
 
-Projects that want pattern-reference-driven reviews declare their reference code in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` using the schema below. The Meta-4 agent consults the declared references when reporting a pattern deviation.
+Projects that want pattern-reference-driven reviews declare their reference code in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` using the schema below. The Meta-4 agent consults the declared references when reporting a pattern deviation.
 
 ---
 

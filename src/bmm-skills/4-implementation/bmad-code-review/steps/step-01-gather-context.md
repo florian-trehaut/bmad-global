@@ -52,7 +52,7 @@ PROJECT_ID=$({FORGE_API_BASE} "projects/{FORGE_PROJECT_PATH_ENCODED}" | jq -r '.
   | jq '{threads_total:[.[]|select(.resolvable==true and .system==false)]|length, threads_resolved:[.[]|select(.resolvable==true and .resolved==true and .system==false)]|length, threads_unresolved:[.[]|select(.resolvable==true and .resolved==false and .system==false)]|length}'
 ```
 
-Collect tracker issues in review state (CRUD patterns from `workflow-knowledge/tracker.md`): team = `{TRACKER_TEAM}`, status = `{TRACKER_STATES.in_review}`, limit 10.
+Collect tracker issues in review state (CRUD patterns from `workflow-knowledge/project.md`): team = `{TRACKER_TEAM}`, status = `{TRACKER_STATES.in_review}`, limit 10.
 
 ### 1.3 Classify
 
@@ -102,8 +102,8 @@ Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. Load
 
 Read if present, otherwise skip:
 
-- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` — project-specific checklists overriding defaults
-- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` — reference code dirs, legacy dirs, forbidden patterns, test conventions, `ui` / `i18n` fields used by trigger routing (§5)
+- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — project-specific checklists overriding defaults
+- `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — reference code dirs, legacy dirs, forbidden patterns, test conventions, `ui` / `i18n` fields used by trigger routing (§5)
 
 ### 3.3 Contribution conventions
 

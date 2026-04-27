@@ -55,7 +55,7 @@ Epic 2: {title}
 
 ### 3. Query existing tracker state
 
-Execute these tracker queries (using CRUD patterns from workflow-knowledge/tracker.md):
+Execute these tracker queries (using CRUD patterns from workflow-knowledge/project.md):
 
 1. **Get current cycle:**
    - Operation: List cycles

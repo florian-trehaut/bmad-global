@@ -48,11 +48,11 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load project review perspectives (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` exists at project root, read it. This file contains project-specific review checklists (security, QA, code quality, tech lead, patterns, specs compliance) that override the defaults embedded in the perspective steps.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains project-specific review checklists (security, QA, code quality, tech lead, patterns, specs compliance) that override the defaults embedded in the perspective steps.
 
 ### 4. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, reference code pointers, and legacy code directories.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, reference code pointers, and legacy code directories.
 
 ### 5. Set defaults
 

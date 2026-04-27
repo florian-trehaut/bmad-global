@@ -25,7 +25,7 @@ Collect all actionable candidates — tracker issues (In Progress / Todo) and fo
 
 ### 2. Collect Tracker Candidates
 
-Query the tracker (using CRUD patterns from workflow-knowledge/tracker.md):
+Query the tracker (using CRUD patterns from workflow-knowledge/project.md):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Status: {TRACKER_STATES.in_progress}

@@ -32,7 +32,7 @@ Examine the identified files and their surroundings:
 - Error handling approaches
 - Test patterns (if tests exist nearby)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, cross-reference with documented patterns and forbidden patterns.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, cross-reference with documented patterns and forbidden patterns.
 
 ### 3. Search for Prior Closed/Rejected PRs
 

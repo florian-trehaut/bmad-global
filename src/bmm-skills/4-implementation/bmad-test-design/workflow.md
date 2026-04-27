@@ -29,11 +29,11 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. It provides the technology stack, service map, and test framework conventions used to inform test type decisions and coverage targets.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides the technology stack, service map, and test framework conventions used to inform test type decisions and coverage targets.
 
 ### 4. Load tracker knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/tracker.md` exists, read it. It provides tracker MCP tool patterns and document conventions.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides tracker MCP tool patterns and document conventions.
 
 ### 5. Set defaults
 

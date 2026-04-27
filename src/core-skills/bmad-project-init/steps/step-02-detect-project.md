@@ -68,7 +68,7 @@ If multiple trackers detected, present all and ask user to pick the active one. 
 
 **Configure based on detected tracker:**
 
-For each tracker type, discover the concept mapping, states, and CRUD operations that will populate `workflow-knowledge/tracker.md`:
+For each tracker type, discover the concept mapping, states, and CRUD operations that will populate `workflow-knowledge/project.md`:
 
 - **MCP-based (e.g., Linear)**: Use discovered MCP prefix to call team listing, status listing, and project listing methods. Map states (Backlog→backlog, Todo→todo, In Progress→in_progress, In Review→in_review, To Test→to_test, Done→done, Canceled→canceled). Discover meta project if available.
 - **CLI-based (GitHub)**: States: todo/in_progress="open", done="closed". Ask about workflow labels.

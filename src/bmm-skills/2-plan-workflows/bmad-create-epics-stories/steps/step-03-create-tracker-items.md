@@ -2,7 +2,7 @@
 
 ## STEP GOAL
 
-Persist the validated epic and story structure into the project tracker by creating epics/projects and stories/issues (using concept mapping from `workflow-knowledge/tracker.md`) with all acceptance criteria, BDD scenarios, and test strategies in the issue descriptions. All stories are created in Backlog state.
+Persist the validated epic and story structure into the project tracker by creating epics/projects and stories/issues (using concept mapping from `workflow-knowledge/project.md`) with all acceptance criteria, BDD scenarios, and test strategies in the issue descriptions. All stories are created in Backlog state.
 
 ## RULES
 
@@ -18,7 +18,7 @@ Persist the validated epic and story structure into the project tracker by creat
 
 Before creating epics as tracker projects, check if projects with the same names already exist.
 
-Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+Query the project tracker (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: List projects
 - Filter: by team ID `{TRACKER_TEAM_ID}`
 
@@ -37,7 +37,7 @@ WAIT for user decision.
 
 For each epic, create a tracker project.
 
-Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+Query the project tracker (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: Create project
 - Fields:
   - name: `{epic_name}`
@@ -101,14 +101,14 @@ Then {expected_result}
 
 Create the issue in the tracker.
 
-Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+Query the project tracker (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: Create issue
 - Fields:
   - title: `{story_title}`
   - description: `{composed_description}`
   - team: `{TRACKER_TEAM_ID}`
   - project: `{EPIC_PROJECT_ID}`
-  - state: Backlog (mapped via `workflow-knowledge/tracker.md` state mapping)
+  - state: Backlog (mapped via `workflow-knowledge/project.md` state mapping)
 
 Log: `Issue créée: {identifier} — {story_title} [Backlog]`
 
@@ -118,7 +118,7 @@ Log: `Issue créée: {identifier} — {story_title} [Backlog]`
 
 After all issues are created, verify by listing issues in each project.
 
-Query the project tracker (using CRUD patterns from `workflow-knowledge/tracker.md`):
+Query the project tracker (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: List issues
 - Filter: by project ID `{EPIC_PROJECT_ID}`
 

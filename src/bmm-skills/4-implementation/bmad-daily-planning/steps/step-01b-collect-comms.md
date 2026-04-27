@@ -17,7 +17,7 @@ Scan comms platform conversations since `{LAST_DAILY_DATE}` to surface discussio
 
 ### 1. List channels
 
-Query the communication platform (using CRUD patterns from `workflow-knowledge/comm-platform.md`):
+Query the communication platform (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: List channels
 - Limit: 200
 
@@ -27,14 +27,14 @@ Collect channel IDs and names for both public and private channels the user has 
 
 For each day from `{LAST_DAILY_DATE}` to `{TODAY}` inclusive, search for messages involving the user.
 
-Query the communication platform (using CRUD patterns from `workflow-knowledge/comm-platform.md`):
+Query the communication platform (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: Search messages
 - Query: messages sent by `{USER_COMM_HANDLE}`
 - Sort: by timestamp, descending
 
 Also search for mentions:
 
-Query the communication platform (using CRUD patterns from `workflow-knowledge/comm-platform.md`):
+Query the communication platform (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: Search messages
 - Query: messages mentioning `{USER_COMM_HANDLE}`
 - Sort: by timestamp, descending
@@ -45,14 +45,14 @@ If the comms handle is not known, use `{USER_NAME}` as fallback for the search q
 
 Search for DM conversations using username-based filtering.
 
-Query the communication platform (using CRUD patterns from `workflow-knowledge/comm-platform.md`):
+Query the communication platform (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: Search messages
 - Query: messages sent by `{USER_COMM_HANDLE}` in DMs
 - Sort: by timestamp, descending
 
 And incoming DMs:
 
-Query the communication platform (using CRUD patterns from `workflow-knowledge/comm-platform.md`):
+Query the communication platform (using CRUD patterns from `workflow-knowledge/project.md`):
 - Operation: Search messages
 - Query: messages sent to `{USER_COMM_HANDLE}` in DMs
 - Sort: by timestamp, descending

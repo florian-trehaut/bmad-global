@@ -64,7 +64,7 @@ Style-only changes activate Meta-6 at reduced scope: 6a if `stack.md: a11y_cover
 
 ## Stack.md contract
 
-Sub-axis 6a + 6b consume these fields from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md`:
+Sub-axis 6a + 6b consume these fields from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`:
 
 ```yaml
 ui: web | none                  # gates Meta-6 activation

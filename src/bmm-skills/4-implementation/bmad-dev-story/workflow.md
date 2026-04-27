@@ -53,11 +53,11 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
 
 ### 4. Load infrastructure knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/infrastructure.md` exists, read it. This file contains cloud infra, CI/CD, deployment config.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. This file contains cloud infra, CI/CD, deployment config.
 
 ### 5. Set defaults
 

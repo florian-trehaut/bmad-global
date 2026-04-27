@@ -27,7 +27,7 @@ Assess data model changes, API contracts, infrastructure requirements, and exter
 
 Investigate in {SPEC_WORKTREE_PATH}:
 
-- Read ORM schema files and migrations impacted by this feature (see workflow-knowledge/stack.md for the project's ORM and file patterns)
+- Read ORM schema files and migrations impacted by this feature (see workflow-knowledge/project.md for the project's ORM and file patterns)
 - Read existing migrations to understand the current state
 - Identify: which tables/columns must be created, modified, or deleted
 

@@ -31,7 +31,7 @@ Same as other metas. READ-ONLY, never downgrade BLOCKER.
 
 **Condition:** Always-on when Meta-4 runs.
 
-Apply project code quality checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded.
+Apply project code quality checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` if loaded.
 
 - [ ] Architecture boundaries (domain never imports infrastructure → **BLOCKER**)
 - [ ] Ports explicit in domain layer
@@ -83,7 +83,7 @@ ls .changeset/*.md 2>/dev/null | head -5
 
 **Condition:** Always-on.
 
-Use reference code directories from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` if loaded. **NEVER reference legacy code.**
+Use reference code directories from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` if loaded. **NEVER reference legacy code.**
 
 - [ ] DTO validation patterns
 - [ ] ConfigService usage (no `process.env` direct access)
@@ -107,7 +107,7 @@ grep -rn "process\.env\." --include="*.ts" {changed_files_dirs} | grep -v "spec.
 
 **Condition:** Always-on.
 
-Apply project QA checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/review-perspectives.md` if loaded.
+Apply project QA checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` if loaded.
 
 ### Forbidden patterns (BLOCKER)
 

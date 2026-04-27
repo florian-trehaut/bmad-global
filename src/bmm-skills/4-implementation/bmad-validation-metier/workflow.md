@@ -35,7 +35,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load environment config (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/environment-config.md` exists at project root, read it. This file contains project-specific environment URLs, database connection info, cloud platform config, and credentials discovery procedures.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains project-specific environment URLs, database connection info, cloud platform config, and credentials discovery procedures.
 
 If this file does not exist, the preflight step will discover environment access dynamically.
 

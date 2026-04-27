@@ -42,7 +42,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. This file contains project-specific test commands, build tools, test conventions, and framework details needed to construct the right test invocations.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. This file contains project-specific test commands, build tools, test conventions, and framework details needed to construct the right test invocations.
 
 ### 4. Set defaults
 

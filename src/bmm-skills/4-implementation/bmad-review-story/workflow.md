@@ -40,15 +40,15 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
 
 ### 4. Load infrastructure knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/infrastructure.md` exists at project root, read it. This file contains cloud infra, CI/CD, deployment config.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains cloud infra, CI/CD, deployment config.
 
 ### 5. Load investigation checklist (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/investigation-checklist.md` exists at project root, read it. This file contains project-specific domain investigation checklists (provider-specific, service-specific, infra-specific).
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains project-specific domain investigation checklists (provider-specific, service-specific, infra-specific).
 
 The generic investigation checklist at `./data/investigation-checklist.md` is always loaded as baseline. Project-specific checklists extend (not replace) the generic one.
 

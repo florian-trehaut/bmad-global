@@ -14,12 +14,12 @@ Load project context, discover available local skills, identify the affected ser
 
 ### 1. Load infrastructure knowledge
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/environment-config.md` exists at project root, read it. Extract:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. Extract:
 - Service URLs for `{TARGET_ENV}`
 - Database connection info relevant to `{AFFECTED_SERVICE}`
 - Health check endpoints
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/infrastructure.md` exists at project root, read it. Extract:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. Extract:
 - Cloud platform layout
 - Deployment pipeline structure
 - Database management rules
