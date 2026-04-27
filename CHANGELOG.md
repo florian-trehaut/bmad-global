@@ -190,6 +190,27 @@ Extension du skill changelog en workflow de release de bout en bout : pre-flight
 - **step-02d-discover** — Référence `{businessContextTemplate}` dans la définition du VM checklist (B5) pour format d'output structuré + guidelines qualité VM.
 - **step-07-plan** — Nouveau §6 "Performance Measurement Plan" conditionnel (latency / batch / binary-size), exigeant instrumentation temporaire + mesures réelles avant removal — les claims de performance en MR sont désormais evidence-backed. Nouveau §7 "Identify Dependencies and Risks". Sections suivantes renumérotées 6→8, 7→9, 8→10, 9→11.
 
+## v1.4.0 - 2026-04-11
+
+### Highlight: Quick-spec / create-story fusion + upstream sync framework
+
+Fuses the `bmad-quick-spec` skill into `bmad-create-story` for a unified spec creation workflow, and integrates the upstream BMAD-METHOD validation framework via a dedicated upstream-sync skill rewrite.
+
+#### What changed
+
+- **Skill fusion** — `bmad-quick-spec` merged into `bmad-create-story` (unified skill for spec creation, no more duplicate paths)
+- **Upstream-sync rewrite** — new fork-identity-aware sync skill with `step-03-review-imports` for systematic post-merge audit
+- **Changelog skill** — new `changelog` skill for guided release workflow (this skill itself)
+- **Validator zero-findings** — all validators now pass with zero findings; `--strict` mode enforced in CI
+- **Worktree fixes** — worktree creation moved to troubleshoot workflow initialization (was inconsistent across skills)
+- **Installer robustness** — `module.yaml` fallback search added for external modules (no more silent failures on non-standard layouts)
+
+#### Upstream integrations (v6.2.2 → v6.3.1)
+
+Significant upstream BMAD-METHOD commits integrated into the fork: party-mode consolidation with real subagents, `bmad-prfaq` skill (alternative analysis path), `bmad-init` removal with standardized config loading, KiloCoder + Junie platform support, `.claude-plugin` marketplace metadata, output_folder path resolution fixes, plugin.json consolidation into marketplace.json.
+
+---
+
 ## v1.3.0 - 2026-04-01
 
 ### Worktree Lifecycle & ADR Improvements
@@ -384,6 +405,19 @@ List all unilateral design decisions made without spec guidance, for inclusion i
 - Move WIP files to `/tmp`, batch findings presentation in review-story
 - Enrich create-story with quick-spec improvements, centralize shared templates
 - Reset versioning to 1.0.0, decouple from upstream BMAD
+
+---
+
+## v1.0.0 - 2026-03-26
+
+### Highlight: Versioning reset, fork decoupled from upstream
+
+Establishes `@florian-trehaut/bmad-global` as an independent fork of `bmad-code-org/BMAD-METHOD`, with its own semver track starting at 1.0.0. Prior versions track upstream (v6.2.x range, kept below for reference).
+
+- Version reset from v6.3.1 to v1.0.0 — fork now publishes under its own version space
+- npm package renamed to `@florian-trehaut/bmad-global` (scoped, public)
+- Distribution channels established: `next` (auto-publish on main) and `latest` (manual dispatch)
+- All implementation-specific tool references removed from skills (provider-neutral)
 
 ---
 
