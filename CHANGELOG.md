@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.7.1 - 2026-04-27
+
+### 🔥 Highlight: Customization resolver no longer gated on a per-project script
+
+Workflow activation steps in 47 skills failed during preflight on every consumer project. The activation step ran `python3 {project-root}/_bmad/scripts/resolve_customization.py`, but that path is never created — the global installer ships skills only, not per-project scripts. Side-effect: the parallel "resolve project root" call was cancelled on every workflow start, leaving the workflow stuck before its first real step.
+
+#### What changed
+
+- **Script moved under `bmad-shared/`** — `resolve_customization.py` now ships with every install at `~/.claude/skills/bmad-shared/scripts/resolve_customization.py`. All 47 SKILL.md activation steps point at that path.
+- **`find_project_root()` no longer matches on `.git`** — only `_bmad/` counts as a project marker. Without this, dotfiles repos containing `~/.claude/` would hijack the project lookup and resolve to the wrong root.
+- **cwd is consulted first** — when the script lives globally, walking up from `skill_dir` never finds an `_bmad/`. The user's cwd is the real source of truth; `skill_dir` is kept as a defensive fallback.
+- **`bmad-customize` preflight rewritten** — previously gated on `{project-root}/_bmad/` existing. Now gates on the global script being installed, since `_bmad/custom/` is created lazily on first override.
+
+#### Post-upgrade
+
+1. `bmad-global install --force` — re-deploy skills + the relocated script. Required: workflows on the previous version reference a path that no longer exists, so a fresh install is mandatory before the next workflow run.
+
 ## v1.7.0 - 2026-04-27
 
 ### 🔥 Highlight: SDD-aligned knowledge lifecycle — split bootstrap, consolidate 10→3 files, drift detection
