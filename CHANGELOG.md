@@ -1,5 +1,48 @@
 # Changelog
 
+## v1.8.0 - 2026-04-27
+
+### 🔥 Highlight: Schema-driven indirection layer for project knowledge
+
+The previous knowledge consolidation (10 files → 3 files) left **162 hard-coded `project.md#anchor` references** scattered across step files, with one anchor (`#tracker-patterns`) referenced 107 times. Renaming a section forced touching 100+ files, schema evolution was effectively frozen, and there was no way for users to add custom sections without forking workflows.
+
+This release replaces those refs with a **5-layer architecture** that decouples consumer workflows from the internal structure of the knowledge file:
+
+| Layer | What it is | Where it lives |
+|-------|------------|----------------|
+| **L1 — Schema** | Single source of truth: file list, section list, semantic IDs, anchors, required flags, `direct_reference_allowed` set, versioning rules | `bmad-shared/knowledge-schema.md` (`schema_version: "1.0"`) |
+| **L2 — Protocols** | JIT-loaded capability files. Workflows reference protocols, not anchors | `bmad-shared/protocols/{tracker-crud,tech-stack-lookup,environments-lookup,validation-tooling-lookup}.md` |
+| **L3 — Workflows** | Consumer files. Direct anchor refs are forbidden by REF-03 | `src/bmm-skills/**/{workflow,steps/*,subagent-workflows/*}.md` |
+| **L4 — Validator** | Enforces REF-01 (no legacy filenames), REF-02 (no soft loads on required files), REF-03 (no direct anchor refs in consumer files) | `tools/validate-knowledge-refs.js` (`npm run validate:knowledge-refs`, hooked into `npm run quality`) |
+| **L5 — Producer** | `bmad-knowledge-bootstrap` writes `schema_version: "1.0"` in `project.md` frontmatter; `step-06-verify` halts on missing required sections; `bmad-knowledge-refresh` aligned on the same version | `src/core-skills/bmad-knowledge-{bootstrap,refresh}/` |
+
+#### What changed for users
+
+- **Schema versioning is now a first-class concept.** Adding an optional section/file/protocol = MINOR bump (1.0 → 1.1). Renaming or removing a section = MAJOR bump with a documented migration path. Unknown sections are ignored by bundled workflows (additive evolution).
+- **User extensibility.** Custom H2 sections in `project.md` / `domain.md` / `api.md` are preserved by `/bmad-knowledge-refresh` and ignored by bundled BMAD workflows. Custom skills can declare new sections in `.claude/workflow-knowledge/.knowledge-schema.local.md` and consume them via project-local protocols.
+- **Spawn protocol updated.** Teammates spawned via Agent Teams now receive the schema and protocol paths in their PROJECT CONTEXT and inherit the no-direct-anchor rule. The `agent-teams-config-schema` integration table is extended accordingly.
+- **`npm run quality` is stricter.** The new `validate:knowledge-refs` step runs alongside existing checks (prettier, eslint, markdownlint, test:install, validate:refs, validate:skills).
+- **CLAUDE.md documents the architecture.** Versioning rules and the user extensibility model are now in the project-level memory.
+
+#### Patterns applied
+
+Data Contracts (Sopan Deole, 2026), Source of Truth (The New Stack agentic patterns), progressive disclosure (Anthropic Claude Skills best practices), schema versioning (MCP, ECM Contracts).
+
+### ✨ Runtime state continuity detection (Meta-2)
+
+Adds an always-on Meta-2 sub-axis to `bmad-code-review` and `bmad-create-story` covering **destructive-then-reconstructive flows on shared state outside a transactional boundary** — the kind of code that passes tests but leaves downstream readers seeing empty data during the rebuild window.
+
+Closes the gap where a pipeline temporarily dereferenced shared state at each run: final state correct, no fallback, no crash, no test failure — yet consumers were briefly empty mid-run.
+
+- **Stack-agnostic concept layer** added to `meta-2-correctness-reliability.md` and the `step-06-audit` / `step-07-plan` audit workflow in `bmad-create-story`.
+- **Per-stack grep patterns** added to `stack-grep-bank/{typescript,python,go,java,ruby,rust}.md` for wipe-then-refill, drop-then-recreate, and clear-then-load patterns.
+- **DOD checklist** extended in `bmad-dev-story` and `self-review` subagent workflow.
+
+### Post-upgrade
+
+1. `npx @florian-trehaut/bmad-global install --force` — re-deploys the schema, the four new protocols, the knowledge-loading helper, the validator, and the runtime state continuity detection axis to `~/.claude/skills/`. **Required**: workflows in this release reference paths and protocols that don't exist in 1.7.1, so a fresh global install is mandatory before the next workflow run.
+2. `/bmad-knowledge-refresh` _(recommended on existing projects)_ — aligns your `project.md` frontmatter with `schema_version: "1.0"` and re-validates required sections. Custom H2 sections you added are preserved.
+
 ## v1.7.1 - 2026-04-27
 
 ### 🔥 Highlight: Customization resolver no longer gated on a per-project script
