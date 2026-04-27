@@ -34,6 +34,7 @@
         "./src/core-skills/bmad-knowledge-bootstrap",
         "./src/core-skills/bmad-knowledge-refresh",
         "./src/core-skills/bmad-party-mode",
+        "./src/core-skills/bmad-project-init",
         "./src/core-skills/bmad-review-adversarial-general",
         "./src/core-skills/bmad-review-edge-case-hunter",
         "./src/core-skills/bmad-review-regression-risk",

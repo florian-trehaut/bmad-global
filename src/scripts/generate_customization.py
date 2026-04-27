@@ -54,6 +54,7 @@ BATCHES = {
         "src/bmm-skills/4-implementation/bmad-daily-planning",
         "src/core-skills/bmad-knowledge-bootstrap",
         "src/core-skills/bmad-knowledge-refresh",
+        "src/core-skills/bmad-project-init",
         "src/core-skills/bmad-brainstorming",
     ],
     "3-tea": [
