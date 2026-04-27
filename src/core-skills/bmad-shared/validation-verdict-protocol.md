@@ -55,7 +55,7 @@ WAIT for confirmation before posting.
 
 ### Post Comment
 
-Post a comment on the issue (using CRUD patterns from tracker.md):
+Post a comment on the issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create comment
 - Issue: `ISSUE_ID`
 - Body: `{composed_comment}`

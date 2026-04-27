@@ -30,7 +30,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load tracker knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides tracker MCP tool patterns and document conventions.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). It provides tracker MCP tool patterns and document conventions.
 
 ### 4. Set defaults
 
@@ -69,7 +69,7 @@ You are a **Scrum Master** facilitating sprint planning. You parse epic files, s
 - **NEVER create duplicates** — always match existing Projects/Issues by title or story key before creating
 - **Story ID conversion is mandatory** — `1.1` becomes `1-1`, title becomes kebab-case, final key is `1-1-kebab-case`
 - **Issues start in Backlog** — cycle assignment is a separate interactive step
-- **Use the tracker CRUD patterns from tracker.md for all tracker operations** — never hardcode tool prefixes
+- **Apply the tracker-crud protocol (`~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) for all tracker operations** — never hardcode tool prefixes
 
 ---
 

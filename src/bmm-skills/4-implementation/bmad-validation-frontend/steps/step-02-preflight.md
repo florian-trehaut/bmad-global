@@ -9,17 +9,17 @@ Verify that the frontend toolchain, test runners, and target environment are ope
 - Each check that fails — HALT with a clear message and corrective action
 - NEVER bypass a failed check
 - NEVER assume that access works without verifying it
-- Adapt checks to the project's frontend framework and test tools as described in `workflow-context.md` and `stack.md`
+- Adapt checks to the project's frontend framework and test tools as described in `workflow-context.md` and the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`)
 
 ## SEQUENCE
 
 ### 1. Load environment, stack, and validation knowledge
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` was loaded during initialization, extract relevant frontend framework, test toolchain, and build conventions.
+Extract from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION): relevant frontend framework, test toolchain, and build conventions.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists and was loaded, extract frontend-specific parameters (staging URLs, dev server config, test fixture paths).
+Extract from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION): frontend-specific parameters (staging URLs, dev server config, test fixture paths).
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` was loaded during initialization:
+Using `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION):
 - Extract `Validation Stack` table → use as pre-detected test commands (skip auto-detection for components already known)
 - Extract `Stack-Specific Validation Notes` → store as `STACK_NOTES` for use in step-04
 - Extract `Test Discovery Patterns` → store as `TEST_DISCOVERY` for test file matching in step-04
@@ -72,7 +72,7 @@ Warn: "No E2E or component test framework detected. Validation will rely on user
 3. Check that `{INSTALL_COMMAND}` has been run (node_modules exists)
 
 **If `ENVIRONMENT = staging`:**
-1. Discover the staging URL from environment-config.md or workflow-context.md
+1. Discover the staging URL from the environments-lookup protocol (`~/.claude/skills/bmad-shared/protocols/environments-lookup.md`) or workflow-context.md
 2. Verify the URL responds:
    ```bash
    curl -s -o /dev/null -w "%{http_code}" {staging_url}
@@ -80,7 +80,7 @@ Warn: "No E2E or component test framework detected. Validation will rely on user
 3. HALT if not accessible: "Staging environment at {staging_url} is not accessible. Status: {status_code}."
 
 **If `ENVIRONMENT = production`:**
-1. Discover the production URL from environment-config.md or workflow-context.md
+1. Discover the production URL from the environments-lookup protocol (`~/.claude/skills/bmad-shared/protocols/environments-lookup.md`) or workflow-context.md
 2. Verify the URL responds (same as staging)
 3. Remind: "Production mode active. Write actions will require authorization."
 

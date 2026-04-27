@@ -130,7 +130,7 @@ sources_used: [list of present sources]
 source_hash:
   {only entries for sources actually used}
 content_hash: {new content_hash}
-schema_version: 2
+schema_version: "1.0"
 manual_override: false
 ---
 ```

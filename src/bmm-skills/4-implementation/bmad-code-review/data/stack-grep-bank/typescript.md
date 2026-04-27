@@ -2,7 +2,7 @@
 
 **Consumed by:** Meta-2 (2a zero-fallback), Meta-3 (3a security, 3b AI safety), Meta-4 (4a code quality, 4d QA).
 
-Meta-agents dispatch these grep patterns when `stack.md: language: typescript` or `javascript`. For other stacks, the Meta-agent dispatches `data/stack-grep-bank/{stack}.md` instead.
+Meta-agents dispatch these grep patterns when the tech-stack-lookup protocol with `language: typescript` or `javascript`. For other stacks, the Meta-agent dispatches `data/stack-grep-bank/{stack}.md` instead.
 
 ---
 

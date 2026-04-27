@@ -9,15 +9,15 @@ Verify that the build environment and toolchain are operational before starting 
 - Each check that fails — HALT with a clear message and corrective action
 - NEVER bypass a failed check
 - NEVER assume the build is working without verifying it
-- Adapt checks to the project's build system as described in `workflow-context.md` and `stack.md`
+- Adapt checks to the project's build system as described in `workflow-context.md` and the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`)
 
 ## SEQUENCE
 
 ### 1. Load environment configuration
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` was loaded during initialization, extract relevant test and build conventions.
+Extract from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION): relevant test and build conventions.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists and was loaded, extract desktop-specific parameters (binary path overrides, log directory, test fixture paths).
+Extract from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION): desktop-specific parameters (binary path overrides, log directory, test fixture paths).
 
 ### 2. Check build system availability
 

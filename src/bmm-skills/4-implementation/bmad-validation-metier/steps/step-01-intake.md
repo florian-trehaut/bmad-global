@@ -22,7 +22,7 @@ Identify the issue to validate (provided by the user or discovered via tracker),
 
 #### 1a. Discover issues in "To Test" status
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Status: {TRACKER_STATES.to_test}
@@ -55,7 +55,7 @@ Store `ISSUE_IDENTIFIER`.
 
 ### 2. Load the issue from tracker
 
-Fetch the issue from the tracker (using CRUD patterns from tracker.md):
+Fetch the issue from the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Get issue
 - Identifier: ISSUE_IDENTIFIER
 

@@ -67,7 +67,7 @@ Review the `{diff_output}` from these perspectives:
 
    **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, load it and apply those review perspectives instead.
+Apply review perspectives from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION).
 
 ---
 

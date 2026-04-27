@@ -17,7 +17,7 @@ Load all non-completed issues relevant to the user from the tracker — assigned
 
 ### 1. Query tracker for assigned issues
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Filter: assigned to `"me"` (authenticated user — NOT `{USER_NAME}` which may not match the tracker's user lookup)
@@ -25,7 +25,7 @@ Query the tracker (using CRUD patterns from tracker.md):
 
 ### 2. Query tracker for created issues
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Filter: created by `"me"` (authenticated user)
@@ -33,7 +33,7 @@ Query the tracker (using CRUD patterns from tracker.md):
 
 ### 3. Query tracker for unassigned issues
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - List issues for team `{TRACKER_TEAM}`
 - Filter: assignee = null (no one assigned)
 - Filter: status NOT in ["Done", "Cancelled", "Duplicate"]

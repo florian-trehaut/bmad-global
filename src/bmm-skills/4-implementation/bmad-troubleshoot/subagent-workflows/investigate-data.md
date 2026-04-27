@@ -6,7 +6,7 @@
 - `TARGET_ENV`: environment to investigate
 - `SYMPTOM`: description of the symptom
 - `LOCAL_SKILLS`: list of available project skills (from `{MAIN_PROJECT_ROOT}/.claude/skills/`)
-- `INVESTIGATION_PATTERNS`: domain-specific investigation queries (from investigation-checklist.md if available)
+- `INVESTIGATION_PATTERNS`: domain-specific investigation queries (from `project.md#investigation-checklist`)
 
 ## Your Role
 

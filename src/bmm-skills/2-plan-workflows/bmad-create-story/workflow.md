@@ -41,13 +41,13 @@ Apply these rules for the entire workflow execution. Key rules:
 - **Verify story ACs don't rely on fallback assumptions.** When defining status mappings or data transformations, explicitly state "unknown value must throw + alert" as an AC.
 - **Every AC must have a complete, verified production chain** from trigger to observable result — never assume "existant" without verification in the codebase.
 
-### 3. Load optional knowledge files
+### 3. Load knowledge files
 
-Load each if it exists in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`:
+Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`. For this workflow:
 
-- `tracker.md` — tracker MCP tool patterns, document conventions, storage adapter details
-- `stack.md` — tech stack, forbidden patterns, test rules, reference code pointers
-- `validation.md` — project-specific validation tooling (E2E framework, component tests, a11y tools), stack-specific notes, test discovery patterns. Use to generate VM items adapted to the project's validation capabilities.
+- **Required (HALT if missing):** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — tracker patterns (`#tracker-patterns`), tech stack (`#tech-stack`), conventions (`#conventions`), validation tooling (`#validation-tooling`), test rules (`#test-rules`)
+- **Required (HALT if missing):** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md` — ubiquitous language and domain rules used to phrase stories
+- **Conditional:** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` — load if the story touches API contracts
 
 ### 4. Set related workflow paths
 

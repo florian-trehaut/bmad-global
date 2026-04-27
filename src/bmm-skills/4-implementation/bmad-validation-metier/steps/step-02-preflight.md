@@ -10,15 +10,15 @@ Verify that all access to the target environment is operational before starting 
 - NEVER bypass a failed check
 - NEVER assume that access works without verifying it
 - NEVER fabricate URLs — discover them dynamically from the cloud platform or environment config
-- If the project has DB proxy requirements (from environment-config.md), always restart proxies at the start of a session
+- If the project has DB proxy requirements (from the environments-lookup protocol (`~/.claude/skills/bmad-shared/protocols/environments-lookup.md`)), always restart proxies at the start of a session
 
 ## SEQUENCE
 
 ### 1. Load environment configuration
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` was loaded during initialization, extract the parameters for `{ENVIRONMENT}`.
+Extract from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION): the parameters for `{ENVIRONMENT}`.
 
-If no environment-config.md exists, proceed with dynamic discovery only (steps 2-3).
+If no environments section exists in project.md (per environments-lookup protocol), proceed with dynamic discovery only (steps 2-3).
 
 ### 2. Check cloud platform access
 
@@ -27,7 +27,7 @@ Verify that the CLI tools for the project's cloud platform are configured for th
 **Discovery approach (adapt to the project's cloud platform):**
 - Check which cloud CLI is available (gcloud, aws, az, etc.)
 - Verify the active project/account matches the target environment
-- If the environment-config.md specifies a project name, verify it matches
+- If the environments-lookup protocol (`~/.claude/skills/bmad-shared/protocols/environments-lookup.md`) specifies a project name, verify it matches
 
 **If failed:**
 HALT: "Cloud platform access is not configured for {ENVIRONMENT}. Action: configure the CLI for the correct project/account."
@@ -46,13 +46,13 @@ Use the methods appropriate to the project's infrastructure:
 2. If a direct service URL exists and is active — use it as fallback
 3. If neither — HALT: "Service {name} is not accessible"
 
-**Note:** Cloud platform service names may differ from application service names. Cross-reference with environment-config.md if available.
+**Note:** Cloud platform service names may differ from application service names. Cross-reference via the environments-lookup protocol (`~/.claude/skills/bmad-shared/protocols/environments-lookup.md`) if available.
 
 ### 4. Verify database access (if needed by VM items)
 
 If any VM item requires DB verification:
 
-- Load DB connection config from environment-config.md (or project's DB access skill)
+- Load DB connection config from the environments-lookup protocol (`~/.claude/skills/bmad-shared/protocols/environments-lookup.md`) (or project's DB access skill)
 - Restart database proxies/tunnels if applicable (existing ones may be stale)
 - Test each required database connection with a simple query (e.g., `SELECT 1;`)
 - Follow the project's established DB access skill for credentials discovery

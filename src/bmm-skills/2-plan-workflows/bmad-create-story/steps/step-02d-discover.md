@@ -157,7 +157,7 @@ Load {businessContextTemplate} for structured output format and VM quality guide
 - [ ] VM-2 [type] *(BAC-3)* : {concrete business test}
 ```
 
-Each VM must trace to BACs. Declare a type in brackets — adapt types to the project's stack (see `validation.md` if loaded):
+Each VM must trace to BACs. Declare a type in brackets — adapt types to the project's stack (see the validation-tooling-lookup protocol (`~/.claude/skills/bmad-shared/protocols/validation-tooling-lookup.md`)):
 
 | Type | When to use |
 |------|------------|

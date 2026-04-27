@@ -19,7 +19,7 @@ Greet the user, detect whether we are in Discovery mode (no existing issue) or E
 
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` if it exists — extract tracker constants, status mappings
 - Load Project Context:
-  1. Tracker documents (primary): list documents in the Meta Project (using CRUD patterns from tracker.md) → find "Project Context" → load its content by document ID
+  1. Tracker documents (primary): list documents in the Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) → find "Project Context" → load its content by document ID
   2. Fallback local: search for `**/project-context.md` in the project
 
 ### 2. Greet and Detect Mode
@@ -30,7 +30,7 @@ Greet {USER_NAME} and analyze the user's request. Adapt tone to {COMMUNICATION_L
 
 **Path A — User provided an issue identifier** (e.g., `{ISSUE_PREFIX}-123` or a full ID):
 
-1. Fetch the issue from the tracker (using CRUD patterns from tracker.md) — Operation: Get issue by ID, Include: relations
+1. Fetch the issue from the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) — Operation: Get issue by ID, Include: relations
 2. Store: `ISSUE_ID`, `ISSUE_IDENTIFIER`, `ISSUE_TITLE`
 3. Extract the project (epic): `PROJECT_NAME`, `PROJECT_ID`
 4. Derive `EPIC_SLUG` — slugified version of `PROJECT_NAME` (lowercase, hyphenated)

@@ -34,7 +34,11 @@ done
 - `sources_used: [...]` non-empty
 - `source_hash: { ... }` matches sources_used
 - `content_hash: ...` non-empty (8 chars)
-- `schema_version: 2`
+- `schema_version: "1.0"` — must match `~/.claude/skills/bmad-shared/knowledge-schema.md`
+
+**Schema conformance check** for `project.md`:
+- All sections marked `required: true` in `~/.claude/skills/bmad-shared/knowledge-schema.md` are present (parse the schema's YAML frontmatter, then grep for each H2 anchor in `project.md`).
+- Missing required section → emit a `MISSING_REQUIRED_SECTION` warning and request user fixup before proceeding.
 
 ### 1b. Verify Legacy 10-File Layout is Cleaned (post-migration)
 

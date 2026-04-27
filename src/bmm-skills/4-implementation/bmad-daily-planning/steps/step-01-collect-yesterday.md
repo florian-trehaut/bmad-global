@@ -57,7 +57,7 @@ Store results as `YESTERDAY_COMMITS` — a list of `{hash} {message}` entries.
 
 Query the tracker for issues that were recently completed (status = Done or equivalent) and are assigned to or created by the user.
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - List issues for team `{TRACKER_TEAM}` with status "Done" or equivalent completion status
 - Filter: assigned to `"me"` (authenticated user — NOT `{USER_NAME}` which may not match the tracker's user lookup) OR created by `"me"`
 - Filter: updated since `{LAST_DAILY_DATE}`

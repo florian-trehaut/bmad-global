@@ -8,7 +8,7 @@ Create missing tracker projects (for epics) and issues (for stories), skip items
 
 - Never create a Project or Issue that already exists — use the match mapping from Step 1
 - Issues are created in Backlog state — cycle assignment is a separate decision
-- Use the tracker CRUD patterns from tracker.md for all tracker operations
+- Apply the tracker-crud protocol (`~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) for all tracker operations
 - Log every action (created or skipped) for the final report
 - When creating Issues, associate them with the correct Project (epic)
 
@@ -34,7 +34,7 @@ For each epic that HAS a matching tracker project:
 
 For each story that has NO matching tracker issue:
 
-- Create Issue in the tracker (using CRUD patterns from tracker.md):
+- Create Issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
   - Operation: Create issue
   - Title: story title (e.g., "Story 1.1: User Authentication")
   - Team: {TRACKER_TEAM_ID}
@@ -82,7 +82,7 @@ Based on user choice:
 **Choice 1 — Assign all Backlog issues:**
 
 For each issue in Backlog status:
-- Update the issue in the tracker (using CRUD patterns from tracker.md):
+- Update the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
   - Operation: Update issue
   - Issue: issue ID
   - Cycle: current cycle ID
@@ -103,7 +103,7 @@ Ask: "Entrez les numeros des issues a assigner (ex: 1,3,5) :"
 WAIT for user input.
 
 For each selected issue:
-- Update the issue in the tracker (using CRUD patterns from tracker.md):
+- Update the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
   - Operation: Update issue
   - Issue: issue ID
   - Cycle: current cycle ID

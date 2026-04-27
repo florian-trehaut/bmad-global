@@ -7,7 +7,7 @@ Select the most appropriate E2E testing framework (Playwright or Cypress) based 
 ## RULES
 
 - Default to **Playwright** unless strong signals favor Cypress
-- If `stack.md` workflow knowledge specifies a framework preference, respect it
+- If the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) workflow knowledge specifies a framework preference, respect it
 - Present the decision transparently — the user should understand why
 - Set the `FRAMEWORK` variable for use in subsequent steps
 

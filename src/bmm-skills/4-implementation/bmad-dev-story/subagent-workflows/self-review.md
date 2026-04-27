@@ -143,7 +143,7 @@ Apply tech lead checklist from project knowledge if available, otherwise apply t
 
 ### P6: Pattern Consistency
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` specifies reference code directories and legacy directories, apply those rules. Otherwise:
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION) specifies reference code directories and legacy directories under `#tech-stack` or `#conventions`, apply those rules. Otherwise:
 
 - Check that new code follows patterns from the most modern/well-maintained parts of the codebase
 - Never reference legacy code as a pattern to follow

@@ -15,7 +15,7 @@ Identify the completed epic/project for retrospective, load all issues with thei
 
 ### 1. List available projects
 
-List all epics/projects for the team to identify candidates for retrospective (using CRUD patterns from tracker.md):
+List all epics/projects for the team to identify candidates for retrospective (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List epics/projects
 - Team: {TRACKER_TEAM}
 
@@ -40,7 +40,7 @@ Store: `{PROJECT_NAME}`, `{PROJECT_ID}`, `{EPIC_SLUG}` (slugified project name).
 
 ### 3. Load all issues for the project
 
-Fetch all issues associated with this project (using CRUD patterns from tracker.md):
+Fetch all issues associated with this project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Project: {PROJECT_NAME}
@@ -55,7 +55,7 @@ Compute and store the following metrics:
 
 ### 4. Load comments on key issues
 
-For issues that were blocked, cancelled, or had labels indicating problems, read their comments to understand context (using CRUD patterns from tracker.md):
+For issues that were blocked, cancelled, or had labels indicating problems, read their comments to understand context (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List comments
 - Issue: {issue_id}
 
@@ -68,7 +68,7 @@ Store notable comments and their themes.
 
 ### 5. Load project documents from the tracker
 
-Search for PRD, architecture, and other scope documents associated with the project (using CRUD patterns from tracker.md):
+Search for PRD, architecture, and other scope documents associated with the project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: {PROJECT_ID}
 
@@ -84,7 +84,7 @@ Run `git log --oneline --since="N months ago"` scoped to relevant paths or commi
 
 ### 7. Load previous retrospectives (optional)
 
-Check if any previous retrospective documents exist in the Meta Project (using CRUD patterns from tracker.md):
+Check if any previous retrospective documents exist in the Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: {TRACKER_META_PROJECT_ID}
 

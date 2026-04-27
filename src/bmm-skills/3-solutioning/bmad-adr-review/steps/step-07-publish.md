@@ -74,9 +74,9 @@ Default destination based on ADR source type:
 | ADR Source | Default Destination | Method |
 |-----------|-------------------|--------|
 | `mr` | Comment on the MR/PR | `{FORGE_CLI} pr comment {N} --body "{report}"` |
-| `tracker` | Comment on the tracker issue | Create comment (using CRUD patterns from tracker.md) |
+| `tracker` | Comment on the tracker issue | Create comment (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) |
 | `file` | New file next to the ADR | Write to `{adr_dir}/review-{slug}-{date}.md` |
-| `text` | Tracker document (Meta Project) | Create document (using CRUD patterns from tracker.md) |
+| `text` | Tracker document (Meta Project) | Create document (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) |
 | `branch` | Comment on related MR if exists, else local file | Detect MR from branch, fallback to file |
 
 The user can override via **[D]** Change destination.

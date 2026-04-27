@@ -94,9 +94,14 @@ Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bma
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **{KEY_RULE_SUMMARY}.**
 
-### 3. Load {knowledge_name} (optional)
+### 3. Load project knowledge (REQUIRED)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{filename}.md` exists at project root, read it. {PURPOSE}.
+Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — {PURPOSE}.
+{ADDITIONAL_KNOWLEDGE_LINES — e.g. domain.md or api.md if this skill needs them}
+
+HALT if any required file is missing (run `/bmad-knowledge-bootstrap`).
 
 ### 4. Set defaults
 

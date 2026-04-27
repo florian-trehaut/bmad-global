@@ -18,9 +18,9 @@ Aggressively investigate the bug — logs, database, code, deployments — witho
 
 Read `../data/troubleshooting-methodology.md`.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it for domain-specific investigation patterns.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing) for domain-specific investigation patterns.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it for stack-specific debugging context.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing) for stack-specific debugging context.
 
 ### 2. Launch parallel investigations
 
@@ -58,7 +58,7 @@ Store findings as `LOG_EVIDENCE`.
    - Records around the incident timestamp
    - Records in abnormal states
    - Integrity checks for inconsistent data
-4. If `investigation-checklist.md` has domain-specific queries for the affected service, run those too
+4. If `project.md#investigation-checklist` has domain-specific queries for the affected service, run those too
 
 Store findings as `DB_EVIDENCE`.
 

@@ -1,6 +1,6 @@
 # Stack Grep Bank — Rust
 
-**Consumed by:** Meta-2 (2a), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when `stack.md: language: rust`.
+**Consumed by:** Meta-2 (2a), Meta-3 (3a, 3b), Meta-4 (4a, 4d). Dispatched when the tech-stack-lookup protocol with `language: rust`.
 
 ---
 

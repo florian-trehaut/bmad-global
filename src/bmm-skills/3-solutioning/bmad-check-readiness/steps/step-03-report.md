@@ -107,7 +107,7 @@ Build the report with this structure:
 
 Search for an existing readiness report in the project:
 
-List documents in the project (using CRUD patterns from tracker.md):
+List documents in the project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: {PROJECT_ID}
 
@@ -115,12 +115,12 @@ Look for a document titled `Readiness Report — {PROJECT_NAME}`.
 
 ### 3. Save or update the report
 
-If a matching document exists, update it in the tracker (using CRUD patterns from tracker.md):
+If a matching document exists, update it in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update document
 - Document: existing_doc_id
 - Content: report_content
 
-If no matching document, create it in the tracker (using CRUD patterns from tracker.md):
+If no matching document, create it in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create document
 - Title: "Readiness Report — {PROJECT_NAME}"
 - Project: {PROJECT_NAME}

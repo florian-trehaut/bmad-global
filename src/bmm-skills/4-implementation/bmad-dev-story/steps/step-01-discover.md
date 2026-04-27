@@ -32,7 +32,7 @@ Query the tracker (using CRUD patterns from workflow-knowledge/project.md):
 - Assigned to: me
 - Limit: 10
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Status: {TRACKER_STATES.todo}

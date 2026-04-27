@@ -51,15 +51,16 @@ Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bma
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **code must throw on unexpected values, never silently degrade.**
 
-### 3. Load stack knowledge (optional)
+### 3. Load project knowledge (REQUIRED)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
-### 4. Load infrastructure knowledge (optional)
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — tech stack (`#tech-stack`), conventions (`#conventions`), test rules (`#test-rules`), validation tooling (`#validation-tooling`), infrastructure (`#infrastructure`), tracker patterns (`#tracker-patterns`).
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` — API contracts the story may touch.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. This file contains cloud infra, CI/CD, deployment config.
+HALT if either file is missing with the message defined in `knowledge-loading.md` (run `/bmad-knowledge-bootstrap`).
 
-### 5. Set defaults
+### 4. Set defaults
 
 - `EXECUTION_MODE = SOLO` (always solo — no team mode)
 - `MR_IID = null` (populated by step-04)

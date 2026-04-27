@@ -69,7 +69,7 @@ WAIT for user selection.
 
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` if it exists — extract tracker constants, status mappings
 - Load Project Context:
-  1. Tracker documents (primary, using CRUD patterns from tracker.md): List documents for project {TRACKER_META_PROJECT_ID} → find "Project Context" → Get document by ID
+  1. Tracker documents (primary, per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`): List documents for project {TRACKER_META_PROJECT_ID} → find "Project Context" → Get document by ID
   2. Fallback local: search for `**/project-context.md` in the project
 
 ### 3. Greet and Ask
@@ -100,7 +100,7 @@ WAIT for user decision. If they confirm it's a spike, continue. If they want spe
 
 ### 5. Discover Existing Spike Issues
 
-Check the tracker for existing spike issues that might relate (using CRUD patterns from tracker.md):
+Check the tracker for existing spike issues that might relate (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Label: Spike

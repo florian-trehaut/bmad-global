@@ -31,7 +31,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides the technology stack, service map, and test framework conventions used to inform test type decisions and fixture patterns.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). It provides the technology stack, service map, and test framework conventions used to inform test type decisions and fixture patterns.
 
 ### 4. Set defaults
 

@@ -73,12 +73,12 @@ Store `MR_IID` and `MR_URL`.
 
 ### 4. Update tracker
 
-Update the issue in the tracker (using CRUD patterns from tracker.md):
+Update the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update issue
 - Issue: {ISSUE_ID}
 - Status: {TRACKER_STATES.in_review}
 
-Add a comment on the tracker issue (using CRUD patterns from tracker.md):
+Add a comment on the tracker issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create comment
 - Issue: {ISSUE_ID}
 - Body: MR created: {MR_URL} — Fix pushed, quality gate passed. Awaiting review + merge + deploy to staging for VM verification.

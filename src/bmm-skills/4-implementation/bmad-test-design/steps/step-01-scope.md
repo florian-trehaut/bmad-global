@@ -33,7 +33,7 @@ Apply the following detection logic in priority order:
 
 **B) Context-based detection:**
 
-- If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/sprint-status.yaml` (or similar sprint artifact) exists at project root --> **epic-level** (active implementation phase)
+- If a sprint artifact exists (e.g., `tracker_file` from `workflow-context.md` for file-based trackers, or active epics in the configured tracker) --> **epic-level** (active implementation phase)
 - Otherwise --> **system-level**
 
 **C) If still ambiguous --> ask:**
@@ -46,7 +46,7 @@ WAIT for user response.
 
 Set `MODE = "epic-level"`.
 
-Load the Epic Project from the tracker (using CRUD patterns from tracker.md):
+Load the Epic Project from the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Get project
 - Query: PROJECT_NAME
 - Include milestones: true
@@ -59,7 +59,7 @@ Set `MODE = "system-level"`.
 
 **Epic-level mode:**
 
-1. List documents in the project (using CRUD patterns from tracker.md):
+1. List documents in the project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List documents
    - Project: PROJECT_ID
 
@@ -71,20 +71,20 @@ Set `MODE = "system-level"`.
 
 4. Find and load the **UX Design** document if available (not required).
 
-5. List all stories in the project (using CRUD patterns from tracker.md):
+5. List all stories in the project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List issues
    - Team: {TRACKER_TEAM}
    - Project: PROJECT_NAME
 
 **System-level mode:**
 
-1. Load global documents from Meta Project (using CRUD patterns from tracker.md):
+1. Load global documents from Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List documents
    - Project: {TRACKER_META_PROJECT_ID}
 
    Find and load "Project Context" and "Architecture Globale" documents.
 
-2. List all active epics/projects (using CRUD patterns from tracker.md):
+2. List all active epics/projects (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List epics/projects
    - Team: {TRACKER_TEAM}
    - State: started

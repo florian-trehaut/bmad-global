@@ -54,14 +54,27 @@ Read these files BEFORE starting work:
 - {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{file}
 {endfor}
 
-### Global rules (REQUIRED)
+### Schema and rules (REQUIRED)
 - ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+- ~/.claude/skills/bmad-shared/knowledge-loading.md
+- ~/.claude/skills/bmad-shared/knowledge-schema.md
+
+### Protocols (JIT — load only when needed)
+The teammate may consult these shared protocols when its task requires:
+- ~/.claude/skills/bmad-shared/protocols/tracker-crud.md            # tracker queries / mutations
+- ~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md       # language / framework / runtime detection
+- ~/.claude/skills/bmad-shared/protocols/environments-lookup.md     # staging / production URLs / DB proxies
+- ~/.claude/skills/bmad-shared/protocols/validation-tooling-lookup.md # lint / format / test runner / discovery patterns
+
+**RULE:** Never reference `project.md#<anchor>` directly in your output — go through the corresponding protocol or the `direct_reference_allowed` set defined in knowledge-schema.md (currently: conventions, review-perspectives, investigation-checklist, communication-platform).
 ```
 
 **Knowledge resolution order** (highest priority wins):
 1. Role-specific `knowledge_files` in `team-config.md`
 2. Role-specific entry in `workflow-context.md` → `agent_teams.knowledge_mapping`
 3. `agent_teams.global_knowledge` (always included)
+
+The `resolved_knowledge_files` list always contains `project.md` at minimum (the schema's required file). `domain.md` and `api.md` are added per role mapping.
 
 ### Section 3: TASK CONTRACT
 

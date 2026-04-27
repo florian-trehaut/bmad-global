@@ -43,7 +43,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. Contains tech stack details, forbidden patterns, and reference code pointers.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). Contains tech stack details, forbidden patterns, and reference code pointers.
 
 ### 4. Detect invocation mode
 

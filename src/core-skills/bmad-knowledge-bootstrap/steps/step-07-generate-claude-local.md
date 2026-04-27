@@ -211,7 +211,7 @@ When you need detailed information beyond this summary, read files from `.claude
 - `api.md` — API style, endpoints, request/response schemas, authentication, error handling, integrations
 ```
 
-Reference specific sections via anchor where workflows need granular access (e.g., `project.md#tech-stack`, `project.md#conventions`).
+Workflows access sections via shared protocols (e.g., `tracker-crud`, `tech-stack-lookup` in `~/.claude/skills/bmad-shared/protocols/`) — direct anchor references are limited to schema-level documentation.
 
 ### 6. Self-Containment Verification
 

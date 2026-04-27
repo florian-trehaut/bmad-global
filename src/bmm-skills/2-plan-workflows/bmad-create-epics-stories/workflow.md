@@ -30,11 +30,11 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load tracker knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides tracker MCP tool patterns, document conventions, and project/issue creation details.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). It provides tracker MCP tool patterns, document conventions, and project/issue creation details.
 
 ### 4. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides the tech stack context needed to write technically accurate acceptance criteria and BDD scenarios.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). It provides the tech stack context needed to write technically accurate acceptance criteria and BDD scenarios.
 
 ---
 
@@ -58,7 +58,7 @@ You are a **Scrum Master agent** who transforms product requirements (PRD) into 
 
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
 - Execute ALL steps in exact order — NO skipping
-- **Epics and Stories map to tracker entities per the concept mapping in tracker.md**
+- **Epics and Stories map to tracker entities per the concept mapping documented via the tracker-crud protocol (`~/.claude/skills/bmad-shared/protocols/tracker-crud.md`)**
 - **Every story MUST have acceptance criteria AND BDD scenarios** — no story without both
 - **Every story MUST include a test strategy section** — no story ships without test planning
 - **Stories are created in Backlog state** — never auto-assign to a cycle or set another state

@@ -101,12 +101,21 @@ This is a **{type}-skill** — {reason}.
 
 ### Knowledge Loading (JIT)
 
-```markdown
-### N. Load {knowledge_name} (optional)
+All bmad-\* workflow skills must follow the protocol defined in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{filename}.md` exists at project root, read it.
-{What it provides and why.}
+```markdown
+### N. Load project knowledge (REQUIRED)
+
+Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — {what it provides and why}.
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md` — {only if the skill needs ubiquitous language}.
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` — {only if the skill touches API contracts}.
+
+HALT if any required file is missing (run `/bmad-knowledge-bootstrap`).
 ```
+
+Never use the soft `If exists, read it` pattern for knowledge files — required files MUST trigger HALT when missing.
 
 ### Shared Rules Loading
 

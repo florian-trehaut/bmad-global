@@ -32,20 +32,18 @@ Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bma
 
 Apply these rules for the entire workflow execution.
 
-### 2. Configuration Loading
+### 2. Configuration Loading (REQUIRED)
 
-Load project context from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` (if exists) and resolve:
+Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
-- `user_name`, `communication_language`, `user_skill_level`
-- Project conventions, forbidden patterns, test rules from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` — resolve `user_name`, `communication_language`, `user_skill_level`, tracker, forge, quality gate. HALT if missing.
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — conventions (`#conventions`), test rules (`#test-rules`), tech stack (`#tech-stack`), validation tooling (`#validation-tooling`). HALT if missing.
 
 **Communication:** Always speak in the configured `communication_language`.
 
 ### 3. Paths
 
 - `wipFile` = `{implementation_artifacts}/spec-wip.md`
-
-- `project_context` = `**/project-context.md` OR `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (load if exists)
 
 ### 4. Related Workflows
 

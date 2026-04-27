@@ -127,7 +127,7 @@ Check `adr_location` in `workflow-context.md`. If set, load ADRs from the config
 ### 3.6 Tracker issue
 
 <check if="LINKED_TRACKER_ISSUE exists">
-  Load full issue (CRUD patterns from `tracker.md`, include relations). Extract Acceptance Criteria, Gherkin scenarios, Test Plan, Validation Métier items. The issue description IS the specs compliance reference.
+  Load full issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`, include relations). Extract Acceptance Criteria, Gherkin scenarios, Test Plan, Validation Métier items. The issue description IS the specs compliance reference.
 </check>
 
 <check if="no LINKED_TRACKER_ISSUE">
@@ -170,7 +170,7 @@ Store: `CHANGED_FILES`, `DIFF_STATS`, `IMPACTED_SERVICES`, `ATTACK_PLAN`.
 
 ## 5. Compute Trigger Routing (Active Metas)
 
-Based on `CHANGED_FILES` and `stack.md` — which meta-perspectives will the orchestrator dispatch in step-02?
+Based on `CHANGED_FILES` and the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) — which meta-perspectives will the orchestrator dispatch in step-02?
 
 **Always-on:** M1 (Contract & Spec), M2 (Correctness & Reliability), M3 (Security & Privacy — at least 3a; 2 parallel reviewers S1/S2), M4 (Engineering Quality).
 
@@ -179,7 +179,7 @@ Based on `CHANGED_FILES` and `stack.md` — which meta-perspectives will the orc
 | Signal in diff | Activates |
 |---|---|
 | Dockerfile, `*.tf`, `k8s/**`, `.github/workflows/**`, new endpoints / jobs / alerts | **M5** |
-| UI globs (`*.tsx`, `*.vue`, `*.svelte`, `*.html`, `*.astro`, `src/components/**`) AND `stack.md: ui=web` | **M6** |
+| UI globs (`*.tsx`, `*.vue`, `*.svelte`, `*.html`, `*.astro`, `src/components/**`) AND the tech-stack-lookup protocol with field `ui=web` | **M6** |
 | Imports from `@anthropic-ai/sdk`, `openai`, `langchain`, `llamaindex`, `ai`, `@modelcontextprotocol/sdk` | **M3.3b** (AI safety sub-axis) |
 | Manifest / lockfile diffs (`package*.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle*`) | **M3.3d** + **M5.5a** |
 | Entity / schema / migration diffs OR logging statement diffs | **M3.3c** + **M5.5b** |

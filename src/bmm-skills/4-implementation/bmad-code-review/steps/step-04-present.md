@@ -219,7 +219,7 @@ EXISTING_APPROVALS=$({FORGE_API_BASE} "projects/$PROJECT_ID/merge_requests/{MR_I
 
 <check if="LINKED_TRACKER_ISSUE exists">
 
-  Create a comment on the tracker issue (CRUD patterns from `tracker.md`):
+  Create a comment on the tracker issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 
   - Operation: Create comment
   - Issue: `{ISSUE_ID}`
@@ -252,7 +252,7 @@ If the user chose auto-fix in self-review mode:
 The worktree IS the MR branch — commits push directly.
 
 <check if="all validations pass AND LINKED_TRACKER_ISSUE exists">
-  Update the issue (CRUD patterns from `tracker.md`):
+  Update the issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
   - Operation: Update issue
   - Issue: `{ISSUE_ID}`
   - Status: `{TRACKER_STATES.to_test}`

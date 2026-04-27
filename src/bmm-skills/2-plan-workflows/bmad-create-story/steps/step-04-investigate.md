@@ -62,7 +62,7 @@ Check `adr_location` from workflow-context.md.
 
 ### 4. Cross-Reference with Standards
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, cross-reference investigation results with project dev standards. Note any deviations or patterns the implementation must follow.
+Using `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION), cross-reference investigation results with project dev standards. Note any deviations or patterns the implementation must follow.
 
 ### 5. Document Technical Context
 

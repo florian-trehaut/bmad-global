@@ -10,7 +10,7 @@ Implement the fix using strict TDD — write failing test first (RED), then impl
 - **All work in `{WORKTREE_PATH}`** — never modify files outside
 - **Minimum change** — fix the bug, nothing more. No refactoring of unrelated code.
 - **HALT on 3 consecutive failures** on the same test
-- Follow project dev standards from `stack.md` if loaded
+- Follow project dev standards from the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) if loaded
 
 ## SEQUENCE
 

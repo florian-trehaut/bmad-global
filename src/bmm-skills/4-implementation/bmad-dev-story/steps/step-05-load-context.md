@@ -16,12 +16,12 @@ The issue description (loaded from tracker in Step 2) IS the story — it contai
 
 ### 2. Load Project Context
 
-1. **Primary (tracker):** If `{TRACKER_META_PROJECT_ID}` is set, list documents in the Meta Project (using CRUD patterns from tracker.md) to find "Project Context" document, then load its content by ID.
+1. **Primary (tracker):** If `{TRACKER_META_PROJECT_ID}` is set, list documents in the Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) to find "Project Context" document, then load its content by ID.
 2. **Fallback (local):** Search for `**/project-context.md` in the project.
 
 ### 3. Load Dev Standards
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it for tech stack context, forbidden patterns, test rules, and reference code pointers.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing) for tech stack context, forbidden patterns, test rules, and reference code pointers.
 
 ### 3b. Load Contribution Conventions
 

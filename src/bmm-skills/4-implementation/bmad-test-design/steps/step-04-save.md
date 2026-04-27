@@ -157,17 +157,17 @@ Title: `Test Design — {project name}`
 
 **Epic-level mode:**
 
-1. Check for an existing "Test Design" document in the project (using CRUD patterns from tracker.md):
+1. Check for an existing "Test Design" document in the project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List documents
    - Project: PROJECT_ID
    Search for a document with "Test Design" in the title.
 
-2. If found — update it (using CRUD patterns from tracker.md):
+2. If found — update it (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: Update document
    - Document: EXISTING_DOC_ID
    - Content: composed_content
 
-3. If not found — create it (using CRUD patterns from tracker.md):
+3. If not found — create it (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: Create document
    - Title: "Test Design"
    - Project: PROJECT_ID
@@ -177,7 +177,7 @@ Title: `Test Design — {project name}`
 
 Save both documents separately:
 
-1. Check for existing documents in the Meta Project (using CRUD patterns from tracker.md):
+1. Check for existing documents in the Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List documents
    - Project: {TRACKER_META_PROJECT_ID}
 

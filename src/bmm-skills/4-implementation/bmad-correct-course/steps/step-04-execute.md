@@ -29,7 +29,7 @@ If **reference only**: skip to section 5 (final report) with a note that no trac
 
 ### 2. Create new issues
 
-For each approved new story, create the issue in the tracker (using CRUD patterns from tracker.md):
+For each approved new story, create the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create issue
 - Title: {title}
 - Description: {description} with Acceptance Criteria section
@@ -40,24 +40,24 @@ Record each created issue identifier.
 
 ### 3. Update modified issues
 
-For each approved modification, update the issue in the tracker (using CRUD patterns from tracker.md):
+For each approved modification, update the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update issue
 - Issue: {issue_id}
 - Description: {updated_description}
 
-Add a traceability comment on each modified issue (using CRUD patterns from tracker.md):
+Add a traceability comment on each modified issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create comment
 - Issue: {issue_id}
 - Body: Course correction: {change_reason} — Related change: {CHANGE_DESCRIPTION_SUMMARY}
 
 ### 4. Cancel issues
 
-For each approved cancellation, update the issue in the tracker (using CRUD patterns from tracker.md):
+For each approved cancellation, update the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update issue
 - Issue: {issue_id}
 - Status: {TRACKER_STATES.canceled}
 
-Add a traceability comment (using CRUD patterns from tracker.md):
+Add a traceability comment (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create comment
 - Issue: {issue_id}
 - Body: Canceled via course correction: {cancellation_reason} — Related change: {CHANGE_DESCRIPTION_SUMMARY}

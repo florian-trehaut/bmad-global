@@ -113,7 +113,7 @@ Assemble the complete document using this structure:
 
 Search for an existing document with the same title in the Meta Project:
 
-List documents in the Meta Project (using CRUD patterns from tracker.md):
+List documents in the Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: {TRACKER_META_PROJECT_ID}
 
@@ -121,12 +121,12 @@ Look for a document titled `Retrospective: {PROJECT_NAME}`.
 
 ### 3. Save or update the document
 
-If a matching document exists, update it in the tracker (using CRUD patterns from tracker.md):
+If a matching document exists, update it in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update document
 - Document: existing_doc_id
 - Content: retrospective_content
 
-If no matching document, create it in the tracker (using CRUD patterns from tracker.md):
+If no matching document, create it in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create document
 - Title: "Retrospective: {PROJECT_NAME}"
 - Project: {TRACKER_META_PROJECT}

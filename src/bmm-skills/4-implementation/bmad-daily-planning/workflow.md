@@ -21,7 +21,7 @@ Extract the following from the YAML frontmatter:
 | `{USER_NAME}` | `user_name` | `Developer` |
 | `{COMMUNICATION_LANGUAGE}` | `communication_language` | `fr` |
 | `{COMM_PLATFORM}` | `comm_platform` | `slack` |
-| `{COMM_MCP_PREFIX}` | `comm_mcp_prefix` | `(see comm-platform.md)` |
+| `{COMM_MCP_PREFIX}` | `comm_mcp_prefix` | `(see project.md#communication-platform)` |
 | `{USER_COMM_HANDLE}` | `user_comm_handle` | `U01ABCDEF` |
 
 ### 2. Resolve today's date

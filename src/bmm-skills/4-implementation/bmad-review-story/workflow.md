@@ -38,21 +38,19 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 - **Findings must be EXECUTABLE** — "Consider X" or "Decide Y" is not acceptable. Each finding must propose a concrete action.
 - **Zero fallback** — if the story proposes a fallback or "best-effort" data mapping, CHALLENGE IT: is the fallback value semantically correct, or just "something that fills the field"?
 
-### 3. Load stack knowledge (optional)
+### 3. Load project knowledge (REQUIRED)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
-### 4. Load infrastructure knowledge (optional)
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — tech stack (`#tech-stack`), conventions (`#conventions`), test rules (`#test-rules`), infrastructure (`#infrastructure`), investigation checklist (`#investigation-checklist`), tracker patterns (`#tracker-patterns`).
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md` — ubiquitous language for spec validation against business requirements.
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` — API surface to validate spec API references.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains cloud infra, CI/CD, deployment config.
+HALT if any of these files is missing (run `/bmad-knowledge-bootstrap`).
 
-### 5. Load investigation checklist (optional)
+The generic investigation checklist at `./data/investigation-checklist.md` (skill-internal) is always loaded as baseline. The project-specific `#investigation-checklist` section extends (not replaces) the generic one.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains project-specific domain investigation checklists (provider-specific, service-specific, infra-specific).
-
-The generic investigation checklist at `./data/investigation-checklist.md` is always loaded as baseline. Project-specific checklists extend (not replace) the generic one.
-
-### 6. Set defaults
+### 4. Set defaults
 
 - `ISSUE_IDENTIFIER = ""` (populated by step-01 from user or discovery)
 

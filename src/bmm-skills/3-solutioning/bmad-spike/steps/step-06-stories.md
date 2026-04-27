@@ -87,7 +87,7 @@ For each selected story, load `../templates/spike-story-template.md` and compose
 
 ### 4. Create Tracker Issues
 
-For each story, create an issue in the tracker (using CRUD patterns from tracker.md):
+For each story, create an issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create issue
 - Title: {title}
 - Team: {TRACKER_TEAM}
@@ -102,7 +102,7 @@ Store created issue IDs and identifiers for the summary.
 
 **If creation fails for any story:** HALT — report error, do NOT silently fallback to local file.
 
-Link each created story to the spike issue (if `SPIKE_ISSUE_ID` is not null) via the tracker (using CRUD patterns from tracker.md):
+Link each created story to the spike issue (if `SPIKE_ISSUE_ID` is not null) via the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create issue relation
 - Issue: {NEW_STORY_ID}
 - Related issue: {SPIKE_ISSUE_ID}

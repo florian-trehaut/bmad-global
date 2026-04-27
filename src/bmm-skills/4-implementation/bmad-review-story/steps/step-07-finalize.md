@@ -98,7 +98,7 @@ WAIT for explicit user confirmation.
 
 ### 5. Push to tracker (if confirmed)
 
-Update the issue in the tracker (using CRUD patterns from tracker.md):
+Update the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update issue
 - Issue: {ISSUE_ID}
 - Description: {updated_description}
@@ -107,7 +107,7 @@ Update the issue in the tracker (using CRUD patterns from tracker.md):
 
 Check if the label `{LABELS.spec_reviewed}` exists in the team.
 
-If the label does not exist, create it via the tracker (using CRUD patterns from tracker.md):
+If the label does not exist, create it via the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create label
 - Team: {TRACKER_TEAM_ID}
 - Name: {LABELS.spec_reviewed}

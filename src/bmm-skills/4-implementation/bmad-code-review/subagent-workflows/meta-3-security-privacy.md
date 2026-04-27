@@ -85,7 +85,7 @@ grep -rn "queryRawUnsafe\|executeRawUnsafe" --include="*.ts" {changed_files_dirs
 grep -rn "password\|secret\|api_key\|apiKey\|token" --include="*.ts" {changed_files_dirs} | grep -v "spec.ts" | grep -v ".d.ts"
 ```
 
-Stack detection driven by `stack.md` field. Phase 7 dispatches per-stack grep banks.
+Stack detection driven by the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) field. Phase 7 dispatches per-stack grep banks.
 
 Each finding carries `owasp: A01..A10` tag where applicable.
 

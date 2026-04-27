@@ -1,4 +1,4 @@
-# Pattern Reference Schema (stack.md extension)
+# Pattern Reference Schema (extension to the tech-stack section described in `~/.claude/skills/bmad-shared/knowledge-schema.md`)
 
 **Consumed by:** sub-axis 4c (Pattern Consistency).
 
@@ -6,7 +6,7 @@ Projects that want pattern-reference-driven reviews declare their reference code
 
 ---
 
-## stack.md field
+## tech-stack field (resolved via tech-stack-lookup protocol)
 
 ```yaml
 # Reference code directories — non-legacy, canonical patterns to cite in findings
@@ -50,15 +50,15 @@ pattern_references:
 
 When sub-axis 4c detects a pattern deviation in `CHANGED_FILES`, it:
 
-1. Looks up the deviation category in `stack.md.pattern_references`
+1. Looks up the deviation category in the `pattern_references` field (resolved via `~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`)
 2. Emits the finding with `pattern_ref: {file}:{line}` populated from the map
-3. If `stack.md.pattern_references` has no entry for that category → emit `pattern_ref: null` and a WARNING note "add a canonical reference to stack.md for this pattern"
+3. If the `pattern_references` field (resolved via `~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) has no entry for that category → emit `pattern_ref: null` and a WARNING note "add a canonical reference to the tech-stack section for this pattern"
 
 ---
 
 ## Graceful fallback
 
-If `stack.md.pattern_references` is absent, Meta-4 falls back to:
+If the `pattern_references` field (resolved via `~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) is absent, Meta-4 falls back to:
 
 1. Searching `reference_code` directories for a plausible canonical example
 2. Reporting the best match as `pattern_ref: {file}:{best_line}` with a confidence marker

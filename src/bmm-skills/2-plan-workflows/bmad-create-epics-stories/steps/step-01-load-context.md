@@ -16,7 +16,7 @@ Select the target project in the tracker, then load all available specification 
 
 ### 1. List available projects
 
-Fetch all epics/projects from the tracker (using CRUD patterns from tracker.md):
+Fetch all epics/projects from the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List epics/projects
 - Team: {TRACKER_TEAM_ID}
 
@@ -39,7 +39,7 @@ WAIT for user selection. Store the selected project as `{SELECTED_PROJECT}` with
 
 ### 3. Load project documents
 
-Fetch all documents attached to the selected project (using CRUD patterns from tracker.md):
+Fetch all documents attached to the selected project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: {SELECTED_PROJECT_ID}
 
@@ -47,7 +47,7 @@ Fetch all documents attached to the selected project (using CRUD patterns from t
 
 Find and load the document identified as the PRD (title containing "PRD", "Product Requirements", or similar).
 
-Load the PRD (using CRUD patterns from tracker.md):
+Load the PRD (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Get document
 - Document: prd_document_id
 
@@ -59,7 +59,7 @@ Store the full PRD content as `{PRD_CONTENT}`.
 
 Find and load the Architecture document if it exists (title containing "Architecture", "Technical Architecture", or similar).
 
-Load the Architecture document (using CRUD patterns from tracker.md):
+Load the Architecture document (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Get document
 - Document: architecture_document_id
 
@@ -76,7 +76,7 @@ WAIT for user confirmation. Store the content as `{ARCHITECTURE_CONTENT}` or mar
 
 Find and load UX Design documents if available (title containing "UX", "Design", "Wireframes", or similar).
 
-Load the UX document (using CRUD patterns from tracker.md):
+Load the UX document (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Get document
 - Document: ux_document_id
 

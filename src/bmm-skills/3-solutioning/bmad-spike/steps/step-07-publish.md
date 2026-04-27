@@ -49,7 +49,7 @@ Load `../templates/spike-deliverable.md`. Compose the full document combining:
 
 ### 2. Determine Document Placement
 
-Check for existing spike documents (using CRUD patterns from tracker.md):
+Check for existing spike documents (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: {TRACKER_META_PROJECT_ID}
 
@@ -59,7 +59,7 @@ If the spike is associated with a specific epic/project (from Step 1): also cons
 
 ### 3. Save Document
 
-**Create or update the tracker document** (using CRUD patterns from tracker.md):
+**Create or update the tracker document** (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create document
 - Title: Spike: {title}
 - Project: {TRACKER_META_PROJECT}
@@ -71,7 +71,7 @@ Store `DOCUMENT_ID`.
 
 ### 4. Update Existing Spike Issue (if SPIKE_ISSUE_ID is not null)
 
-Add a completion comment and close the issue (using CRUD patterns from tracker.md):
+Add a completion comment and close the issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 
 Post a comment on the issue:
 - Operation: Create comment
@@ -87,7 +87,7 @@ Add label `Spike` if not already present.
 
 ### 5. Create Spike Issue (if SPIKE_ISSUE_ID is null)
 
-If the spike was initiated ad-hoc (no pre-existing tracker issue), create one for traceability (using CRUD patterns from tracker.md):
+If the spike was initiated ad-hoc (no pre-existing tracker issue), create one for traceability (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create issue
 - Title: Spike: {title}
 - Team: {TRACKER_TEAM}

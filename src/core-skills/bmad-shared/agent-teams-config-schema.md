@@ -26,28 +26,26 @@ agent_teams:
   max_teammates: 5                   # Maximum concurrent teammates per team
 
   # Per-role knowledge files — loaded JIT by each teammate
+  # Values are filenames (not anchors) in .claude/workflow-knowledge/.
+  # Since the consolidation, the only files are project.md, domain.md, api.md.
+  # Per-role specialization happens via the H2 anchors mentioned in spawn prompts.
   knowledge_mapping:
     specs-reviewer:
-      - review-perspectives.md
-      - stack.md
+      - project.md          # #review-perspectives, #conventions
+      - domain.md           # ubiquitous language for spec validation
     security-reviewer:
-      - review-perspectives.md
-      - stack.md
+      - project.md          # #review-perspectives, #investigation-checklist
+      - api.md              # auth, surface area
     code-reviewer:
-      - review-perspectives.md
-      - stack.md
-      - conventions.md
+      - project.md          # #conventions, #review-perspectives, #tech-stack
     investigator:
-      - stack.md
-      - infrastructure.md
+      - project.md          # #investigation-checklist, #infrastructure
     scanner:
-      - stack.md
-      - infrastructure.md
-      - conventions.md
+      - project.md          # #tech-stack, #conventions
 
   # Knowledge files loaded by ALL teammates regardless of role
   global_knowledge:
-    - stack.md
+    - project.md
 ```
 
 ---
@@ -91,6 +89,8 @@ Priority order (highest wins):
 | `team-router.md` | `enabled`, `teammate_mode`, `max_teammates` | Determine TEAM_MODE and team configuration |
 | `spawn-protocol.md` | `knowledge_mapping`, `global_knowledge`, `default_worker_model` | Build teammate spawn prompts with correct knowledge |
 | `team-config.md` (per-skill) | References role keys from `knowledge_mapping` | Skill-specific team definitions |
+| `knowledge-schema.md` | (read by spawn-protocol when resolving anchors) | Defines valid section IDs the teammate may reference |
+| `protocols/*.md` | (loaded JIT by teammate) | Indirection layer for tracker CRUD, tech-stack lookups, etc. — teammates use protocols instead of direct anchor refs |
 
 ---
 
@@ -106,21 +106,19 @@ agent_teams:
 
   knowledge_mapping:
     specs-reviewer:
-      - review-perspectives.md
-      - stack.md
+      - project.md          # #review-perspectives, #conventions
+      - domain.md
     qa-reviewer:
-      - review-perspectives.md
-      - stack.md
+      - project.md          # #review-perspectives, #test-rules, #validation-tooling
     architecture-reviewer:
-      - review-perspectives.md
-      - stack.md
-      - infrastructure.md
+      - project.md          # #review-perspectives, #infrastructure, #architecture-patterns
+      - api.md
     security-reviewer:
-      - review-perspectives.md
-      - stack.md
+      - project.md          # #review-perspectives, #investigation-checklist
+      - api.md
 
   global_knowledge:
-    - stack.md
+    - project.md
 ```
 
 This configuration enables the colleague review mode in `bmad-code-review` step-06 to spawn 5 workers (3 review-workers + 2 security-reviewers) with role-appropriate knowledge files.

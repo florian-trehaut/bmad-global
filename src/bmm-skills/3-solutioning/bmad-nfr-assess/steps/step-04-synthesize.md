@@ -245,7 +245,7 @@ nfr_assessment:
 
 **If SCOPE == "epic":**
 
-1. Check for an existing "NFR Assessment" document in the Epic Project (using CRUD patterns from tracker.md):
+1. Check for an existing "NFR Assessment" document in the Epic Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List documents
    - Project: PROJECT_ID
 2. If a document titled "NFR Assessment" exists, update it:
@@ -260,7 +260,7 @@ nfr_assessment:
 
 **If SCOPE == "system":**
 
-1. Check for an existing "NFR Assessment: System" document in the Meta Project (using CRUD patterns from tracker.md):
+1. Check for an existing "NFR Assessment: System" document in the Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
    - Operation: List documents
    - Project: {TRACKER_META_PROJECT_ID}
 2. Update or create as above, with title "NFR Assessment: System".

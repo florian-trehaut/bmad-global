@@ -15,7 +15,7 @@ Load ALL available context needed to enrich the story: Project Context from Meta
 
 ### 1. Load Project Context from Meta Project
 
-1. List documents in the Meta Project (using CRUD patterns from tracker.md) — Operation: List documents, Project: {TRACKER_META_PROJECT_ID}
+1. List documents in the Meta Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) — Operation: List documents, Project: {TRACKER_META_PROJECT_ID}
 2. Find the document named "Project Context" (or similar)
 3. Load its content by document ID
 4. Store as `PROJECT_CONTEXT`
@@ -24,7 +24,7 @@ Load ALL available context needed to enrich the story: Project Context from Meta
 
 ### 2. Load Epic documents (PRD, Architecture, UX)
 
-1. List documents in the Epic's Project (using CRUD patterns from tracker.md) — Operation: List documents, Project: PROJECT_ID
+1. List documents in the Epic's Project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) — Operation: List documents, Project: PROJECT_ID
 2. For each of the following, find and load:
    - **PRD** — search for document containing "PRD" in the title
    - **Architecture** — search for document containing "Architecture" in the title

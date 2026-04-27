@@ -5,7 +5,7 @@ sources_used: [code]
 source_hash:
   code: fc0f0bba
 content_hash: i9j0k1l2
-schema_version: 2
+schema_version: "1.0"
 manual_override: false
 ---
 
@@ -173,7 +173,7 @@ source_hash:
   specs: 8-char-md5
   code: 8-char-md5
 content_hash: 8-char-md5  # body hash for manual-edit detection
-schema_version: 2
+schema_version: "1.0"
 manual_override: false    # true = skip in future refreshes
 ---
 ```

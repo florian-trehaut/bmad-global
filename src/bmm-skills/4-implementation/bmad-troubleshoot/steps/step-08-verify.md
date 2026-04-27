@@ -51,14 +51,14 @@ For each VM item from the tracker issue:
 
 ### 4. Post results to tracker
 
-Post a comment on the tracker issue (using CRUD patterns from tracker.md):
+Post a comment on the tracker issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create comment
 - Issue: {ISSUE_ID}
 - Body: VM results table with verdict
 
 **If DONE:**
 
-Update the issue in the tracker (using CRUD patterns from tracker.md):
+Update the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update issue
 - Issue: {ISSUE_ID}
 - Status: {TRACKER_STATES.done}

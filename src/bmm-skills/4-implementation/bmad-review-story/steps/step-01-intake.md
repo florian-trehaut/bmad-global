@@ -22,7 +22,7 @@ Select the story to review, setup a read-only investigation worktree, load the s
 
 #### 1a. Discover stories ready for spec review
 
-Query the tracker (using CRUD patterns from tracker.md) to list candidate issues:
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) to list candidate issues:
 
 - Operation: List issues
 - Team: {TRACKER_TEAM}
@@ -62,7 +62,7 @@ Store `ISSUE_IDENTIFIER`.
 
 ### 3. Load story details
 
-Fetch the full story from the tracker (using CRUD patterns from tracker.md):
+Fetch the full story from the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Get issue
 - Issue: {ISSUE_IDENTIFIER}
 

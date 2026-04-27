@@ -5,7 +5,7 @@ sources_used: [code]
 source_hash:
   code: 9ffeaad2
 content_hash: a1b2c3d4
-schema_version: 2
+schema_version: "1.0"
 manual_override: false
 ---
 

@@ -41,7 +41,7 @@ Load available planning documents to understand the project scope for impact ass
 
 ### 3. Load current sprint state from tracker
 
-Query the tracker (using CRUD patterns from tracker.md) for:
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) for:
 
 1. **Current cycle:**
    - Operation: List cycles

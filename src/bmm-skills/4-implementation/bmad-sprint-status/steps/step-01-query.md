@@ -6,7 +6,7 @@ Retrieve all data needed for the sprint status report: the current cycle, all te
 
 ## RULES
 
-- Use the tracker CRUD patterns from tracker.md for all tracker operations
+- Apply the tracker-crud protocol (`~/.claude/skills/bmad-shared/protocols/tracker-crud.md`) for all tracker operations
 - Use `{TRACKER_TEAM}` and `{TRACKER_TEAM_ID}` for team filtering
 - If any query fails with auth errors, HALT and report the error
 - Do NOT filter issues by cycle at query time — fetch all issues to get the full picture
@@ -31,7 +31,7 @@ Store from the result:
 
 ### 2. List all issues in the team
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Limit: 250
@@ -42,7 +42,7 @@ If the result indicates more issues exist beyond the limit, make additional pagi
 
 ### 3. List all projects (epics)
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List projects
 - Team: {TRACKER_TEAM}
 

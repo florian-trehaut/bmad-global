@@ -117,10 +117,14 @@ source_hash:
   specs: {8-char hash, if present}
   code: {8-char hash, if present}
 content_hash: {8-char hash of body — for manual-edit detection}
-schema_version: 2
+schema_version: "1.0"   # Matches ~/.claude/skills/bmad-shared/knowledge-schema.md
 manual_override: false
 ---
 ```
+
+**Schema version contract:** `schema_version` MUST match the `schema_version` field in `~/.claude/skills/bmad-shared/knowledge-schema.md`. Workflows compare these on load and HALT on mismatch (the user is then instructed to run `/bmad-knowledge-refresh` to migrate).
+
+**Required sections:** the body must contain ALL sections marked `required: true` in the schema. Missing required sections fail validation in step-06.
 
 #### g. Adaptive Header Comment
 

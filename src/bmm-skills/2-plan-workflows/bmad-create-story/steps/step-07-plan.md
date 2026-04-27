@@ -143,7 +143,7 @@ Compose the full Markdown description filling in all accumulated content. Omit s
 - **Validation Metier** stays in its natural position after implementation plan
   - Each VM declares its type and traces to BACs: `VM-N [type] *(BAC-X,Y)* : description`
   - Non-regression VMs trace to impacts: `VM-NR-N [type] *(Impact IN)* : description`
-  - Adapt VM types to the project's stack (from validation.md if loaded)
+  - Adapt VM types to the project's stack (via the validation-tooling-lookup and tech-stack-lookup protocols (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`))
 
 ### 9. Estimate Story Points
 

@@ -15,7 +15,7 @@ Select the target project from the tracker, then load ALL planning artifacts (PR
 
 ### 1. List available projects
 
-Query the tracker for all epics/projects in the team (using CRUD patterns from tracker.md):
+Query the tracker for all epics/projects in the team (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List epics/projects
 - Team: {TRACKER_TEAM}
 
@@ -39,11 +39,11 @@ Store: `{PROJECT_NAME}`, `{PROJECT_ID}`.
 
 ### 3. Load all project documents
 
-Fetch the document list for the selected project (using CRUD patterns from tracker.md):
+Fetch the document list for the selected project (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: {PROJECT_ID}
 
-For EACH document found, load its full content (using CRUD patterns from tracker.md):
+For EACH document found, load its full content (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Get document
 - Document: document_id
 
@@ -58,7 +58,7 @@ Classify each document by type based on its title and content:
 
 ### 4. Load all project issues (stories/epics)
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Project: {PROJECT_NAME}

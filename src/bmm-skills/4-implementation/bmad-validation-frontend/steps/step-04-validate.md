@@ -51,7 +51,7 @@ Read:
 - `./data/proof-standards.md`
 - `./data/chrome-mcp-patterns.md`
 
-If `STACK_NOTES`, `TEST_DISCOVERY`, or `ANTI_PATTERNS` were extracted from `validation.md` during preflight, apply them throughout this step:
+If `STACK_NOTES`, `TEST_DISCOVERY`, or `ANTI_PATTERNS` were extracted from the validation-tooling-lookup protocol (`~/.claude/skills/bmad-shared/protocols/validation-tooling-lookup.md`) during preflight, apply them throughout this step:
 - **STACK_NOTES**: follow stack-specific instructions (e.g., wait for WASM hydration before asserting, use `tauri-driver` instead of Playwright for Tauri apps)
 - **TEST_DISCOVERY**: use the file/name/command patterns to locate tests matching each VM
 - **ANTI_PATTERNS**: reject proof types flagged as invalid for this project's specific stack

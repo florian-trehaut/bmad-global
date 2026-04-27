@@ -18,7 +18,7 @@ Store `ISSUE_IDENTIFIER`, proceed to issue loading.
 
 ### If no identifier provided
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: `{TRACKER_TEAM}`
 - Status: `{TRACKER_STATES.to_test}`

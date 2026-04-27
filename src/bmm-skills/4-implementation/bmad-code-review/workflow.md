@@ -46,15 +46,16 @@ Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bma
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **code must throw on unexpected values, never silently degrade. A log is NOT an alert.**
 
-### 3. Load project review perspectives (optional)
+### 3. Load project knowledge (REQUIRED)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains project-specific review checklists (security, QA, code quality, tech lead, patterns, specs compliance) that override the defaults embedded in the perspective steps.
+Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
-### 4. Load stack knowledge (optional)
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — review perspectives (`#review-perspectives`), tech stack (`#tech-stack`), conventions (`#conventions`), test rules (`#test-rules`), investigation checklist (`#investigation-checklist`).
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` — API surface for endpoints under review.
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists at project root, read it. This file contains tech stack details, forbidden patterns, test rules, reference code pointers, and legacy code directories.
+HALT if either file is missing (run `/bmad-knowledge-bootstrap`).
 
-### 5. Set defaults
+### 4. Set defaults
 
 - `REVIEW_MODE = null` (determined in step-01 after classification)
 - `MR_IID = null` (populated by step-01)

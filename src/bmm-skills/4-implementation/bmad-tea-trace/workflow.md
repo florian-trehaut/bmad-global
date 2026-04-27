@@ -27,7 +27,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. It provides the technology stack, test framework conventions, and directory structure used to inform test discovery and level classification.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). It provides the technology stack, test framework conventions, and directory structure used to inform test discovery and level classification.
 
 ### 4. Set defaults
 

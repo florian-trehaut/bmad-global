@@ -45,7 +45,7 @@ Fill the diagnosis report template with all accumulated data:
 
 ### 4. Create the issue
 
-Create the issue in the tracker (using CRUD patterns from tracker.md):
+Create the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create issue
 - Title: fix({AFFECTED_SERVICE}): {SHORT_DESCRIPTION}
 - Team: {TRACKER_TEAM}

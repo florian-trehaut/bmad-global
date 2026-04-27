@@ -47,7 +47,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load stack knowledge (optional)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read it. This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
 
 ### 4. Setup working environment
 

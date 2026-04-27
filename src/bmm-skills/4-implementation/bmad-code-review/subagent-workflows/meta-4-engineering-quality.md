@@ -92,7 +92,7 @@ Use reference code directories from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowle
 - [ ] Integration test setup patterns
 - [ ] Error handling (domain errors + exception mapping)
 
-For each finding, provide `file:line` of the correct pattern reference from non-legacy code. If `stack.md: pattern_references` schema is populated (Phase 7 defines the schema in `data/pattern-reference-schema.md`), resolve the recommended reference via that map.
+For each finding, provide `file:line` of the correct pattern reference from non-legacy code. If the tech-stack-lookup protocol with field `pattern_references` schema is populated (Phase 7 defines the schema in `data/pattern-reference-schema.md`), resolve the recommended reference via that map.
 
 ### Grep scan
 

@@ -5,7 +5,7 @@
 Meta-6 only runs if BOTH of these are true:
 
 1. `CHANGED_FILES` contains at least one UI file
-2. `stack.md: ui: web` (the project declares itself as having a web UI)
+2. the tech-stack-lookup protocol with field `ui: web` (the project declares itself as having a web UI)
 
 If only one condition is met, Meta-6 does not activate.
 
@@ -58,7 +58,7 @@ static/**
 **/*.stylus
 ```
 
-Style-only changes activate Meta-6 at reduced scope: 6a if `stack.md: a11y_covered: true`, 6b if the CSS touches text content (unlikely).
+Style-only changes activate Meta-6 at reduced scope: 6a if the tech-stack-lookup protocol with field `a11y_covered: true`, 6b if the CSS touches text content (unlikely).
 
 ---
 
@@ -76,7 +76,7 @@ i18n:
   rtl_required: true | false
 ```
 
-Phase 6 extends the stack.md schema to include these fields. Projects that have not yet updated their `stack.md` default to `ui: none` → Meta-6 does not activate.
+Phase 6 extends the tech-stack schema (per `~/.claude/skills/bmad-shared/knowledge-schema.md`) to include these fields. Projects that have not yet updated their tech-stack section default to `ui: none` → Meta-6 does not activate.
 
 ---
 

@@ -14,7 +14,7 @@ Persist the product brief as a tracker document, either in a matching Project or
 
 ### 1. Determine target project
 
-List epics/projects to find a match (using CRUD patterns from tracker.md):
+List epics/projects to find a match (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List epics/projects
 - Team: {TRACKER_TEAM}
 
@@ -23,7 +23,7 @@ Otherwise, save in the Meta Project.
 
 ### 2. Check for existing document
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List documents
 - Project: target_project_id
 
@@ -31,12 +31,12 @@ Look for an existing `Product Brief` document.
 
 ### 3. Save or update
 
-If exists, update the document (using CRUD patterns from tracker.md):
+If exists, update the document (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Update document
 - Document: existing_doc_id
 - Content: brief_content
 
-If not, create it (using CRUD patterns from tracker.md):
+If not, create it (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: Create document
 - Title: document_title
 - Project: target_project_name

@@ -58,7 +58,7 @@ Ask user to confirm or adjust.
 
 #### D4. Create the Tracker Issue
 
-Create the issue in the tracker (using CRUD patterns from tracker.md):
+Create the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 
 - Operation: Create issue
 - Title: {title}
@@ -88,7 +88,7 @@ Update the issue status — Operation: Update issue, Issue: {ISSUE_ID}, Status: 
 
 #### E3. Add Readiness Comment
 
-Add a comment confirming the issue is ready (using CRUD patterns from tracker.md):
+Add a comment confirming the issue is ready (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 
 - Operation: Create comment
 - Issue: {ISSUE_ID}

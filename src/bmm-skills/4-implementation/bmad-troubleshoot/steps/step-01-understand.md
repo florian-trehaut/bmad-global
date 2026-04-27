@@ -29,7 +29,7 @@ Launch these investigations in parallel based on what the user described:
 
 **a. Tracker search** — find related issues (recent, in-progress, recently closed):
 
-Query the tracker (using CRUD patterns from tracker.md):
+Query the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 - Operation: List issues
 - Team: {TRACKER_TEAM}
 - Query: {keywords_from_symptom}

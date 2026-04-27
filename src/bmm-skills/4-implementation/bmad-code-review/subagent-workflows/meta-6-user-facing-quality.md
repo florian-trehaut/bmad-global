@@ -15,9 +15,9 @@ conditional: true
 | Sub-axis | Name | Always-on (when M6 activates) |
 |----------|------|-----------|
 | 6a | Accessibility (WCAG 2.2 AA) | ✓ |
-| 6b | Internationalization | ✓ (conditional on `stack.md: i18n.library ≠ none`) |
+| 6b | Internationalization | ✓ (conditional on the tech-stack-lookup protocol with field `i18n.library ≠ none`) |
 
-**Meta-6 itself is conditional.** Activated by step-01 when UI globs match (`*.tsx`, `*.vue`, `*.svelte`, `*.html`, `*.astro`, `src/components/**`) AND `stack.md: ui: web`. If M6 does not activate, its 0.05 weight renormalizes across active metas.
+**Meta-6 itself is conditional.** Activated by step-01 when UI globs match (`*.tsx`, `*.vue`, `*.svelte`, `*.html`, `*.astro`, `src/components/**`) AND the tech-stack-lookup protocol with field `ui: web`. If M6 does not activate, its 0.05 weight renormalizes across active metas.
 
 ---
 
@@ -60,7 +60,7 @@ findings:
 
 ## SUB-AXIS 6b: Internationalization
 
-**Condition:** Always-on when Meta-6 runs AND `stack.md: i18n.library ≠ none`. Phase 3 stub; populated in Phase 6.
+**Condition:** Always-on when Meta-6 runs AND the tech-stack-lookup protocol with field `i18n.library ≠ none`. Phase 3 stub; populated in Phase 6.
 
 ### Phase 3 stub
 

@@ -85,7 +85,7 @@ When a change made during this session affects the project's ground truth (stack
 2. **Read** the current file to understand structure and existing content.
 3. **Edit in-place** — add, modify, or remove lines as needed. Preserve YAML frontmatter syntactic validity.
 4. **Escalate if non-trivial**: if the change rewrites > 5 lines, alters the file's purpose, or spans > 2 knowledge files, STOP editing blindly and run `/bmad-knowledge-refresh` instead. That skill uses source-hash detection + per-file diff review — the correct tool for large or cross-cutting updates.
-5. **Mention the update** in your session summary (e.g., `"Updated stack.md to add Redis 7 as new dependency"`). Make the knowledge delta explicit for the user's review.
+5. **Mention the update** in your session summary (e.g., `"Updated project.md tech-stack section to add Redis 7 as new dependency"`). Make the knowledge delta explicit for the user's review.
 
 ### When in Doubt
 

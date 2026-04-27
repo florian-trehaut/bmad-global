@@ -87,7 +87,7 @@ Inside `{SPIKE_WORKTREE_PATH}`:
 - Use subprocess per file when available (context savings)
 - Trace the architecture relevant to the spike question
 - Note test files and testing patterns
-- Cross-reference against `stack.md` if it exists
+- Cross-reference against the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) if it exists
 - Document findings with `file:line` references
 
 **Checkpoint — present codebase findings before continuing:**
@@ -213,9 +213,9 @@ WAIT for selection. Process Q/D, redisplay menu. On C, continue.
 
 ### 6. Cross-Reference with Standards
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists:
+Using `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION):
 - Cross-reference findings against project standards
-- Note conflicts (e.g., "stack.md forbids library X, but it's the best option for this use case")
+- Note conflicts (e.g., "the tech-stack section forbids library X, but it's the best option for this use case")
 - Note alignments (e.g., "consistent with existing pattern Y")
 
 ### 7. Timebox Check
