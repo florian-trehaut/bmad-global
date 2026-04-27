@@ -1,8 +1,12 @@
-# Step 2: Scan and Generate Updates
+# Step 2: Scan and Generate Updates (3-file layout, multi-source)
 
 ## STEP GOAL
 
-For each file in TARGET_FILES, read the existing knowledge file, re-run the relevant source scans, and generate an updated draft that preserves the file's structure while refreshing its content with current data. This step is fully automated — no user interaction.
+For each file in TARGET_FILES, read the existing knowledge file, re-run the relevant source scans (planning artifacts + specs + code, adaptive to what's available), and generate an updated draft that preserves the file's structure while refreshing its content with current data per the SDD priority pyramid.
+
+If `DRIFT_AXIS1` or `DRIFT_AXIS2` was detected in step-01: skip generation for the affected files (step-03 handles those interactively). Generate only for the non-drift files in TARGET_FILES.
+
+This step is fully automated — no user interaction.
 
 ---
 
@@ -11,143 +15,136 @@ For each file in TARGET_FILES, read the existing knowledge file, re-run the rele
 ### 1. Load References
 
 Read `../data/source-hash-mapping.md` for:
-- Source file mapping (what to scan per knowledge file)
+- Source file mapping per knowledge file × source type
 - Dependency graph (processing order)
 
-### 2. Determine Processing Order
+### 2. Skip Drift Files
 
-Process TARGET_FILES respecting the dependency graph:
+For each file in TARGET_FILES:
+- If file is in `DRIFT_AXIS1_DETECTED` or `DRIFT_AXIS2_DETECTED` (from step-01) → mark as `DEFERRED_TO_STEP_03` and skip generation here
+- The drift summary persists for step-03 to present to the user
 
-**Tier 0 first** (in any order within the tier):
-stack.md, infrastructure.md, conventions.md, domain-glossary.md, environment-config.md, tracker.md, comm-platform.md
+Build `GENERATION_TARGETS` = TARGET_FILES minus drift-affected files.
 
-**Tier 1 second** (after their parents are processed):
-review-perspectives.md, investigation-checklist.md, validation.md, api-surface.md
+### 3. Determine Processing Order
 
-This ensures that if a Tier 1 file depends on a freshly updated Tier 0 file, the scan uses the latest data.
+Process `GENERATION_TARGETS` respecting the dependency graph:
 
-### 3. For Each File in TARGET_FILES (in order)
+**Tier 0 first** (in any order):
+- `project.md`
+- `domain.md`
+
+**Tier 1 second** (after Tier 0 parents):
+- `api.md` (depends on `domain.md`)
+
+This ensures `api.md` regeneration uses the freshly updated `domain.md` if it was refreshed.
+
+### 4. For Each File in GENERATION_TARGETS (in order)
 
 #### a. Read Existing File
 
 Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{filename}`.
 
-Store as `CURRENT_CONTENT`.
+Store as `CURRENT_CONTENT`. Extract heading structure (`##`, `###`) — this is the structural skeleton to preserve.
 
-Extract the heading structure — all `##` and `###` headings in order. This is the structural skeleton to preserve.
+Read frontmatter to know previous `sources_used`.
 
-#### b. Run Targeted Scan
+#### b. Run Adaptive Targeted Scans
 
-Execute the scan logic for the specific knowledge file. Use `source_extensions` from stack.md (loaded during initialization) for dynamic grep scoping — do NOT hardcode file extensions.
+Use `CURRENT_SOURCES_AVAILABLE` (from step-01) to determine which sources to scan. Use `source_extensions` from the existing `project.md` (or detect afresh) for dynamic grep scoping.
 
-**stack.md scan:**
-- Read main package manifest (package.json, Cargo.toml, pyproject.toml, go.mod)
-- Read all dependencies and devDependencies
-- Read lint configs → active rules, severity
-- Read formatter config → key options
-- Read test configs → test roots, frameworks, coverage
-- Read pre-commit config → hook commands
-- Detect source file patterns from file extension distribution
-- Classify architecture patterns from directory structure
+**For project.md** :
 
-**infrastructure.md scan:**
-- Read all CI/CD workflow files → jobs, triggers, dependencies
-- Read Dockerfiles → base images, build stages
-- Read deployment configs
-- Read .env.example → variable names (NOT values)
-- Identify cloud service references
+If `PRD_PRESENT`: read `{planning_artifacts}/prd.md` § Project Type, § Non-functional Requirements
+If `ARCHITECTURE_PRESENT`: read `{planning_artifacts}/architecture.md` § Tech Stack, § Patterns, § Project Structure, § Infrastructure, § Environments, § Test Strategy, § Conventions, § Observability
+If `ADRS_PRESENT`: read `{adr_location}/*.md` (Accepted/Approved, chronological — most recent supersedes)
+If `SPECS_PRESENT`: read `_bmad-output/implementation-artifacts/spec-*.md` § Technical Decisions, § Forbidden Patterns
+If `CODE_PRESENT`: scan package manifests, lint configs, formatter configs, test configs, CI files, Dockerfile, deploy configs, .env.example, .editorconfig, src/ directory structure, workflow-context.md (tracker + comm sections)
 
-**conventions.md scan:**
-- `git log --oneline -30` → detect commit message patterns
-- Read .editorconfig if present
-- Check PR template: `.github/pull_request_template.md`
-- Analyze import ordering from a sample of source files
-- Check branch naming: `git branch -r | head -20`
+**For domain.md** :
 
-**domain-glossary.md scan:**
-- Grep for entity/model definitions using detected source extensions
-- Scan DTOs and request/response schemas
-- Scan domain exceptions and errors
-- Identify bounded contexts from directory structure
+If `PRD_PRESENT`: read `{planning_artifacts}/prd.md` § Domain, § Functional Requirements, § Vision
+If `BRIEF_PRESENT`: read `{planning_artifacts}/product-brief.md` § Vision, § Domain
+If `ARCHITECTURE_PRESENT`: read `{planning_artifacts}/architecture.md` § Domain Model, § Bounded Contexts (if present)
+If `ADRS_PRESENT`: filter ADRs for domain-related decisions
+If `SPECS_PRESENT`: read specs § Domain Entities (if present), § Glossary additions
+If `CODE_PRESENT`: scan entity/model files, schema files, domain exceptions, bounded-context directories
 
-**api-surface.md scan:**
-- Grep for route/endpoint definitions using detected source extensions
-- Scan OpenAPI specs if present
-- Check for new controllers, handlers, or route files
+**For api.md** :
 
-**review-perspectives.md scan:**
-- Read the freshly updated stack.md (if it was refreshed in this run) or the existing one
-- Identify security-relevant patterns (auth middleware, input validation)
-- Identify forbidden patterns enforced by linter
+If `ARCHITECTURE_PRESENT`: read `{planning_artifacts}/architecture.md` § API Design, § Endpoints, § Auth
+If `ADRS_PRESENT`: filter ADRs for API-related decisions
+If `SPECS_PRESENT`: read specs § API Contract, § Endpoint additions
+If `CODE_PRESENT`: scan route/controller files, OpenAPI specs, GraphQL schemas
 
-**investigation-checklist.md scan:**
-- Map directory structure: `find . -maxdepth 3 -type d | sort | grep -v node_modules | grep -v .git | grep -v vendor`
-- Identify domain-specific areas and their key files
+#### c. Apply SDD Priority Pyramid (merge order)
 
-**tracker.md scan:**
-- Read workflow-context.md tracker configuration section
-- If file-based tracker: check sprint-status.yaml structure
+For each section in the existing file's structure, build refreshed content by merging:
 
-**environment-config.md scan:**
-- Scan environment references in code
-- Read deployment configs for environment URLs
-- Check for feature flag systems
+1. **PRD** content (lowest priority — base context)
+2. **Architecture** content (overlay tech/infra)
+3. **ADRs** content chronologically (overlay specific decisions, most recent wins)
+4. **Specs** content (overlay feature-level, can override architecture for their scope)
+5. **Code** facts (verification + brownfield fallback for observable values)
 
-**validation.md scan:**
-- Read E2E config files (playwright.config.*, cypress.config.*)
-- Read component test configs
-- Scan for stack-specific test patterns using detected source extensions
-- Identify test file naming and location patterns
+Skip any source that is absent (`CURRENT_SOURCES_AVAILABLE` reflects current presence).
 
-**comm-platform.md scan:**
-- Read workflow-context.md communication platform section
+#### d. Generate Updated Draft
 
-#### c. Generate Updated Draft
-
-Build the updated file by merging scan results with existing content:
+Build the updated file:
 
 1. **Start with the existing heading structure** — preserve all `##` and `###` headings in their current order
+2. **For each section** :
+   - If new merged data differs from current → **UPDATE** with new data
+   - If new merged data matches current → **PRESERVE** existing text verbatim
+   - If a section contains content NOT derivable from any current source (manual additions) → **PRESERVE** unchanged (will be flagged by content_hash if it changes)
+3. **New content** : add under most appropriate existing heading
+4. **Removed content** : if scans confirm something is gone, remove stale entries (do NOT remove entire sections — may contain user-added context)
 
-2. **For each section** (content between two headings):
-   - If scan data reveals changes from current content → **UPDATE** the section with new data
-   - If scan data matches current content → **PRESERVE** the existing text verbatim
-   - If a section contains content not derivable from scans (appears to be user-added notes, custom context) → **PRESERVE** it unchanged
+#### e. Compute New Hashes
 
-3. **New content** — if scans reveal new items not covered by any existing section:
-   - Add new content under the most appropriate existing heading
-   - If no heading fits, add a new section at the logical position in the file
-
-4. **Removed content** — if scans confirm that something previously documented no longer exists in the codebase:
-   - Remove the stale entries from the relevant section
-   - Do NOT remove entire sections — they may contain user-added context
-
-#### d. Compute New Source Hash
-
-Using the source file mapping for this knowledge file:
+Multi-source `source_hash` (one per source actually used):
 
 ```bash
-cat {source_files} 2>/dev/null | md5 | cut -c1-8
+new_source_hash:
+  prd: $([ "$PRD_PRESENT" = true ] && hash_planning_prd)
+  architecture: $([ "$ARCHITECTURE_PRESENT" = true ] && hash_planning_arch)
+  adrs: $([ "$ADRS_PRESENT" = true ] && hash_adrs)
+  specs: $([ "$SPECS_PRESENT" = true ] && hash_specs)
+  code: $([ "$CODE_PRESENT" = true ] && hash_code_for "$file")
 ```
 
-#### e. Build New Frontmatter
+`content_hash` of the new body content (excluding frontmatter):
+
+```bash
+new_content_hash=$(echo "$NEW_BODY" | md5 | cut -c1-8)
+```
+
+#### f. Build New Frontmatter
 
 ```yaml
 ---
 generated: {YYYY-MM-DD}
 generator: bmad-knowledge-refresh
-source_hash: {new 8-char hash}
+sources_used: [list of present sources]
+source_hash:
+  {only entries for sources actually used}
+content_hash: {new content_hash}
+schema_version: 2
+manual_override: false
 ---
 ```
 
-#### f. Store Draft
+#### g. Store Draft
 
-Store the complete draft (frontmatter + updated content) keyed by filename. Also store a structured change summary:
+Store the complete draft (frontmatter + updated content) keyed by filename. Also store change summary:
+- Sources used (this run)
 - Sections updated: count and names
 - Sections preserved: count
 - New content added: yes/no
 - Stale content removed: yes/no
 
-### 4. Handle workflow-context.md (if in TARGET_FILES)
+### 5. Handle workflow-context.md (if in TARGET_FILES)
 
 workflow-context.md is different — it has YAML frontmatter as its primary content, not markdown sections.
 
@@ -156,12 +153,15 @@ workflow-context.md is different — it has YAML frontmatter as its primary cont
 3. Generate a field-level diff: `{ field: { current: value, proposed: value, reason: string } }`
 4. Store as a special draft type — field-level changes, not a full file replacement
 
-### 5. Log Generation Summary
+### 6. Log Generation Summary
 
 ```
 Generated {N} updated drafts:
-  - {filename}: {N} sections updated, {N} preserved
+  - {filename}: sources={list}, {N} sections updated, {N} preserved
   - ...
+
+Deferred to step-03 (drift):
+  - {filename}: {DRIFT_AXIS1 / DRIFT_AXIS2}
 ```
 
 If workflow-context.md is included:

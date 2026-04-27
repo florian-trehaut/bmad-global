@@ -1,8 +1,10 @@
-# Step 1: Detect Changes
+# Step 1: Detect Changes (3-file layout, multi-source, drift-aware)
 
 ## STEP GOAL
 
-Identify which knowledge files need refreshing by combining three signals: conversation context analysis, source hash comparison, and date-based staleness. Build a prioritized TARGET_FILES list with user confirmation.
+Identify which of the 3 knowledge files (`project.md`, `domain.md`, `api.md`) need refreshing by combining four signals: (1) conversation context, (2) per-source-type hash comparison, (3) date-based staleness, and (4) drift detection on two axes (code vs spec, manual edit vs source).
+
+Build a prioritized TARGET_FILES list. If drift detected on either axis, mark the affected files for BLOCK in step-03.
 
 ---
 
@@ -10,89 +12,183 @@ Identify which knowledge files need refreshing by combining three signals: conve
 
 ### 1. Inventory Existing Knowledge Files
 
-List all `.md` files in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`:
+List the 3 knowledge files in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/`:
 
 ```bash
-ls -la {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/*.md 2>/dev/null
+ls -la {MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{project,domain,api}.md 2>/dev/null
 ```
 
 For each file, read the YAML frontmatter and extract:
 - `generated` — date of last generation (YYYY-MM-DD)
 - `generator` — which skill generated it (bmad-knowledge-bootstrap or bmad-knowledge-refresh)
-- `source_hash` — 8-character MD5 hash of source files at generation time
+- `sources_used` — list of source types present at generation (subset of [planning, specs, code])
+- `source_hash` — map: { prd, architecture, adrs, specs, code } with 8-char MD5 hashes for sources actually used
+- `content_hash` — 8-char MD5 of body content (used for manual-edit detection)
+- `manual_override` — true if user previously chose [K] Keep manual; if true, **skip this file entirely** in this refresh
 
 Store as `KNOWLEDGE_INVENTORY`:
 ```
-{filename}: { generated: date, generator: string, source_hash: string }
+{filename}: {
+  generated: date,
+  generator: string,
+  sources_used: [...],
+  source_hash: { ... },
+  content_hash: string,
+  manual_override: bool
+}
 ```
 
 If a file has no frontmatter or no `generated` date, mark its status as `STALE_NO_META`.
 
-### 2. Analyze Conversation Context
+If `manual_override: true`, skip the file silently (`SKIPPED_MANUAL_OVERRIDE` status). Do not include in any further detection — the user opted out.
 
-Review the current conversation history. Identify changes made during this session:
+### 2. Detect Sources Currently Available
+
+Probe each source type (independent of what was used at generation time):
+
+```bash
+ls "{planning_artifacts}/prd.md" 2>/dev/null && PRD_PRESENT=true
+ls "{planning_artifacts}/architecture.md" 2>/dev/null && ARCHITECTURE_PRESENT=true
+ls "{planning_artifacts}/product-brief.md" 2>/dev/null && BRIEF_PRESENT=true
+[ -d "{adr_location}" ] && ls "{adr_location}/"*.md 2>/dev/null | head -1 && ADRS_PRESENT=true
+ls _bmad-output/implementation-artifacts/spec-*.md 2>/dev/null | head -1 && SPECS_PRESENT=true
+ls package.json Cargo.toml pyproject.toml go.mod 2>/dev/null | head -1 && CODE_PRESENT=true
+```
+
+Persist `CURRENT_SOURCES_AVAILABLE` for downstream use.
+
+### 3. Analyze Conversation Context
+
+Review conversation history. Identify changes made during this session:
 
 **A. Files created or modified** — from tool use history (Write, Edit calls), git diff output, or explicit user statements about what changed.
 
-**B. Technologies added or removed** — npm install, cargo add, pip install, new config files created, dependencies modified.
+**B. Source artifact changes** — was `prd.md` updated? `architecture.md`? new ADR created? new spec written?
 
-**C. Structural changes** — new directories created, files moved, modules reorganized.
+**C. Code changes** — npm install / cargo add / new dependencies, new endpoints, new entities, config changes.
 
-**D. Configuration changes** — lint rules, CI workflows, env vars, deployment configs, test configs.
+**D. Structural changes** — new directories, files moved, modules reorganized.
 
 Load `../data/source-hash-mapping.md` and use the **Context-to-File Mapping** table to map each detected change to the knowledge files it likely affects.
 
 Store results as `CONTEXT_CANDIDATES` — a list of `{ filename, reason }` pairs.
 
-### 3. Compute Current Source Hashes
+### 4. Compute Current Per-Source Hashes
 
-Using the **Source File Mapping** table from `../data/source-hash-mapping.md`:
-
-For each file in KNOWLEDGE_INVENTORY, identify its source files and compute the current hash:
+For each file in KNOWLEDGE_INVENTORY (excluding `manual_override`), compute hashes for each source listed in `sources_used`:
 
 ```bash
-cat {source_files} 2>/dev/null | md5 | cut -c1-8
+for source in $(yaml_list sources_used); do
+  case "$source" in
+    planning)
+      [ "$PRD_PRESENT" = true ] && current_prd=$(hash_planning_prd) || current_prd="absent"
+      [ "$ARCHITECTURE_PRESENT" = true ] && current_arch=$(hash_planning_arch) || current_arch="absent"
+      [ "$BRIEF_PRESENT" = true ] && current_brief=$(hash_planning_brief) || current_brief="absent"
+      [ "$ADRS_PRESENT" = true ] && current_adrs=$(hash_adrs) || current_adrs="absent"
+      ;;
+    specs)
+      [ "$SPECS_PRESENT" = true ] && current_specs=$(hash_specs) || current_specs="absent"
+      ;;
+    code)
+      [ "$CODE_PRESENT" = true ] && current_code=$(hash_code_for "$file") || current_code="absent"
+      ;;
+  esac
+done
+
+# Compare each per-source hash with stored equivalent
 ```
 
-Compare the computed hash with the stored `source_hash` from frontmatter:
-- **MATCH** — source files have not changed since generation
-- **MISMATCH** — source files have changed
+Build `HASH_STATUS` per file:
+- **MATCH** — all stored source hashes equal current hashes
+- **MISMATCH** — at least one source hash differs (record which source(s))
+- **NEW_SOURCE_AVAILABLE** — a source absent at generation is now present (e.g., greenfield project that previously had `sources_used=[planning]` and now has `code`)
+- **SOURCE_DISAPPEARED** — a source present at generation is now absent (e.g., specs were deleted; rare)
 
-Store as `HASH_STATUS` per file.
+**Note:** Absence of a source for a file that didn't use it is not a change.
 
-**Note:** If source files for a knowledge file do not exist (e.g., no Cargo.toml in a JS project), that knowledge file's hash status is MATCH by default — absence is not change.
+### 5. Detect Drift Axe 1 (code vs specs)
 
-### 4. Date-Based Staleness Check
+Independent of source_hash. If `SPECS_PRESENT=true` AND `CODE_PRESENT=true`:
 
-For each file in KNOWLEDGE_INVENTORY:
+For each spec, parse declared facts (e.g., "ORM: Prisma" in spec body) and compare with code observable values (e.g., `grep "drizzle-orm" package.json`).
+
+Build `DRIFT_AXIS1` list of mismatches:
+```
+[
+  {
+    spec: "_bmad-output/implementation-artifacts/spec-feat-orm-migration.md",
+    declared: "ORM = Prisma",
+    declared_location: "line 42",
+    observed: "drizzle-orm@0.x in package.json (no Prisma)",
+    affected_target: "project.md§Tech Stack"
+  },
+  ...
+]
+```
+
+**Drift detection rules** (conservative — avoid false positives):
+- Spec must declare the value EXPLICITLY (in a "Technical Decisions" section or labeled fact). Do not infer from prose.
+- Code observation must be UNAMBIGUOUS (e.g., direct dependency, explicit config). Do not interpret implicit signals.
+- If either is ambiguous → no drift detected, no false positive.
+
+If `DRIFT_AXIS1` is non-empty: mark affected files (`project.md`, `domain.md`, or `api.md`) with `DRIFT_AXIS1_DETECTED`. The list is passed to step-03 for user resolution.
+
+### 6. Detect Drift Axe 2 (manual edit vs source)
+
+For each file in KNOWLEDGE_INVENTORY (excluding `manual_override`):
+
+```bash
+stored_content_hash=$(yaml_extract content_hash "$file")
+current_content_hash=$(hash_content "$file")
+
+if [ "$stored_content_hash" != "$current_content_hash" ]; then
+  MANUAL_EDIT_DETECTED[$file]=true
+fi
+```
+
+Cross-reference with HASH_STATUS:
+
+| MANUAL_EDIT | HASH_STATUS | Result |
+|---|---|---|
+| true | MATCH | **silent skip** — user edited the knowledge file, no source changed; refresh leaves it alone (no overwrite) |
+| true | MISMATCH or NEW_SOURCE | **DRIFT_AXIS2** — manual edit AND source change → BLOCK in step-03 |
+| false | MATCH | nothing to do |
+| false | MISMATCH or NEW_SOURCE | normal refresh path |
+
+Build `DRIFT_AXIS2` list of `{ filename, manual_change_summary, source_changes }` for affected files.
+
+### 7. Date-Based Staleness Check
+
+For each file in KNOWLEDGE_INVENTORY (excluding manual_override):
 - No `generated` date → `DATE_STALE`
-- `generated` date > 7 days ago → `DATE_STALE`
-- `generated` date ≤ 7 days → `DATE_FRESH`
+- `generated` date > 30 days ago → `DATE_STALE` (more lenient than the previous 7-day window: planning artifacts evolve slowly)
+- `generated` date ≤ 30 days → `DATE_FRESH`
 
-### 5. Cascade Analysis
+### 8. Cascade Analysis
 
 Load the **Dependency Graph** from `../data/source-hash-mapping.md`.
 
-For each file that has `HASH_STATUS = MISMATCH` or is in `CONTEXT_CANDIDATES`:
-- Check if it has Tier 1 dependents in the dependency graph
-- Add each dependent to the candidate list with reason: "cascade from {parent_filename}"
-- Do NOT cascade from Tier 1 files — only Tier 0 → Tier 1 cascades
+For 3-file layout:
+- If `domain.md` is REFRESH_NEEDED → mark `api.md` as REFRESH_CASCADE
+- `project.md` has no dependents (leaf in graph)
 
-### 6. Classify Each File
+### 9. Classify Each File
 
-Assign a final status to each knowledge file using this priority order:
+Final status priority order:
 
 | Status | Condition | Priority |
 |---|---|---|
+| `SKIPPED_MANUAL_OVERRIDE` | `manual_override: true` | SKIP (silent) |
+| `DRIFT_AXIS1_DETECTED` | code/spec divergence found in section 5 | BLOCK |
+| `DRIFT_AXIS2_DETECTED` | manual edit + source change | BLOCK |
 | `STALE_NO_META` | No frontmatter or no generated date | HIGH |
-| `REFRESH_NEEDED` | HASH_STATUS = MISMATCH OR file is in CONTEXT_CANDIDATES | HIGH |
-| `REFRESH_CASCADE` | File is a Tier 1 dependent of a REFRESH_NEEDED file | MEDIUM |
-| `STALE_DATE_ONLY` | DATE_STALE but HASH_STATUS = MATCH and not in CONTEXT_CANDIDATES | LOW |
-| `FRESH` | DATE_FRESH and HASH_STATUS = MATCH and not in CONTEXT_CANDIDATES | SKIP |
+| `REFRESH_NEEDED` | HASH_STATUS = MISMATCH OR NEW_SOURCE_AVAILABLE OR file is in CONTEXT_CANDIDATES | HIGH |
+| `REFRESH_CASCADE` | Tier 1 dependent of a REFRESH_NEEDED file | MEDIUM |
+| `STALE_DATE_ONLY` | DATE_STALE but HASH_STATUS = MATCH | LOW |
+| `FRESH` | DATE_FRESH and HASH_STATUS = MATCH | SKIP |
+| `MANUAL_EDIT_NO_SOURCE_CHANGE` | manual edit detected but no source changed | SKIP (silent) |
 
-### 7. Present Assessment
-
-Display a structured summary:
+### 10. Present Assessment
 
 ```
 Knowledge Refresh — Change Detection
@@ -102,67 +198,84 @@ Conversation context signals:
   - {change description} → {affected file(s)}
   - ...
 
+Sources currently available:
+  Planning artifacts: {PRD/Arch/Brief/ADRs} — present/absent
+  Phase 4 specs:      {N files / absent}
+  Codebase:           {present / absent}
+
 Knowledge file status:
 
-| File | Hash | Date | Context | Cascade | Status |
-|------|------|------|---------|---------|--------|
-| stack.md | MATCH/MISMATCH | FRESH/STALE | YES/— | — | {status} |
-| infrastructure.md | ... | ... | ... | ... | ... |
-| ... | ... | ... | ... | ... | ... |
+| File | sources_used | hash | content | drift | status |
+|------|--------------|------|---------|-------|--------|
+| project.md | {list} | MATCH/MISMATCH | unchanged/edited | — / Axe1 / Axe2 | {status} |
+| domain.md  | {list} | ... | ... | ... | ... |
+| api.md     | {list} | ... | ... | ... | ... |
+
+Drift detected:
+  Axe 1 (code vs spec): {N items / none}
+  Axe 2 (manual edit + source change): {N files / none}
+  → step-03 will BLOCK on these files for resolution.
 
 Recommended refresh:
   HIGH:   {list or "none"}
   MEDIUM: {list or "none"}
   LOW:    {list or "none"}
+  BLOCK:  {list or "none"}
 ```
 
-If ALL files are FRESH and CONTEXT_CANDIDATES is empty:
+If ALL files are FRESH or SKIPPED and no drift detected:
 - Display: "All knowledge files are up to date. Nothing to refresh."
 - **END OF WORKFLOW.**
 
+If only `BLOCK` items exist and no refresh-needed files:
+- Display: "Drift detected. Step-03 will prompt for resolution."
+- Skip user choice menu, proceed directly to step-02 with BLOCK markers.
+
 Otherwise, HALT and present the menu.
 
-### 8. User Choice
+### 11. User Choice
 
-> **[A]** Accept recommendation — refresh HIGH + MEDIUM priority files
+> **[A]** Accept recommendation — refresh HIGH + MEDIUM priority files (drift handled in step-03)
 > **[H]** HIGH only — refresh only HIGH priority files
 > **[C]** Custom — select specific files to refresh
-> **[F]** Force all — refresh every existing knowledge file regardless of status
+> **[F]** Force all — refresh every file regardless of status (ignores manual_override warning)
 > **[Q]** Quit — nothing to refresh
 
 HALT — wait for user selection.
 
 **Menu handling:**
-- **A**: TARGET_FILES = all HIGH + MEDIUM files
-- **H**: TARGET_FILES = all HIGH files only
-- **C**: Present numbered list of all files, ask user to select by number. HALT — wait for selection.
-- **F**: TARGET_FILES = all files in KNOWLEDGE_INVENTORY
+- **A**: TARGET_FILES = HIGH + MEDIUM + BLOCK
+- **H**: TARGET_FILES = HIGH + BLOCK
+- **C**: Present numbered list, ask user to select. Skip manual_override files unless user explicitly types their number.
+- **F**: TARGET_FILES = all files in KNOWLEDGE_INVENTORY (including manual_override, with confirmation prompt)
 - **Q**: END OF WORKFLOW
 
-### 9. Check workflow-context.md (OPTIONAL)
+### 12. Check workflow-context.md (OPTIONAL)
 
-If CONTEXT_CANDIDATES includes signals that suggest `workflow-context.md` itself may need updates (new tracker config, new commands, forge changes, new build commands):
+If CONTEXT_CANDIDATES suggests `workflow-context.md` itself may need updates (new tracker, forge changes, command changes):
 
 ```
-workflow-context.md may also need updates based on session changes:
-  - {field}: {reason for potential update}
-  - ...
+workflow-context.md may also need updates:
+  - {field}: {reason}
 
 Include workflow-context.md in refresh? [Y/N]
 ```
 
-HALT — wait for user response.
-
 If Y: add `workflow-context.md` to TARGET_FILES with a `context_update` flag.
-If N: proceed without it.
 
-### 10. Build TARGET_FILES and Proceed
+### 13. Build TARGET_FILES and Proceed
 
-Store the final TARGET_FILES list.
+Persist:
+- `TARGET_FILES` (list)
+- `DRIFT_AXIS1` (list, may be empty)
+- `DRIFT_AXIS2` (list, may be empty)
+- `CURRENT_SOURCES_AVAILABLE` (for step-02)
 
 Log:
 ```
 Refreshing {N} files: {comma-separated list}
+Drift Axe 1: {N items}
+Drift Axe 2: {N files}
 ```
 
 ---

@@ -42,7 +42,7 @@ Run `MAIN_PROJECT_ROOT=$(dirname "$(git rev-parse --git-common-dir)")` to resolv
 
 Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`.
 
-**HALT if not found:** "No workflow-context.md found. Run `/bmad-knowledge-bootstrap` first to initialize project configuration."
+**HALT if not found:** "No workflow-context.md found. Run `/bmad-project-init` first to initialize project configuration."
 
 ### 5. Verify knowledge directory exists
 
@@ -50,9 +50,11 @@ Check that `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` exists and contains
 
 **HALT if not found or empty:** "No knowledge files found. Run `/bmad-knowledge-bootstrap` first to generate knowledge files."
 
-### 6. Load stack knowledge (optional)
+### 6. Load project knowledge (optional, for source_extensions)
 
-If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/stack.md` exists, read it. Extract `source_extensions` and `test_file_patterns` for dynamic scan scoping in step 02.
+If `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` exists, read its §"Source File Patterns" section. Extract `source_extensions` and `test_file_patterns` for dynamic scan scoping in step 02.
+
+For projects still on the legacy 10-file layout (pre-consolidation): if `stack.md` exists instead of `project.md`, read it for the same patterns. Step-01 will detect this and recommend migration via `/bmad-knowledge-bootstrap`.
 
 ### 7. Communication language
 
@@ -79,9 +81,13 @@ You are a **knowledge maintenance specialist** who identifies stale knowledge fi
 - **NEVER regenerate from scratch** — read the existing file, identify what changed, update only what needs updating
 - **Existing file IS the template** — preserve structure, headings, and user-edited content where possible
 - **User review mandatory** before overwriting any file
-- **Staleness tracking mandatory** — every refreshed file gets updated frontmatter (generated date + source_hash)
+- **Staleness tracking mandatory** — every refreshed file gets updated frontmatter (generated date, sources_used, source_hash per source, content_hash)
 - **Cascade awareness** — when a file changes, check its dependents via the dependency graph
+- **Drift handling on 2 axes**:
+  - **Axe 1** (code vs spec): if specs declare X but code shows Y → BLOCK in step-03 with `[U] Update spec / [F] Fix code / [I] Ignore / [Q] Quit`. Suggest `/bmad-create-adr` for traceability.
+  - **Axe 2** (manual edit vs source change): if `content_hash` mismatch detected AND a source has changed → BLOCK with `[M] Merge / [O] Overwrite / [K] Keep manual / [Q] Quit`. The `[K]` choice sets `manual_override: true` to skip future refreshes.
 - **ZERO FALLBACK / ZERO FALSE DATA** — apply shared rules loaded at initialization
+- **Adaptive sources** — refresh from whatever sources are present (PRD ∪ architecture ∪ ADRs ∪ specs ∪ code); do NOT require all sources
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
 - Execute ALL steps in exact order — NO skipping
 
@@ -104,10 +110,10 @@ Load and execute `./steps/step-01-detect-changes.md`.
 ## HALT CONDITIONS (GLOBAL)
 
 - Not in a git repository → HALT
-- No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found → HALT (run `/bmad-knowledge-bootstrap` first)
+- No `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` found → HALT (run `/bmad-project-init` first)
 - No `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` directory or no files → HALT (run `/bmad-knowledge-bootstrap` first)
 - User explicitly requests stop → HALT
-- All knowledge files are FRESH and no context-suggested changes → INFORM and END (nothing to do)
+- All knowledge files are FRESH and no context-suggested changes and no drift → INFORM and END (nothing to do)
 
 ---
 
