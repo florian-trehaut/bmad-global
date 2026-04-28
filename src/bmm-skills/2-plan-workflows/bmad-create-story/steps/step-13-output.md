@@ -1,4 +1,4 @@
-# Step 9: Publish to Tracker
+# Step 13: Publish to Tracker
 
 
 ## NO-SKIP CLAUSE (workflow-adherence Rule 1)
@@ -9,18 +9,19 @@ Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "sp
 
 Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
 
-## STEP ENTRY (CHK-STEP-09-ENTRY)
+## STEP ENTRY (CHK-STEP-13-ENTRY)
 
 Avant d'executer, verifier:
 
-- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Step precedent complete (CHK-STEP-12-EXIT emis dans la conversation)
+- [ ] 0 BLOCKER findings outstanding from Step 12 multi-validator
 - [ ] Variables requises en scope (verifier avant action)
 - [ ] Working state attendu
 
 Emettre EXACTEMENT:
 
 ```
-CHK-STEP-09-ENTRY PASSED — entering Step 9: Publish to Tracker with {var=value, ...}
+CHK-STEP-13-ENTRY PASSED — entering Step 13: Publish to Tracker with {var=value, ...}
 ```
 
 Si une precondition manque => HALT, signaler quelle precondition.
@@ -55,11 +56,15 @@ Prioritized candidate sources (in order):
 
 1. **Status / enum / mapping decisions with unknown handling** — every place the spec says "throw on unknown" or "fallback to default" (zero-fallback rule from `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`).
 2. **External dependencies marked Blocking** — gates on partners, legal, compliance, third-party APIs.
-3. **Out-of-scope frontiers** — what the spec explicitly EXCLUDES that an outside reader might assume is in.
+3. **Out-of-scope frontiers** — items from the explicit Out-of-Scope register (OOS-N) that an outside reader might assume is in.
 4. **BACs with non-trivial business logic** — anything beyond CRUD page renders; especially conditional flows, time/date handling, money, multi-actor permissions, regulatory constraints.
 5. **Irreversible operations** — data deletion, money transfer, contract emission, notification dispatch to end users.
-6. **Migration / data transformation rules** — name-matching, slug-matching, environment-dependent WHERE clauses (per the mandatory guardrail #2 from Step 7).
-7. **Concurrency / null-safety candidate ACs accepted in Step 7.4b** — these often encode invisible runtime contracts.
+6. **Migration / data transformation rules** — name-matching, slug-matching, environment-dependent WHERE clauses (per the mandatory guardrail #2 from Step 11).
+7. **Concurrency / null-safety candidate ACs accepted in Step 11.4b** — these often encode invisible runtime contracts.
+8. **HIGH-impact Risks from the Risks Register** — every Risk-N flagged HIGH/HIGH should be presented for active confirmation that the user accepts the residual exposure even with the proposed mitigation.
+9. **Security Gate FAIL items with planned remediation** — the user must explicitly confirm that they accept the remediation approach (which becomes a task) and that production deployment is gated on it.
+10. **NFR MISSING / PARTIAL items** — the user must confirm the planned target is the right one (e.g. "p95 < 500ms is the right target", not "p95 < 1s").
+11. **Boundaries Triple "Never Do" items that contradict the typical "always-on" agent reflex** — confirm the agent will refuse, not bypass.
 
 Pick the **3-5 most critical** by combining both dimensions. Fewer than 3 → still pick at least 3 (use lower-priority categories). More than 5 → split: present the most critical 5 now, queue the rest for a follow-up gate iteration.
 
@@ -83,9 +88,9 @@ For each distilled item, present in this exact format:
 - **?**: produce ONE concrete fictional but plausible example illustrating the decision in action (e.g., "Le client Acme essaie de commander apres expiration de leur abonnement le 28/04/2026 a 14h32 — le systeme renvoie HTTP 402 et n'envoie PAS l'email de confirmation"). Then re-present the same item with [Y] / [N] choices. Loop ? at most twice per item — third time on `?`, force a Y/N by stating: "On a fait deux exemples — il faut maintenant trancher : Y ou N."
 
 - **N**: ask "Qu'est-ce qui ne correspond pas a ton intention ?". Capture the divergence. Then:
-  - **Discovery mode**: edit the relevant spec element inline (BAC, VM, guardrail, dependency entry) per the user's correction. Re-distill the item. Re-present.
+  - **Discovery mode**: edit the relevant spec element inline (BAC, VM, guardrail, OOS, Risk, Boundary, NFR target, Security Gate row, etc.) per the user's correction. Re-distill the item. Re-present.
   - **Enrichment mode**: same — edit the composed description inline. Re-distill. Re-present.
-  - If the divergence requires re-doing investigation or modeling (Steps 4-5), stop the gate and HALT with a clear message: "Cette divergence demande une re-investigation. Je propose de retourner a Step 4 (investigate) avant de republier. Confirmes-tu ?"
+  - If the divergence requires re-doing investigation or modeling (Steps 5, 7, or 8), stop the gate and HALT with a clear message: "Cette divergence demande une re-investigation. Je propose de retourner a Step {N} avant de republier. Confirmes-tu ?"
 
 #### 0.4 Gate exit
 
@@ -206,10 +211,16 @@ Present the completion report:
 
 ### Contenu
 
-- Acceptance Criteria : {N} BACs + {N} TACs
-- Taches : {N} applicatives + {N} CI/CD & infra
+- Acceptance Criteria : {N} BACs (G/W/T) + {N} TACs (EARS)
+- Taches : {N} applicatives + {N} CI/CD & infra + {N} observability + {N} security remediation
 - Guardrails : {N}
 - Tests Validation Metier : {N}
+- Out-of-scope : {N} OOS-N items
+- Risks register : {N} risks ({n_high} HIGH-impact)
+- Boundaries triple : {n_always} always / {n_ask} ask first / {n_never} never
+- INVEST : {n_yes}/6 YES
+- Security Gate : {PASS | FAIL with {N} remediation tasks}
+- NFR coverage : {n_present}/7 categories PRESENT
 - Fichiers attendus : {N}
 
 ### Issue Lifecycle
@@ -228,12 +239,12 @@ ou le workflow review-story pour une revue adversariale avant dev.
 
 ---
 
-## STEP EXIT (CHK-STEP-09-EXIT)
+## STEP EXIT (CHK-STEP-13-EXIT)
 
 Avant de transitionner, emettre EXACTEMENT:
 
 ```
-CHK-STEP-09-EXIT PASSED — completed Step 9: Publish to Tracker
+CHK-STEP-13-EXIT PASSED — completed Step 13: Publish to Tracker
   actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
   artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
   next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
@@ -244,4 +255,4 @@ Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait,
 
 ---
 
-**Next:** Read FULLY and apply: `./step-10-cleanup.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+**Next:** Read FULLY and apply: `./step-14-cleanup.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

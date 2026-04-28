@@ -75,15 +75,20 @@ If the diff is empty: return a BLOCKER ("No fix found — empty diff against bas
 
 ### 2. Build Independent Coverage Matrix
 
-Extract from the issue body:
+Extract from the issue body (story-spec v2 schema where applicable — see `~/.claude/skills/bmad-shared/spec-completeness-rule.md`):
 
 - **Root Cause** (one paragraph from the Diagnosis section)
 - **Causal Chain** (Five Whys or equivalent)
 - **Definition of Done** items (product DoD, NOT technical DoD)
-- **Acceptance Criteria**: BAC-1..N (Business) and TAC-1..N (Technical)
+- **Acceptance Criteria**:
+  - **BACs (Business — Given/When/Then)** — each BAC describes the user-observable correction
+  - **TACs (Technical — EARS notation)** — each TAC describes the system-behaviour correction (Ubiquitous / Event-driven / State-driven / Optional / Unwanted)
+- **Out-of-Scope register (OOS-N)** — items the fix MUST NOT touch (typically: similar patterns flagged for awareness only)
 - **Fix Plan** numbered tasks (each with file path + specific change)
 - **Validation Metier** items: VM-1..N (staging tests)
-- **Similar Patterns** (codebase locations flagged for awareness, NOT to fix)
+- **Boundaries Triple — Never Do** — actions the fix must refuse (committed secrets, modified migrations, removed failing tests, `--no-verify`)
+- **Risks register** — risks introduced by the fix (regressions, new failure modes); HIGH-impact risks must have mitigation in the diff
+- **Similar Patterns** (codebase locations flagged for awareness, NOT to fix — overlap with Out-of-Scope register)
 
 For EACH item, mark as one of:
 

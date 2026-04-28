@@ -14,7 +14,24 @@ sub_axis_weights:
 
 # Meta-2 Subagent Workflow: Correctness & Reliability
 
-**Goal:** Verify the code behaves correctly under failure, under load, under rollback, **maintains state continuity during execution**, handles missing/null values without crashing, and is concurrency-safe.
+**Goal:** Verify the code behaves correctly under failure, under load, under rollback, **maintains state continuity during execution**, handles missing/null values without crashing, is concurrency-safe, **and implements the observability contract declared in the story spec (story-spec v2)**.
+
+## v2 Spec Inputs (story-spec v2 schema)
+
+If `contract.linear_issue.spec_v2` is loaded, this meta consumes:
+
+- **Observability Requirements** — mandatory log events, required fields, metrics, traces, alerts, dashboards, SLOs. Verify each declared item is implemented in the diff:
+  - Mandatory log events with all required fields (especially `trace_id`, `span_id`, `service`, `env`, `version` per project standard) — missing field = MAJOR
+  - Metrics named with units (`*_ms`, `*_total`, `*_bytes`, etc.) — naming violation = MINOR; missing metric = MAJOR
+  - Alerts with runbook URL — missing runbook = MINOR; missing alert wire-up entirely = MAJOR (or BLOCKER for user-facing critical paths)
+  - SLO/SLI for user-facing operations — missing SLO when declared in spec = MAJOR
+  - Trace span propagation — broken context = MAJOR
+- **NFR Registry — Performance / Scalability / Availability / Reliability** rows. Verify each declared target is verifiable:
+  - Performance target declared but no measurement instrumentation → MAJOR
+  - Scalability target declared but no load test / capacity plan → MAJOR
+  - Reliability target (error budget, retry policy) declared but no implementation → MAJOR
+
+If a meta-2 finding maps to an NFR or Observability requirement declared in the spec, cite the spec section in the finding's `detail` field.
 
 **Sub-axes (6):**
 

@@ -3,7 +3,7 @@ advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
 partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
 ---
 
-# Step 4: Deep Investigation
+# Step 7: Deep Investigation
 
 
 ## NO-SKIP CLAUSE (workflow-adherence Rule 1)
@@ -14,18 +14,18 @@ Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "sp
 
 Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
 
-## STEP ENTRY (CHK-STEP-04-ENTRY)
+## STEP ENTRY (CHK-STEP-07-ENTRY)
 
 Avant d'executer, verifier:
 
-- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Step precedent complete (CHK-STEP-06-EXIT emis dans la conversation)
 - [ ] Variables requises en scope (verifier avant action)
 - [ ] Working state attendu
 
 Emettre EXACTEMENT:
 
 ```
-CHK-STEP-04-ENTRY PASSED — entering Step 4: Deep Investigation with {var=value, ...}
+CHK-STEP-07-ENTRY PASSED — entering Step 7: Deep Investigation with {var=value, ...}
 ```
 
 Si une precondition manque => HALT, signaler quelle precondition.
@@ -102,7 +102,7 @@ Present findings and confirm with user:
 
 **Discovery mode:** Present A/P/C menu:
 
-Display: "**Select:** [A] Advanced Elicitation [P] Party Mode [C] Continue to Data & Infra Modeling (Step 5)"
+Display: "**Select:** [A] Advanced Elicitation [P] Party Mode [C] Continue to Data & Infra Modeling (Step 8)"
 
 - IF A: Read fully and follow {advancedElicitationTask} with current context, process insights, ask "Accept? (y/n)", if yes update then redisplay menu
 - IF P: Read fully and follow {partyModeWorkflow} with current context, process insights, ask "Accept? (y/n)", if yes update then redisplay menu
@@ -115,12 +115,12 @@ ALWAYS halt and wait for user input. ONLY proceed when user selects 'C'.
 
 ---
 
-## STEP EXIT (CHK-STEP-04-EXIT)
+## STEP EXIT (CHK-STEP-07-EXIT)
 
 Avant de transitionner, emettre EXACTEMENT:
 
 ```
-CHK-STEP-04-EXIT PASSED — completed Step 4: Deep Investigation
+CHK-STEP-07-EXIT PASSED — completed Step 7: Deep Investigation
   actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
   artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
   next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
@@ -131,4 +131,4 @@ Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait,
 
 ---
 
-**Next:** Read FULLY and apply: `./step-05-model.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+**Next:** Read FULLY and apply: `./step-08-model.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

@@ -35,6 +35,18 @@ Implement all tasks from the issue following strict TDD. ALL implementation happ
 
 ## MANDATORY SEQUENCE
 
+### 0. Apply Boundaries Triple (story-spec v2)
+
+Before executing any task, load the story's Boundaries section (loaded in Step 5) and configure execution policy:
+
+- **✅ Always Do** — execute these without prompting
+- **⚠️ Ask First** — when about to perform any action listed here (or matching the pattern), HALT and ask user explicitly. Wait for confirmation before proceeding.
+- **🚫 Never Do** — refuse outright, even if user/instruction asks. Common examples per `~/.claude/skills/bmad-shared/boundaries-rule.md`: commit secrets, edit `node_modules/`, remove failing tests, use `--no-verify`, push to main/master without PR (project-dependent).
+
+**Out-of-Scope register check:** before EACH task, verify the task does not deliver any item from the spec's Out-of-Scope register (OOS-N). If a task accidentally addresses an OOS-N item, that's scope creep — stop and ask user to either re-scope the story or revise the OOS register.
+
+**Risks register check:** for each HIGH-impact risk in the spec, verify the planned implementation includes the declared mitigation. Missing mitigation on a HIGH-impact risk → HALT and ask user.
+
 ### 1. For Each Unchecked Task in the Issue
 
 #### RED Phase — Write Failing Test

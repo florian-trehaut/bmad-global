@@ -62,7 +62,7 @@ Analyze the user's input to determine mode:
 - Load the spec, extract tasks/context/AC
 - Set `{execution_mode}` = "tech-spec"
 - Set `{tech_spec_path}` = provided path
-- **NEXT:** Read fully and follow: `step-03-execute.md`
+- **NEXT:** Read fully and follow: `step-02b-evidence.md` (lightweight Phase B pass before implementation)
 
 **Mode B: Direct Instructions**
 - User provided task description directly
@@ -132,7 +132,7 @@ Present: "This sounds like platform/system work."
 
 **CRITICAL:** When this step completes, explicitly state which step to load:
 
-- Mode A (tech-spec): "**NEXT:** Read fully and follow: `step-03-execute.md`"
+- Mode A (tech-spec): "**NEXT:** Read fully and follow: `step-02b-evidence.md`"
 - Mode B (direct, [E] selected): "**NEXT:** Read fully and follow: `step-02-context-gathering.md`"
 - Escalation ([P] or [W]): "**EXITING Quick Dev.** Follow the directed workflow."
 

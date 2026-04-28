@@ -36,6 +36,15 @@ Present ALL findings at once to the user, then collect decisions on each. Before
 - **PROACTIVE INVESTIGATION (CRITICAL):** Before presenting findings, review each proposed action. If ANY finding proposes multiple options or alternatives (e.g., "Option A: ... or Option B: ..."), you MUST autonomously investigate to determine the best option BEFORE presenting. This means: query databases, read code, search for best practices on the web, check documentation — whatever it takes. Then present a SINGLE recommended action with evidence for why it's the best choice. The user should receive a clear recommendation, not an open question.
 - Track decisions: ACCEPTED / REJECTED / MODIFIED / SKIPPED
 - Do not apply modifications yet — that happens in Step 7
+- **Surface story-spec v2 findings explicitly**, in this order of priority:
+  1. **EARS conformance violations** (TACs not matching one of the 5 patterns / TACs without BAC reference / BACs not in G/W/T) — usually MAJOR
+  2. **Risks register gaps** (HIGH-impact risks without mitigation in scope, INVALIDATED assumptions silently ignored) — usually MAJOR-to-BLOCKER
+  3. **Phase B quality gaps** (shallow Real-Data Findings or External Research on stories that warrant them) — usually MINOR-to-MAJOR
+  4. **Out-of-Scope contradictions** (an OOS-N item that contradicts the in-scope section) — MAJOR
+  5. **Boundary contradictions** (story-specific items contradicting project baseline, or single-item buckets) — MAJOR
+  6. **NFR / Security Gate / Observability quality gaps** (categories left blank without N/A justification, security gate without binary verdict) — MAJOR-to-BLOCKER
+  7. **INVEST self-check failures** (any NO without remediation action) — MAJOR
+  These v2-specific findings are tagged in the table with a `[v2]` label.
 
 ## SEQUENCE
 

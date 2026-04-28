@@ -74,16 +74,22 @@ If the diff is empty: return a BLOCKER ("No implementation found — empty diff 
 
 ### 2. Build Independent Coverage Matrix
 
-Extract from the story:
+Extract from the story (story-spec v2 schema — sections per `bmad-shared/spec-completeness-rule.md`):
 
-- Definition of Done items
+- Definition of Done items (Feature DoD + Non-regression DoD)
 - Scope (Included / Excluded)
-- Business Acceptance Criteria (BAC-1..N)
-- Technical Acceptance Criteria (TAC-1..N)
+- **Out-of-Scope register (OOS-1..N)** — items the implementation MUST NOT deliver
+- Business Acceptance Criteria (BAC-1..N) in Given / When / Then
+- Technical Acceptance Criteria (TAC-1..N) in EARS notation (Ubiquitous / Event-driven / State-driven / Optional / Unwanted)
 - Validation Metier (VM-1..N)
-- Numbered Tasks
+- Numbered Tasks (including [CI/CD], [INFRA], [OBS], [SEC] prefixed)
 - Files to Create / Modify (if listed)
 - Mandatory guardrails
+- **NFR Registry items marked PRESENT or MISSING with remediation tasks**
+- **Security Gate items marked FAIL with remediation tasks**
+- **Observability Requirements** (mandatory log events, metrics, traces, alerts, dashboards, SLOs)
+- **Boundaries Triple** — Always Do / Ask First / Never Do (used to flag boundary violations in the diff)
+- **Risks register** — HIGH-impact risks with mitigation in scope
 
 For EACH item, mark as one of:
 
@@ -91,10 +97,21 @@ For EACH item, mark as one of:
 - `TESTED` — the diff also contains a test exercising it
 - `PARTIAL` — partially delivered (cite what's missing)
 - `MISSING` — not present in the diff
-- `SCOPE_CREEP` — present in the diff but NOT in the story
+- `SCOPE_CREEP` — present in the diff but NOT in the story (cross-check against Out-of-Scope register; if matches an OOS-N item → BLOCKER severity)
+- `BOUNDARY_VIOLATION` — present in the diff and matches a "Never Do" boundary item (BLOCKER severity)
 - `N/A` — meta item (e.g., DoD references) requiring no direct mapping
 
-For the diff, also list any changed files NOT mapped to a story item — these are candidate scope creep.
+For the diff, also list any changed files NOT mapped to a story item — these are candidate scope creep, especially if they touch areas listed in Out-of-Scope.
+
+**TAC pattern coverage check:**
+For each TAC, verify the test scaffold matches the EARS pattern declared in the spec:
+- Ubiquitous → "always" assertion across many fixtures
+- Event-driven → setup + trigger + assert
+- State-driven → state-machine test (pre-state, transition, post-state)
+- Optional → feature-flag conditional test
+- Unwanted → negative test + alert assertion
+
+Mismatch (e.g., Event-driven TAC tested with a single-fixture happy-path test) → MINOR finding.
 
 ### 3. Detect Oversights
 
@@ -108,6 +125,10 @@ Search the codebase for things the IMPLEMENTATION should have addressed:
 - **Tooling**: validators, linters, build scripts may need updates the dev forgot
 - **Tracker entries**: if the project uses a tracker file (e.g., `sprint-status.yaml`), verify the story is reflected there if needed
 - **Migration notes**: if the diff renames a public-ish key (YAML field, enum, API), is there a migration note documented in the diff itself?
+- **NFR remediation**: if the spec NFR Registry has any MISSING/PARTIAL category, verify a remediation task delivered the target — code present at the right place + measurement instrumented
+- **Security remediation**: if the spec Security Gate has any FAIL row, verify the remediation in the diff (code change + audit log + test)
+- **Observability instrumentation**: for each mandatory log event / metric / alert declared in spec, verify the diff implements it (structured log call with required fields, metric registration, alert config)
+- **Boundary Never-Do violations**: scan the diff for any action listed under "🚫 Never Do" in the spec Boundaries section (committed secrets, modified migrations already run, removed failing tests, `--no-verify`, etc.)
 
 ### 4. Identify Risks Not Addressed
 

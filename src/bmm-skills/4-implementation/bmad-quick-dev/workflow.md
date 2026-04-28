@@ -1,6 +1,8 @@
-# Quick Dev Workflow
+# Quick Dev Workflow (v2)
 
-**Goal:** Execute implementation tasks efficiently, either from a tech-spec file or direct user instructions, with built-in escalation routing, adversarial self-review, and finding resolution.
+**Goal:** Execute implementation tasks efficiently, either from a tech-spec file (story-spec v2 quick profile) or direct user instructions, with built-in escalation routing, adversarial self-review, and finding resolution.
+
+**Spec profile:** `bmad-quick-dev` reads/writes specs in the **quick profile** of the v2 schema. For full investigation rigor (real-data confrontation, external research, multi-validator review, Business Comprehension Gate), escalate to `/bmad-create-story` (full profile).
 
 **Your Role:** An elite developer executing tasks autonomously. Follow patterns, ship code, run tests. Every response moves the project forward.
 
@@ -30,7 +32,17 @@ This uses **step-file architecture** for focused execution:
 
 Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
 
-Apply these rules for the entire workflow execution.
+Apply these rules for the entire workflow execution. Key rules for this workflow:
+
+- `no-fallback-no-false-data.md` — Zero Fallback / Zero False Data
+- `evidence-based-debugging.md` — diagnostic integrity
+- `validation-proof-principles.md` — proof standards
+- `validation-verdict-protocol.md` — binary verdict semantics (Security Gate)
+- `workflow-adherence.md` — NO-SKIP discipline + CHK-STEP receipts
+- **`ac-format-rule.md`** — BACs in Given/When/Then; TACs in EARS (5 patterns)
+- **`spec-completeness-rule.md`** — mandatory sections list (story-spec v2 schema, quick profile allows terse N/A on Real-Data Findings + External Research)
+- **`boundaries-rule.md`** — boundaries triple (Always / Ask First / Never)
+- **`knowledge-schema.md`** — schema_version v1.1 expected (with optional sections data-sources / compliance-requirements / observability-standards / nfr-defaults / security-baseline)
 
 ### 2. Configuration Loading (REQUIRED)
 
@@ -38,6 +50,7 @@ Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` — resolve `user_name`, `communication_language`, `user_skill_level`, tracker, forge, quality gate. HALT if missing.
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — conventions (`#conventions`), test rules (`#test-rules`), tech stack (`#tech-stack`), validation tooling (`#validation-tooling`). HALT if missing.
+- **Optional v1.1 sections (additive, no HALT if absent):** `#data-sources`, `#compliance-requirements`, `#observability-standards`, `#nfr-defaults`, `#security-baseline` — used to cross-reference per-story values when the story declares NFR / security / observability requirements.
 
 **Communication:** Always speak in the configured `communication_language`.
 
@@ -47,8 +60,9 @@ Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
 ### 4. Related Workflows
 
-- Escalation to planning: `/bmad-create-story` (story creation/enrichment)
+- Escalation to planning: `/bmad-create-story` (story creation/enrichment, full v2 profile)
 - Escalation to full method: `/bmad-create-prd` (PRD workflow)
+- Spec template (v2 quick profile): `templates/spec-template.md`
 
 ---
 
@@ -59,16 +73,23 @@ Emit EXACTLY this block (filling in actual values you read), then proceed to the
 
 ```
 CHK-INIT PASSED — Initialization complete:
-  shared_rules_loaded: {N} files (list filenames)
+  shared_rules_loaded: {N} files (list filenames, must include ac-format-rule.md, spec-completeness-rule.md, boundaries-rule.md)
   project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
   project_knowledge:
-    - project.md (schema_version: {X})
+    - project.md (schema_version: {X}, expected v1.1+)
     - domain.md ({"loaded" | "not required" | "required-but-missing"})
     - api.md ({"loaded" | "not required" | "required-but-missing"})
+  optional_v1_1_sections:
+    - data-sources: {"present" | "absent"}
+    - compliance-requirements: {"present" | "absent"}
+    - observability-standards: {"present" | "absent"}
+    - nfr-defaults: {"present" | "absent"}
+    - security-baseline: {"present" | "absent"}
   worktree_path: {WORKTREE_PATH or "n/a"}
   team_mode: {true | false}
   user_name: {USER_NAME}
   communication_language: {LANGUAGE}
+  spec_profile: "quick" (use /bmad-create-story for "full" profile)
 ```
 
 ## EXECUTION

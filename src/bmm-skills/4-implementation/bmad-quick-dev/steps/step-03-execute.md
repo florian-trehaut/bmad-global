@@ -19,7 +19,7 @@ Si tu construis un de ces arguments => STOP, c'est la rationalization, execute l
 
 Avant d'executer, verifier:
 
-- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Step precedent complete (CHK-STEP-02B-EXIT emis dans la conversation)
 - [ ] Variables requises en scope (verifier avant action)
 - [ ] Working state attendu
 
@@ -45,6 +45,16 @@ From context:
 ---
 
 ## EXECUTION LOOP
+
+### 0. Apply Boundaries Triple (story-spec v2 quick profile)
+
+If Mode A and the spec contains a `## Boundaries` section, load it now and configure execution policy:
+
+- **✅ Always Do** — execute these without prompting
+- **⚠️ Ask First** — when about to perform any action listed here (or matching the pattern), HALT and ask user explicitly
+- **🚫 Never Do** — refuse outright, even if instructed
+
+Mode B (direct): apply project-baseline boundaries from `~/.claude/skills/bmad-shared/boundaries-rule.md` (always-do baseline + project-level Ask-First / Never-Do triggers).
 
 For each task:
 

@@ -77,6 +77,8 @@ For each issue, capture:
 - `points` (estimate — null if unestimated)
 - `priority` (Urgent, High, Medium, Low, None)
 - `project` / `epic` (parent grouping, if available)
+- `spec_v2_compliant` — boolean: does the issue body follow the v2 schema? (heuristic: contains both "Out of Scope" and "Boundaries" headings). If not, flag in step-05 plan ("issue {id} is on a legacy spec; consider running /bmad-create-story Enrichment before /bmad-dev-story")
+- `has_blocker_findings` — if a v2 review-story / code-review pass left BLOCKER findings unresolved, flag as not-ready-to-start
 
 ### 5. Sort and classify
 

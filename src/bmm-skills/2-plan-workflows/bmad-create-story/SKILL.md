@@ -1,14 +1,16 @@
 ---
 name: bmad-create-story
-description: "Unified story creation and enrichment engine. Discovery mode: conversational spec engineering when no issue exists, captures business context and investigates code to create a new tracker issue. Enrichment mode: loads ALL context (PRD, Architecture, UX, completed stories, git history) and enriches an existing Backlog issue with tasks, guardrails, ACs, and test requirements. Both modes produce implementation-ready stories with deployment chain audit, impact analysis, and validation metier. Use when 'create story', 'enrich story', 'quick spec', 'spec story', 'write spec', 'nouvelle story', 'enrichir story', 'preparer story', 'creer story', 'spec rapide' is mentioned."
+description: "Unified story creation and enrichment engine (story-spec v2). Produces implementation-ready stories with real-data confrontation (provider/DB/cloud), external research (docs/RFC/gotchas), structured NFRs (7 categories), binary security gate, observability requirements, deployment chain audit, impact analysis, BACs in Given/When/Then, TACs in EARS notation, INVEST self-check, out-of-scope register, risks/assumptions register, boundaries triple, and multi-validator review. Discovery mode creates a new tracker issue from conversational spec engineering; Enrichment mode loads full context (PRD, Architecture, UX, completed stories, git history) and enriches an existing Backlog issue. Use when 'create story', 'enrich story', 'spec story', 'write spec', 'nouvelle story', 'enrichir story', 'preparer story', 'creer story' is mentioned."
 disable-model-invocation: true
 ---
 
-# Create Story
+# Create Story (v2)
 
 ## Overview
 
-Unified story creation and enrichment engine. Discovery mode creates a new tracker issue from conversational spec engineering; enrichment mode loads full context (PRD, Architecture, UX, completed stories, git history) and enriches an existing Backlog issue with tasks, guardrails, ACs, and test requirements. Both modes produce implementation-ready stories.
+Unified story creation and enrichment engine producing implementation-ready stories per the **story-spec v2 schema** (`bmad-shared/spec-completeness-rule.md`). The pipeline runs three evidence-gathering steps (access verification → real-data investigation → external research) before any spec content is written, then proceeds through code investigation, modeling, NFR / Security / Observability, audit, plan composition with EARS-formatted technical ACs, and a multi-validator review gate.
+
+Discovery mode creates a new tracker issue from conversational spec engineering; Enrichment mode loads full context (PRD, Architecture, UX, completed stories, git history) and enriches an existing Backlog issue. Both modes share the 14-step pipeline.
 
 ## Conventions
 

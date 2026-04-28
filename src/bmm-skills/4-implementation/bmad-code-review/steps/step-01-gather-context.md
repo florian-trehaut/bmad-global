@@ -149,14 +149,31 @@ Check `adr_location` in `workflow-context.md`. If set, load ADRs from the config
   `{FORGE_CLI} mr list --state closed --search "{ISSUE_IDENTIFIER}"` → extract rejection reasons and prior approaches. Store as `PRIOR_MRS` — if current MR repeats a rejected approach, flag it.
 </check>
 
-### 3.6 Tracker issue
+### 3.6 Tracker issue (story-spec v2)
 
 <check if="LINKED_TRACKER_ISSUE exists">
-  Load full issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`, include relations). Extract Acceptance Criteria, Gherkin scenarios, Test Plan, Validation Métier items. The issue description IS the specs compliance reference.
+  Load full issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`, include relations). The issue description IS the specs compliance reference, structured per the **story-spec v2 schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`).
+
+  Extract these sections (tolerant — missing optional sections noted but do NOT halt; missing mandatory sections produce a meta-1 finding):
+
+  - **BACs** (Given/When/Then) — used by Meta-1 sub-axis 1a (Specs Compliance), parsed as `bacs[]`
+  - **TACs** (EARS notation: Ubiquitous / Event-driven / State-driven / Optional / Unwanted) — used by Meta-1 sub-axis 1a, parsed as `tacs[]` with `pattern` + `refs_bacs`
+  - **Validation Metier (VM-N)** — used by Meta-1 sub-axis 1a (production verification reference)
+  - **Definition of Done** — used by Meta-1
+  - **Out-of-Scope register (OOS-N)** — used by Meta-1 sub-axis 1a for scope-creep detection. ANY change in the diff that delivers an OOS-N item → BLOCKER.
+  - **Boundaries Triple** — used by Meta-1 + Meta-3 to detect violations (especially Never-Do items: committed secrets, modified migrations already run, removed failing tests, `--no-verify`)
+  - **Risks register** — used by Meta-1 sub-axis 1c (Decision Documentation) — verify HIGH-impact risks have mitigation in the diff
+  - **NFR Registry** — informs Meta-1 (target verification) and Meta-2 (perf/scalability/availability checks)
+  - **Security Gate** — feeds Meta-3 (Security & Privacy) directly. FAIL items in spec → Meta-3 verifies remediation in diff
+  - **Observability Requirements** — feeds Meta-2 (Correctness & Reliability) — verify mandatory log events / metrics / alerts implemented
+  - **Real-Data Findings + External Research** — informational context for all metas (do not re-investigate; flag if absent or shallow on stories that warrant them)
+
+  Store as `LINKED_TRACKER_ISSUE.spec_v2` for downstream metas.
 </check>
 
 <check if="no LINKED_TRACKER_ISSUE">
   Log: "No tracker issue linked — Specs Compliance perspective limited to MR description." Parse MR description for ACs.
+  Note: without a v2 spec, Out-of-Scope detection is best-effort (parse MR description for "out of scope" / "non-goals" sections).
 </check>
 
 ---

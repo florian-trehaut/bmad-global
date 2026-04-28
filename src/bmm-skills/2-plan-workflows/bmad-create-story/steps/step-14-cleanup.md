@@ -1,4 +1,4 @@
-# Step 10: Cleanup & Report
+# Step 14: Cleanup & Report
 
 
 ## NO-SKIP CLAUSE (workflow-adherence Rule 1)
@@ -9,18 +9,18 @@ Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "sp
 
 Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
 
-## STEP ENTRY (CHK-STEP-10-ENTRY)
+## STEP ENTRY (CHK-STEP-14-ENTRY)
 
 Avant d'executer, verifier:
 
-- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Step precedent complete (CHK-STEP-13-EXIT emis dans la conversation)
 - [ ] Variables requises en scope (verifier avant action)
 - [ ] Working state attendu
 
 Emettre EXACTEMENT:
 
 ```
-CHK-STEP-10-ENTRY PASSED — entering Step 10: Cleanup & Report with {var=value, ...}
+CHK-STEP-14-ENTRY PASSED — entering Step 14: Cleanup & Report with {var=value, ...}
 ```
 
 Si une precondition manque => HALT, signaler quelle precondition.
@@ -78,12 +78,12 @@ The bmad-create-story workflow is complete.
 
 ---
 
-## STEP EXIT (CHK-STEP-10-EXIT)
+## STEP EXIT (CHK-STEP-14-EXIT)
 
 Avant de transitionner, emettre EXACTEMENT:
 
 ```
-CHK-STEP-10-EXIT PASSED — completed Step 10: Cleanup & Report
+CHK-STEP-14-EXIT PASSED — completed Step 14: Cleanup & Report
   actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
   artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
   next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
@@ -99,9 +99,11 @@ Avant de declarer la tache terminee, emettre EXACTEMENT:
 
 ```
 CHK-WORKFLOW-COMPLETE PASSED — workflow bmad-create-story executed end-to-end:
-  steps_executed: ['01', '02d', '02e', '03', '04', '05', '06', '07', '08', '09', '10']   ← liste TOUS les CHK-STEP-NN-EXIT emis dans CETTE conversation
+  steps_executed: ['01', '02d', '02e', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14']   ← liste TOUS les CHK-STEP-NN-EXIT emis dans CETTE conversation
   steps_skipped: []   ← MUST be empty unless utilisateur a explicitement autorise via citation verbatim
   final_artifacts: {liste finale}
 ```
 
-Si steps_executed != ['01', '02d', '02e', '03', '04', '05', '06', '07', '08', '09', '10'] sequentiel ET steps_skipped sans citation user verbatim => HALT.
+Si steps_executed manque un step (sequentiel: 01 → 02d/02e → 03 → 04 → 05 → 06 → 07 → 08 → 09 → 10 → 11 → 12 → 13 → 14) ET steps_skipped sans citation user verbatim => HALT.
+
+Note: in Discovery mode, '02d' is emitted; in Enrichment mode, '02e' is emitted. Exactly one of the two must appear in steps_executed.

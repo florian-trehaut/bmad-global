@@ -80,6 +80,54 @@ WAIT for user selection.
 
 **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
 
+### 1c. Story-spec v2 Phase B quality audit
+
+create-story v2 produces **Real-Data Findings** (Step 5) and **External Research** (Step 6) BEFORE writing the spec. review-story's job here is NOT to re-do that investigation from scratch — it's to **verify the quality of the work that was done**, then complement it from a fresh perspective.
+
+For Real-Data Findings:
+
+- [ ] Section present in the spec (not "N/A" without justification)
+- [ ] Sources investigated table populated with concrete sources (provider / DB / cloud_logs)
+- [ ] Real samples / query results / log lines included (not just "I checked")
+- [ ] Field-level observations match the data model (Step 8 of create-story) — schema-vs-reality drift addressed in spec
+- [ ] Spec assumptions vs reality table present and complete
+- [ ] INVALIDATED assumptions correctly converted to spec changes (not silently ignored)
+
+If Real-Data Findings is shallow (single sentence, no concrete data), or marked "N/A" without justification on a story that touches real data → **MAJOR finding**: "create-story Phase B was skipped — real-data confrontation is incomplete. Either re-run /bmad-create-story Step 5, or accept the risk explicitly with a recorded waiver."
+
+For External Research:
+
+- [ ] Section present
+- [ ] Official documentation cited with version (not just "the docs")
+- [ ] Best practices linked to specific TACs / NFRs / Risks
+- [ ] Known issues scanned for libs / vendors involved
+- [ ] Search trail visible (queries listed)
+
+If External Research is shallow → **MINOR-to-MAJOR finding** (severity scales with the criticality of the external dependencies).
+
+For NFR Registry (Step 9 of create-story):
+
+- [ ] All 7 categories addressed (PRESENT / MISSING / PARTIAL / N/A justified)
+- [ ] Targets are quantifiable (numbers, not "fast")
+- [ ] N/A categories have 1-line justification
+- [ ] PARTIAL / MISSING categories have remediation tasks in Implementation Plan
+
+For Security Gate:
+
+- [ ] Binary verdict (PASS / FAIL / N/A — no PARTIAL, no PASS-with-caveats)
+- [ ] All checklist items addressed (auth, authz, data exposure, input sanitization, secrets, audit trail, compliance)
+- [ ] FAIL verdicts have remediation tasks
+- [ ] Compliance scope explicit (which standards apply)
+
+For Observability Requirements:
+
+- [ ] Mandatory log events listed with required fields
+- [ ] Metrics named with units (`*_ms`, `*_total`, `*_bytes`, etc.)
+- [ ] Alerts have runbook URL or task to create one
+- [ ] SLO/SLI defined for user-facing operations (or N/A justified)
+
+For Out-of-Scope, Risks Register, Boundaries, INVEST: verify presence, completeness, and absence of contradictions per `~/.claude/skills/bmad-shared/spec-completeness-rule.md`.
+
 ### 2. The production chain hypothesis
 
 **"Works in production" is the hypothesis that matters most.** For each AC, the story implicitly assumes that every link in the production chain exists and is active:

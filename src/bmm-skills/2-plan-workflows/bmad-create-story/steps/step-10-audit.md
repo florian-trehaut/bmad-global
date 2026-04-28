@@ -1,4 +1,4 @@
-# Step 6: Deployment Chain Audit & Impact Analysis
+# Step 10: Deployment Chain Audit & Impact Analysis
 
 
 ## NO-SKIP CLAUSE (workflow-adherence Rule 1)
@@ -9,18 +9,18 @@ Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "sp
 
 Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
 
-## STEP ENTRY (CHK-STEP-06-ENTRY)
+## STEP ENTRY (CHK-STEP-10-ENTRY)
 
 Avant d'executer, verifier:
 
-- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Step precedent complete (CHK-STEP-09-EXIT emis dans la conversation)
 - [ ] Variables requises en scope (verifier avant action)
 - [ ] Working state attendu
 
 Emettre EXACTEMENT:
 
 ```
-CHK-STEP-06-ENTRY PASSED — entering Step 6: Deployment Chain Audit & Impact Analysis with {var=value, ...}
+CHK-STEP-10-ENTRY PASSED — entering Step 10: Deployment Chain Audit & Impact Analysis with {var=value, ...}
 ```
 
 Si une precondition manque => HALT, signaler quelle precondition.
@@ -268,12 +268,12 @@ WAIT for user approval. If user requests scope changes, update and re-present.
 
 ---
 
-## STEP EXIT (CHK-STEP-06-EXIT)
+## STEP EXIT (CHK-STEP-10-EXIT)
 
 Avant de transitionner, emettre EXACTEMENT:
 
 ```
-CHK-STEP-06-EXIT PASSED — completed Step 6: Deployment Chain Audit & Impact Analysis
+CHK-STEP-10-EXIT PASSED — completed Step 10: Deployment Chain Audit & Impact Analysis
   actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
   artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
   next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
@@ -284,4 +284,4 @@ Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait,
 
 ---
 
-**Next:** Read FULLY and apply: `./step-07-plan.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+**Next:** Read FULLY and apply: `./step-11-plan.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

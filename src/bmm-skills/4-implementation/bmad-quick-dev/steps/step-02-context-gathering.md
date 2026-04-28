@@ -142,7 +142,7 @@ Ready to execute? (y/n/adjust)
 ## NEXT STEP DIRECTIVE
 
 When user confirms ready:
-- **y:** "**NEXT:** Read fully and follow: `step-03-execute.md`"
+- **y:** "**NEXT:** Read fully and follow: `step-02b-evidence.md`" (lightweight Phase B pass before execution)
 - **n/adjust:** Continue gathering context, then re-present plan
 
 ---
@@ -163,4 +163,4 @@ Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait,
 
 ---
 
-**Next:** Read FULLY and apply: `./step-03-execute.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+**Next:** Read FULLY and apply: `./step-02b-evidence.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

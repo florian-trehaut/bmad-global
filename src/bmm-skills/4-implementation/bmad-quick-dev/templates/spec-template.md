@@ -3,86 +3,228 @@ title: '{title}'
 type: 'feature' # feature | bugfix | refactor | chore
 created: '{date}'
 status: 'draft' # draft | ready-for-dev | in-progress | in-review | done
-context: [] # optional: `{project-root}/`-prefixed paths to project-wide standards/docs the implementation agent should load. Keep short — only what isn't already distilled into the spec body.
+profile: 'quick' # quick (this template) | full (use bmad-create-story for the full v2 schema)
+context: [] # optional: `{project-root}/`-prefixed paths to project-wide standards/docs the implementation agent should load.
 ---
 
-<!-- Target: 900–1300 tokens. Above 1600 = high risk of context rot.
-     Never over-specify "how" — use boundaries + examples instead.
-     Cohesive cross-layer stories (DB+BE+UI) stay in ONE file.
-     IMPORTANT: Remove all HTML comments when filling this template. -->
+<!--
+  This is the QUICK profile of the story-spec v2 schema (`bmad-shared/spec-completeness-rule.md`).
+  All mandatory sections from v2 are present here, with terse N/A justifications allowed for
+  Real-Data Findings and External Research when the scope is purely internal.
+
+  For complex stories that warrant full investigation (provider data, DB queries, NFR rigor,
+  multi-validator review, Business Comprehension Gate), use `/bmad-create-story` (full profile).
+
+  Target: 1500-2500 tokens for the quick profile. Anything richer = use full profile.
+
+  IMPORTANT: Remove all HTML comments when filling this template.
+-->
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
-## Intent
+## Definition of Done (product)
 
-<!-- What is broken or missing, and why it matters. Then the high-level approach — the "what", not the "how". -->
+**Feature:** {1-line outcome — what the user can observe when this is done}
+**Non-regression:** {1-line — what existing flows must still work}
 
-**Problem:** ONE_TO_TWO_SENTENCES
+## Problem
 
-**Approach:** ONE_TO_TWO_SENTENCES
+{1-2 sentences — what is broken or missing, and why it matters}
 
-## Boundaries & Constraints
+## Proposed Solution
 
-<!-- Three tiers: Always = invariant rules. Ask First = human-gated decisions. Never = out of scope + forbidden approaches. -->
+{1-2 sentences — the high-level approach (the "what", not the "how")}
 
-**Always:** INVARIANT_RULES
+## Scope
 
-**Ask First:** DECISIONS_REQUIRING_HUMAN_APPROVAL
-<!-- Agent: if any of these trigger during execution, HALT and ask the user before proceeding. -->
+**Included:** {bullet list — what's in}
+**Excluded:** {bullet list — what's NOT in}
 
-**Never:** NON_GOALS_AND_FORBIDDEN_APPROACHES
+## Out of Scope (explicit non-goals)
 
-## I/O & Edge-Case Matrix
+| # | Non-goal | Why excluded | Where it might land |
+| - | -------- | ------------ | -------------------- |
+| OOS-1 | {item that a thoughtful reader might EXPECT to be included} | {1-line reason} | {next story / future epic / never} |
+| OOS-2 | {item} | {reason} | {target} |
 
-<!-- If no meaningful I/O scenarios exist, DELETE THIS ENTIRE SECTION. Do not write "N/A" or "None". -->
+## Business Context
 
-| Scenario | Input / State | Expected Output / Behavior | Error Handling |
-|----------|--------------|---------------------------|----------------|
-| HAPPY_PATH | INPUT | OUTCOME | N/A |
-| ERROR_CASE | INPUT | OUTCOME | ERROR_HANDLING |
+### User Journey
+
+**Primary actor:** {persona}
+
+1. {step}
+2. {step}
+N. {expected outcome}
+
+### Business Acceptance Criteria (BACs — Given/When/Then)
+
+- [ ] BAC-1: Given {context}, when {action}, then {observable result}.
+- [ ] BAC-2: Given {context}, when {action}, then {result}.
+
+### External Dependencies & Validation Gates
+
+| Dependency | Owner | Required Action | Gate (blocking?) | Status |
+| ---------- | ----- | --------------- | ---------------- | ------ |
+
+## Real-Data Findings
+
+<!-- Quick mode: terse N/A justification allowed if scope is purely internal (no provider, no DB drift, no cloud logs). Full mode requires full investigation per real-data-findings-template.md. -->
+
+{either: investigation findings (provider samples, DB queries, cloud logs); or: "N/A — {1-line: scope is internal-only, no external data flow"}}
+
+## External Research
+
+<!-- Quick mode: terse N/A justification allowed if no external libs / APIs / protocols are touched. Full mode requires research per external-research-template.md. -->
+
+{either: source citations + key findings; or: "N/A — {1-line: uses only internal utilities, no new external dep"}}
+
+## Technical Context
+
+### Code Map
+
+- `FILE` — ROLE_OR_RELEVANCE
+- `FILE` — ROLE_OR_RELEVANCE
+
+### Technical Decisions
+
+{1-3 bullets — non-obvious technical choices (algorithm, library, pattern)}
 
 </frozen-after-approval>
 
-## Code Map
+## NFR Registry
 
-<!-- Agent-populated during planning. Annotated paths prevent blind codebase searching. -->
+| Category | Requirement | Target | Measurement | Status |
+| -------- | ----------- | ------ | ----------- | ------ |
+| Performance     | {target} | {e.g. < 500ms p95} | {test} | PRESENT / MISSING / PARTIAL / N/A |
+| Scalability     | {target} | {volume / growth} | {test}    | PRESENT / MISSING / PARTIAL / N/A |
+| Availability    | {target} | {SLO}             | {SLI}     | PRESENT / MISSING / PARTIAL / N/A |
+| Reliability     | {target} | {error budget}    | {metric}  | PRESENT / MISSING / PARTIAL / N/A |
+| Security        | see Security Gate below | — | — | (cross-ref) |
+| Observability   | see Observability below | — | — | (cross-ref) |
+| Maintainability | {target} | {coverage / complexity} | {tooling} | PRESENT / MISSING / PARTIAL / N/A |
+| Usability       | {target} | {WCAG / i18n}     | {audit}   | PRESENT / MISSING / PARTIAL / N/A |
 
-- `FILE` -- ROLE_OR_RELEVANCE
-- `FILE` -- ROLE_OR_RELEVANCE
+> All 7 categories must have a status. N/A allowed only with 1-line justification.
 
-## Tasks & Acceptance
+## Security Gate
 
-<!-- Tasks: backtick-quoted file path -- action -- rationale. Prefer one task per file; group tightly-coupled changes when splitting would be artificial. -->
-<!-- If an I/O Matrix is present, include a task to unit-test its edge cases. -->
-<!-- AC covers system-level behaviors not captured by the I/O Matrix. Do not duplicate I/O scenarios here. -->
+**Verdict:** PASS | FAIL | N/A *(N/A requires per-item justification)*
 
-**Execution:**
-- [ ] `FILE` -- ACTION -- RATIONALE
+| Item | Verdict | Evidence / Mitigation |
+| ---- | ------- | --------------------- |
+| Authentication       | PASS / FAIL / N/A | {evidence or "no user input / no auth surface"} |
+| Authorization        | PASS / FAIL / N/A | {evidence} |
+| Data Exposure        | PASS / FAIL / N/A | {evidence} |
+| Input Sanitization   | PASS / FAIL / N/A | {evidence} |
+| Secrets Handling     | PASS / FAIL / N/A | {evidence} |
+| Audit Trail          | PASS / FAIL / N/A | {evidence} |
+| Compliance — applicable | PASS / FAIL / N/A | {GDPR / HIPAA / SOC2 / PCI-DSS / Other / "no regulated data"} |
 
-**Acceptance Criteria:**
-- Given PRECONDITION, when ACTION, then EXPECTED_RESULT
+> ANY item FAIL → gate FAILS → BLOCKING for production. Add remediation tasks in Implementation Plan.
+
+## Observability Requirements
+
+**Mandatory log events:**
+
+| Event | Severity | Required Fields |
+| ----- | -------- | --------------- |
+| {EventName} | INFO | trace_id, ... |
+
+**Metrics:** {list with name + type + labels, OR "N/A — {1-line}"}
+**Traces:** {span propagation + critical spans, OR "N/A"}
+**Alerts:** {alert + trigger + routing + runbook, OR "N/A"}
+**Dashboard:** {URL or "task added to create one" or "N/A"}
+**SLO:** {SLI / target / window, OR "N/A"}
+
+## Implementation Plan
+
+### Tasks
+
+- [ ] Task 1: `FILE` — ACTION — RATIONALE
+- [ ] Task 2: `FILE` — ACTION — RATIONALE
+- [ ] [CI/CD] Task N: {if pipeline changes}
+- [ ] [INFRA] Task M: {if infra changes}
+- [ ] [OBS] Task O: {observability remediation if applicable}
+- [ ] [SEC] Task S: {security remediation if Security Gate FAIL}
+
+### Technical Acceptance Criteria (TACs — EARS)
+
+- [ ] TAC-1 *(Ubiquitous, refs BAC-X)*: The {system} shall {action}.
+- [ ] TAC-2 *(Event-driven, refs BAC-X)*: When {trigger}, the {system} shall {action}.
+- [ ] TAC-3 *(State-driven, refs BAC-X)*: While {state}, the {system} shall {action}.
+- [ ] TAC-4 *(Optional, refs BAC-X)*: Where {feature is enabled}, the {system} shall {action}.
+- [ ] TAC-5 *(Unwanted, refs BAC-X)*: If {undesired condition}, then the {system} shall {action to prevent / handle}.
+
+> Every TAC matches one of the 5 EARS patterns AND references at least one BAC. See `bmad-shared/data/ears-acceptance-criteria-template.md`.
+
+## Guardrails
+
+- {story-specific guardrail}
+- "Do not consider the story complete if schema changes exist without generated migrations"
+- "Do not consider the story complete if a service is not deployable end-to-end via CI/CD"
+- (other mandatory guardrails per `bmad-create-story` step-11 §4 — apply project-wide)
+
+## Validation Metier
+
+- [ ] VM-1 [type] *(BAC-X)*: {concrete production test, expected result}
+- [ ] VM-2 [type] *(BAC-Y)*: {test, result}
+
+> Types: `[api]`, `[db]`, `[e2e]`, `[component]`, `[visual]`, `[responsive]`, `[accessibility]`, `[error-handling]`, `[performance]`, `[cloud_log]`, `[state]`
+
+## Boundaries (Agent Execution Constraints)
+
+### ✅ Always Do
+
+- Run `{project quality command}` before declaring a task complete
+- Follow `project.md#conventions`
+- Use the project's logger (no `console.log`)
+
+### ⚠️ Ask First
+
+- Add a new dependency to package.json
+- Modify CI/CD pipeline files
+- Touch files outside the Code Map
+
+### 🚫 Never Do
+
+- Commit secrets or credentials
+- Use `--no-verify` to skip hooks
+- Remove a failing test to make CI pass
+
+## Risks & Assumptions
+
+### Risks
+
+| ID | Description | Probability | Impact | Mitigation | Validation Method |
+| -- | ----------- | ----------- | ------ | ---------- | ----------------- |
+
+### Assumptions
+
+| ID | Assumption | Source | Validation Status | Validation Method |
+| -- | ---------- | ------ | ----------------- | ----------------- |
+
+## INVEST Self-Check
+
+| Criterion | Answer | Evidence |
+| --------- | ------ | -------- |
+| Independent | YES / NO | {evidence} |
+| Negotiable  | YES / NO | {evidence} |
+| Valuable    | YES / NO | {evidence} |
+| Estimable   | YES / NO | {evidence} |
+| Small       | YES / NO | {evidence} |
+| Testable    | YES / NO | {evidence} |
+
+> ANY NO → fix or split.
 
 ## Spec Change Log
 
-<!-- Append-only. Populated by step-04 during review loops. Do not modify or delete existing entries.
-     Each entry records: what finding triggered the change, what was amended, what known-bad state
-     the amendment avoids, and any KEEP instructions (what worked well and must survive re-derivation).
-     Empty until the first bad_spec loopback. -->
-
-## Design Notes
-
-<!-- If the approach is straightforward, DELETE THIS ENTIRE SECTION. Do not write "N/A" or "None". -->
-<!-- Design rationale and golden examples only when non-obvious. Keep examples to 5–10 lines. -->
-
-DESIGN_RATIONALE_AND_EXAMPLES
+<!-- Append-only. Populated by step-04 during review loops. -->
 
 ## Verification
 
-<!-- If no build, test, or lint commands apply, DELETE THIS ENTIRE SECTION. Do not write "N/A" or "None". -->
-<!-- How the agent confirms its own work. Prefer CLI commands. When no CLI check applies, state what to inspect manually. -->
-
 **Commands:**
-- `COMMAND` -- expected: SUCCESS_CRITERIA
+- `COMMAND` — expected: SUCCESS_CRITERIA
 
-**Manual checks (if no CLI):**
+**Manual checks (if no CLI applies):**
 - WHAT_TO_INSPECT_AND_EXPECTED_STATE

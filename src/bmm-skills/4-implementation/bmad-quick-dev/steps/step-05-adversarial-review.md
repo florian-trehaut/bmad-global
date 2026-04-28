@@ -34,6 +34,22 @@ Si une precondition manque => HALT, signaler quelle precondition.
 From previous steps:
 - `{baseline_commit}` - Git HEAD at workflow start (CRITICAL for diff)
 - `{execution_mode}` - "tech-spec" or "direct"
+- Story-spec v2 sections (Mode A) — surfaced by step-02b: BACs / TACs / Out-of-Scope / NFR / Security Gate / Observability / Boundaries / Risks
+- step-02b warnings — Phase B sections that were shallow or N/A (informational input for the adversarial reviewer)
+
+---
+
+## v2 Spec Audit Context
+
+The adversarial review takes the **story-spec v2 contract** into account:
+
+- **Out-of-Scope items (OOS-N)** — any modification in the diff that delivers an OOS-N item → BLOCKER finding (scope creep into explicit non-goal)
+- **Boundaries Triple — Never-Do** — any action in the diff matching a Never-Do item → BLOCKER (committed secrets, modified migrations already run, removed failing tests, `--no-verify`, etc.)
+- **TAC EARS pattern coverage** — for each TAC declared in the spec, verify the test scaffold matches the EARS pattern (Ubiquitous → "always" assertion; Event-driven → setup+trigger+assert; State-driven → state-machine; Optional → feature-flag conditional; Unwanted → negative test)
+- **Security Gate FAIL items** — verify each remediation task in the spec has a corresponding implementation in the diff
+- **Observability Requirements** — verify mandatory log events / metrics / alerts are wired up
+
+For Mode B (no spec), apply project-baseline boundaries from `~/.claude/skills/bmad-shared/boundaries-rule.md` and the standard adversarial perspectives.
 
 ---
 

@@ -50,11 +50,20 @@ Once the story is provided, extract:
 
 - **Story ID** (set `STORY_ID`)
 - **Story title**
-- **All acceptance criteria** (ACs) — each must be testable
+- **All acceptance criteria** — for story-spec v2:
+  - **BACs (Given/When/Then)** — each must be testable at integration/journey level
+  - **TACs (EARS — 5 patterns)** — each must be testable; the EARS pattern determines the test scaffold:
+    - **Ubiquitous** (`The {system} shall {action}`) → "always" assertion across multiple fixtures
+    - **Event-driven** (`When {trigger}, the {system} shall {action}`) → setup + trigger + assert
+    - **State-driven** (`While {state}, the {system} shall {action}`) → state-machine test (pre-state + transition + post-state)
+    - **Optional** (`Where {feature is enabled}, the {system} shall {action}`) → feature-flag conditional test
+    - **Unwanted** (`If {undesired}, then the {system} shall {action to prevent / handle}`) → negative test + alert assertion
 - **Affected components/systems**
 - **Technical constraints** (if any)
 
-**HALT if:** Story has no acceptance criteria, or criteria are not testable (e.g., "improve performance" without measurable target).
+For legacy specs without v2 BAC/TAC distinction, treat all ACs as generic and use Event-driven scaffold by default.
+
+**HALT if:** Story has no acceptance criteria, or criteria are not testable (e.g., "improve performance" without measurable target). For TACs in EARS format, "not testable" means: pattern cannot be matched to one of the 5, OR action verb is not concrete (e.g., "shall be fast"), OR no observable outcome.
 
 ### 2. Detect test framework
 

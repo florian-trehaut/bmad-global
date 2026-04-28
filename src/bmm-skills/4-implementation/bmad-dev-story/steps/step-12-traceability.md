@@ -38,20 +38,46 @@ Every AC must have at least one test at the level specified in the test strategy
 
 ### 1. Build Traceability Matrix
 
-For each AC in the issue description:
+For each BAC and each TAC in the issue description (story-spec v2: BACs in G/W/T, TACs in EARS):
 
 ```yaml
 traceability:
-  - ac_id: 'AC1'
-    ac_text: '{description}'
+  # Business Acceptance Criteria (G/W/T) — verified by VM (Validation Metier) at production time
+  # AND by integration / journey tests pre-production
+  - ac_id: 'BAC-1'
+    ac_format: 'given-when-then'
+    ac_text: 'Given …, when …, then …'
+    expected_levels: [Integration, Journey]  # from TEST_STRATEGY
+    priority: P0
+    coverage:
+      integration: { status: COVERED | MISSING, tests: ['file.spec.ts:line - test name'] }
+      journey: { status: COVERED | MISSING | N/A, tests: [] }
+      vm: { status: PLANNED, vm_id: 'VM-N' }  # Validation Metier executes at production time
+    overall: FULL | PARTIAL | MISSING
+
+  # Technical Acceptance Criteria (EARS) — verified by unit + integration tests
+  - ac_id: 'TAC-1'
+    ac_format: 'ears'
+    ac_pattern: 'ubiquitous' | 'event-driven' | 'state-driven' | 'optional' | 'unwanted'
+    ac_text: 'When …, the … shall …' (or other EARS pattern)
+    refs_bacs: ['BAC-1', 'BAC-2']
     expected_levels: [Unit, Integration]  # from TEST_STRATEGY
     priority: P0
     coverage:
-      unit: { status: COVERED | MISSING, tests: ['file.spec.ts:line - test name'] }
+      unit: { status: COVERED | MISSING, tests: ['file.spec.ts:line'] }
       integration: { status: COVERED | MISSING, tests: [] }
-      journey: { status: COVERED | MISSING | N/A, tests: [] }
+    pattern_scaffold_match: TRUE | FALSE  # does the test scaffold match the EARS pattern?
     overall: FULL | PARTIAL | MISSING
 ```
+
+**EARS pattern → test scaffold expectation:**
+- Ubiquitous → "always" assertion across multiple fixtures
+- Event-driven → setup + trigger + assert
+- State-driven → state-machine test (pre-state, transition, post-state)
+- Optional → feature-flag conditional test
+- Unwanted → negative test + alert assertion (verify the system DID NOT do the forbidden thing AND emitted the proper alert/error)
+
+If `pattern_scaffold_match` is FALSE → MINOR finding (test exists but doesn't exercise the EARS pattern correctly).
 
 ### 2. Scan Test Files
 
@@ -66,12 +92,28 @@ For each test file, read and match `describe`/`it` blocks to ACs by keyword/inte
 
 ```yaml
 traceability_summary:
-  total_acs: 0
-  fully_covered: 0
-  partially_covered: 0
-  not_covered: 0
+  bacs:
+    total: 0
+    fully_covered: 0
+    partially_covered: 0
+    not_covered: 0
+  tacs:
+    total: 0
+    by_pattern:
+      ubiquitous: { total: 0, covered: 0 }
+      event_driven: { total: 0, covered: 0 }
+      state_driven: { total: 0, covered: 0 }
+      optional: { total: 0, covered: 0 }
+      unwanted: { total: 0, covered: 0 }
+    fully_covered: 0
+    partially_covered: 0
+    not_covered: 0
+    pattern_mismatches: 0  # tests exist but don't match the EARS pattern (MINOR)
   verdict: PASS | GAPS_FOUND
 ```
+
+A BAC without at least one VM (Validation Metier) is a GAP (production verification missing). Surface as MAJOR.
+A TAC with `pattern_scaffold_match: FALSE` is a MINOR finding (test exists but doesn't exercise the EARS pattern correctly).
 
 ### 4. Address Gaps
 

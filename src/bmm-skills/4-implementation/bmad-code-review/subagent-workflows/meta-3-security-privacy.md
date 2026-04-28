@@ -8,7 +8,20 @@ voting: true
 
 # Meta-3 Subagent Workflow: Security & Privacy
 
-**Goal:** Verify the MR does not introduce exploitable vulnerabilities, regulatory violations, or supply-chain risks.
+**Goal:** Verify the MR does not introduce exploitable vulnerabilities, regulatory violations, or supply-chain risks. **Verify the Security Gate declared in the story spec (story-spec v2) is delivered in the diff.**
+
+## v2 Spec Inputs (story-spec v2 schema)
+
+If `contract.linear_issue.spec_v2.security_gate` is loaded:
+
+- **Security Gate verdict** — if PASS in spec, verify the diff does not introduce new security debt that would break PASS status. If FAIL in spec, verify EACH failed item has its remediation implemented in the diff (cite file:line).
+- **Per-item verification** — for each row of the gate (Authentication / Authorization / Data Exposure / Input Sanitization / Secrets Handling / Audit Trail / Compliance — GDPR/HIPAA/SOC2/PCI-DSS):
+  - Spec verdict PASS + diff introduces a new gap → BLOCKER
+  - Spec verdict FAIL + remediation task present + diff implements remediation correctly → COMPLIANT
+  - Spec verdict FAIL + diff does NOT implement remediation → BLOCKER
+  - Spec verdict N/A → verify the justification still holds (the diff doesn't add a new attack surface that would invalidate the N/A)
+- **Compliance scope** — if `contract.linear_issue.spec_v2.security_gate.compliance` lists GDPR/HIPAA/SOC2/PCI-DSS, ensure the diff respects the corresponding controls (audit trail, encryption, retention, etc.). Compliance violation in scope → BLOCKER (regulatory).
+- **Project security baseline** — if `project.md#security-baseline` exists, cross-reference the diff against the baseline. Deviation without ADR coverage = MAJOR.
 
 **Sub-axes (4):**
 

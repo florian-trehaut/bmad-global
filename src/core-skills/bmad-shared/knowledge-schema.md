@@ -1,5 +1,5 @@
 ---
-schema_version: "1.0"
+schema_version: "1.1"
 schema_status: stable
 
 # ============================================================
@@ -92,6 +92,32 @@ files:
         title: "Communication Platform"
         description: "Slack, Teams, Discord, etc. — handle and MCP prefix"
         required: false
+      # ----- v1.1 additions (story-spec v2 schema) -----
+      - id: data-sources
+        anchor: "data-sources"
+        title: "Data Sources"
+        description: "DB hosts, provider systems (SFTP/FTP/API), cloud platforms accessible to this project — read by step-04 access-verification"
+        required: false
+      - id: compliance-requirements
+        anchor: "compliance-requirements"
+        title: "Compliance Requirements"
+        description: "Project-wide compliance constraints (GDPR, HIPAA, SOC2, PCI-DSS, ...) — read by step-09 security gate"
+        required: false
+      - id: observability-standards
+        anchor: "observability-standards"
+        title: "Observability Standards"
+        description: "Default log fields, metric naming conventions, SLO baselines — read by step-09 observability requirements"
+        required: false
+      - id: nfr-defaults
+        anchor: "nfr-defaults"
+        title: "NFR Defaults"
+        description: "Project-wide NFR baselines (perf p95, scalability targets, availability SLO, ...) — read by step-09 NFR registry"
+        required: false
+      - id: security-baseline
+        anchor: "security-baseline"
+        title: "Security Baseline"
+        description: "Project-wide auth/authz patterns, secret management approach, audit policy — read by step-09 security gate"
+        required: false
 
   domain:
     path: "{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md"
@@ -167,9 +193,15 @@ direct_reference_allowed:
   - review-perspectives       # code-review skill specifics
   - investigation-checklist   # troubleshoot / review-story specifics
   - communication-platform    # daily-planning, comm-platform handles
+  # ----- v1.1 additions (story-spec v2 schema, low-consumption) -----
+  - data-sources              # create-story / quick-dev step-04 access-verification
+  - compliance-requirements   # create-story / code-review meta-3 / quick-dev
+  - observability-standards   # create-story step-09 / code-review meta-2 / quick-dev
+  - nfr-defaults              # create-story step-09 / quick-dev
+  - security-baseline         # create-story step-09 / code-review meta-3 / quick-dev
 ---
 
-# Knowledge Schema — v1.0
+# Knowledge Schema — v1.1
 
 This document is the **single source of truth** for the project knowledge layout consumed by all bmad-\* workflow skills. It defines:
 
@@ -252,13 +284,27 @@ This pattern is documented in:
 
 | Change | Effect on `schema_version` |
 |--------|----------------------------|
-| Add a new optional section | minor bump (1.0 → 1.1) |
+| Add a new optional section | minor bump (1.0 → 1.1, 1.1 → 1.2, …) |
 | Add a new file | minor bump |
 | Add a new protocol | minor bump |
 | Rename a section anchor / id | **MAJOR bump** (1.x → 2.0) — breaking |
 | Remove a section | **MAJOR bump** — breaking |
 | Make an optional section required | **MAJOR bump** — breaking |
 | Tighten constraints (regex, type) on existing field | **MAJOR bump** — breaking |
+
+### v1.0 → v1.1 changelog (story-spec v2 schema)
+
+Five new optional sections added to `project.md` to support the story-spec v2 schema (real-data confrontation + NFR + security gate + observability + compliance):
+
+- `data-sources` — accessible DB / providers / cloud platforms (consumed by step-04 access-verification in create-story / quick-dev)
+- `compliance-requirements` — GDPR / HIPAA / SOC2 / PCI-DSS / project-specific (consumed by step-09 security gate)
+- `observability-standards` — log fields, metric naming, SLO baselines (consumed by step-09 observability requirements)
+- `nfr-defaults` — project-wide NFR baselines (consumed by step-09 NFR registry)
+- `security-baseline` — project-wide auth/authz/secret patterns (consumed by step-09 security gate)
+
+All five are **optional** — projects that do not declare them simply produce per-story values without baseline cross-reference. Bundled workflows that consume them read defensively (no HALT if section absent).
+
+`bmad-knowledge-bootstrap` and `bmad-knowledge-refresh` will, on next run, ask the user whether to populate these sections (skippable per section).
 
 Bumping MAJOR requires:
 1. Updating `bmad-knowledge-bootstrap` to emit the new schema_version.

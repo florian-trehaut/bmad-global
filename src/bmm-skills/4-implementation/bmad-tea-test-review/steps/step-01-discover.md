@@ -106,8 +106,13 @@ Search for related artifacts that provide review context:
 - **Test design document**: Look for a test-design artifact that defines priorities (P0/P1/P2/P3) for the tests under review
 
 If found, extract:
-- Acceptance criteria from the story (for coverage gap analysis)
+- **Acceptance criteria from the story** (for coverage gap analysis):
+  - **BACs (Given/When/Then)** — track separately; coverage by integration / journey tests
+  - **TACs (EARS — Ubiquitous / Event-driven / State-driven / Optional / Unwanted)** — track separately; coverage by unit / integration tests; verify the test scaffold matches the EARS pattern (mismatch = MINOR finding)
+  - For legacy specs without v2 BAC/TAC distinction, fall back to generic AC extraction
 - Priority assignments from the test-design (P0/P1/P2/P3)
+- **NFR Registry rows declaring measurable targets** (e.g. Performance p95 < 500ms) — flag absence of corresponding test/measurement as a coverage gap
+- **Observability mandatory log events** — flag absence of corresponding test asserting log emission as a coverage gap
 
 These are optional — the review proceeds without them, but coverage analysis will be less precise.
 

@@ -44,7 +44,27 @@ Fetch the issue from the tracker (using CRUD patterns from workflow-knowledge/pr
 
 Store:
 - ISSUE_ID, ISSUE_IDENTIFIER, ISSUE_TITLE, PROJECT_NAME, PROJECT_ID
-- The issue description IS the story — it contains tasks, AC, guardrails
+- The issue description IS the story — it contains, per the **story-spec v2 schema** (see `~/.claude/skills/bmad-shared/spec-completeness-rule.md`):
+  - Definition of Done (Feature + Non-regression)
+  - Problem / Proposed Solution / Scope (Included/Excluded) / **Out of Scope (OOS-N)**
+  - Business Context (User Journey + BACs in Given/When/Then + External Dependencies)
+  - Technical Context (in `<details>` collapsible)
+  - **Real-Data Findings** (or N/A justified)
+  - **External Research** (or N/A justified)
+  - Data Model / API Contracts / Infrastructure / External Data Interface Contracts / Data Mapping (conditional)
+  - **NFR Registry** (7 categories)
+  - **Security Gate** (binary verdict)
+  - **Observability Requirements** (logs / metrics / traces / alerts / dashboards / SLOs)
+  - Implementation Plan (Tasks + TACs in EARS notation)
+  - Guardrails
+  - Validation Metier (VM-N)
+  - **Boundaries Triple** (Always Do / Ask First / Never Do)
+  - **Risks & Assumptions Register**
+  - **INVEST Self-Check**
+  - Test Strategy
+  - File List
+
+Tolerant parsing: missing optional sections are noted but do NOT halt the workflow. Missing mandatory sections (per spec-completeness-rule.md) → HALT and prompt user to either fix the spec or grant explicit waiver.
 
 ### 2. Derive Names
 

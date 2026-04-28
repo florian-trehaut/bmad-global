@@ -37,7 +37,29 @@ Load the project context (source of truth for dev standards) and check for cross
 
 ### 1. Load Issue Description
 
-The issue description (loaded from tracker in Step 2) IS the story — it contains tasks, AC, guardrails.
+The issue description (loaded from tracker in Step 2) IS the story (story-spec v2 schema) — it contains tasks, BACs (G/W/T), TACs (EARS), guardrails, NFR registry, Security Gate, Observability Requirements, Boundaries Triple, Risks register, Out-of-Scope, INVEST self-check, plus all standard sections.
+
+**Surface v2 sections explicitly to the dev** (display before implementation begins):
+
+```
+## Story v2 Spec Snapshot
+
+- BACs: {N} (Given/When/Then format)
+- TACs: {N} EARS-formatted (Ubiquitous: {n}, Event-driven: {n}, State-driven: {n}, Optional: {n}, Unwanted: {n})
+- Tasks: {N} (incl. {n_cicd} [CI/CD], {n_infra} [INFRA], {n_obs} [OBS], {n_sec} [SEC] prefixed)
+- Out-of-Scope: {N} OOS-N items — modifications matching these → BLOCKER
+- Boundaries Triple:
+  - ✅ Always Do: {N} items
+  - ⚠️ Ask First: {N} items — STOP and ask before executing
+  - 🚫 Never Do: {N} items — refuse, even if asked
+- Security Gate verdict: {PASS | FAIL with {N} remediation tasks}
+- NFR Registry: {n_present}/7 PRESENT, {n_partial}/7 PARTIAL, {n_missing}/7 MISSING
+- Observability requirements: {N} mandatory log events, {N} metrics, {N} alerts
+- Risks: {N} ({n_high} HIGH-impact)
+- INVEST: {n_yes}/6 YES
+```
+
+If the spec is missing v2 mandatory sections (per `~/.claude/skills/bmad-shared/spec-completeness-rule.md`), HALT and prompt the user to either fix the spec via `/bmad-create-story` (Enrichment mode) or grant explicit waiver per section.
 
 ### 2. Load Project Context
 

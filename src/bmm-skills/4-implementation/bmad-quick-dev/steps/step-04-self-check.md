@@ -45,10 +45,17 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 ### 3. Acceptance Criteria Satisfied
 
-For each AC:
-- [ ] AC is demonstrably met
-- [ ] Can explain how implementation satisfies AC
+For each BAC (Given / When / Then):
+- [ ] BAC is demonstrably met
+- [ ] Can explain how implementation satisfies it
 - [ ] Edge cases considered
+
+For each TAC (EARS pattern):
+- [ ] Ubiquitous TACs verified by always-true assertions
+- [ ] Event-driven TACs verified by trigger + assert tests
+- [ ] State-driven TACs verified by state-machine tests (pre + transition + post)
+- [ ] Optional TACs verified under feature-flag conditional tests
+- [ ] Unwanted TACs verified by negative tests + alert assertions
 
 ### 4. Patterns Followed
 
@@ -56,6 +63,22 @@ For each AC:
 - [ ] Follows project rules from workflow-knowledge (if exists)
 - [ ] Error handling consistent with codebase
 - [ ] No forbidden patterns introduced
+
+### 4b. Spec v2 Quick Profile Compliance (when Mode A — tech-spec present)
+
+If `{execution_mode}` is "tech-spec" and the spec follows the v2 quick profile:
+
+- [ ] BACs use Given/When/Then format (per `bmad-shared/ac-format-rule.md`)
+- [ ] TACs use one of the 5 EARS patterns AND reference at least one BAC
+- [ ] Security Gate items addressed in implementation (auth, authz, input sanitization, secrets handling); if any FAIL in spec → remediation tasks completed
+- [ ] Observability requirements implemented (mandatory log events with structured fields, metrics, alerts as declared)
+- [ ] NFR targets that apply (performance, scalability) verified by measurement (see Section 5)
+- [ ] Boundaries Triple respected:
+  - All ✅ Always-Do items executed
+  - All ⚠️ Ask-First items had explicit user approval before execution
+  - No 🚫 Never-Do items violated
+- [ ] Out-of-Scope items NOT delivered (no scope creep into OOS-N register)
+- [ ] Risks register: HIGH-impact risks have their mitigation in the diff (or explicit deferral with user approval)
 
 ### 5. Performance Verification (if applicable)
 

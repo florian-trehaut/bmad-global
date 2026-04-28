@@ -8,7 +8,7 @@ externalInterfaceTemplate: '~/.claude/skills/bmad-shared/data/external-interface
 dataMappingTemplate: '~/.claude/skills/bmad-shared/data/data-mapping-template.md'
 ---
 
-# Step 5: Data Model, API, Infrastructure & External Interfaces
+# Step 8: Data Model, API, Infrastructure & External Interfaces
 
 
 ## NO-SKIP CLAUSE (workflow-adherence Rule 1)
@@ -19,18 +19,18 @@ Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "sp
 
 Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
 
-## STEP ENTRY (CHK-STEP-05-ENTRY)
+## STEP ENTRY (CHK-STEP-08-ENTRY)
 
 Avant d'executer, verifier:
 
-- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Step precedent complete (CHK-STEP-07-EXIT emis dans la conversation)
 - [ ] Variables requises en scope (verifier avant action)
 - [ ] Working state attendu
 
 Emettre EXACTEMENT:
 
 ```
-CHK-STEP-05-ENTRY PASSED — entering Step 5: Data Model, API, Infrastructure & External Interfaces with {var=value, ...}
+CHK-STEP-08-ENTRY PASSED — entering Step 8: Data Model, API, Infrastructure & External Interfaces with {var=value, ...}
 ```
 
 Si une precondition manque => HALT, signaler quelle precondition.
@@ -41,10 +41,12 @@ Assess data model changes, API contracts, infrastructure requirements, and exter
 
 ## RULES
 
-- Focus on structural assessment — not generating implementation tasks yet (that's Step 7)
+- Focus on structural assessment — not generating implementation tasks yet (that's Step 11)
 - Sections 1-3 are independent — launch in parallel when subprocess available
 - Use subprocess per ORM/schema type when available
 - Every "existant" claim must be VERIFIED in the codebase at {SPEC_WORKTREE_PATH}
+- **Cross-reference Real-Data Findings (Step 5)** for any field-level claim — schema files lie, real data does not. If Step 5 flagged a schema-vs-reality drift, this step MUST encode it (new column, expanded enum, NULL handling, etc.).
+- **Cross-reference External Research (Step 6)** for protocol / library / API contract claims — cite the source URL and version captured in Step 6.
 
 ## SEQUENCE
 
@@ -149,7 +151,7 @@ WAIT for user feedback. Address any corrections.
 
 **Discovery mode:** Present A/P/C menu:
 
-Display: "**Select:** [A] Advanced Elicitation [P] Party Mode [C] Continue to audit & impact analysis (Step 6)"
+Display: "**Select:** [A] Advanced Elicitation [P] Party Mode [C] Continue to NFR / Security Gate / Observability (Step 9)"
 
 - IF A: Read fully and follow {advancedElicitationTask}, process insights, ask "Accept? (y/n)", update then redisplay menu
 - IF P: Read fully and follow {partyModeWorkflow}, process insights, ask "Accept? (y/n)", update then redisplay menu
@@ -162,12 +164,12 @@ ALWAYS halt and wait for user input. ONLY proceed when user selects 'C'.
 
 ---
 
-## STEP EXIT (CHK-STEP-05-EXIT)
+## STEP EXIT (CHK-STEP-08-EXIT)
 
 Avant de transitionner, emettre EXACTEMENT:
 
 ```
-CHK-STEP-05-EXIT PASSED — completed Step 5: Data Model, API, Infrastructure & External Interfaces
+CHK-STEP-08-EXIT PASSED — completed Step 8: Data Model, API, Infrastructure & External Interfaces
   actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
   artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
   next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
@@ -178,4 +180,4 @@ Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait,
 
 ---
 
-**Next:** Read FULLY and apply: `./step-06-audit.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+**Next:** Read FULLY and apply: `./step-09-nfr-security-observability.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

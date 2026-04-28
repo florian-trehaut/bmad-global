@@ -66,35 +66,79 @@ review_contract:
 
 "Does the code do what was asked — in production, not just in tests?"
 
-### AC Coverage
+### AC Coverage (story-spec v2 — separated BAC + TAC)
 
-For EACH acceptance criterion in `contract.linear_issue.acceptance_criteria`:
+For EACH BAC (Given/When/Then) AND each TAC (EARS) in `contract.linear_issue.spec_v2`:
 
 ```yaml
 ac_coverage:
-  - ac_id: 'AC1'
-    ac_text: '{text}'
-    implemented: true | false
-    implementation_location: 'file.ts:line'
-    tested: true | false
-    test_location: 'file.spec.ts:line'
-    status: 'COMPLIANT' | 'PARTIAL' | 'NOT_IMPLEMENTED'
+  bacs:
+    - ac_id: 'BAC-1'
+      ac_format: 'given-when-then'
+      ac_text: 'Given …, when …, then …'
+      implemented: true | false
+      implementation_location: 'file.ts:line'
+      tested: true | false        # integration / journey test that exercises the BAC
+      test_location: 'file.spec.ts:line'
+      vm_planned: true | false    # Validation Metier scheduled for production verification
+      vm_id: 'VM-N'
+      status: 'COMPLIANT' | 'PARTIAL' | 'NOT_IMPLEMENTED'
+
+  tacs:
+    - ac_id: 'TAC-1'
+      ac_format: 'ears'
+      ac_pattern: 'ubiquitous' | 'event-driven' | 'state-driven' | 'optional' | 'unwanted'
+      ac_text: 'When …, the … shall …' (or other EARS pattern)
+      refs_bacs: ['BAC-1', 'BAC-2']
+      implemented: true | false
+      implementation_location: 'file.ts:line'
+      tested: true | false
+      test_location: 'file.spec.ts:line'
+      pattern_scaffold_match: true | false  # does the test scaffold match the EARS pattern?
+      status: 'COMPLIANT' | 'PARTIAL' | 'NOT_IMPLEMENTED'
 ```
+
+**EARS pattern → expected test scaffold (verify match):**
+- Ubiquitous → "always" assertion across multiple fixtures
+- Event-driven → setup + trigger + assert
+- State-driven → state-machine test (pre-state + transition + post-state)
+- Optional → feature-flag conditional test
+- Unwanted → negative test + alert assertion (verify the system DID NOT do the forbidden thing AND emitted the proper alert)
+
+`pattern_scaffold_match: false` → MINOR finding (test exists but doesn't exercise the EARS pattern correctly).
 
 ### NOT_IMPLEMENTED triggers (BLOCKER)
 
-An AC is NOT_IMPLEMENTED if ANY of these is true:
+An AC (BAC or TAC) is NOT_IMPLEMENTED if ANY of these is true:
 - Code exists but a dependency is disabled in production
 - Code exists but nothing triggers it in production
 - Code exists but the downstream service/template it calls does not exist
 - Code exists but a required config/secret is missing from deployment config
 - Code exists but a migration must run first and there is no migration
 
-### Scope analysis
+### Scope analysis (extended for v2 Out-of-Scope)
 
-- **Scope creep** (MORE than asked) → QUESTION
+- **Scope creep** (MORE than asked) → QUESTION (or BLOCKER if it matches an OOS-N item from the spec's Out-of-Scope register)
 - **Missing** (LESS than asked) → BLOCKER
 - **Deviation** (SOMETHING ELSE) → BLOCKER
+- **Out-of-Scope violation** — diff delivers an item explicitly listed under `## Out of Scope` → **BLOCKER** (story spec contract violated; either re-scope the story or split the diff)
+
+### Boundary violations (story-spec v2)
+
+Scan the diff for actions that match items in the spec's `🚫 Never Do` section of the Boundaries Triple:
+- Committed secrets / API keys / tokens / `.env` files
+- Edits to `node_modules/`, `vendor/`, `dist/`, generated directories
+- Removed failing tests
+- `--no-verify` / `--no-gpg-sign` in commits
+- Pushes to `main`/`master` without PR (project-dependent — verify per workflow-context.md)
+
+Each match → **BLOCKER** finding.
+
+### Risks register cross-check
+
+For each HIGH-impact risk in `contract.linear_issue.spec_v2.risks_register`:
+- Verify the declared mitigation is implemented in the diff (cite file:line)
+- If mitigation is absent and the risk is still HIGH/HIGH → **BLOCKER**
 
 ### Regression-risk cross-reference
 

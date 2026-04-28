@@ -6,6 +6,12 @@ Display: `Orientation → [Walkthrough] → Detail Pass → Testing`
 
 - Organize by **concern**, not by file. A concern is a cohesive design intent — e.g., "input validation," "state management," "API contract." One file may appear under multiple concerns; one concern may span multiple files.
 - The walkthrough activates **design judgment**, not correctness checking. Frame each concern as "here's what this change does and why" — the human evaluates whether it's the right approach for the system.
+- **Story-spec v2 awareness** — when walking through a story implemented per the v2 schema (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`), inform the concern grouping with these spec sections (read but do not parse strictly):
+  - **Out-of-Scope register** — call out if the diff approaches an OOS-N item (suggests scope creep risk)
+  - **Boundaries Triple — Never Do** — call out if a concern touched a Never-Do area
+  - **Risks register HIGH-impact** — surface as a "design decision" concern: how was the risk mitigated in the diff?
+  - **TAC EARS patterns** — group concerns by EARS pattern when relevant (Ubiquitous-driven changes vs Event-driven vs State-driven, etc.)
+  These are informational hints, not strict requirements — the walkthrough remains diff-driven.
 
 ## BUILD THE WALKTHROUGH
 

@@ -39,6 +39,12 @@ Present: "How would you like to handle these findings?"
 
 ALWAYS halt and wait for user input.
 
+## BLOCKER findings — non-skippable
+
+Findings flagged BLOCKER from the v2 spec audit (scope creep into Out-of-Scope, Boundaries Never-Do violation, missing Security Gate remediation, broken EARS pattern coverage on tested TACs) cannot be Skipped. The user must Fix or Walk-through them. If the user attempts [S] on a BLOCKER, refuse and re-present the menu with only [W] and [F] available for those findings.
+
+This mirrors create-story step-12 multi-validator semantics (no BLOCKER → Step 13 publication).
+
 ---
 
 ## WALK THROUGH [W]

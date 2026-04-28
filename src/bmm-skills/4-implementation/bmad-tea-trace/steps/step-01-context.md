@@ -49,19 +49,24 @@ Set `GATE_TYPE` accordingly. Default: `story`.
 
 WAIT for user response if not already specified.
 
-### 2. Load acceptance criteria
+### 2. Load acceptance criteria (story-spec v2 aware)
 
 **If user specifies a story or requirement source:**
 
-Read the file or tracker issue. Extract all acceptance criteria (ACs). Each AC gets an ID (e.g., `AC-01`, `AC-02`).
+Read the file or tracker issue. If the story follows the **story-spec v2 schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`), distinguish two AC types:
+
+- **BACs (Business Acceptance Criteria)** — Given/When/Then format. Assign IDs `BAC-01`, `BAC-02`, ... — these are verified at production time by Validation Metier (VM-N) AND by integration / journey tests pre-production.
+- **TACs (Technical Acceptance Criteria)** — EARS notation (Ubiquitous / Event-driven / State-driven / Optional / Unwanted). Assign IDs `TAC-01`, `TAC-02`, ... and capture the EARS pattern + the BAC reference (`refs_bacs: [BAC-1, BAC-2]`) for each.
+
+If the story does NOT follow v2 (legacy spec or third-party requirement source), fall back to generic `AC-01`, `AC-02`, ... extraction.
 
 **If user provides inline requirements:**
 
-Number them as `AC-01`, `AC-02`, etc.
+Number them as `AC-01`, `AC-02`, ... (or BAC/TAC if the user explicitly provides v2-formatted criteria).
 
 **If gate type is epic or release:**
 
-Gather ACs from all stories/requirements in scope. Group by story/feature.
+Gather BACs and TACs from all stories/requirements in scope. Group by story/feature. Maintain BAC/TAC type information for the coverage matrix.
 
 **HALT if no ACs found:** "No acceptance criteria available. Provide a story file, tracker issue, or inline requirements."
 
