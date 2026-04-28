@@ -329,6 +329,10 @@ Find channel ID via `mcp__slack__channels_list` with `channel_types: "mpim,im,pu
 
 #### 10.2 Slack post template
 
+**Cardinal rule**: the Slack post mirrors the **full** CHANGELOG.md entry, transposed to mrkdwn. Same themes, same description paragraphs, same bullet density. Slack readers should not need to click through to the changelog URL to get a complete picture of the release. Do **not** truncate, do **not** summarise, do **not** drop themes — Slack messages are immutable, an under-detailed post cannot be fixed.
+
+The only Slack-specific additions versus CHANGELOG.md are: (a) header with package + registry, (b) install commands, (c) post-upgrade commands, (d) a tail link to the full changelog (kept as a courtesy, not as an excuse to abridge).
+
 Post a structured message using the mrkdwn template below. Each section is either always present (★) or conditional on data availability.
 
 ```
@@ -344,22 +348,48 @@ Post a structured message using the mrkdwn template below. Each section is eithe
                • `/{command_1}` — {description_1}
                • `/{command_2}` — {description_2}
 
-★ Highlight (top theme from impact-weighted ordering 5.2):
-             :fire: *{top_theme_title}*
-             {1-2 sentence teaser}
+★ Highlight (top theme from impact-weighted ordering 5.2 — full detail):
+             :fire: *Highlight — {top_theme_title}*
+             {full description paragraph from CHANGELOG, can be multi-sentence}
+               • {bullet 1 — full sentence, same as CHANGELOG}
+               • {bullet 2}
+               • {bullet 3}
+               • ... (every bullet from the CHANGELOG section, no truncation)
+
+◇ Themes   (every other theme with impact_score ≥ 10% of max — full detail,
+            one block per theme, in descending impact order):
+             :sparkles: *{theme_2_title}*
+             {full description paragraph from CHANGELOG}
                • {bullet 1}
                • {bullet 2}
-               • {bullet 3-5}
+               • ... (every bullet from the CHANGELOG section)
 
-◇ Other    (themes with impact_score ≥ 10% of max, compact form):
+             :wrench: *{theme_3_title}*
+             {full description paragraph from CHANGELOG}
+               • ... (every bullet)
+
+             (continue for theme_4, theme_5, ...)
+
+◇ Minor    (themes with impact_score < 10% of max, compact form — only when
+            CHANGELOG itself groups them under "Other changes"):
              *Other changes*
-               • {theme 2}: {one-line summary}
-               • {theme 3}: {one-line summary}
+               • {minor theme}: {one-line summary, same as CHANGELOG}
+
+◇ Breaking (only if any ⚠️ BREAKING bullets in CHANGELOG):
+             :warning: *Breaking changes*
+               • {breaking change 1 — full sentence}
+               • {breaking change 2}
+
+◇ Patterns (only if CHANGELOG entry includes a "Patterns applied" block):
+             *Patterns applied*
+             {comma-separated list, same as CHANGELOG}
 
 ★ Link     : Full changelog: {changelog_url}
 ```
 
-Legend: ★ = always include, ◇ = conditional.
+Legend: ★ = always include, ◇ = conditional on the corresponding section existing in the CHANGELOG entry being posted.
+
+**Faithfulness check** before sending: open `CHANGELOG.md`, count themes and bullets in the new entry, verify the Slack draft has the same theme count and the same bullet count per theme. Mismatch = revise the draft, not the changelog.
 
 Derive commands and URLs automatically:
 
