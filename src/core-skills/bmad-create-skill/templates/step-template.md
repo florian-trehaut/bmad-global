@@ -9,6 +9,30 @@ Use this template when generating step files for a new bmad-* skill.
 ````markdown
 # Step {N}: {Descriptive Name}
 
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-{NN}-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-{NN}-ENTRY PASSED — entering Step {N}: {Descriptive Name} with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL
 
 {One paragraph describing what this step accomplishes and why it matters in the workflow.}
@@ -48,7 +72,22 @@ WAIT for user confirmation. Apply any corrections.
 
 ---
 
-**Next:** Read fully and follow `./steps/step-{NN}-{name}.md`
+## STEP EXIT (CHK-STEP-{NN}-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-{NN}-EXIT PASSED — completed Step {N}: {Descriptive Name}
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.
+
+---
+
+**Next:** Read FULLY and apply: `./steps/step-{NN}-{name}.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
 ````
 
 ---
@@ -74,9 +113,24 @@ Include the CHECKPOINT section. Always:
 
 ### Final Step
 
-Replace the NEXT section with:
+Replace the NEXT section with the WORKFLOW-COMPLETE block:
 
 ```markdown
+---
+
+## WORKFLOW EXIT (CHK-WORKFLOW-COMPLETE)
+
+Avant de declarer la tache terminee, emettre EXACTEMENT:
+
+\`\`\`
+CHK-WORKFLOW-COMPLETE PASSED — workflow bmad-{name} executed end-to-end:
+  steps_executed: ['01', '02', ..., '{N}']
+  steps_skipped: []   ← MUST be empty unless utilisateur a explicitement autorise via citation verbatim
+  final_artifacts: {liste finale}
+\`\`\`
+
+Si steps_executed != ['01', '02', ..., '{N}'] sequentiel ET steps_skipped sans citation user verbatim => HALT.
+
 ---
 
 ## END OF WORKFLOW

@@ -4,6 +4,31 @@ nextStepFile: './step-11-component-strategy.md'
 
 # Step 10: User Journey Flows
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-10-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-10-ENTRY PASSED — entering Step 10: User Journey Flows with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL
 
 Design detailed user journey flows for critical user interactions. Build on PRD user journeys to design the mechanics of how each journey works, with Mermaid flow diagrams.
@@ -146,3 +171,18 @@ Prepare content to append to the document:
 - **A**: Invoke `bmad-advanced-elicitation`, process insights, confirm with user, return to menu
 - **P**: Invoke `bmad-party-mode`, process insights, confirm with user, return to menu
 - **C**: Append content to `{planning_artifacts}/ux-design-specification.md`, update frontmatter `stepsCompleted`, load {nextStepFile}
+
+---
+
+## STEP EXIT (CHK-STEP-10-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-10-EXIT PASSED — completed Step 10: User Journey Flows
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.

@@ -75,6 +75,25 @@ SPEC_WORKTREE_PATH: null
 
 ---
 
+
+### CHK-INIT — Initialization Read Receipt
+
+Emit EXACTLY this block (filling in actual values you read), then proceed to the first step. If any line cannot be filled truthfully, HALT.
+
+```
+CHK-INIT PASSED — Initialization complete:
+  shared_rules_loaded: {N} files (list filenames)
+  project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
+  project_knowledge:
+    - project.md (schema_version: {X})
+    - domain.md ({"loaded" | "not required" | "required-but-missing"})
+    - api.md ({"loaded" | "not required" | "required-but-missing"})
+  worktree_path: {WORKTREE_PATH or "n/a"}
+  team_mode: {true | false}
+  user_name: {USER_NAME}
+  communication_language: {LANGUAGE}
+```
+
 ## YOUR ROLE
 
 **Discovery mode:** Spec Engineering Facilitator. Collaborative partner who asks informed questions, investigates code deeply, and helps produce complete actionable specs.
@@ -125,7 +144,7 @@ This uses **step-file architecture** for disciplined execution:
 | 6 | `step-06-audit.md` | Both | Deployment chain audit, AC viability, impact analysis |
 | 7 | `step-07-plan.md` | Both | Tasks, ACs, test strategy, guardrails, composition, estimation |
 | 8 | `step-08-review.md` | Discovery | Review loop with adversarial review option |
-| 9 | `step-09-output.md` | Both | Create new issue (Discovery) or update existing (Enrichment) |
+| 9 | `step-09-output.md` | Both | Business Comprehension Gate (mandatory, hard gate) + Create new issue (Discovery) or update existing (Enrichment) |
 | 10 | `step-10-cleanup.md` | Both | Remove worktree, summary, retrospective |
 
 ## ENTRY POINT

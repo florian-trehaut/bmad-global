@@ -4,6 +4,31 @@ severityActionMatrix: '../data/severity-action-matrix.md'
 
 # Step 4: Present & Post
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-04-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-04-ENTRY PASSED — entering Step 4: Present & Post with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL:
 
 Present the `consolidated_report` to the user (categorised by severity + action), let them choose the output method, then post findings to the forge (DiffNotes) and/or tracker, apply `patch` fixes in the orchestrator, and handle approval decisions. Absorbs v1 step-07 (present) + step-08 (post).
@@ -326,3 +351,33 @@ After the final report is presented, execute the retrospective step: read and fo
 
 ### SUCCESS: Consolidated report presented, actions routed, findings posted, approval handled, final report produced, retrospective executed
 ### FAILURE: Filtering findings, auto-selecting output without user input, approving MR with BLOCKERs, skipping retrospective, silently dismissing without `dismiss_reason`
+
+---
+
+## STEP EXIT (CHK-STEP-04-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-04-EXIT PASSED — completed Step 4: Present & Post
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.
+
+---
+
+## WORKFLOW EXIT (CHK-WORKFLOW-COMPLETE)
+
+Avant de declarer la tache terminee, emettre EXACTEMENT:
+
+```
+CHK-WORKFLOW-COMPLETE PASSED — workflow bmad-code-review executed end-to-end:
+  steps_executed: ['01', '02', '03', '04']   ← liste TOUS les CHK-STEP-NN-EXIT emis dans CETTE conversation
+  steps_skipped: []   ← MUST be empty unless utilisateur a explicitement autorise via citation verbatim
+  final_artifacts: {liste finale}
+```
+
+Si steps_executed != ['01', '02', '03', '04'] sequentiel ET steps_skipped sans citation user verbatim => HALT.

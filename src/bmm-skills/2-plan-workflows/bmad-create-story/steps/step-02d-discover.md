@@ -6,6 +6,31 @@ businessContextTemplate: '~/.claude/skills/bmad-shared/data/business-context-tem
 
 # Step 2d: Conversational Discovery (Discovery Mode Only)
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-02d-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-02d-ENTRY PASSED — entering Step 2d: Conversational Discovery (Discovery Mode Only) with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL
 
 Scan the codebase and tracker for context, ask informed questions, capture scope, then capture the full business context (user journey, BACs, validation metier, DoD) — all BEFORE diving into technical investigation.
@@ -204,16 +229,106 @@ Present the full business context. WAIT for user feedback. Address corrections.
 
 ### PART C — Menu
 
-Display: "**Select:** [A] Advanced Elicitation [P] Party Mode [C] Continue to worktree setup (Step 3)"
+**Smart suggestion logic** — count signals of "sparse spec" before displaying menu:
+
+- BACs captured in B3: less than 3
+- Examples grounding the BACs: 0 (no concrete user/data scenarios cited)
+- External dependencies status (B4): not addressed or "I don't know"
+- VMs in B5: less than 2
+
+If at least 2 signals match → prefix the menu with: "Vu le niveau de detail actuel, je recommande de lancer [B] avant de continuer — la spec gagnera en precision sur les regles metier et les exemples concrets."
+
+Otherwise → present menu neutrally.
+
+Display: "**Select:** [B] Brainstorm spec (Example Mapping) [A] Advanced Elicitation [P] Party Mode [C] Continue to worktree setup (Step 3)"
 
 #### Menu Handling Logic:
 
+- IF B: Execute the Example Mapping flow described in PART D below. After it completes, redisplay this menu.
 - IF A: Read fully and follow {advancedElicitationTask} with current context, process insights, ask "Accept improvements? (y/n)", if yes update then redisplay menu
 - IF P: Read fully and follow {partyModeWorkflow} with current context, process insights, ask "Accept changes? (y/n)", if yes update then redisplay menu
 - IF C: Load, read fully, and execute `./step-03-setup-worktree.md`
 - IF any other: Respond helpfully then redisplay menu
 
 ALWAYS halt and wait for user input after presenting menu. ONLY proceed when user selects 'C'.
+
+### PART D — Example Mapping Flow (when [B] is selected)
+
+**Goal:** Generate concrete examples and surface unknown questions to refine the BACs / VMs / external dependencies captured in PART B. Story-scoped, divergent, intentionally lightweight (a single technique, not a multi-method session — for that, escalate to `/bmad-brainstorming`).
+
+**Method:** Example Mapping (Matt Wynne, BDD discovery). Four card colors, one focused pass.
+
+#### D1. Frame the session
+
+Reframe to the user:
+
+> On va faire un Example Mapping rapide. Tu vas me donner des exemples concrets, je vais en deduire des regles, et on va lister les questions qu'on n'arrive pas a trancher. Ces questions deviendront soit des BACs supplementaires, soit des dependances externes a clarifier avant le dev.
+>
+> On boucle technique-par-technique. Quand il ne reste plus qu'une question rouge ouverte (ou aucune), on arrete.
+
+#### D2. Yellow card — Story summary
+
+Echo back the title + problem statement from A3 in one sentence. Confirm with user that this is what we're mapping.
+
+#### D3. Blue cards — Rules (max 7)
+
+Ask the user to enumerate the business rules that govern this feature. Examples of prompts:
+
+- "Quelles sont les conditions pour qu'un client puisse declencher cette action ?"
+- "Quelles donnees sont obligatoires vs optionnelles ?"
+- "Quels statuts / etats peut prendre l'entite manipulee ?"
+- "Quelles permissions sont requises ?"
+
+For each rule the user gives, restate it concisely as a candidate. Cap at 7 rules — if more emerge, the story is likely too big and should be split (warn the user).
+
+#### D4. Green cards — Examples per rule (1-3 per rule)
+
+For each blue rule, ask for 1 to 3 concrete examples that illustrate it. The examples must be specific enough to imagine a unit test or a manual production check:
+
+- Bad: "Un client peut commander."
+- Good: "Le client Acme (Pro plan, France) commande 5 licences en EUR un jour ouvre a 10h => commande validee, facture emise."
+
+If the user struggles to give an example for a rule, that's a smell:
+
+- Either the rule is wrong / unclear → drop or rephrase the rule
+- Either the rule is correct but underspecified → write the example as "??? — needs business input" and promote to a red question
+
+#### D5. Red cards — Open questions
+
+Capture every "I don't know" / "depends on" / "we should ask X" as a red card. Format:
+
+```
+RED-N: [Question]
+  Owner: [who can answer — product, legal, partner, ...]
+  Blocking?: [yes / no]
+```
+
+#### D6. Loop control
+
+After each rule is processed (D3 + D4 + D5), ask:
+
+> "Ce point est traite. On enchaine sur une autre regle, ou on arrete ?"
+
+Continue until ANY of:
+
+- 7 rules reached
+- Open red questions count <= 1
+- User says "stop" / "ca suffit"
+
+#### D7. Synthesize back into PART B
+
+Update the captured PART B content based on Example Mapping output:
+
+- **B3 BACs**: each green example becomes (or refines) a BAC in Given/When/Then. The blue rule is the "Then" assertion.
+- **B4 External dependencies**: each red question with `Owner != self` and `Blocking?: yes` becomes a row in the Dependencies table.
+- **B5 Validation Metier**: each green example becomes (or refines) a VM item — concrete, executable in production.
+- **B6 Out-of-control factors**: each red question with `Owner != self` (blocking or not) is a candidate.
+
+Present the updated PART B content as a diff (what was vs what is). Ask user to confirm the integration.
+
+#### D8. Return
+
+Return to the PART C menu (do NOT auto-continue to Step 3).
 
 ---
 
@@ -229,7 +344,8 @@ ALWAYS halt and wait for user input after presenting menu. ONLY proceed when use
 - Validation Metier checklist defined with VM types and BAC tracing
 - Product-level DoD synthesized
 - User confirmed business context
-- Menu presented and handled
+- Menu presented with smart suggestion when sparse-spec signals match
+- If [B] selected, Example Mapping flow executed (yellow/blue/green/red cards) and PART B updated with concrete examples + open questions integrated as BACs / dependencies / VMs
 
 ### FAILURE:
 
@@ -239,3 +355,20 @@ ALWAYS halt and wait for user input after presenting menu. ONLY proceed when use
 - VM items that are technical (e.g., "check logs") instead of business
 - Not asking about external dependencies
 - Proceeding without user confirmation
+- Skipping the smart suggestion logic before menu display when sparse-spec signals match
+- Auto-continuing past PART D back to Step 3 instead of returning to PART C menu
+
+---
+
+## STEP EXIT (CHK-STEP-02d-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-02d-EXIT PASSED — completed Step 2d: Conversational Discovery (Discovery Mode Only)
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.

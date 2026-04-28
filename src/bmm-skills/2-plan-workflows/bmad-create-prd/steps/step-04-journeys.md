@@ -1,5 +1,30 @@
 # Step 4: User Journey Mapping
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-04-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-04-ENTRY PASSED — entering Step 4: User Journey Mapping with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL
 
 Create compelling narrative user journeys that leverage existing personas from product briefs and identify additional user types needed for comprehensive coverage. No journey = no functional requirements = product doesn't exist.
@@ -142,3 +167,18 @@ When user selects 'C', append the content directly to the document:
 3. **Admin/Operations User**: Management, configuration, monitoring
 4. **Support/Troubleshooting**: Help, investigation, issue resolution
 5. **API/Integration** (if applicable): Developer/technical user journey
+
+---
+
+## STEP EXIT (CHK-STEP-04-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-04-EXIT PASSED — completed Step 4: User Journey Mapping
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.

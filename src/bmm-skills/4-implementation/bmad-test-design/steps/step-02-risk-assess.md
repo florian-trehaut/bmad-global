@@ -1,5 +1,30 @@
 # Step 2: Risk Assessment
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-02-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-02-ENTRY PASSED — entering Step 2: Risk Assessment with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL
 
 Analyze the loaded requirements and architecture to identify concrete risks, score each using a 3x3 probability/impact matrix, and classify them into action thresholds. In system-level mode, also perform a testability review of the architecture. This assessment drives test coverage priorities in the next step.
@@ -122,4 +147,20 @@ WAIT for user confirmation.
 
 ---
 
-**Next:** Read fully and follow `./step-03-coverage.md`
+## STEP EXIT (CHK-STEP-02-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-02-EXIT PASSED — completed Step 2: Risk Assessment
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.
+
+
+---
+
+**Next:** Read FULLY and apply: `./step-03-coverage.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

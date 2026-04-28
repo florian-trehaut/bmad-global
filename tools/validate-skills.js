@@ -615,6 +615,166 @@ function validateSkill(skillDir) {
     }
   }
 
+  // ============================================================
+  // HARD-01..08 — Workflow Adherence Hardening
+  // Enforces the canonical anti-rationalization countermeasures
+  // documented in src/core-skills/bmad-shared/workflow-adherence.md.
+  // Severity HIGH => exit 1 in --strict mode.
+  // Only applied to skills that HAVE a workflow.md (workflow-style skills).
+  // ============================================================
+
+  if (fs.existsSync(workflowMdPath)) {
+    const wfContent = safeReadFile(workflowMdPath, findings, 'workflow.md');
+    if (wfContent !== null) {
+      // --- HARD-01: workflow.md must contain CHK-INIT in INITIALIZATION ---
+      const hasInitialization = /^##\s+INITIALIZATION\s*$/m.test(wfContent);
+      const hasChkInit = /CHK-INIT/.test(wfContent);
+      if (hasInitialization && !hasChkInit) {
+        findings.push({
+          rule: 'HARD-01',
+          title: 'workflow.md Must Contain CHK-INIT in INITIALIZATION',
+          severity: 'HIGH',
+          file: 'workflow.md',
+          detail:
+            'INITIALIZATION section present but no CHK-INIT Read Receipt block found. Per workflow-adherence Rule 2, every workflow must emit a structured CHK-INIT receipt enumerating loaded files.',
+          fix: 'Add a CHK-INIT block at the end of INITIALIZATION (template in src/core-skills/bmad-shared/workflow-adherence.md "Rule 2 — Read Receipt at INITIALIZATION").',
+        });
+      }
+    }
+
+    // Walk all step files for HARD-02 to HARD-08
+    if (fs.existsSync(stepsDir)) {
+      const stepFiles = fs
+        .readdirSync(stepsDir)
+        .filter((f) => /^step-\d{2}[a-z]?-[a-z0-9-]+\.md$/.test(f))
+        .sort();
+
+      for (const stepFile of stepFiles) {
+        const stepPath = path.join(stepsDir, stepFile);
+        const relStepFile = `steps/${stepFile}`;
+        const stepContent = safeReadFile(stepPath, findings, relStepFile);
+        if (stepContent === null) continue;
+
+        // Extract step number (handle both step-01 and step-02d patterns)
+        const stepNumMatch = stepFile.match(/^step-(\d{2}[a-z]?)-/);
+        const stepNum = stepNumMatch ? stepNumMatch[1] : '??';
+
+        // --- HARD-03: step file must open with NO-SKIP CLAUSE ---
+        if (!/##\s+NO-SKIP CLAUSE/.test(stepContent)) {
+          findings.push({
+            rule: 'HARD-03',
+            title: 'Step File Must Open With NO-SKIP CLAUSE',
+            severity: 'HIGH',
+            file: relStepFile,
+            detail:
+              'Missing "## NO-SKIP CLAUSE" block. Per workflow-adherence Rule 6, every step file must declare the no-skip clause to block rationalizations.',
+            fix: 'Insert the canonical "## NO-SKIP CLAUSE (workflow-adherence Rule 1)" block right after the H1 header. Template in src/core-skills/bmad-shared/workflow-adherence.md.',
+          });
+        }
+
+        // --- HARD-05: step file must contain CHK-STEP-NN-ENTRY ---
+        const entryRegex = new RegExp(`CHK-STEP-${stepNum}-ENTRY`, 'i');
+        if (!entryRegex.test(stepContent)) {
+          findings.push({
+            rule: 'HARD-05',
+            title: `Step File Must Contain CHK-STEP-${stepNum}-ENTRY`,
+            severity: 'HIGH',
+            file: relStepFile,
+            detail: `Missing CHK-STEP-${stepNum}-ENTRY checkpoint. Per workflow-adherence Rule 4, every step must verify its preconditions and emit an entry receipt.`,
+            fix: `Insert a "## STEP ENTRY (CHK-STEP-${stepNum}-ENTRY)" block after the NO-SKIP CLAUSE. Template in src/core-skills/bmad-shared/workflow-adherence.md.`,
+          });
+        }
+
+        // --- HARD-04: step file must contain CHK-STEP-NN-EXIT ---
+        const exitRegex = new RegExp(`CHK-STEP-${stepNum}-EXIT`, 'i');
+        if (!exitRegex.test(stepContent)) {
+          findings.push({
+            rule: 'HARD-04',
+            title: `Step File Must Contain CHK-STEP-${stepNum}-EXIT`,
+            severity: 'HIGH',
+            file: relStepFile,
+            detail: `Missing CHK-STEP-${stepNum}-EXIT receipt. Per workflow-adherence Rule 4, every step must emit an exit receipt enumerating actions executed and artifacts produced before transitioning.`,
+            fix: `Insert a "## STEP EXIT (CHK-STEP-${stepNum}-EXIT)" block at the end of the step before the Next: transition. Template in src/core-skills/bmad-shared/workflow-adherence.md.`,
+          });
+        }
+
+        // --- HARD-02 / HARD-07 / HARD-08: anti-skim phrasing on every Next: ---
+        // Find all "Next:" lines (markdown style "**Next:**" or plain "Next:")
+        const lines = stepContent.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          // Match "**Next:**" or "Next:" at line start (allowing leading whitespace)
+          const nextMatch = line.match(/^\s*(\*\*Next:\*\*|Next:)\s+(.+)/);
+          if (!nextMatch) continue;
+
+          // Skip lines inside code blocks (rough heuristic: count fences before this line)
+          const beforeText = lines.slice(0, i).join('\n');
+          const fenceCount = (beforeText.match(/^```/gm) || []).length;
+          if (fenceCount % 2 === 1) continue; // inside a code block
+
+          const remainder = nextMatch[2];
+
+          // Skip terminal-state Next: lines that explicitly declare end of workflow
+          // (e.g. "**Next:** This is the final step. No next step file.")
+          // These are valid endings, not transitions to file-load.
+          const isTerminal = /no next step|final step|workflow.*complete|workflow ends|end of workflow|nothing to load/i.test(remainder);
+          // Also skip if no path reference at all (no .md, no backtick, no {placeholder})
+          const hasPathRef = /`[^`]+`/.test(remainder) || /\.md\b/.test(remainder) || /\{[a-zA-Z_]+\}/.test(remainder);
+          if (isTerminal || !hasPathRef) continue;
+
+          const hasReadFully = /Read FULLY and apply/.test(remainder);
+          const hasAntiSkimPhrase = /do not summarise from memory, do not skip sections/.test(remainder);
+
+          // HARD-02 / HARD-07: must use canonical "Read FULLY and apply" pattern
+          if (!hasReadFully) {
+            findings.push({
+              rule: 'HARD-07',
+              title: 'Soft Next: Transition Without Anti-Skim Phrasing',
+              severity: 'HIGH',
+              file: relStepFile,
+              line: i + 1,
+              detail: `Next: transition does not use the canonical "Read FULLY and apply" prefix. Soft transitions allow Claude to skip the next step.`,
+              fix: 'Rewrite as: **Next:** Read FULLY and apply: `path/to/next.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.',
+            });
+          }
+
+          // HARD-08: must include the full anti-skim sentence
+          if (!hasAntiSkimPhrase) {
+            findings.push({
+              rule: 'HARD-08',
+              title: 'Next: Transition Missing Anti-Skim Phrase',
+              severity: 'HIGH',
+              file: relStepFile,
+              line: i + 1,
+              detail:
+                'Next: transition is missing the exact phrase "do not summarise from memory, do not skip sections". This phrase is required to block Claude from optimizing away the next-step read.',
+              fix: 'Append to the Next: line: "— load the file with the Read tool, do not summarise from memory, do not skip sections."',
+            });
+          }
+        }
+      }
+
+      // --- HARD-06: workflow's last step OR workflow.md must declare CHK-WORKFLOW-COMPLETE ---
+      if (stepFiles.length > 0) {
+        const lastStepPath = path.join(stepsDir, stepFiles.at(-1));
+        const lastStepContent = safeReadFile(lastStepPath, findings, `steps/${stepFiles.at(-1)}`);
+        const lastStepHasComplete = lastStepContent !== null && /CHK-WORKFLOW-COMPLETE/.test(lastStepContent);
+        const wfHasComplete = wfContent !== null && /CHK-WORKFLOW-COMPLETE/.test(wfContent);
+        if (!lastStepHasComplete && !wfHasComplete) {
+          findings.push({
+            rule: 'HARD-06',
+            title: 'Workflow Must Declare CHK-WORKFLOW-COMPLETE',
+            severity: 'HIGH',
+            file: `steps/${stepFiles.at(-1)}`,
+            detail:
+              'Neither the last step file nor workflow.md declares a CHK-WORKFLOW-COMPLETE receipt. Per workflow-adherence Rule 7, every workflow must emit a final receipt enumerating all CHK-STEP-NN-EXIT emitted in the conversation.',
+            fix: 'Insert a "## WORKFLOW EXIT (CHK-WORKFLOW-COMPLETE)" block at the end of the last step file (or in workflow.md). Template in src/core-skills/bmad-shared/workflow-adherence.md.',
+          });
+        }
+      }
+    }
+  }
+
   return findings;
 }
 

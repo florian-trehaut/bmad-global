@@ -5,6 +5,31 @@ scopeCompletenessSubagent: '../subagent-workflows/scope-completeness.md'
 
 # Step 12: Traceability, Task Verification & Impartial Scope Audit
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-12-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-12-ENTRY PASSED — entering Step 12: Traceability, Task Verification & Impartial Scope Audit with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL:
 
 Every AC must have at least one test at the level specified in the test strategy. Every task must be verified complete. Missing coverage = finding. After the local traceability check passes, an **impartial scope-completeness subagent** independently audits the implementation against the spec — last safety net before push.
@@ -160,3 +185,18 @@ Load and execute {nextStepFile}.
 
 ### SUCCESS: Every AC mapped to tests, P0 gaps addressed, all tasks verified, impartial audit APPROVED (or explicit user acceptance of remaining findings)
 ### FAILURE: Skipping traceability, ignoring P0 gaps, marking tasks complete without verification, skipping the impartial audit on a non-trivial story, hiding audit findings from the user
+
+---
+
+## STEP EXIT (CHK-STEP-12-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-12-EXIT PASSED — completed Step 12: Traceability, Task Verification & Impartial Scope Audit
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.

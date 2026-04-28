@@ -166,15 +166,113 @@ This is purely for grep/audit purposes — `grep -rE "<!-- /?CHK-" src/` lists e
 
 ## Application Strategy
 
-This rule is **opt-in per workflow during migration** (additive, no breakage):
+**As of 2026-04-28, this rule is MANDATORY for ALL bmad-\* workflows — no exceptions, no phases, no "overhead-sensitive" loophole.**
 
-1. **Phase 1 — High-stakes workflows first:** `bmad-troubleshoot`, `bmad-dev-story`, `bmad-code-review`, `bmad-review-story`. Apply Rule 2 (Read Receipt) and Rule 3 (Anti-Skim) at minimum.
-2. **Phase 2 — Validation workflows:** `bmad-validation-*`. Apply Rules 2 and 3.
-3. **Phase 3 — Quick / Daily workflows:** Apply Rule 2 only (overhead-sensitive).
+The earlier 3-phase migration plan (high-stakes first, daily workflows last) was deprecated after a documented incident: the "overhead-sensitive" classification of `bmad-quick-dev` was used as a rationalization to skip steps 02-06 of an actual workflow execution. Any classification that says "this workflow is allowed to be lighter" becomes the porte-de-sortie for ALL rationalisation patterns. Killed.
 
-A workflow that has not yet adopted the pattern continues to function — this rule **does not break** existing workflows. It defines the target pattern.
+Every workflow MUST satisfy:
 
-The validator (`tools/validate-skills.js`) MAY add an inference-only rule (severity: INFO) that warns when a high-stakes workflow lacks `CHK-INIT`. This is a future enhancement, not enforced today.
+- Rule 1 — `CHK-{N}` checkpoints at every state transition
+- Rule 2 — `CHK-INIT` Read Receipt at INITIALIZATION end
+- Rule 3 — Anti-Skim phrasing at every step transition (the FULL phrase, not abbreviated variants)
+- Rule 4 — `CHK-STEP-{NN}-ENTRY` and `CHK-STEP-{NN}-EXIT` at top and bottom of every step file
+- Rule 5 — `<!-- CHK -->` comment markers around in-step checkpoints
+- **Rule 6 (NEW)** — `## NO-SKIP CLAUSE` block at the top of every step file (see Section "NO-SKIP CLAUSE" below)
+- **Rule 7 (NEW)** — `CHK-WORKFLOW-COMPLETE` Read Receipt at the end of the last step
+
+The validator (`tools/validate-skills.js`) **enforces** these rules via the `HARD-01` through `HARD-08` rule family, severity HIGH, exit 1 in `--strict` mode. CI runs `--strict`. New skills cannot be added without satisfying these rules — `bmad-create-skill` templates are pre-hardened.
+
+---
+
+## Rationalization Patterns That Are FORBIDDEN
+
+This is the closed list of arguments Claude MUST NOT use to skip a step. The list exists because each one of these has been observed in practice. **None is a valid skip reason.** The ONLY valid reason to skip a step is an explicit user instruction in the current conversation that names the specific step.
+
+| ID | Pattern | Forme typique |
+|----|---------|---------------|
+| R-01 | Simplicité perçue | "tâche simple", "trivial", "one-liner" |
+| R-02 | Type de fichier | "juste du .md", "que de la spec", "que de la config" |
+| R-03 | Validators verts | "tests passent déjà", "lint clean", "CI green" |
+| R-04 | Profil utilisateur | "user expert", "tu sais déjà", "senior dev" |
+| R-05 | Compréhension auto-déclarée | "j'ai compris ce que ce step fait" |
+| R-06 | Disproportion ressentie | "overkill pour ce cas", "lourdeur inutile" |
+| R-07 | Conditionalité bidouillée | "ce step est pour tel mode" alors qu'il s'applique vraiment |
+| R-08 | Substitution par autre | "j'ai fait l'équivalent ailleurs", "couvert par step-X" |
+| R-09 | Pression efficacité | "auto mode actif", "user veut aller vite", "pas le temps" |
+| R-10 | Implicite vs explicite | "fait implicitement via un autre tool call" |
+| R-11 | Échappatoire de classification | "Phase 3 / overhead-sensitive donc moins exigeant" — **DEPRECATED**, was the incident trigger |
+| R-12 | Compaction | "au step X je n'avais plus le contexte initial" |
+
+**Rule of detection:** if you find yourself constructing any of these arguments, STOP. The argument IS the rationalization. Execute the step.
+
+**Exception clause (sole valid skip path):**
+
+> "User said in this conversation, verbatim: \"{quote}\", which explicitly requests skipping {step_NN_or_workflow_section}."
+
+If you cannot quote the user verbatim with citation in conversation, the skip is forbidden. No exceptions.
+
+---
+
+## NO-SKIP CLAUSE — Mandatory Block at Top of Every Step File
+
+Every step file (after the H1, optionally after frontmatter) MUST open with this exact block:
+
+```markdown
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+```
+
+The validator enforces this as `HARD-03`. Skills that omit this block cannot pass `npm run validate:skills --strict`.
+
+---
+
+## CHK-WORKFLOW-COMPLETE — Final Read Receipt
+
+The last step file (or a dedicated section in `workflow.md`) MUST emit a workflow-level receipt enumerating every CHK-STEP-NN-EXIT emitted in the conversation:
+
+```markdown
+## WORKFLOW EXIT (CHK-WORKFLOW-COMPLETE)
+
+Avant de declarer la tache terminee, emettre EXACTEMENT:
+
+\`\`\`
+CHK-WORKFLOW-COMPLETE PASSED — workflow {name} executed end-to-end:
+  steps_executed: [01, 02, ..., N]   ← liste TOUS les CHK-STEP-NN-EXIT emis dans CETTE conversation
+  steps_skipped: []   ← MUST be empty unless utilisateur a explicitement autorise via citation verbatim
+  final_artifacts: {liste finale}
+\`\`\`
+
+Si steps_executed != [01..N] sequentiel ET steps_skipped sans citation user verbatim => HALT.
+```
+
+The validator enforces this as `HARD-06`.
+
+---
+
+## Anti-Skim Canonical Phrasing — Every Transition
+
+Every "Next:" line in any step file MUST follow this exact pattern (the FULL phrase — abbreviated variants like "Read fully and follow" are rejected by `HARD-08`):
+
+```markdown
+**Next:** Read FULLY and apply: `path/to/next-step.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+```
+
+---
+
+## Conditional Skip — CHK-STEP-NN-SKIPPED
+
+For steps that are mode-specific by design (e.g. step-08 of `bmad-create-story` runs only in Discovery mode), the alternative mode emits an explicit skip receipt with citation of the workflow.md condition that justifies it:
+
+```
+CHK-STEP-08-SKIPPED — Enrichment mode bypasses review step per workflow.md table line 127 (mode column = "Discovery")
+```
+
+The skip is **never silent**. The condition is **always cited** with its source location.
 
 ---
 

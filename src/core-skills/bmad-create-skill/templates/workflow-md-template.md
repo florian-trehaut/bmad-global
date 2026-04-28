@@ -17,6 +17,24 @@ Use this template when generating the workflow.md file for a new bmad-* skill. C
 
 {INITIALIZATION_VARIANT}
 
+### CHK-INIT — Initialization Read Receipt
+
+Emit EXACTLY this block (filling in actual values you read), then proceed to the first step. If any line cannot be filled truthfully, HALT.
+
+```
+CHK-INIT PASSED — Initialization complete:
+  shared_rules_loaded: {N} files (list filenames)
+  project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
+  project_knowledge:
+    - project.md (schema_version: {X})
+    - domain.md ({"loaded" | "not required" | "required-but-missing"})
+    - api.md ({"loaded" | "not required" | "required-but-missing"})
+  worktree_path: {WORKTREE_PATH or "n/a"}
+  team_mode: {true | false}
+  user_name: {USER_NAME}
+  communication_language: {LANGUAGE}
+```
+
 ---
 
 ## YOUR ROLE
@@ -47,7 +65,7 @@ You are {ROLE_DESCRIPTION}.
 
 ## ENTRY POINT
 
-Load and execute `./steps/{FIRST_STEP_FILE}`.
+**Next:** Read FULLY and apply: `./steps/{FIRST_STEP_FILE}` — load the file with the Read tool, do not summarise from memory, do not skip sections.
 
 ## HALT CONDITIONS (GLOBAL)
 

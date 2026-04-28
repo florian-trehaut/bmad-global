@@ -10,6 +10,31 @@ meta6: '../subagent-workflows/meta-6-user-facing-quality.md'
 
 # Step 2: Parallel Review Dispatch
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-02-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-02-ENTRY PASSED — entering Step 2: Parallel Review Dispatch with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL:
 
 Dispatch the 5-7 review agents in ONE orchestrator message, so the Claude Code runtime executes them concurrently. Every worker returns a structured YAML `perspective_report` directly via the `Agent()` tool response. No Agent Teams orchestration primitives are used — no experimental flag required.
@@ -251,3 +276,18 @@ Pass `META_REPORTS`, `LINKED_TRACKER_ISSUE`, `REGRESSION_RISK_LEVEL`, `PHASE2_SU
 
 ### SUCCESS: All active agents dispatched in one parallel call, reports collected, failed layers recorded
 ### FAILURE: Calling agents sequentially, skipping S2 security voting, substituting failed layers with empty reports, violating READ-ONLY constraint
+
+---
+
+## STEP EXIT (CHK-STEP-02-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-02-EXIT PASSED — completed Step 2: Parallel Review Dispatch
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.

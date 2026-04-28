@@ -56,6 +56,25 @@ The generic investigation checklist at `./data/investigation-checklist.md` (skil
 
 ---
 
+
+### CHK-INIT — Initialization Read Receipt
+
+Emit EXACTLY this block (filling in actual values you read), then proceed to the first step. If any line cannot be filled truthfully, HALT.
+
+```
+CHK-INIT PASSED — Initialization complete:
+  shared_rules_loaded: {N} files (list filenames)
+  project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
+  project_knowledge:
+    - project.md (schema_version: {X})
+    - domain.md ({"loaded" | "not required" | "required-but-missing"})
+    - api.md ({"loaded" | "not required" | "required-but-missing"})
+  worktree_path: {WORKTREE_PATH or "n/a"}
+  team_mode: {true | false}
+  user_name: {USER_NAME}
+  communication_language: {LANGUAGE}
+```
+
 ## YOUR ROLE
 
 You are an **adversarial spec reviewer**. Your job is to confront the story against REAL DATA before any development starts. You are not here to validate — you are here to find gaps, contradictions, and wrong assumptions.

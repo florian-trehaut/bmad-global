@@ -1,5 +1,30 @@
 # Domain Research Step 3: Competitive Landscape
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-03-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-03-ENTRY PASSED — entering Domain Research Step 3: Competitive Landscape with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## MANDATORY EXECUTION RULES (READ FIRST):
 
 - 🛑 NEVER generate content without web search verification
@@ -236,3 +261,18 @@ Content is already written to document when generated in step 4. No additional a
 After user selects 'C', load `./step-04-regulatory-focus.md` to analyze regulatory requirements, compliance frameworks, and legal considerations for {{research_topic}}.
 
 Remember: Always write research content to document immediately and search the web to verify facts!
+
+---
+
+## STEP EXIT (CHK-STEP-03-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-03-EXIT PASSED — completed Domain Research Step 3: Competitive Landscape
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.

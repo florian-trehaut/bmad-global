@@ -6,6 +6,31 @@ adversarialReview: '~/.claude/skills/bmad-review-adversarial-general/SKILL.md'
 
 # Step 8: Review & Finalize (Discovery Mode Only)
 
+
+## NO-SKIP CLAUSE (workflow-adherence Rule 1)
+
+Ce step DOIT etre execute integralement. La SEULE raison valide de skip est une instruction explicite de l'utilisateur DANS CETTE CONVERSATION nommant ce step specifique. Aucune autre raison n'est valide.
+
+Sont rejetes (rationalizations interdites): "simple", "trivial", ".md only", "spec only", "validators verts", "user expert", "je sais deja", "overkill", "Phase 3 light", "couvert ailleurs", "implicite", "auto mode", "no time", "compaction".
+
+Si tu construis un de ces arguments => STOP, c'est la rationalization, execute le step.
+
+## STEP ENTRY (CHK-STEP-08-ENTRY)
+
+Avant d'executer, verifier:
+
+- [ ] Step precedent complete (CHK-STEP-{NN-1}-EXIT emis dans la conversation, OU step 01)
+- [ ] Variables requises en scope (verifier avant action)
+- [ ] Working state attendu
+
+Emettre EXACTEMENT:
+
+```
+CHK-STEP-08-ENTRY PASSED — entering Step 8: Review & Finalize (Discovery Mode Only) with {var=value, ...}
+```
+
+Si une precondition manque => HALT, signaler quelle precondition.
+
 ## STEP GOAL
 
 Present the complete spec to the user for review. Offer editing, questioning, adversarial review, and refinement options before finalizing. This step only runs in Discovery mode — Enrichment mode skips directly to Step 9.
@@ -86,3 +111,18 @@ Display: "**Select:** [C] Create tracker issue [E] Edit [Q] Questions [A] Advanc
 - Proceeding without user's explicit [C] selection
 - Hardcoding adversarial review path instead of using variable
 - Not re-presenting menu after non-C selections
+
+---
+
+## STEP EXIT (CHK-STEP-08-EXIT)
+
+Avant de transitionner, emettre EXACTEMENT:
+
+```
+CHK-STEP-08-EXIT PASSED — completed Step 8: Review & Finalize (Discovery Mode Only)
+  actions_executed: {liste concrete des actions ; jamais "done", "ok", "completed" seuls}
+  artifacts_produced: {fichiers crees/modifies, decisions prises, outputs concrets}
+  next_step: {chemin step suivant, ou "WORKFLOW-COMPLETE"}
+```
+
+Si tu ne peux pas remplir avec des artefacts concrets => le step n'est pas fait, retourner l'executer.

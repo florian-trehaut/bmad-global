@@ -43,6 +43,25 @@ Default: global.
 
 ---
 
+
+### CHK-INIT — Initialization Read Receipt
+
+Emit EXACTLY this block (filling in actual values you read), then proceed to the first step. If any line cannot be filled truthfully, HALT.
+
+```
+CHK-INIT PASSED — Initialization complete:
+  shared_rules_loaded: {N} files (list filenames)
+  project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
+  project_knowledge:
+    - project.md (schema_version: {X})
+    - domain.md ({"loaded" | "not required" | "required-but-missing"})
+    - api.md ({"loaded" | "not required" | "required-but-missing"})
+  worktree_path: {WORKTREE_PATH or "n/a"}
+  team_mode: {true | false}
+  user_name: {USER_NAME}
+  communication_language: {LANGUAGE}
+```
+
 ## YOUR ROLE
 
 You are a **skill architect**. You design workflow skills that are precise, self-contained, and follow the bmad-* conventions exactly.
