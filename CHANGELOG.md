@@ -1,5 +1,47 @@
 # Changelog
 
+## v1.10.0 - 2026-04-28
+
+### 🔥 Highlight: Workflow adherence rule + mechanical anti-skim countermeasures
+
+A new shared rule (`bmad-shared/workflow-adherence.md`) addresses Claude's documented tendency to skim long workflows and skip "simple" steps — a failure mode verified across 7 community sources (anthropics/claude-code#36997, #20024, #32290, #18454, #21187, bmad-code-org/BMAD-METHOD#387, HumanLayer 2026 blog, HN thread #46102048). Skim-and-skip is invisible the moment it happens, so the countermeasures are mechanical rather than exhortatory.
+
+- **5 mandatory mechanisms**, all expressible in markdown (no `settings.json` hooks needed):
+  - `CHK-{N}` named checkpoints with literal echo lines that must appear verbatim in output;
+  - **Read Receipt** at the end of `INITIALIZATION` — a structured block enumerating every file actually loaded; emit it before running step-01, or HALT;
+  - **Anti-skim step transition phrasing** — every step instruction ends with "Read FULLY ... do not summarise from memory, do not skip sections";
+  - **Step entry checks** — high-stakes steps echo a one-line summary of what they are about to do before doing it;
+  - **HTML comment markers** for grep audit (`<!-- CHK-INIT -->`, `<!-- ANTI-SKIM -->`).
+- **Migration is opt-in per workflow** — additive, non-breaking. This release applies it to `bmad-troubleshoot` and `bmad-dev-story` workflow.md (CHK-INIT block + anti-skim entry-point directive). Other workflows continue to work unchanged.
+- **Cross-referenced from `knowledge-loading.md`** as a companion rule — knowledge files declare what to read, workflow-adherence proves it was actually read.
+
+### 🛡️ Impartial scope-completeness audit at end of bmad-troubleshoot
+
+Mirrors the dev-story scope-completeness audit added in v1.9.0, this time tuned to bug-fix semantics. Runs as the last safety net between the fix and the push.
+
+- New `subagent-workflows/scope-completeness.md` builds an independent coverage matrix mapping each acceptance criterion / test plan item to one of `IMPLEMENTED` / `TESTED` / `PARTIAL` / `MISSING` / `SCOPE_CREEP` / `OUT_OF_SCOPE_VIOLATION`, with `file:line` evidence from `git diff baseline..HEAD`.
+- **Bug-fix-specific checks**: detects symptom-vs-root-cause patches (e.g. swallowed exceptions instead of fixing the root failure), flags fallback insertions that hide the bug rather than fix it, and verifies that regression tests reproduce the actual failure mode (not adjacent code paths).
+- Wired into `step-07-ship` as the new §3 between self-review (§2) and push (§4). Subsequent sections renumbered (push → §4, tracker → §5, auto-proceed → §6).
+- **Skip gate** for trivial fixes (≤1 file, ≤5 lines, no tests, no API change). Otherwise mandatory.
+- **Bounded retry loop** on `NEEDS REVISION` verdict (max 2 iterations).
+- Impartiality contract forbids any summary in the spawning prompt — the subagent must issue its own `Read` and `git diff` calls.
+
+### 🔬 Evidence-based debugging shared rule
+
+A new shared rule (`bmad-shared/evidence-based-debugging.md`) turns "I read the code and it should work" into a non-acceptable form of proof, replacing it with a 5-rung Reproduction Hierarchy.
+
+- **Cardinal principle**: code reading is never proof of a bug or a fix; reproduction is.
+- **5-rung Reproduction Hierarchy** (in descending preference): rung 1 — local automated test against real dependencies (the target); rung 2 — manual reproduction (CLI / curl / browser); rung 3 — captured production artifact (log, trace, dump); rung 4 — live observation (screen-share, paired session); rung 5 — user report only (never as final proof).
+- **8 documented exception classes** (E-1 to E-8) where rung 1 is unreachable: E-1 prod-only state, E-2 race conditions, E-3 infrastructure-dependent, E-4 third-party state, E-5 one-shot events, E-6 heisenbugs, E-7 time-dependent, E-8 hardware-specific. Each lists its highest-reachable rung and the follow-up evidence required to close the loop.
+- **7 anti-patterns rejected as proof**: code-tour, speculation, mocked-test pseudo-proof, CI-says-it-works, static-analysis, hand-waved staging, symptom-based proof.
+- Wired into `bmad-troubleshoot` step-03 (RULES + new §5 classifies `EVIDENCE_RUNG`, HALT if rung-5 with no exception class declared) and step-06 (RULES + §2 HALT if rung < 1, capture pre-fix output verbatim before applying any change).
+- Globally referenced via the new `bmad-knowledge-bootstrap` `claude-local-template.md` — auto-emitted in `CLAUDE.local.md` for new projects, and surfaced in this project's `CLAUDE.md` as a debugging standard.
+
+### Post-upgrade
+
+1. `npx @florian-trehaut/bmad-global install --force` — re-deploys the workflow-adherence rule, the evidence-based-debugging rule, the troubleshoot scope-completeness subagent, and the updated `claude-local-template.md` to `~/.claude/skills/`. **Required**: workflows in this release reference rule files that don't exist in 1.9.0, so a fresh global install is mandatory before the next workflow run.
+2. `/bmad-knowledge-refresh` _(recommended on existing projects)_ — re-runs the knowledge bootstrap step that emits `CLAUDE.local.md`, picking up the new evidence-based-debugging reference. Custom H2 sections you added are preserved.
+
 ## v1.9.0 - 2026-04-28
 
 ### 🔥 Highlight: Runtime Robustness review system
