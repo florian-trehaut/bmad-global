@@ -1,5 +1,36 @@
 # Changelog
 
+## v1.9.0 - 2026-04-28
+
+### 🔥 Highlight: Runtime Robustness review system
+
+Reviews and self-reviews now check **language-aware** runtime robustness — concurrency hazards and null-safety pitfalls are evaluated against rules tailored to your project's stack rather than generic principles.
+
+**What's new:**
+
+- A `bmad-shared/stacks/` directory ships per-language rules for **Go**, **Rust**, **TypeScript**, and **Python**, each covering concurrency and null-safety patterns specific to that language (channels & goroutines for Go, `Send + Sync` for Rust, `strict` mode and exhaustive checks for TS, `asyncio` and `Optional` for Python).
+- Two new shared protocols, `concurrency-review` and `null-safety-review`, hold the language-agnostic principles and JIT-load the matching stack file via `tech-stack-lookup`.
+- `bmad-review-story` step-05 gains a Runtime Robustness analysis section.
+- `bmad-dev-story` step-08 enforces stack-appropriate concurrency/null guardrails during implementation.
+- `bmad-dev-story` self-review perspective #2 is renamed `Zero Fallback` → `Runtime Robustness` and now exposes three sub-axes: `zero_fallback`, `null_safety`, `concurrency`. Race-condition coverage moves from Security to this perspective; TOCTOU stays in Security.
+- `bmad-create-story` step-07 auto-suggests robustness ACs/tasks when stack triggers fire.
+- `bmad-code-review` meta-2 gains sub-axes `2e` (null_safety) and `2f` (concurrency); `2a` (zero_fallback) is unchanged. Weights re-balanced.
+- New validator rule **STACK-15** (LOW severity) verifies stack files have the required H2 sections.
+- `knowledge-schema.md` gains two additive protocol entries plus a Stacks documentation section. Schema version stays at `1.0` (additive change).
+
+The shared rule `no-fallback-no-false-data.md` is unchanged; `null-safety-review` cross-references it (business angle vs runtime angle).
+
+### 🛡️ Impartial scope-completeness audit at end of dev-story
+
+A new impartial subagent runs as the **last safety net** before pushing in `bmad-dev-story` — it independently audits the actual implementation against the story spec and produces a structured coverage matrix.
+
+- Lives in `subagent-workflows/scope-completeness.md` and runs from `step-12-traceability` §6 (between the local traceability matrix and the step-13 push), not at plan-approval time.
+- Inputs: `story_path`, `worktree_path`, `baseline_commit`. The subagent runs `git diff baseline..HEAD` itself and builds a coverage matrix mapping each spec item to `IMPLEMENTED` / `TESTED` / `PARTIAL` / `MISSING` / `SCOPE_CREEP` / `N/A` with `file:line` evidence.
+- Mandatory by default; skip allowed only on truly trivial stories (verdict PASS + <3 ACs + <5 tasks + no cross-cutting changes).
+- Bounded loop preserved (max 2 iterations on `NEEDS REVISION` verdict).
+- Impartiality contract forbids any summary in the spawning prompt — the subagent must issue its own `Read` and `git diff` calls.
+- `step-07-plan-approval` reverts to its original plan-mode-only role (EnterPlanMode / draft / ExitPlanMode); no subagent invocation there anymore.
+
 ## v1.8.0 - 2026-04-27
 
 ### 🔥 Highlight: Schema-driven indirection layer for project knowledge
