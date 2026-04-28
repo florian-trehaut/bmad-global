@@ -144,6 +144,17 @@ protocols:
     file: "~/.claude/skills/bmad-shared/protocols/validation-tooling-lookup.md"
     sections_consumed: [validation-tooling, test-rules]
     consumed_by: "Test design, validation-*, dev-story validation steps"
+  concurrency-review:
+    file: "~/.claude/skills/bmad-shared/protocols/concurrency-review.md"
+    sections_consumed: []
+    stacks_consumed: ["bmad-shared/stacks/{language}.md#concurrency"]
+    consumed_by: "review-story, dev-story, create-story, code-review meta-2 (sub-axis 2f)"
+  null-safety-review:
+    file: "~/.claude/skills/bmad-shared/protocols/null-safety-review.md"
+    sections_consumed: []
+    stacks_consumed: ["bmad-shared/stacks/{language}.md#null-safety"]
+    consumed_by: "review-story, dev-story, create-story, code-review meta-2 (sub-axis 2e)"
+    cross_reference: "bmad-shared/no-fallback-no-false-data.md (business angle, complementary)"
 
 # ============================================================
 # DIRECT-REFERENCE EXCEPTIONS
@@ -292,3 +303,19 @@ Users with project-specific knowledge that doesn't fit the canonical sections ma
 3. **Author a custom protocol** in `{MAIN_PROJECT_ROOT}/.claude/skills/{plugin}/protocols/{my-protocol}.md` — the protocol references the local schema overrides.
 
 The bundled BMAD workflows never read project-local schema overrides — they only consume v1 canonical sections.
+
+---
+
+## Stacks — language-specific rule files (added with the Runtime Robustness Stacks story)
+
+Beyond the project-knowledge files (`project.md`, `domain.md`, `api.md`), BMAD now supports a global, **language-keyed** rule store at `~/.claude/skills/bmad-shared/stacks/{language}.md`. Each stack file contains H2 sections per concern:
+
+- `## Concurrency` — read by `concurrency-review.md` protocol
+- `## Null Safety` — read by `null-safety-review.md` protocol
+- (future) other concerns may add new H2 sections without breaking existing protocols
+
+Stacks are **global** (not per-project) — they describe how a language behaves, not how a project uses it. Adding a new language = adding `stacks/{language}.md` with the required H2 sections. No knowledge-schema bump is required (the directory lives in `bmad-shared/`, separate from project knowledge).
+
+The validator rule `STACK-15` (`tools/validate-skills.js`) checks that each stack file has the required H2 sections.
+
+See `~/.claude/skills/bmad-shared/stacks/README.md` for the stack file convention and the relationship with `bmad-code-review/data/stack-grep-bank/` (a separate, skill-local grep-pattern store).

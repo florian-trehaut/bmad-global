@@ -5,26 +5,31 @@ meta: 2
 meta_weight: 0.20
 sub_axis_weights:
   '2a': 0.15
-  '2b': 0.425
-  '2c': 0.425
+  '2b': 0.20
+  '2c': 0.20
+  '2d': 0.25
+  '2e': 0.10
+  '2f': 0.10
 ---
 
 # Meta-2 Subagent Workflow: Correctness & Reliability
 
-**Goal:** Verify the code behaves correctly under failure, under load, under rollback, and **maintains state continuity during execution**.
+**Goal:** Verify the code behaves correctly under failure, under load, under rollback, **maintains state continuity during execution**, handles missing/null values without crashing, and is concurrency-safe.
 
-**Sub-axes (4):**
+**Sub-axes (6):**
 
 | Sub-axis | Name | Always-on | Weight within M2 |
 |----------|------|-----------|------------------|
 | 2a | Zero Fallback / Zero False Data | ✓ | **0.15** |
-| 2b | Resilience | ✓ | 0.275 |
-| 2c | Rollback Safety | ✓ | 0.275 |
-| 2d | Runtime State Continuity | ✓ | **0.30** |
+| 2b | Resilience | ✓ | 0.20 |
+| 2c | Rollback Safety | ✓ | 0.20 |
+| 2d | Runtime State Continuity | ✓ | **0.25** |
+| 2e | Null Safety | ✓ | 0.10 |
+| 2f | Concurrency | ✓ | 0.10 |
 
 Per-meta weight of M2 = 0.20 in the overall judge-triage weighting.
 
-Weight rationale: 2b and 2c are Phase 4 stubs (effective contribution = 0 until populated), so 2d carries the second-highest active weight after 2a — it covers the transient-degradation class of bugs that pass tests but break consumers mid-run.
+Weight rationale: 2b and 2c are Phase 4 stubs (effective contribution = 0 until populated). 2d carries the highest active weight — it covers the transient-degradation class of bugs. 2a (zero-fallback) keeps its anchor weight. 2e and 2f are introduced with the Runtime Robustness Stacks story; their initial weights are intentionally modest (0.10 each) and may be calibrated in a future story once `stack-grep-bank/{lang}.md` ships per-stack grep patterns for them.
 
 ---
 
@@ -184,6 +189,78 @@ Independent of language or storage technology, flag any of these:
 
 ---
 
+## SUB-AXIS 2e: Null Safety
+
+**Condition:** ALWAYS executed.
+
+**Purpose:** Detect runtime null/missing-value pitfalls — the runtime-robustness counterpart to 2a (which covers business-fallback). They sometimes intersect on the same line, in which case findings cite both sub-axes.
+
+**Load and apply `~/.claude/skills/bmad-shared/protocols/null-safety-review.md`.**
+
+The protocol JIT-loads `~/.claude/skills/bmad-shared/stacks/{language}.md#null-safety` for each detected language via `tech-stack-lookup`.
+
+### Checks
+
+- [ ] **Boundary validation present**: external input (HTTP body, RPC, config, deserialised JSON, CLI args) goes through a parser that produces a typed result (Zod, pydantic, `serde`, custom). Missing = **BLOCKER** if the input is consumed downstream as if validated.
+- [ ] **Type-system enforcement**: project's compiler/lint config has stack-appropriate guardrails — TS `strictNullChecks` + `noUncheckedIndexedAccess`; Python `mypy --strict`; Rust `clippy::unwrap_used` denied; Go `go vet`/`staticcheck` mandatory. Disabled = **BLOCKER**.
+- [ ] **No `!` non-null assertion** introduced (TypeScript). Each one = **MAJOR** unless paired with a proven invariant comment.
+- [ ] **No `.unwrap()` / `.expect()`** introduced in Rust production paths (allowed in `#[cfg(test)]`). Each one = **MAJOR**.
+- [ ] **No bare `dict[k]`** introduced in Python on potentially-missing keys — use `dict.get(k, default)` or explicit `if k in d` guard. Each one = **MAJOR**.
+- [ ] **No pointer deref without nil check** in Go after external boundary. Each one = **BLOCKER** if reachable from a request handler.
+- [ ] **`||` vs `??`**: TypeScript code using `value || default` where `0`/`""`/`false` are valid = **MAJOR** (also crosses 2a if business-critical).
+- [ ] **Absent-path test**: every new nullable field crossing a boundary has at least one test exercising the absent case. Missing = **MAJOR**.
+
+### Stack-specific rules
+
+For each detected language `L`, apply the anti-patterns enumerated in `~/.claude/skills/bmad-shared/stacks/{L}.md` under `## Null Safety` → `### Anti-patterns to flag`. Findings cite the rule (`stack-{L}.md#null-safety: <pattern>`) for traceability.
+
+If no stack file exists for a detected language, fall back to the generic principles from `null-safety-review.md`.
+
+### Cross-axis with 2a
+
+When a single line of code violates BOTH 2a (zero-fallback business) AND 2e (null-safety runtime) — e.g., `price ?? 0` on a required price field — produce one finding citing both sub-axes:
+
+```yaml
+- id: 'F-meta2-2e-1'
+  severity: BLOCKER
+  meta: 2
+  sub_axes: ['2a', '2e']           # cross-axis finding
+  ...
+```
+
+---
+
+## SUB-AXIS 2f: Concurrency
+
+**Condition:** Triggered when the diff touches goroutines, threads, async/await, channels, queues, batch processors, schedulers, callback timers, or shared mutable state.
+
+**Load and apply `~/.claude/skills/bmad-shared/protocols/concurrency-review.md`.**
+
+The protocol JIT-loads `~/.claude/skills/bmad-shared/stacks/{language}.md#concurrency` for each detected language.
+
+### Checks
+
+- [ ] **Shared state identified**: every variable read/written by 2+ concurrent flows is named and documented. Missing = **MAJOR**.
+- [ ] **Synchronisation present and consistent**: ONE mechanism per shared variable (lock / atomic / channel / immutable). Mixed = **MAJOR**.
+- [ ] **Lock acquisition order globally consistent**: 2+ locks held simultaneously must be acquired in the same order across all paths. Inconsistent = **BLOCKER**.
+- [ ] **No blocking primitive across suspension point**: no `MutexGuard` across `.await` (Rust), no synchronous lock across `await asyncio.X` (Python). Each = **BLOCKER**.
+- [ ] **Bounded parallelism**: `Promise.all` / `asyncio.gather` / `errgroup` / `JoinSet` over external input has explicit limit. Unbounded = **MAJOR**.
+- [ ] **Cancellation propagation defined**: long-lived async tasks accept `context.Context` / `AbortSignal` / `CancellationToken`. Missing = **MAJOR**.
+- [ ] **Race detector / stress test evidence**: for Go, the diff includes `go test -race` results in CI. For other languages, the diff includes a stress test (`Promise.all` of N / `asyncio.gather` of N) asserting state consistency. Missing on a concurrent code path = **MAJOR**.
+
+### Stack-specific rules
+
+For each detected language `L`, apply anti-patterns from `~/.claude/skills/bmad-shared/stacks/{L}.md#concurrency` → `### Anti-patterns to flag`. Examples:
+
+- Go: concurrent map writes (BLOCKER), counter `++` without atomic/mutex (BLOCKER), unbounded `go func()` (MAJOR)
+- Rust: `MutexGuard` across `.await` (BLOCKER), inconsistent lock order (BLOCKER), `Arc<Mutex<T>>` where channels would do (MINOR design smell)
+- TypeScript: `Promise.all` rejecting on first error when partial results matter (MAJOR), check-then-act on shared state (MAJOR), missing `await` (MAJOR)
+- Python: `time.sleep` in `async def` (BLOCKER), unbounded `asyncio.gather` (MAJOR), `requests` in async code (MAJOR)
+
+If no stack file exists for a detected language, fall back to the generic principles from `concurrency-review.md`.
+
+---
+
 ## OUTPUT FORMAT
 
 Same schema as Meta-1. `scores` map keyed by sub-axis. `sub_axes_executed` lists active sub-axes. Scores for stubs = 1.0 (neutral — no deductions).
@@ -191,13 +268,15 @@ Same schema as Meta-1. `scores` map keyed by sub-axis. `sub_axes_executed` lists
 ```yaml
 perspective_report:
   meta: 2
-  sub_axes_executed: ['2a', '2b', '2c', '2d']
+  sub_axes_executed: ['2a', '2b', '2c', '2d', '2e', '2f']
   findings: [...]
   scores:
-    '2a': 0.90   # zero-fallback — weight 0.15 within M2
-    '2b': 1.0    # stub — weight 0.275
-    '2c': 1.0    # stub — weight 0.275
-    '2d': 0.85   # runtime state continuity — weight 0.30 within M2
+    '2a': 0.90   # zero-fallback — weight 0.15
+    '2b': 1.0    # stub — weight 0.20
+    '2c': 1.0    # stub — weight 0.20
+    '2d': 0.85   # runtime state continuity — weight 0.25
+    '2e': 0.95   # null safety — weight 0.10 (new — Runtime Robustness Stacks story)
+    '2f': 0.95   # concurrency — weight 0.10 (new — Runtime Robustness Stacks story)
   summary: {...}
 ```
 

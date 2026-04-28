@@ -29,8 +29,11 @@ Count changed files for routing decision.
   **Inline review** — execute 6 perspectives directly:
 
   1. **Specs Compliance** — For each AC: implemented? tested? works in production (not just in tests)? scope creep?
-  2. **Zero Fallback** — Apply zero-fallback rules from initialization. Grep for silent fallbacks on business-critical fields. Check for computed substitutions.
-  3. **Security** — Injection, auth, validation, secrets, crypto, race conditions, framework config
+  2. **Runtime Robustness** *(formerly Zero Fallback — now covers Zero Fallback + Null Safety + Concurrency)* — Three sub-axes:
+     - **2a. Zero Fallback** — Apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`. Grep for silent fallbacks on business-critical fields. Check for computed substitutions.
+     - **2b. Null Safety** — Apply `~/.claude/skills/bmad-shared/protocols/null-safety-review.md` (loads stack-specific rules per detected language). Verify boundary validation, type-system enforcement (`strictNullChecks`, `mypy --strict`, `clippy::unwrap_used`, `go vet`/`staticcheck`), absent-path tests.
+     - **2c. Concurrency** — Apply `~/.claude/skills/bmad-shared/protocols/concurrency-review.md` (loads stack-specific rules per detected language). Verify race-detector / stress-test evidence, lock ordering, bounded parallelism, cancellation propagation, no-blocking-across-await.
+  3. **Security** — Injection, auth, validation, secrets, crypto, framework config, TOCTOU and authorization races (data-race concurrency moved to perspective #2)
   4. **QA & Testing** — Test coverage per AC, test quality, forbidden patterns (mocks in unit tests), edge cases, deterministic tests
   5. **Code Quality** — Hexagonal architecture, DDD, naming, duplication, TypeScript strict, no dead code
   6. **Tech Lead** — SOLID, N+1, scalability, DI patterns, monorepo impact, migration risks

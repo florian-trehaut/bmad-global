@@ -44,6 +44,35 @@ Implement all tasks from the issue following strict TDD. ALL implementation happ
 2. Scope boundary: ONLY files modified during GREEN
 3. Run tests — still PASS
 
+#### Runtime Robustness Guardrails (apply per detected stack)
+
+After GREEN passes, before COMMIT, apply both protocols loaded JIT:
+
+- `~/.claude/skills/bmad-shared/protocols/concurrency-review.md`
+- `~/.claude/skills/bmad-shared/protocols/null-safety-review.md`
+
+The protocols read `~/.claude/skills/bmad-shared/stacks/{language}.md` for the detected languages.
+
+**Concurrency guardrail** — apply when the changed code involves goroutines, threads, async tasks, queues, batch processors, schedulers, callbacks under timers, or shared mutable state. Run the language-specific concurrent test command:
+
+- Go: `go test -race ./...` MUST pass — failure is a HALT (not "skip", not "known issue")
+- Rust: `cargo test` with relevant async tests; consider `loom` for low-level critical sections
+- TypeScript / Node.js: stress test pattern — `await Promise.all(Array.from({ length: 100 }, () => fn(sharedKey)))` and assert state consistency
+- Python: `pytest-asyncio` async tests with `asyncio.gather(*[fn() for _ in range(100)])`
+
+If the project has no concurrent test for the new code path, **add one before commit**.
+
+**Null safety guardrail** — for every nullable field crossing a boundary touched by this change, verify the project's stack-specific compiler/lint configuration enforces it:
+
+- Go: `go vet`, `staticcheck`, optionally `nilaway`
+- Rust: `clippy::unwrap_used`, `clippy::expect_used`, `clippy::indexing_slicing` denied at crate level
+- TypeScript: `tsconfig.json` has `strictNullChecks: true` AND `noUncheckedIndexedAccess: true`
+- Python: `mypy --strict` (or `pyright --strict`) and `ruff` rules `B008`, `S101`, `RUF013`
+
+A test exercises the absent-value path for every new nullable field. Missing test = MAJOR finding (do not commit).
+
+**Note:** the term "zero-fallback rules" in this file refers to `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` — that file/rule is NOT renamed by this story. Only the dev-story self-review YAML report key (`scores.zero_fallback`) and perspective heading rename to `runtime_robustness`.
+
 ### 2. Verify Test Coverage
 
 After all tasks complete:
@@ -80,6 +109,7 @@ Load and execute {nextStepFile}.
 - 3 consecutive test failures on same task
 - Security concern discovered
 - Required data source is inaccessible and no semantically correct alternative exists (do NOT use wrong data as fallback)
+- `go test -race` failure on a Go change — concurrency bug, NEVER ship without fixing
 
 ## SUCCESS/FAILURE:
 

@@ -1,7 +1,7 @@
 /**
  * Deterministic Skill Validator
  *
- * Validates 14 deterministic rules across all skill directories.
+ * Validates 15 deterministic rules across all skill directories.
  * Acts as a fast first-pass complement to the inference-based skill validator.
  *
  * What it checks:
@@ -19,6 +19,7 @@
  * - STEP-06: step frontmatter has no name/description
  * - STEP-07: step count 2-15
  * - SEQ-02: no time estimates
+ * - STACK-15: bmad-shared/stacks/{lang}.md files contain required H2 sections
  *
  * Usage:
  *   node tools/validate-skills.js                    # All skills, human-readable
@@ -573,6 +574,42 @@ function validateSkill(skillDir) {
             fix: 'Remove time estimates — AI execution speed varies too much.',
           });
           break; // Only report once per line
+        }
+      }
+    }
+  }
+
+  // --- STACK-15: bmad-shared/stacks/{lang}.md must have required H2 sections ---
+  // Stack files describe per-language runtime-robustness rules consumed by
+  // protocols (concurrency-review, null-safety-review). The required sections
+  // mirror the H2 anchors those protocols read.
+  // Severity is LOW (warning) so partial files are allowed during development.
+  if (dirName === 'bmad-shared') {
+    const stacksDir = path.join(skillDir, 'stacks');
+    if (fs.existsSync(stacksDir) && fs.statSync(stacksDir).isDirectory()) {
+      const REQUIRED_STACK_H2 = ['## Concurrency', '## Null Safety'];
+      const stackFiles = fs.readdirSync(stacksDir).filter((f) => f.endsWith('.md') && path.basename(f) !== 'README.md');
+
+      for (const stackFile of stackFiles) {
+        const stackPath = path.join(stacksDir, stackFile);
+        const relFile = path.join('stacks', stackFile);
+        const content = safeReadFile(stackPath, findings, relFile);
+        if (content === null) continue;
+
+        for (const requiredH2 of REQUIRED_STACK_H2) {
+          // Match the H2 header on its own line (anchored, multiline).
+          const escaped = requiredH2.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+          const regex = new RegExp(`^${escaped}\\s*$`, 'm');
+          if (!regex.test(content)) {
+            findings.push({
+              rule: 'STACK-15',
+              title: 'Stack File Required H2 Sections',
+              severity: 'LOW',
+              file: relFile,
+              detail: `Stack file is missing required H2 section: "${requiredH2}".`,
+              fix: `Add a "${requiredH2}" H2 section per src/core-skills/bmad-shared/stacks/README.md convention.`,
+            });
+          }
         }
       }
     }

@@ -10,7 +10,7 @@ reportFormat: '../data/review-report-format.md'
 
 **Scope:** Analyzes the diff and produces a findings report. Does NOT fix code (except trivial auto-fixes).
 
-**Perspectives:** Specs Compliance, Zero Fallback, Security, QA, Code Quality, Tech Lead.
+**Perspectives:** Specs Compliance, Runtime Robustness *(formerly Zero Fallback — now covers Zero Fallback + Null Safety + Concurrency)*, Security, QA, Code Quality, Tech Lead.
 
 ---
 
@@ -79,7 +79,11 @@ COMPLIANT = the feature works end-to-end in production, not just in the test har
 
 Scope analysis: creep (MORE than asked -> QUESTION), missing (LESS -> BLOCKER), deviation (SOMETHING ELSE -> BLOCKER).
 
-### P1.5: Zero Fallback / Zero False Data (MANDATORY — before Security)
+### P1.5: Runtime Robustness (MANDATORY — before Security)
+
+*Formerly "Zero Fallback / Zero False Data" — now a unified perspective with three sub-axes covering business-correctness AND runtime-robustness risks.*
+
+#### P1.5.a: Zero Fallback
 
 **Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`**
 
@@ -94,6 +98,37 @@ For each match: is the fallback value semantically identical to the expected val
 
 Also check for computed substitutions (deriving a value instead of reading the actual source) -> **BLOCKER**.
 
+#### P1.5.b: Null Safety
+
+**Load and apply `~/.claude/skills/bmad-shared/protocols/null-safety-review.md`**
+
+The protocol JIT-loads `~/.claude/skills/bmad-shared/stacks/{language}.md#null-safety` for each detected language.
+
+Verify the project enforces stack-appropriate guardrails:
+
+- TypeScript: `tsconfig.json` has `strictNullChecks: true` AND `noUncheckedIndexedAccess: true`
+- Python: `mypy --strict` (or `pyright --strict`) configured in CI
+- Rust: `clippy::unwrap_used`, `clippy::expect_used` denied at crate level
+- Go: `go vet` / `staticcheck` runs; optionally `nilaway`
+
+For each nullable field crossing a boundary in the diff: an absent-path test exists. Missing test = MAJOR. Missing guardrail = BLOCKER.
+
+#### P1.5.c: Concurrency
+
+**Load and apply `~/.claude/skills/bmad-shared/protocols/concurrency-review.md`**
+
+The protocol JIT-loads `~/.claude/skills/bmad-shared/stacks/{language}.md#concurrency` for each detected language.
+
+For diffs touching goroutines/threads/async/channels/shared state, verify:
+
+- Race-detector / stress test evidence (Go: `go test -race`; Rust: relevant async tests; TS/Python: stress test pattern)
+- Lock acquisition order is consistent across paths
+- Bounded parallelism (semaphore, worker pool, `errgroup.SetLimit`)
+- Cancellation propagation defined (context, AbortSignal, asyncio task cancellation)
+- No blocking primitive held across `.await` / suspension point
+
+A missing race-detector run or missing concurrent test on a concurrent code path = MAJOR. A confirmed data race or `MutexGuard across await` = BLOCKER.
+
 ### P2: Security
 
 Apply security checklist from project knowledge (`{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`) if available, otherwise apply these defaults:
@@ -103,7 +138,7 @@ Apply security checklist from project knowledge (`{MAIN_PROJECT_ROOT}/.claude/wo
 - Input validation (missing DTOs, validation decorators, validation pipe)
 - Sensitive data (secrets/PII in logs, hardcoded credentials)
 - Crypto (weak MD5/SHA1, `Math.random()` for security)
-- Race conditions (TOCTOU, missing transactions)
+- TOCTOU and authorization races (data-race concurrency moved to P1.5.c)
 - Framework config (missing security headers, permissive CORS, missing rate limiting)
 
 ### P3: QA & Testing

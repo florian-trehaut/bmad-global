@@ -90,9 +90,34 @@ From the real data examined in Step 3:
 
 - What edge cases exist in the real data that the story does not cover?
 - What is the actual data volume? Does the story account for scale?
-- Are there NULL values, unexpected formats, or outliers?
 - What happens when the source data is unavailable or malformed?
-- Are there timing/ordering concerns (race conditions, out-of-order events)?
+
+### 4b. Runtime robustness (concurrency + null safety)
+
+Apply protocols (loaded JIT):
+
+- `~/.claude/skills/bmad-shared/protocols/concurrency-review.md` — generic concurrency principles + per-language anti-patterns
+- `~/.claude/skills/bmad-shared/protocols/null-safety-review.md` — generic null-safety principles + per-language anti-patterns
+
+For each task / AC in the story:
+
+**Concurrency hypotheses** (apply if the story touches shared state, async, batch, queue, pipeline, scheduler, worker, goroutine, thread):
+
+- Is shared mutable state explicitly identified?
+- Is the synchronisation strategy stated (locks, channels, atomics, immutability)?
+- Are bounds on parallelism declared (semaphore, worker pool size, `errgroup.SetLimit`)?
+- Is cancellation propagation defined (context, AbortSignal, async cancel)?
+- Are tests under concurrency required (race detector, stress, fuzz)?
+- Apply stack-specific anti-patterns from each detected language (Go, Rust, TypeScript, Python, …).
+
+**Null safety hypotheses** (apply for any field crossing a boundary — API ingress, deserialisation, config, CLI):
+
+- Is nullability of each input/output field explicit in the data model (`Optional[T]`, `*T`, `T | null`)?
+- Is the boundary validation strategy stated (Zod, pydantic, custom)?
+- Does an absent-path test exist per nullable field?
+- Apply stack-specific anti-patterns from each detected language.
+
+Each violation produces a finding with severity per the protocol's rubric. A missing concurrency test on a concurrent code path is at minimum MAJOR. A missing null-safety guardrail (`strictNullChecks`, `mypy --strict`, `clippy::unwrap_used`) is BLOCKER.
 
 ### 5. Synthesize findings
 

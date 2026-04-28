@@ -106,6 +106,40 @@ What NOT to do, common mistakes to avoid for THIS story.
 
 Plus story-specific guardrails from analysis (ADR violations, prior MR rejections, etc.).
 
+### 4b. Runtime Robustness AC suggestion (concurrency + null safety)
+
+Apply protocols (loaded JIT):
+
+- `~/.claude/skills/bmad-shared/protocols/concurrency-review.md`
+- `~/.claude/skills/bmad-shared/protocols/null-safety-review.md`
+
+**Concurrency triggers** — keywords in the task descriptions that suggest concurrent code: `goroutine`, `thread`, `async`, `await`, `Promise.all`, `Promise.allSettled`, `worker`, `queue`, `batch`, `pipeline`, `scheduler`, `cron`, `tokio`, `asyncio`, `mutex`, `lock`, `channel`, `concurrent`, "shared state".
+
+**Null safety triggers** — patterns suggesting boundary-crossing data: `Optional`, `nullable`, `?:` (optional fields in schemas), `null`, `undefined`, `nil`, `None`, "external API", "request body", "deserialise", "JSON", "config", "env var", "user input".
+
+For each detected trigger, surface candidate ACs/tasks for user confirmation (no silent insertion):
+
+- **Candidate AC**: "Concurrency: shared state X must be protected by {Mutex|atomic|channel} per the {language} stack rules"
+- **Candidate AC**: "Null safety: boundary input Y must be validated by {Zod|pydantic|serde|...} returning a typed result; no `!` non-null assertion downstream"
+- **Candidate task**: "Add a stack-appropriate concurrent test (e.g., Go: `go test -race`; TS: `Promise.all` of N concurrent calls asserting state consistency)"
+- **Candidate task**: "Verify project's tooling enforces null safety: `tsconfig.strictNullChecks`, `mypy --strict`, `clippy::unwrap_used`, `go vet`/`staticcheck`"
+
+Present:
+
+```
+## Runtime Robustness candidates detected
+
+The following ACs/tasks may apply to this story (per detected triggers + stack rules):
+
+[List of candidates]
+
+[A]ccept all  [S]elect specific  [N]one apply
+```
+
+WAIT for user choice. Add only the accepted items to the AC/task lists.
+
+If no triggers match, skip this section silently (no candidates surfaced).
+
 ### 5. Generate File List
 
 Expected files to create and modify, grouped by service/area.
