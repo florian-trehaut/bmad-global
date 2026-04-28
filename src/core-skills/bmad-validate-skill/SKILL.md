@@ -4,4 +4,4 @@ description: "Validate a bmad-* workflow skill against conventions. Checks struc
 disable-model-invocation: true
 ---
 
-Follow the instructions in ./workflow.md.
+Read FULLY and follow `./workflow.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

@@ -4,4 +4,4 @@ description: "Transforms a PRD into epics and stories with acceptance criteria, 
 disable-model-invocation: true
 ---
 
-Follow the instructions in ./workflow.md.
+Read FULLY and follow `./workflow.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

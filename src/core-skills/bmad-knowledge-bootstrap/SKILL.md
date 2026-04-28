@@ -66,4 +66,4 @@ Execute each entry in `{workflow.activation_steps_append}` in order.
 
 ---
 
-**Activation complete.** Read fully and follow `./workflow.md` for the step-by-step workflow.
+**Activation complete.** Read FULLY and follow `./workflow.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

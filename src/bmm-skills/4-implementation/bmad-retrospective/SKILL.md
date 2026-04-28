@@ -80,4 +80,4 @@ Activation is complete.
 
 ---
 
-**Read fully and follow `./workflow.md`** for the step-by-step workflow.
+**Read FULLY and follow `./workflow.md`** — load the file with the Read tool, do not summarise from memory, do not skip sections.
