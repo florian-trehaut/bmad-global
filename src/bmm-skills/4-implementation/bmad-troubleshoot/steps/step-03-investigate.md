@@ -2,7 +2,7 @@
 
 ## STEP GOAL
 
-Aggressively investigate the bug — logs, database, code, deployments — without asking the user. Launch parallel investigations via subagents when available. This is the autonomous phase.
+Aggressively investigate the bug — logs, database, code, deployments — without asking the user. Launch parallel investigations via subagents when available. This is the autonomous phase. **Climb the Reproduction Hierarchy** defined in `~/.claude/skills/bmad-shared/evidence-based-debugging.md` as far as possible — rung 1 (local reproduction via test) is the target for any deterministic bug.
 
 ## RULES
 
@@ -11,6 +11,10 @@ Aggressively investigate the bug — logs, database, code, deployments — witho
 - **Use local skills** — invoke project skills from `LOCAL_SKILLS` (discovered in step 2)
 - **NEVER fabricate evidence** — if a source is inaccessible, report it, don't substitute
 - **Parallel when possible** — launch subagent investigations concurrently
+- **Evidence-based mandate** — apply `~/.claude/skills/bmad-shared/evidence-based-debugging.md`:
+  - Code reading is **never** proof on its own — it identifies WHERE to look, never WHAT happened
+  - Attempt rung-1 reproduction (local test that fails at the baseline commit) for every deterministic bug
+  - If rung 1 is unreachable, document which exception class (E-1 to E-8) applies and climb to the highest rung that IS reachable
 
 ## SEQUENCE
 
@@ -97,10 +101,24 @@ DEPLOY_EVIDENCE: {summary}
 
 Flag any investigation axis that could not be executed (no log access, no DB access, etc.).
 
-### 5. Auto-proceed
+### 5. Determine reproduction rung achieved
 
-Evidence collected. Proceed to diagnosis.
+Per `~/.claude/skills/bmad-shared/evidence-based-debugging.md`, classify the highest evidence rung obtained for the bug:
+
+- **Rung 1** — local reproduction via automated test (deterministic). Capture pre-fix failure output now, even if the fix is not yet implemented (the test exists and fails at baseline)
+- **Rung 2** — local reproduction via manual run (deterministic but no test artifact yet — must be promoted to rung 1 in step-06)
+- **Rung 3** — captured production artifact (log line + correlation ID, DB snapshot, stack trace) — record the exception class E-1 to E-8 that justifies why rung 1-2 are unreachable
+- **Rung 4** — live production observation (note the screenshot/copy made for durability)
+- **Rung 5** — user report only (acceptable as starting point, but cannot be the final proof — must be promoted before step-06)
+
+Store as `EVIDENCE_RUNG` and (if applicable) `EVIDENCE_EXCEPTION_CLASS`. The diagnosis report in step-04 will cite these.
+
+If `EVIDENCE_RUNG` is 5 (user report only) and no exception class applies, **HALT**: "Cannot diagnose with rung-5 evidence alone. Investigate further: try local reproduction (rung 1-2), or capture a production artifact (rung 3). Re-run step-03 once you have a higher-rung artifact."
+
+### 6. Auto-proceed
+
+Evidence collected and rung classified. Proceed to diagnosis.
 
 ---
 
-**Next:** Read fully and follow `./steps/step-04-diagnose.md`
+**Next:** Read FULLY and apply: `./steps/step-04-diagnose.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

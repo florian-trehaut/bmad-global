@@ -4,6 +4,8 @@
 
 Skipping this protocol means the workflow operates blind — without tech stack, conventions, tracker patterns, or communication preferences. **That is never acceptable.**
 
+**Companion rule:** `workflow-adherence.md` operationalises the proof of execution — every workflow that loads files via this protocol MUST also emit the `CHK-INIT` Read Receipt defined in workflow-adherence Rule 2 before running its first step. The receipt enumerates which files were actually Read, making any silent skip detectable.
+
 ---
 
 ## The Three Knowledge Sources

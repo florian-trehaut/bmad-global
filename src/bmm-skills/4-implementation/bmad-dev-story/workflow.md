@@ -65,6 +65,25 @@ HALT if either file is missing with the message defined in `knowledge-loading.md
 - `EXECUTION_MODE = SOLO` (always solo — no team mode)
 - `MR_IID = null` (populated by step-04)
 
+### 5. CHK-INIT — Initialization Read Receipt
+
+Per `~/.claude/skills/bmad-shared/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
+
+```
+CHK-INIT PASSED — bmad-dev-story initialization complete:
+  shared_rules_loaded: {N} files ({list filenames you actually Read})
+  project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
+  project_knowledge:
+    - project.md (schema_version: {X})
+    - api.md (loaded)
+    - domain.md ({"loaded" | "not required"})
+  worktree_template: {WORKTREE_TEMPLATE_DEV}
+  team_mode: {true | false}
+  user_name: {USER_NAME}
+  communication_language: {COMMUNICATION_LANGUAGE}
+  defaults: EXECUTION_MODE=SOLO, MR_IID=null
+```
+
 ---
 
 ## YOUR ROLE
@@ -125,7 +144,7 @@ Each step file contains its own `nextStepFile` frontmatter reference for sequent
 
 ## ENTRY POINT
 
-Load and execute `./steps/step-01-discover.md`.
+After CHK-INIT is emitted, **Read FULLY and apply**: `./steps/step-01-discover.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
 
 ## HALT CONDITIONS (GLOBAL)
 

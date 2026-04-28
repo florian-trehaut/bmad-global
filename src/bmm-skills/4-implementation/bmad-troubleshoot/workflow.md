@@ -79,6 +79,26 @@ After the protocol completes, `WORKTREE_PATH` is set.
 - `ISSUE_IDENTIFIER = null` (populated by step-05)
 - `MR_IID = null` (populated by step-07)
 
+### 6. CHK-INIT — Initialization Read Receipt
+
+Per `~/.claude/skills/bmad-shared/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
+
+```
+CHK-INIT PASSED — bmad-troubleshoot initialization complete:
+  shared_rules_loaded: {N} files ({list filenames you actually Read})
+  project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
+  project_knowledge:
+    - project.md (schema_version: {X})
+    - domain.md ({"loaded" | "not required"})
+    - api.md ({"loaded" | "not required"})
+  worktree_path: {WORKTREE_PATH}
+  worktree_reused_current: {true | false}
+  team_mode: {true | false}
+  user_name: {USER_NAME}
+  communication_language: {COMMUNICATION_LANGUAGE}
+  defaults: ISSUE_ID=null, ISSUE_IDENTIFIER=null, MR_IID=null
+```
+
 ---
 
 ## YOUR ROLE
@@ -126,7 +146,7 @@ You are a **systematic bug hunter**. You aggressively investigate problems witho
 
 ## ENTRY POINT
 
-Load and execute `./steps/step-01-understand.md`.
+After CHK-INIT is emitted, **Read FULLY and apply**: `./steps/step-01-understand.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
 
 ## HALT CONDITIONS (GLOBAL)
 
