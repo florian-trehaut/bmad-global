@@ -1,12 +1,13 @@
 ---
 nextStepFile: './step-13-push-mr.md'
+scopeCompletenessSubagent: '../subagent-workflows/scope-completeness.md'
 ---
 
-# Step 12: Traceability & Task Verification
+# Step 12: Traceability, Task Verification & Impartial Scope Audit
 
 ## STEP GOAL:
 
-Every AC must have at least one test at the level specified in the test strategy. Every task must be verified complete. Missing coverage = finding.
+Every AC must have at least one test at the level specified in the test strategy. Every task must be verified complete. Missing coverage = finding. After the local traceability check passes, an **impartial scope-completeness subagent** independently audits the implementation against the spec — last safety net before push.
 
 ## MANDATORY SEQUENCE
 
@@ -81,12 +82,81 @@ For each task marked [x] in the issue, verify it is truly complete:
   Re-validate.
 </check>
 
-### 6. Proceed
+### 6. Impartial Scope-Completeness Audit (mandatory)
 
-Store TRACEABILITY_REPORT for inclusion in completion comment (Step 14).
+After the local traceability matrix passes, spawn an independent, impartial subagent that re-checks the SAME story against the ACTUAL implementation (the diff), with no shared context with this thread. This is the last safety net before push.
+
+#### Why a separate audit when traceability already ran?
+
+- Traceability (sections 1–5) is built BY the same thread that wrote the code — it answers "for each AC I know about, is there a test?"
+- The impartial audit answers a stricter question: "for each task and AC declared in the spec, does the implementation deliver it? Are there oversights, missing files, scope creep, or stale references the author missed?"
+- The two are complementary; both run before push.
+
+#### Gating
+
+This audit is **MANDATORY** at end-of-workflow — it always runs. The cost (~30-60s of subagent time) is small relative to the cost of a missed scope item shipping to review.
+
+The only allowed skip: if the traceability matrix in section 3 reports `verdict: PASS` AND total ACs < 3 AND total tasks < 5 AND no cross-cutting infrastructure files were modified (no changes under `bmad-shared/`, `core-skills/`, `tools/`, `.github/workflows/`). Otherwise: run.
+
+If skipping, log: `Impartial scope audit skipped (trivial story + clean traceability)`. Otherwise proceed below.
+
+#### Invocation
+
+Spawn the subagent per the contract `{scopeCompletenessSubagent}`. CRITICAL: the prompt MUST contain ONLY the inputs listed below — no summary, no excerpt, no hint about what was implemented. The subagent's value depends on its independence.
+
+```
+Agent(
+  subagent_type: 'general-purpose',
+  description: 'Impartial scope-completeness audit (post-implementation)',
+  prompt: |
+    Read and apply this contract IN FULL: ~/.claude/skills/bmad-dev-story/subagent-workflows/scope-completeness.md
+
+    Inputs:
+      story_path: '{ABSOLUTE_PATH_TO_STORY_FILE_OR_TRACKER_DUMP}'
+      worktree_path: '{WORKTREE_PATH}'
+      baseline_commit: '{BASELINE_COMMIT}'
+
+    Return the structured Markdown report defined in the contract. No preamble, no postamble.
+)
+```
+
+`{BASELINE_COMMIT}` is `git merge-base HEAD origin/main` from the worktree (same value used by step-11 self-review).
+
+If the issue tracker is file-based (the story is a markdown file), pass the local path. If the tracker is API-based (Linear / GitHub / GitLab), dump the issue body to a temporary file in the worktree and pass that path:
+
+```bash
+# Example for file-based tracker:
+STORY_PATH="{TRACKER_STORY_LOCATION}/{story-slug}.md"
+
+# Example for Linear:
+mkdir -p {WORKTREE_PATH}/.bmad-tmp
+linear issue view {ISSUE_IDENTIFIER} --markdown > {WORKTREE_PATH}/.bmad-tmp/story.md
+STORY_PATH="{WORKTREE_PATH}/.bmad-tmp/story.md"
+```
+
+#### Handling the report
+
+Wait for the subagent's response (a structured Markdown report with sections: Coverage matrix / Oversights detected / Risks not addressed / Verdict).
+
+**If verdict = `APPROVED`** (no BLOCKER, ≤2 MAJOR):
+Store the report alongside `TRACEABILITY_REPORT` for inclusion in the completion comment (Step 14). Proceed to step 7.
+
+**If verdict = `NEEDS REVISION`** (≥1 BLOCKER or >2 MAJOR):
+1. Present the findings to the user verbatim.
+2. For each finding:
+   - **BLOCKER**: must fix before push. Implement the fix (back to step-08 mentally, run tests, re-validate). Then re-run the audit.
+   - **MAJOR**: ask the user — fix now, defer to a follow-up issue, or accept with justification.
+3. The audit may re-run ONCE on the corrected diff (bounded to 2 iterations total to prevent infinite refinement).
+4. If still NEEDS REVISION after 2 iterations, **HALT** and ask the user how to proceed (accept remaining findings with explicit justification recorded in the MR description, or abandon push).
+
+The audit findings (or the explicit acceptance) MUST be visible to the user before step-13 (push & MR creation).
+
+### 7. Proceed
+
+Store TRACEABILITY_REPORT and IMPARTIAL_AUDIT_REPORT for inclusion in completion comment (Step 14).
 Load and execute {nextStepFile}.
 
 ## SUCCESS/FAILURE:
 
-### SUCCESS: Every AC mapped to tests, P0 gaps addressed, all tasks verified
-### FAILURE: Skipping traceability, ignoring P0 gaps, marking tasks complete without verification
+### SUCCESS: Every AC mapped to tests, P0 gaps addressed, all tasks verified, impartial audit APPROVED (or explicit user acceptance of remaining findings)
+### FAILURE: Skipping traceability, ignoring P0 gaps, marking tasks complete without verification, skipping the impartial audit on a non-trivial story, hiding audit findings from the user

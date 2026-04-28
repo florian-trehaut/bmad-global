@@ -1,15 +1,15 @@
 ---
 type: 'subagent-workflow'
 parent_workflow: 'bmad-dev-story'
-parent_step: 'step-07-plan-approval.md'
+parent_step: 'step-12-traceability.md'
 agent_type: 'general-purpose'
 ---
 
-# Subagent Workflow: Scope Completeness Check
+# Subagent Workflow: Impartial Scope-Completeness Audit (post-implementation)
 
-**Goal:** Independently verify that a drafted implementation plan covers a story's full scope and surface oversights, gaps, and risks before the user approves the plan. Acts as the safety net between the plan author (who may have missed things) and the user.
+**Goal:** Independently audit whether an implementation actually delivers a story's full scope and surface any oversights, missing items, scope creep, or stale references — last safety net before push. Acts as an impartial second pair of eyes on top of the same-thread self-review (step-11) and traceability (step-12 §1-5).
 
-**Spawned by:** `bmad-dev-story` step-07-plan-approval, between the plan draft and the `ExitPlanMode` call.
+**Spawned by:** `bmad-dev-story` step-12-traceability §6, after the local traceability matrix passes and before step-13 (push & MR).
 
 **Agent type:** `general-purpose` — deliberately not specialised, to maintain neutrality. The subagent has no shared context with the spawning thread.
 
@@ -17,39 +17,44 @@ agent_type: 'general-purpose'
 
 ## ANTI-DEVIATION CONTRACT — IMPARTIALITY GUARANTEED
 
-This subagent is the **safety net** for plan completeness. Its value depends entirely on its independence from the plan author. The contract below MUST be respected in full.
+This subagent is the **last safety net** for scope completeness before push. Its value depends entirely on its independence from the dev thread that produced the implementation. The contract below MUST be respected in full.
 
 ### Inputs the subagent receives
 
-The spawning prompt MUST contain ONLY these two fields:
+The spawning prompt MUST contain ONLY these three fields:
 
-- `story_path` — absolute path to the story spec file
-- `plan_path` — absolute path to the drafted plan file
+- `story_path` — absolute path to the story spec file (markdown). For API-based trackers, the spawner is responsible for dumping the issue body to a local file first and passing that path.
+- `worktree_path` — absolute path to the worktree where the implementation lives.
+- `baseline_commit` — git commit SHA representing the pre-implementation state (`git merge-base HEAD origin/main`).
 
 The subagent MUST NOT receive:
 
 - A summary of the story scope (no "the story does X")
-- A summary of the plan content (no "the plan implements Y")
-- Any excerpt of either file
+- A summary of the implementation (no "the diff implements Y")
+- A list of changed files dictated by the spawner
+- Any excerpt of either the story or the diff
 - Any hint about which areas are likely problematic
-- References to this conversation's context
+- The traceability report from step-12 §1-5 (impartiality requires the subagent to compute its own coverage matrix)
+- References to the spawning conversation's context
 
 ### Inputs the subagent MUST produce itself
 
-- It MUST issue its own `Read` call on `story_path` to load the story
-- It MUST issue its own `Read` call on `plan_path` to load the plan
-- It MUST read enough of the codebase to validate file paths, existing patterns, and cross-references the plan claims
-- It MUST NOT trust any claim in the plan without verifying against the codebase
+- Issue its own `Read` call on `story_path` to load the spec
+- Issue its own `git diff {baseline_commit}..HEAD --stat` and `git diff {baseline_commit}..HEAD --name-only` from `worktree_path` to get the changed file list
+- Read the actual changed files (or at least their diffs) to verify implementation
+- Grep the codebase for cross-references the implementation may have missed
+- MUST NOT trust any claim in the spawning prompt beyond the three input paths/SHA
 
 ### Forbidden behaviour
 
-- DO NOT skip reading either file ("the prompt told me what's in it")
+- DO NOT skip reading the story or the diff ("the prompt told me what's in it")
 - DO NOT defer to the spawning thread's judgment on any finding
+- DO NOT trust the traceability report — recompute coverage independently
 - DO NOT downgrade severity to be polite
-- DO NOT remove findings because the plan "probably handles them"
-- DO NOT echo the plan's structure as if it were verified
+- DO NOT remove findings because the dev "probably handles them"
+- DO NOT echo the diff's structure as if it were verified
 
-If the subagent finds itself with no spec to verify against (story file empty / unreadable), it MUST return a single BLOCKER finding ("Story file unreadable — cannot verify scope") and stop. It MUST NOT fabricate findings.
+If the subagent finds itself with no spec to verify against (story file empty / unreadable), it MUST return a single BLOCKER finding ("Story file unreadable — cannot audit scope") and stop. It MUST NOT fabricate findings.
 
 ---
 
@@ -59,12 +64,15 @@ If the subagent finds itself with no spec to verify against (story file empty / 
 
 ```
 Read({story_path})
-Read({plan_path})
+cd {worktree_path} && git diff --stat {baseline_commit}..HEAD
+cd {worktree_path} && git diff --name-only {baseline_commit}..HEAD
 ```
 
-If either file is unreadable: return a BLOCKER and stop.
+If the story file is unreadable: return a BLOCKER and stop.
 
-### 2. Build Coverage Matrix
+If the diff is empty: return a BLOCKER ("No implementation found — empty diff against baseline") and stop.
+
+### 2. Build Independent Coverage Matrix
 
 Extract from the story:
 
@@ -74,36 +82,43 @@ Extract from the story:
 - Technical Acceptance Criteria (TAC-1..N)
 - Validation Metier (VM-1..N)
 - Numbered Tasks
-- Files to Create / Modify
+- Files to Create / Modify (if listed)
+- Mandatory guardrails
 
 For EACH item, mark as one of:
 
-- `COVERED` — the plan addresses it explicitly
-- `PARTIAL` — the plan addresses some but not all aspects
-- `MISSING` — the plan does not address it
-- `N/A` — the item is meta (e.g., DoD references) and doesn't need direct mapping
+- `IMPLEMENTED` — the diff contains code that delivers it (cite file:line)
+- `TESTED` — the diff also contains a test exercising it
+- `PARTIAL` — partially delivered (cite what's missing)
+- `MISSING` — not present in the diff
+- `SCOPE_CREEP` — present in the diff but NOT in the story
+- `N/A` — meta item (e.g., DoD references) requiring no direct mapping
+
+For the diff, also list any changed files NOT mapped to a story item — these are candidate scope creep.
 
 ### 3. Detect Oversights
 
-Search the codebase for things the plan SHOULD have considered:
+Search the codebase for things the IMPLEMENTATION should have addressed:
 
-- **Cross-references**: if the plan renames an identifier (e.g., a key, a perspective name), `grep -rn "{old name}" src/` to find every site that breaks under the rename
-- **Sibling files**: if the plan modifies a file in a directory, check whether sibling files in the same directory follow the same pattern and may need parallel updates
-- **Referenced files**: if the plan claims to reference an existing file, read it and verify the reference is correct
-- **Test artefacts**: changes to source structure may break tests (`test/`, `*.spec.*`, `*.test.*`)
-- **Documentation**: `docs/`, `README.md`, `CLAUDE.md`, `module-help.csv` may mention the changed concepts
-- **Tooling**: validators, linters, build scripts may need updates
-- **Tracker**: if the project uses a tracker file, the story may need an entry
+- **Cross-references**: if the diff renames an identifier (e.g., a key, a perspective name, an enum), `grep -rn "{old name}"` to find every site that breaks under the rename
+- **Sibling files**: if the diff modifies a file in a directory, check whether sibling files in the same directory follow the same pattern and may need parallel updates
+- **Referenced files**: when the story claims to reference an existing file or workflow, verify the reference is correct against the codebase
+- **Test artefacts**: changes to source structure may break existing tests (`test/`, `*.spec.*`, `*.test.*`)
+- **Documentation drift**: `docs/`, `README.md`, `CLAUDE.md`, `module-help.csv` may mention concepts changed by the diff
+- **Tooling**: validators, linters, build scripts may need updates the dev forgot
+- **Tracker entries**: if the project uses a tracker file (e.g., `sprint-status.yaml`), verify the story is reflected there if needed
+- **Migration notes**: if the diff renames a public-ish key (YAML field, enum, API), is there a migration note documented in the diff itself?
 
 ### 4. Identify Risks Not Addressed
 
-For each design choice in the plan, ask:
+For each design choice visible in the diff, ask:
 
 - **Backwards compatibility** — will this break consumers / parsers / downstream tools?
-- **Performance** — does this add a synchronous step to a hot path?
-- **Naming clarity** — will the new identifier confuse maintainers?
+- **Performance** — does the change add a synchronous step to a hot path?
+- **Naming clarity** — will the new identifier confuse maintainers? Is there a parenthetical "(formerly X)" for transition?
 - **Migration path** — how do existing instances of the system migrate?
 - **Rollback** — if the change goes wrong, can it be reverted cleanly?
+- **Failed Story-Tasks**: are there tasks marked complete in the story but with no clear implementation in the diff?
 
 ### 5. Return Structured Report
 
@@ -112,11 +127,12 @@ Output format (Markdown, returned as the subagent's final message):
 ```markdown
 ## 1. Coverage matrix
 
-| Item | Status | Note |
-|------|--------|------|
-| Task 1 | COVERED | Phase 1 |
-| Task 2 | PARTIAL | Plan covers file but not the test |
-| BAC-1 | COVERED | via Task 5 |
+| Item | Status | Evidence |
+|------|--------|----------|
+| Task 1 | IMPLEMENTED + TESTED | `path/file.ext:42`, `path/file.spec.ext:18` |
+| Task 2 | PARTIAL | code present at `path/file.ext:30`, no test |
+| BAC-1 | IMPLEMENTED + TESTED | … |
+| Unmapped diff entry | SCOPE_CREEP | `path/extra.ext` not referenced by any task/AC |
 | ...
 
 ## 2. Oversights detected
@@ -125,9 +141,9 @@ For each (numbered):
 - **Title**
 - **Evidence** (file:line or grep result)
 - **Severity**: BLOCKER / MAJOR / MINOR / INFO
-- **Proposed action**: concrete change to the plan
+- **Proposed action**: concrete change to the implementation
 
-## 3. Risks not addressed by the plan
+## 3. Risks not addressed by the implementation
 
 For each (numbered):
 - **Risk**
@@ -150,38 +166,39 @@ The report is returned verbatim to the spawning thread for presentation to the u
 
 **DO:**
 
-- Issue your own `Read` calls to load the story and plan independently
+- Issue your own `Read` calls to load the story and your own `git diff` calls to load the implementation
 - Verify cross-references with `grep` against the codebase
-- Return a structured Markdown report with the four sections above
+- Build the coverage matrix yourself — do not rely on any traceability report
 - Cite evidence (file:line or grep result) for every finding
-- Be ruthlessly thorough — the user explicitly asked for an impartial check
+- Be ruthlessly thorough — the user explicitly asked for an impartial check at the end of the workflow
 
 **DO NOT:**
 
-- Trust the spawning prompt for content beyond the two file paths
-- Accept the plan's claims without verification
+- Trust the spawning prompt for content beyond `story_path` / `worktree_path` / `baseline_commit`
+- Accept the implementation's structure without verification
 - Skip findings to be polite
 - Fabricate findings when the inputs are unreadable
 - Reference any conversation context outside this contract
-- Compute or recommend a final implementation decision — that belongs to the user
+- Recommend a final implementation decision — that belongs to the user
 
 ---
 
-## EXAMPLE INVOCATION (from step-07-plan-approval.md)
+## EXAMPLE INVOCATION (from step-12-traceability.md §6)
 
 ```
 Agent(
   subagent_type: 'general-purpose',
-  description: 'Impartial scope-completeness audit',
+  description: 'Impartial scope-completeness audit (post-implementation)',
   prompt: |
     Read and apply this contract IN FULL: ~/.claude/skills/bmad-dev-story/subagent-workflows/scope-completeness.md
 
     Inputs:
-      story_path: '{ABSOLUTE_PATH_TO_STORY_FILE}'
-      plan_path: '{ABSOLUTE_PATH_TO_PLAN_FILE}'
+      story_path: '{ABSOLUTE_PATH_TO_STORY_FILE_OR_TRACKER_DUMP}'
+      worktree_path: '{WORKTREE_PATH}'
+      baseline_commit: '{BASELINE_COMMIT}'
 
     Return the structured Markdown report defined in the contract. No preamble, no postamble.
 )
 ```
 
-The spawning thread MUST NOT include a summary of the story or the plan in the prompt. Only the two paths.
+The spawning thread MUST NOT include a summary of the story or the implementation in the prompt. Only the three inputs.
