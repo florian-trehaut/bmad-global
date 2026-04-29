@@ -2,6 +2,10 @@
 
 ## v1.11.0 - 2026-04-29
 
+> **TL;DR** — Claude can no longer silently skip steps in your workflows; story specs now do evidence work upfront (real-data + research + NFR + security gate); opt-in story-spec bifurcation lets your PM edit business sections in Linear/GitHub/GitLab/Jira while you keep technical sections in code.
+> **Action:** `npx @florian-trehaut/bmad-global install --force` (required), then `/bmad-knowledge-refresh` on existing projects (recommended).
+> **Breaking:** none for default usage. Custom skills with non-conformant workflow.md / step files will fail `npm run validate:skills --strict` — migrate via `node tools/migrate-workflow-hardening.js`.
+
 ### 🔥 Highlight: Claude can no longer silently skip steps in your workflows
 
 You know that moment where Claude runs a long workflow and you realize it skipped 3 steps "because they looked simple"? Done. v1.11.0 makes the anti-skip mechanism **mandatory and machine-checked** instead of doctrine-only.

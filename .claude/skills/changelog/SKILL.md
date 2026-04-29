@@ -184,6 +184,39 @@ Any non-empty match against the forbidden list = the draft has tech-dump residue
 
 A clean grep (every line empty or only allowlisted matches) = OK to proceed to §5.1.
 
+#### 5.0.5 Mandatory TL;DR
+
+Every changelog entry MUST open with a TL;DR for readers who don't have time to read the full body. The TL;DR is the very first content under the `## v{version}` heading, BEFORE the highlight.
+
+**Format (literal blockquote):**
+
+```markdown
+## v{new_version} - {YYYY-MM-DD}
+
+> **TL;DR** — {one sentence on what changes for users}.
+> **Action:** {one line with the commands to run, or "none" if no migration is needed}.
+> **Breaking:** {one line — list breaking changes by user-visible behavior, or "none"}.
+
+### 🔥 Highlight: {top theme}
+...
+```
+
+**Rules:**
+
+- Exactly 3 lines, each starting with a bold label (`**TL;DR**`, `**Action:**`, `**Breaking:**`). No more, no fewer.
+- Each line MUST fit on ONE line in the rendered markdown. No bullet lists, no sub-clauses, no parentheticals that wrap.
+- **TL;DR line:** what users *gain* or *should expect* in this version, in user-facing voice (per §5.0). If multiple themes, pick the strongest user-facing summary — the body breaks them out.
+- **Action line:** literal commands the user runs (`npx ... install --force`, `/bmad-knowledge-refresh`, etc.) or the literal word "none" if no migration is required. Never "see post-upgrade section" — repeat the commands here.
+- **Breaking line:** literal description of what stops working or behaves differently, or "none". If breaking, include "**migrate via:** {command}" in the same line.
+
+**Anti-patterns:**
+
+- ❌ "TL;DR — lots of improvements to specs and workflows" (vague — re-read your themes and pick the strongest)
+- ❌ "Action: see Post-upgrade section below" (defeats the point of the TL;DR — *repeat* the commands here)
+- ❌ Multi-line TL;DR with sub-bullets (the user wants 3 lines, not a nested table)
+
+**Voice check:** the §5.0 anti-tech-dump grep applies to the TL;DR too — no file:line refs, no rule IDs, no internal validator names. Apply the Outcome-First Rewrite Rule.
+
 #### 5.1 Language
 
 Write in `document_output_language` from `workflow-context.md` — CHANGELOG.md is a written artifact, not an interactive message. If `document_output_language` is not set in the frontmatter, fall back to `communication_language`.
@@ -414,6 +447,10 @@ Post a structured message using the mrkdwn template below. Each section is eithe
 ```
 ★ Header   : :package: *{package_name} {new_version} published on {registry}*
              {registry_url}
+
+★ TL;DR    : *TL;DR* — {one-line user-facing summary, same as CHANGELOG TL;DR line}
+             *Action:* {commands literal, same as CHANGELOG Action line}
+             *Breaking:* {description, same as CHANGELOG Breaking line}
 
 ★ Install  : *Install / update*
                • Global : `{global_install_command}`

@@ -6,6 +6,7 @@
  *   - Pre-flight + gap detection (§2.1)
  *   - Post-upgrade commands discovery (§3.1)
  *   - User-Facing Voice anti-tech-dump filter (§5.0)  ← v1.11.x
+ *   - Mandatory TL;DR block (§5.0.5)  ← v1.11.x
  *   - Language resolution via document_output_language (§5.1)
  *   - Impact-weighted theme ordering (§5.2)
  *   - Voice gate before Slack-immutability warning (§5.4)
@@ -185,6 +186,56 @@ test('AC-33: §5.4 voice gate runs the self-check before showing the draft', () 
     /before.*(showing|presenting).*draft|before.*user/i.test(reviewText),
     '§5.4 voice gate must run BEFORE presenting the draft to the user',
   );
+});
+
+// ============================================================
+// G18 — Mandatory TL;DR (§5.0.5 + §10.2)
+// ============================================================
+
+console.log(`\n${colors.cyan}G18 — Mandatory TL;DR${colors.reset}`);
+
+test('AC-34: §5.0.5 mandates a TL;DR block at the top of every entry', () => {
+  const content = fileContent(SKILL);
+  assert(/###?#? 5\.0\.5 Mandatory TL;DR/i.test(content), 'Missing §5.0.5 Mandatory TL;DR header');
+  assert(/MUST open with a TL;DR/i.test(content), '§5.0.5 must mandate the TL;DR for every entry');
+  assert(/BEFORE the highlight/i.test(content), '§5.0.5 must specify TL;DR position (before the highlight)');
+});
+
+test('AC-35: §5.0.5 specifies the 3-line format with TL;DR / Action / Breaking labels', () => {
+  const content = fileContent(SKILL);
+  assert(/\*\*TL;DR\*\*/.test(content), 'TL;DR label must be the first line');
+  assert(/\*\*Action:\*\*/.test(content), 'Action label must be the second line');
+  assert(/\*\*Breaking:\*\*/.test(content), 'Breaking label must be the third line');
+  assert(/Exactly 3 lines/i.test(content), 'Format must specify exactly 3 lines');
+});
+
+test('AC-36: §5.0.5 anti-patterns block "see post-upgrade section" deflection', () => {
+  const content = fileContent(SKILL);
+  assert(/Anti-patterns/i.test(content), 'Anti-patterns subsection missing');
+  assert(
+    /see Post-upgrade section/i.test(content) || /see post-upgrade/i.test(content),
+    'Must explicitly forbid the "see post-upgrade section" deflection in Action line',
+  );
+});
+
+test('AC-37: §5.0.5 voice check applies the §5.0 anti-tech-dump grep to the TL;DR', () => {
+  const content = fileContent(SKILL);
+  const tldr = content.match(/####\s+5\.0\.5[\s\S]*?(?=####\s+\d+\.\d|###\s+\d+\.|$)/);
+  assert(tldr, '§5.0.5 section must exist');
+  const tldrText = tldr[0];
+  assert(/§\s*5\.0/.test(tldrText) || /Outcome-First/.test(tldrText), '§5.0.5 voice check must reference §5.0 / Outcome-First rule');
+});
+
+test('AC-38: §10.2 Slack template includes a TL;DR section right after the header', () => {
+  const content = fileContent(SKILL);
+  const tmpl = content.match(/####\s+10\.2[\s\S]*?(?=####\s+\d+\.\d|###\s+\d+\.|$)/);
+  assert(tmpl, '§10.2 section must exist');
+  const tmplText = tmpl[0];
+  assert(/TL;DR/.test(tmplText), 'Slack template must include a TL;DR line');
+  const headerIdx = tmplText.search(/Header/);
+  const tldrIdx = tmplText.search(/TL;DR/);
+  const installIdx = tmplText.search(/\*Install/);
+  assert(headerIdx >= 0 && tldrIdx > headerIdx && installIdx > tldrIdx, 'Slack template ordering must be Header → TL;DR → Install');
 });
 
 // ============================================================
