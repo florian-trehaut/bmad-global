@@ -110,6 +110,80 @@ HALT — ask user to confirm or override: `[P]atch / [Mi]nor / [Ma]jor / [C]usto
 
 Group changes **by theme**, not by commit. Multiple commits on the same topic merge into one section.
 
+#### 5.0 User-Facing Voice — Mandatory Anti-Tech-Dump Filter
+
+**Audience:** users of the package (people who run `npm install` and use the CLI/skills). Not contributors. Not reviewers. Not future-you reading the diff. Users do not have the codebase open.
+
+A user reading the changelog wants three answers:
+
+1. **What changes for me when I upgrade?** (concrete capability gained, friction removed, behavior shifted)
+2. **What might break? How do I migrate?** (with explicit commands)
+3. **Why should I care?** (the *outcome*, not the implementation)
+
+A user does **not** want a tour of the diff. The CHANGELOG is not a PR description.
+
+##### Forbidden tech-dump patterns
+
+Reject any bullet matching these patterns. The grep regex is given so the §5.4 self-check can flag them mechanically:
+
+| Pattern | Regex | Example to avoid |
+|---------|-------|------------------|
+| File:line references | `[\w/.-]+\.(md\|js\|ts\|py\|json\|yaml\|sh):\d+(-\d+)?` | "in `tools/validate-skills.js:615-775`" |
+| Line-count annotations | `(\+\|\\(was )?\d+\s*lines\b\|\d+\s*lines,\s*NEW\b\|\+\d+%` | "(354 lines, NEW)", "(was 285 → 410 lines, +44%)" |
+| Internal rule/code IDs | `\b[A-Z]{3,}-\d{2}(\.\.[A-Z]{3,}?-?\d{2})?\b` (allowing the SAME ID once when introducing a user-visible flag) | "HARD-01..HARD-08", "SPEC-SPLIT-NO-TRACKER-ID", "R-01..R-12" |
+| Validator/regex internals | `(validateMandatorySections\|validateAcFormat\|regex literally rejects\|regex pattern\|(case-insensitive\|code-fence-aware) ?[—-])` | "Validator regex literally rejects PARTIAL", "case-insensitive, supports compound numbers like 02d, 01b" |
+| Refactor narratives | `(rewritten\|deleted\|renumbered\|cloned from\|+\d+ steps\b\|step-\d{2}[a-z]?-[a-z-]+\.md)` | "step-04-investigate → step-07-investigate (R092)", "rewritten (was 128 → 244 lines, +90%)" |
+| Codemod/script internals | `(codemod\|key transformation function\|line \d+ of diff\|migrate-\w+\.js)` | "Mass migration via idempotent codemod (462 lines, kept in tree)" |
+| Internal file paths | `(src/[^ ]*\.md\|protocols/[^ ]*\.md\|bmad-shared/[^ ]*\b)` (only allowed when the user must edit/install that file) | "in `src/core-skills/bmad-shared/workflow-adherence.md`" |
+| Cross-workflow propagation lists | `\b\d+\s+workflows?\s+(touched\|rewired\|consumers?\|propagation)\b` | "Cross-workflow consumer rewiring (9 workflows touched)" |
+| Diff stats | `\b\d+\s+files?\s+changed\b\|\b\+\d+\s+/\s+-\d+\b` | "331 files / +13988 / -94" |
+
+**Allowlist** (these tech terms are user-facing and OK):
+
+- Public command names (`/bmad-create-story`, `npm run validate:skills --strict`)
+- Public CLI flags (`--force`, `--strict`, `--profile=quick`)
+- Public config keys the user sets (`spec_split_enabled`, `worktree_enabled`)
+- Public workflow names (`/bmad-knowledge-refresh`)
+- Public file the user reads/edits (`workflow-context.md`, `CHANGELOG.md`)
+- Industry vocabulary the user knows (BDD, EARS, NFR, OWASP)
+
+##### The Outcome-First Rewrite Rule
+
+Before writing a bullet, force the lead-in to be one of these shapes — never an internal-mechanism shape:
+
+- ✅ **"You can now …"** / **"Before: X. Now: Y."** / **"When you run /command, …"**
+- ✅ **"⚠️ Breaking: existing X will now Y. Migrate by Z."**
+- ❌ **"Validator validates …"** / **"Codemod migrates …"** / **"Refactored X to Y."** / **"Added N rules in tools/foo.js."**
+
+If a bullet starts with the name of a validator, file, function, regex, or rule ID — **rewrite it to start with the user-visible outcome**, then mention the mechanism only if the user actually interacts with it (e.g. they have to run a command, or their CI will block).
+
+##### Concrete before/after
+
+| ❌ Tech dump | ✅ User-facing rewrite |
+|-------------|------------------------|
+| "HARD-01..HARD-08 validator rules in `tools/validate-skills.js:615-775` (HIGH severity, exit 1 in strict). 7 rules emitted in code (HARD-02 collapsed into HARD-07)." | "`npm run validate:skills --strict` now blocks any custom skill that lets Claude skip steps. CI runs strict, so a non-conformant skill won't merge." |
+| "Mass migration via idempotent codemod (`tools/migrate-workflow-hardening.js`, 462 lines, kept in tree): 49 workflows + 283 step files updated." | "All bundled workflows were retrofitted in this release. Got a custom skill of your own? Run `node tools/migrate-workflow-hardening.js` to retrofit it (idempotent, safe to re-run)." |
+| "step-04-access-verification.md (167 lines, NEW) — pure HALT gate: PASS / FAIL / EXEMPTED only." | "`/bmad-create-story` now HALTs immediately if you don't have access to the providers/DBs/services the story touches. Stops you from designing a plan you can't execute." |
+| "Cross-workflow consumer rewiring (not just a spec change — 9 workflows touched): `bmad-code-review` meta-1 OOS-N violations now BLOCKER (was QUESTION in v1)." | "Code review is now stricter on out-of-scope additions: any change that violates an OOS item blocks the PR (was a soft warning before)." |
+
+##### Mandatory self-check
+
+After drafting, before reaching §5.4 review gate, run this grep on the draft:
+
+```bash
+DRAFT=/tmp/changelog-draft.md   # write the draft to this path first
+grep -nE '[a-zA-Z_/.-]+\.(md|js|ts|py|json|yaml|sh):[0-9]+' "$DRAFT" || true
+grep -nE '\([+-]?[0-9]+\s+lines' "$DRAFT" || true
+grep -nE '\b[A-Z]{3,}-[0-9]{2}\b' "$DRAFT" || true
+grep -nE '\b(validateMandatorySections|validateAcFormat|case-insensitive|code-fence-aware)\b' "$DRAFT" || true
+grep -nE '\b[0-9]+\s+(files? changed|workflows? touched|step files? updated)\b' "$DRAFT" || true
+grep -nE '\bstep-[0-9]{2}[a-z]?-[a-z-]+\.md\b' "$DRAFT" || true
+```
+
+Any non-empty match against the forbidden list = the draft has tech-dump residue. **Rewrite that bullet using the Outcome-First rule before continuing.**
+
+A clean grep (every line empty or only allowlisted matches) = OK to proceed to §5.1.
+
 #### 5.1 Language
 
 Write in `document_output_language` from `workflow-context.md` — CHANGELOG.md is a written artifact, not an interactive message. If `document_output_language` is not set in the frontmatter, fall back to `communication_language`.
@@ -142,6 +216,8 @@ This replaces the prior "lead with the most impactful changes" instruction with 
 - Append `## Post-upgrade` subsection if `POST_UPGRADE_COMMANDS` is non-empty (step 3.1). Format as a numbered list with command + rationale.
 
 #### 5.4 Review gate
+
+**Voice gate (mandatory before showing the draft to the user):** Re-run the §5.0 self-check grep on the final draft. If ANY forbidden pattern matches outside the allowlist, the draft is **not ready** — rewrite the matching bullets using the Outcome-First rule, then re-grep. Loop until clean. Only after a clean grep do you present the draft.
 
 Present the changelog to the user in the conversation.
 

@@ -5,9 +5,10 @@
  * improvement we extracted from the v1.5.0 release ad-hoc fixes:
  *   - Pre-flight + gap detection (§2.1)
  *   - Post-upgrade commands discovery (§3.1)
+ *   - User-Facing Voice anti-tech-dump filter (§5.0)  ← v1.11.x
  *   - Language resolution via document_output_language (§5.1)
  *   - Impact-weighted theme ordering (§5.2)
- *   - Slack-immutability review warning (§5.4)
+ *   - Voice gate before Slack-immutability warning (§5.4)
  *   - Pre-push tarball sanity check (§7.5)
  *   - Provenance note on workflow path (§8)
  *   - CI failure triage + recovery menu (§9.5 / §9.6)
@@ -118,6 +119,72 @@ test('AC-7: discovery reads workflow-context.md post_install_commands AND scans 
 test('AC-8: discovery persists POST_UPGRADE_COMMANDS for downstream use', () => {
   const content = fileContent(SKILL);
   assert(/POST_UPGRADE_COMMANDS/.test(content), 'Must store discovered list as POST_UPGRADE_COMMANDS');
+});
+
+// ============================================================
+// G17 — User-facing voice / anti-tech-dump filter (§5.0 + §5.4)
+// ============================================================
+
+console.log(`\n${colors.cyan}G17 — User-facing voice / anti-tech-dump${colors.reset}`);
+
+test('AC-28: §5.0 declares a User-Facing Voice anti-tech-dump filter', () => {
+  const content = fileContent(SKILL);
+  assert(/###?#? 5\.0 User-Facing Voice/i.test(content), 'Missing §5.0 User-Facing Voice header');
+  assert(/audience/i.test(content), '§5.0 must define the audience explicitly');
+  assert(/(users? (do not|don'?t) (want|have))|not contributors/i.test(content), '§5.0 must contrast user-want vs contributor-want');
+});
+
+test('AC-29: §5.0 lists forbidden tech-dump patterns with grep regexes', () => {
+  const content = fileContent(SKILL);
+  assert(/Forbidden tech-dump patterns/i.test(content), 'Missing forbidden-patterns subheading');
+  for (const fragment of [
+    'File:line references',
+    'Line-count annotations',
+    'Internal rule/code IDs',
+    'Refactor narratives',
+    'Codemod/script internals',
+    'Cross-workflow propagation',
+    'Diff stats',
+  ]) {
+    assert(content.includes(fragment), `Forbidden pattern row missing: ${fragment}`);
+  }
+});
+
+test('AC-30: §5.0 defines an Outcome-First Rewrite Rule with allow/forbid lead-ins', () => {
+  const content = fileContent(SKILL);
+  assert(/Outcome-First Rewrite Rule/i.test(content), 'Missing Outcome-First Rewrite Rule subheading');
+  assert(/You can now/i.test(content), 'Outcome-First lead-in "You can now…" missing');
+  assert(/Before:.*Now:/i.test(content), 'Outcome-First lead-in "Before: … Now: …" missing');
+  assert(
+    /Validator validates/i.test(content) || /Codemod migrates/i.test(content),
+    'Forbidden lead-ins (Validator validates / Codemod migrates) must be listed as anti-patterns',
+  );
+});
+
+test('AC-31: §5.0 ships concrete before/after rewrite examples', () => {
+  const content = fileContent(SKILL);
+  assert(/Tech dump.*User-facing rewrite/is.test(content), 'Before/after table header missing');
+  assert(/HARD-01\.\.HARD-08/.test(content), 'Concrete example referencing the actual tech-dump pattern that triggered this rule');
+});
+
+test('AC-32: §5.0 mandates a self-check grep before §5.4 review', () => {
+  const content = fileContent(SKILL);
+  assert(/Mandatory self-check/i.test(content), 'Missing "Mandatory self-check" gate');
+  assert(/grep -nE/.test(content), 'Self-check must include grep -nE shell snippet');
+});
+
+test('AC-33: §5.4 voice gate runs the self-check before showing the draft', () => {
+  const content = fileContent(SKILL);
+  // §5.4 must explicitly require running §5.0 grep BEFORE presenting to the user
+  const review = content.match(/####\s+5\.4[\s\S]*?(?=####\s+\d+\.\d|###\s+\d+\.|$)/);
+  assert(review, '§5.4 section must exist');
+  const reviewText = review[0];
+  assert(/Voice gate/i.test(reviewText), '§5.4 must contain a "Voice gate"');
+  assert(/§\s*5\.0/.test(reviewText) || /5\.0 self-check/i.test(reviewText), '§5.4 voice gate must reference §5.0 self-check');
+  assert(
+    /before.*(showing|presenting).*draft|before.*user/i.test(reviewText),
+    '§5.4 voice gate must run BEFORE presenting the draft to the user',
+  );
 });
 
 // ============================================================
