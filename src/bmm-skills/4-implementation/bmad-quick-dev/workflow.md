@@ -40,7 +40,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 - `validation-verdict-protocol.md` — binary verdict semantics (Security Gate)
 - `workflow-adherence.md` — NO-SKIP discipline + CHK-STEP receipts
 - **`ac-format-rule.md`** — BACs in Given/When/Then; TACs in EARS (5 patterns)
-- **`spec-completeness-rule.md`** — mandatory sections list (story-spec v2 schema, quick profile allows terse N/A on Real-Data Findings + External Research)
+- **`spec-completeness-rule.md`** — mandatory sections list (story-spec v2 (monolithic) or v3 (bifurcation) schema, quick profile allows terse N/A on Real-Data Findings + External Research)
 - **`boundaries-rule.md`** — boundaries triple (Always / Ask First / Never)
 - **`knowledge-schema.md`** — schema_version v1.1 expected (with optional sections data-sources / compliance-requirements / observability-standards / nfr-defaults / security-baseline)
 

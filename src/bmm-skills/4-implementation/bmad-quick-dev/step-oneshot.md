@@ -31,15 +31,47 @@ Deduplicate all review findings. Three categories only:
 
 If a finding is caused by this change but too significant for a trivial patch, HALT and present it to the human for decision before proceeding.
 
+### Resolve Output Mode (story-spec v3 bifurcation)
+
+Before writing the spec trace, determine the output mode:
+
+```
+output_mode = bifurcation  IF spec_split_enabled == true (in workflow-context.md frontmatter)
+                            AND tracker ∈ {linear, github, gitlab, jira}
+output_mode = monolithic   OTHERWISE (file tracker, or flag false / absent)
+```
+
+**Path A — `output_mode == monolithic`:** write the full trace spec to `{spec_file}` only (legacy behavior). Frontmatter records `mode: monolithic` explicitly so downstream tooling can distinguish intentional one-shot from absent (legacy v1).
+
+**Path B — `output_mode == bifurcation`:** apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 1 (Create — initial publish) in quick-mode condensed form:
+
+1. **Idempotency pre-check** — if a draft local file already exists at `{spec_file}` with frontmatter `tracker_issue_id` set, treat as **update** (operation 5). Otherwise create.
+2. **Compose business markdown** — concatenate the canonical business sections present in the trace (typically only DoD/Problem/Solution if the one-shot was that simple, or the full set if more context emerged). Append the local-spec footer linking to `{spec_file}`.
+3. **Size pre-check** per Size Limits in spec-bifurcation.md.
+4. **Tracker write** — `tracker-crud.md` `create_issue` (or `update_issue_preserve` on retry) with the composed business markdown. Capture `id` + `url`. Emit structured echo per Observability section of tracker-crud.md.
+5. **Compute** `business_content_hash = MD5(composed_business)[:8]`.
+6. **Write local file** at `{spec_file}` with v3 frontmatter (`schema_version: "3.0"`, `mode: bifurcation`, `tracker_issue_id`, `tracker_url`, `business_content_hash`, `business_synced_at`) + business mirrors with markers + technical sections.
+
+This ensures one-shot specs in bifurcation projects receive the same collaborative surface as `bmad-create-story`-produced specs (per BAC-1 + Task 6 of the v3 story).
+
+**HALT contract** applies (zero-fallback per `no-fallback-no-false-data.md`): tracker write failure → HALT, never silently fall back to local-only.
+
 ### Generate Spec Trace
 
 Set `{title}` = a concise title derived from the clarified intent.
 
-Write `{spec_file}` using `./spec-template.md`. Fill only these sections — delete all others:
+Write `{spec_file}` using `./spec-template.md`. Fill only these sections — delete all others.
 
-1. **Frontmatter** — set `title: '{title}'`, `type`, `created`, `status: 'done'`. Add `route: 'one-shot'`.
-2. **Title and Intent** — `# {title}` heading and `## Intent` with **Problem** and **Approach** lines. Reuse the summary you already generated for the terminal.
-3. **Suggested Review Order** — append after Intent. Build using the same convention as `./step-05-present.md` § "Generate Suggested Review Order" (spec-file-relative links, concern-based ordering, ultra-concise framing).
+**Frontmatter (branches on `output_mode`):**
+
+- `output_mode == monolithic`: `title: '{title}'`, `type`, `created`, `status: 'done'`, `route: 'one-shot'`, `mode: 'monolithic'`.
+- `output_mode == bifurcation`: same fields + `schema_version: "3.0"`, `mode: 'bifurcation'`, `tracker_issue_id`, `tracker_url`, `business_content_hash`, `business_synced_at` (populated by Path B above).
+
+**Body sections:**
+
+1. **Title and Intent** — `# {title}` heading and `## Intent` with **Problem** and **Approach** lines. Reuse the summary you already generated for the terminal. In bifurcation mode, this content also goes into the tracker description as the "Problem" + "Proposed Solution" canonical sections.
+2. **Business mirrors (bifurcation only)** — for each business section published to the tracker, emit the heading + marker `> Mirror — see tracker for canonical: {tracker_url}` + 1-line synopsis.
+3. **Suggested Review Order** — append after Intent. Build using the same convention as `./step-05-present.md` § "Generate Suggested Review Order" (spec-file-relative links, concern-based ordering, ultra-concise framing). Technical only — never published to tracker.
 
 Follow `./sync-sprint-status.md` with `{target_status}` = `review`.
 

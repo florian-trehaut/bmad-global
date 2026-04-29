@@ -45,6 +45,19 @@ const ALLOWED_LEGACY_PATHS = [
   'src/core-skills/bmad-validate-skill/steps/step-04-conventions.md',
 ];
 
+// Known protocols registered in knowledge-schema.md `protocols:` map. New protocols
+// added by knowledge-schema bumps MUST be reflected here so that consumer workflows
+// referencing them are recognised by REF-04 (protocol path validity check).
+const KNOWN_PROTOCOLS = [
+  'tracker-crud',
+  'tech-stack-lookup',
+  'environments-lookup',
+  'validation-tooling-lookup',
+  'concurrency-review',
+  'null-safety-review',
+  'spec-bifurcation', // Added in knowledge-schema v1.2 (story-spec v3 bifurcation).
+];
+
 // File names that no longer exist post-consolidation.
 const LEGACY_FILE_NAMES = [
   'tracker.md',
@@ -84,6 +97,58 @@ function isConsumerPath(relPath) {
 
 function isAllowed(relPath) {
   return ALLOWED_LEGACY_PATHS.some((allowed) => relPath.startsWith(allowed) || relPath === allowed);
+}
+
+// Parse the YAML frontmatter from knowledge-schema.md to obtain the registered
+// protocol keys. The set is used by checkProtocolRefs to reject references to
+// unknown protocols (REF-04).
+function loadRegisteredProtocols() {
+  const fallback = new Set(KNOWN_PROTOCOLS);
+  if (!fs.existsSync(SCHEMA_PATH)) return fallback;
+  const text = fs.readFileSync(SCHEMA_PATH, 'utf8');
+  const m = text.match(/^---\n([\s\S]*?)\n---/);
+  if (!m) return fallback;
+  const block = m[1];
+  const startIdx = block.indexOf('protocols:');
+  if (startIdx === -1) return fallback;
+  const after = block.slice(startIdx);
+  const lines = after.split('\n').slice(1);
+  const items = new Set();
+  for (const line of lines) {
+    const itemMatch = line.match(/^ {2}([a-z][a-z0-9-]*):\s*$/);
+    if (itemMatch) {
+      items.add(itemMatch[1]);
+      continue;
+    }
+    if (line.length > 0 && /^\S/.test(line)) break;
+  }
+  return items.size > 0 ? items : fallback;
+}
+
+function checkProtocolRefs(absPath, content, findings, registeredProtocols) {
+  const relPath = path.relative(PROJECT_ROOT, absPath);
+  if (relPath.startsWith('src/core-skills/bmad-shared/knowledge-schema.md')) return;
+  if (relPath.startsWith('src/core-skills/bmad-shared/protocols/')) return;
+
+  const PROTOCOL_REF_RE = /~\/\.claude\/skills\/bmad-shared\/protocols\/([a-z][a-z0-9-]*)\.md/g;
+  const lines = content.split('\n');
+  for (const [idx, line] of lines.entries()) {
+    let m;
+    PROTOCOL_REF_RE.lastIndex = 0;
+    while ((m = PROTOCOL_REF_RE.exec(line)) !== null) {
+      const protocolName = m[1];
+      if (!registeredProtocols.has(protocolName)) {
+        findings.push({
+          rule: 'REF-04',
+          severity: 'HIGH',
+          file: relPath,
+          line: idx + 1,
+          message: `Reference to unknown protocol '${protocolName}'. Registered protocols: ${[...registeredProtocols].join(', ')}. Either fix the path or add the protocol to knowledge-schema.md.`,
+          excerpt: line.trim().slice(0, 160),
+        });
+      }
+    }
+  }
 }
 
 // Parse the YAML frontmatter from knowledge-schema.md to obtain the
@@ -227,19 +292,31 @@ function main() {
   }
 
   const allowedAnchors = loadAllowedDirectAnchors();
+  const registeredProtocols = loadRegisteredProtocols();
   const findings = [];
   for (const file of walk(SRC_DIR)) {
     const content = loadFile(file);
     checkLegacyRefs(file, content, findings);
     checkSoftLoads(file, content, findings);
     checkDirectAnchorRefs(file, content, findings, allowedAnchors);
+    checkProtocolRefs(file, content, findings, registeredProtocols);
   }
 
   if (JSON_OUTPUT) {
-    process.stdout.write(JSON.stringify({ findings, allowedAnchors: [...allowedAnchors] }, null, 2) + '\n');
+    process.stdout.write(
+      JSON.stringify(
+        {
+          findings,
+          allowedAnchors: [...allowedAnchors],
+          registeredProtocols: [...registeredProtocols],
+        },
+        null,
+        2,
+      ) + '\n',
+    );
   } else if (findings.length === 0) {
     console.log(
-      `Knowledge refs validation: PASSED (no legacy filenames, no soft loads, no direct anchor refs in consumer files; allowed anchors: ${[...allowedAnchors].join(', ')}).`,
+      `Knowledge refs validation: PASSED (no legacy filenames, no soft loads, no direct anchor refs in consumer files, no unknown protocol refs; allowed anchors: ${[...allowedAnchors].join(', ')}; registered protocols: ${[...registeredProtocols].join(', ')}).`,
     );
   } else {
     console.log(`Knowledge refs validation: ${findings.length} finding(s)\n`);

@@ -89,6 +89,27 @@ Verify:
 
 Store `ISSUE_ID`, `ISSUE_TITLE`, `ISSUE_DESCRIPTION`.
 
+### 2b. Bifurcation mode detection (story-spec v3)
+
+Before parsing sections, detect whether the spec is in bifurcation mode:
+
+```
+spec_mode = bifurcation  IF a local spec file exists at {TRACKER_STORY_LOCATION}/{story_key}.md
+                            AND its frontmatter has mode: bifurcation
+                            AND tracker_issue_id matches ISSUE_IDENTIFIER
+spec_mode = monolithic   OTHERWISE
+```
+
+**If `spec_mode == bifurcation`:**
+
+Apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md`:
+1. **Drift check** (operation 3) — lightweight `get issue updatedAt`. If drift, HALT, present `[R]/[I]/[V]` menu, wait for user selection. On `[R]`, refresh mirror + frontmatter + commit. On `[I]`, log and continue.
+2. **VM parsing source:** canonical in tracker — `ISSUE_DESCRIPTION` from step 2 IS the source.
+3. **DoD parsing source:** canonical in tracker — same source.
+4. Local file mirrors are non-canonical synopses — never use them for VM/DoD parsing.
+
+**If `spec_mode == monolithic`:** proceed with VM/DoD parsing on `ISSUE_DESCRIPTION` (full spec) as before.
+
 ### 3. Parse the VM and DoD sections
 
 Search in `ISSUE_DESCRIPTION`:

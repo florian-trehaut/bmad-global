@@ -10,7 +10,7 @@ voting: true
 
 **Goal:** Verify the MR does not introduce exploitable vulnerabilities, regulatory violations, or supply-chain risks. **Verify the Security Gate declared in the story spec (story-spec v2) is delivered in the diff.**
 
-## v2 Spec Inputs (story-spec v2 schema)
+## v2 Spec Inputs (story-spec v2 (monolithic) or v3 (bifurcation) schema)
 
 If `contract.linear_issue.spec_v2.security_gate` is loaded:
 

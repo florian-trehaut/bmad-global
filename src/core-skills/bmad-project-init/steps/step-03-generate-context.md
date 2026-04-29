@@ -41,6 +41,26 @@ Gather all confirmed values from **Step 02**: project_name, issue_prefix, app_ty
 
 Note: knowledge files (`workflow-knowledge/project.md`, `domain.md`, `api.md`) are generated separately by `/bmad-knowledge-bootstrap` after this skill completes.
 
+### 1b. Resolve Story-Spec Bifurcation Mode (v3)
+
+If `tracker ∈ {linear, github, gitlab, jira}` (collaborative tracker), prompt the user:
+
+> Story-spec v3 introduit le mode **bifurcation** : sections métier dans le tracker (Linear / GitHub Issues / GitLab Issues / Jira), sections techniques dans un fichier .md local versionné avec le code, drift detection on-demand.
+>
+> Avantage : Product Owners et stakeholders collaborent sur les BACs, DoD, scope dans leur outil habituel ; développeurs et Claude lisent les sections techniques avec le code.
+>
+> Voir `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` pour le détail.
+>
+> Activer le mode bifurcation pour ce projet ? **[O]ui** / **[N]on** (default: N — comportement v2 monolithic préservé)
+
+WAIT for explicit user input in `{communication_language}`. Set `{spec_split_enabled}`:
+- On `[O]ui` → `true`
+- On `[N]on` (or any other input) → `false`
+
+If `tracker == file` (file-based tracker), **skip this prompt** and set `{spec_split_enabled}` = `false` (file trackers are not collaborative; the flag is ignored anyway, but set explicitly for clarity in the generated workflow-context.md).
+
+Log: `Resolved spec_split_enabled = {value} for tracker = {tracker_type}`.
+
 ### 2. Generate the File
 
 Write `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` with the following structure:
@@ -115,6 +135,9 @@ user_skill_level: {skill_level}
 labels:
   spec_reviewed: "{spec_reviewed_label}"
   client_prefix: "{client_prefix}"
+
+# --- Story-spec mode (v3 bifurcation) ---
+spec_split_enabled: {spec_split_enabled}  # true = bifurcation (business in tracker, technical in local), false = monolithic (all-in-one). Defaults to false. ONLY relevant when tracker ∈ {linear, github, gitlab, jira} (collaborative trackers). Ignored on file-based trackers.
 ---
 ```
 

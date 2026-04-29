@@ -2,7 +2,7 @@
 
 Template for composing the tracker issue description in Step 11/13.
 
-This template implements the **story-spec v2 schema** defined by `bmad-shared/spec-completeness-rule.md`. All sections marked ALWAYS are mandatory for both `bmad-create-story` (full mode) and `bmad-quick-dev` (quick mode, with N/A allowances on Real-Data Findings + External Research).
+This template implements the **story-spec v2 (monolithic) or v3 (bifurcation) schema** defined by `bmad-shared/spec-completeness-rule.md`. All sections marked ALWAYS are mandatory for both `bmad-create-story` (full mode) and `bmad-quick-dev` (quick mode, with N/A allowances on Real-Data Findings + External Research).
 
 ## Structure
 

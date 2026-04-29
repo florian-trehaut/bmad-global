@@ -16,7 +16,7 @@ sub_axis_weights:
 
 **Goal:** Verify the code behaves correctly under failure, under load, under rollback, **maintains state continuity during execution**, handles missing/null values without crashing, is concurrency-safe, **and implements the observability contract declared in the story spec (story-spec v2)**.
 
-## v2 Spec Inputs (story-spec v2 schema)
+## v2 Spec Inputs (story-spec v2 (monolithic) or v3 (bifurcation) schema)
 
 If `contract.linear_issue.spec_v2` is loaded, this meta consumes:
 

@@ -111,6 +111,21 @@ If at any point the user explicitly says "stop" or "abandonne" → HALT and exit
 
 ---
 
+### PART 0.5 — Resolve Output Mode (bifurcation vs monolithic)
+
+After PART 0 completes (gate exit OK), determine the output mode for this story spec **before** branching to D1 / E1.
+
+Read `spec_split_enabled` from `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` YAML frontmatter.
+
+```
+output_mode = bifurcation  IF spec_split_enabled == true AND tracker ∈ {linear, github, gitlab, jira}
+output_mode = monolithic   OTHERWISE (file tracker, or flag false / absent)
+```
+
+Store `OUTPUT_MODE`. Both Discovery and Enrichment paths branch on this.
+
+**Idempotency pre-check (story-spec v3, applies to all modes):** if a draft local file already exists at `{TRACKER_STORY_LOCATION}/{story_key}.md` with frontmatter `tracker_issue_id` set, treat the operation as **update** (Enrichment-style update of the existing tracker issue), not as create. Prevents duplicate tracker issues on workflow retries.
+
 ### Discovery Mode Path
 
 #### D1. Determine Issue Placement
@@ -155,31 +170,64 @@ Ask user to confirm or adjust.
 - Type label: "Bug", "Task", "Improvement", "Feature"
 - Client label if applicable (using the label prefix from `workflow-context.md`)
 
-#### D4. Create the Tracker Issue
+#### D4. Create the Tracker Issue (branches on OUTPUT_MODE)
+
+**Path D4-monolithic** (`OUTPUT_MODE == monolithic`):
 
 Create the issue in the tracker (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`):
 
 - Operation: Create issue
 - Title: {title}
 - Team: {TRACKER_TEAM}
-- Description: {composed_description}
+- Description: {composed_description}  *(full spec — all sections)*
 - Priority: {priority}
 - Labels: {labels}
 - Project: {project_name_if_any}
 - Status: {TRACKER_STATES.todo}
 - Estimate: {estimate}
 
+For file-based trackers (`tracker == file`): write the full spec to `{TRACKER_STORY_LOCATION}/{story_key}.md` per the tracker file recipe in `tracker-crud.md`. **No tracker write attempt** — file IS the tracker.
+
 Store: `NEW_ISSUE_ID`, `NEW_ISSUE_IDENTIFIER`.
 
-**If issue creation fails:** HALT — report error. Do NOT fallback to local file.
+**Path D4-bifurcation** (`OUTPUT_MODE == bifurcation`):
+
+Apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 1 (Create — initial publish):
+
+1. **Compose business markdown** — concatenate sections 1-6 + 20 (DoD, Problem, Solution, Scope, OOS, Business Context, Validation Metier) in canonical order. Append the local-spec footer (with placeholder `{REPO_URL}` resolved from git config).
+2. **Size pre-check** per the protocol's Size Limits section. HALT if exceeded.
+3. **Tracker write** — call `tracker-crud.md` create_issue with the composed business markdown as the description, plus title / priority / labels / project / status / estimate as in monolithic path. Capture returned `id` and `url`. Emit structured echo (per Observability Requirements): `tracker call: create_issue {id_or_n/a} → {status} ({duration_ms}ms)`.
+4. **Compute business_content_hash** — `MD5(composed_business_markdown).hex()[:8]`.
+5. **Write local file** — `{TRACKER_STORY_LOCATION}/{story_key}.md` with:
+   - Frontmatter: `schema_version: "3.0"`, `mode: bifurcation`, `tracker_issue_id: {id}`, `tracker_url: {url}`, `business_content_hash: {hash}`, `business_synced_at: {ISO 8601 now}`, plus existing fields (`generated`, `generator`, `slug`, `story_points`, `profile`).
+   - Business mirror sections 1-6 + 20 — for each: H2 heading + marker `> Mirror — see tracker for canonical: {tracker_url}` + 1-line synopsis (≤ 200 chars from first paragraph or first list item).
+   - Technical sections 7-19, 21-25 in full canonical form (no mirror — they live only here).
+6. **Display result** — print tracker URL + local file path + write timings.
+
+Store: `NEW_ISSUE_ID = {id}`, `NEW_ISSUE_IDENTIFIER = {tracker-issue-identifier}`, `LOCAL_SPEC_PATH = {TRACKER_STORY_LOCATION}/{story_key}.md`.
+
+**If tracker write fails (any path):** HALT — report tracker error verbatim. Do NOT fallback to local file (zero-fallback rule). Do NOT silently retry.
 
 ### Enrichment Mode Path
 
-#### E1. Update Issue Description
+#### E1. Update Issue Description (branches on OUTPUT_MODE)
 
-1. Update the issue description in the tracker — Operation: Update issue, Issue: {ISSUE_ID}, Field: description, Value: enriched_description
+**Path E1-monolithic** (`OUTPUT_MODE == monolithic`):
+
+1. Update the issue description in the tracker — Operation: Update issue, Issue: {ISSUE_ID}, Field: description, Value: enriched_description (full spec)
 2. Update the issue estimate — Operation: Update issue, Issue: {ISSUE_ID}, Field: estimate, Value: {estimate}
-3. If the update fails due to size, try splitting: update description first, then add details as a comment
+3. If the update fails due to size, HALT (per `tracker-crud.md` HALT contract — never silently truncate). Do not fall back to comments without explicit user instruction.
+
+**Path E1-bifurcation** (`OUTPUT_MODE == bifurcation`):
+
+Apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 5 (Update — sync tracker from local preserving non-managed sections):
+
+1. Fetch current tracker description (operation 3 in tracker-crud.md = `get_issue`).
+2. Parse by H2 heading. Identify managed business sections vs PO-added non-managed sections.
+3. Compose the new description: managed sections from the (re-)distilled local content + non-managed sections preserved in original positions.
+4. Apply size pre-check.
+5. Call `tracker-crud.md` operation 7 (`update issue description preserving non-managed sections`) with the composed description.
+6. Update the local file frontmatter: `business_synced_at: {ISO 8601 now}`, `business_content_hash: MD5(composed_business)[:8]`. Commit `spec: update bifurcated business sections` (or include in the surrounding workflow commit if part of a larger change).
 
 #### E2. Update Issue Status to Todo
 

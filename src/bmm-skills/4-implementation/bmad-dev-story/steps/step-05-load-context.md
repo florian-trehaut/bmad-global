@@ -35,11 +35,31 @@ Load the project context (source of truth for dev standards) and check for cross
 
 ## MANDATORY SEQUENCE
 
-### 1. Load Issue Description
+### 1. Load Issue Description (story-spec v2 OR v3 bifurcation)
 
-The issue description (loaded from tracker in Step 2) IS the story (story-spec v2 schema) — it contains tasks, BACs (G/W/T), TACs (EARS), guardrails, NFR registry, Security Gate, Observability Requirements, Boundaries Triple, Risks register, Out-of-Scope, INVEST self-check, plus all standard sections.
+The issue description (loaded from tracker in Step 2) is ONE of two shapes:
 
-**Surface v2 sections explicitly to the dev** (display before implementation begins):
+**Story-spec v2 monolithic** — the tracker description IS the full story (BACs G/W/T + TACs EARS + tasks + guardrails + NFR registry + Security Gate + Observability Requirements + Boundaries Triple + Risks + OOS + INVEST + Test Strategy + File List).
+
+**Story-spec v3 bifurcation** — the tracker description contains ONLY the canonical business sections (DoD, Problem, Solution, Scope, OOS, Business Context with BACs G/W/T, Validation Metier). The technical sections (TACs EARS, NFR, Security Gate, Observability, Boundaries, Risks, INVEST, Test Strategy, File List, Implementation Plan) live in the LOCAL spec file (mirror of business + canonical technical), at `{TRACKER_STORY_LOCATION}/{story_key}.md` (or moved into the worktree by step-03 in projects with worktrees).
+
+**Detect mode:**
+
+```
+Read frontmatter of the local spec file at {TRACKER_STORY_LOCATION}/{story_key}.md (or {WORKTREE_PATH}/{TRACKER_STORY_LOCATION}/{story_key}.md if step-03 performed worktree handoff).
+If frontmatter has `mode: bifurcation` → bifurcation mode.
+Else (mode: monolithic, or absent for legacy v2) → monolithic mode.
+```
+
+**If `mode: bifurcation`:**
+
+1. Apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 3 (drift check) — fetch lightweight `tracker.updatedAt`, compare with frontmatter `business_synced_at` (60s tolerance). If drift detected, HALT, present `[R]/[I]/[V]` menu, wait for user input. On `[R]` apply operation 4. On `[I]` log and continue.
+2. Apply protocol operation 2 (compose unified view) — read local file (technical sections) + tracker description (business sections) and compose the unified view. Use the unified view as the input to step-08 (implementation) and step-12 (traceability).
+3. The technical sections (TACs, NFR, Security, etc.) are loaded from the LOCAL file — never from the tracker description, which only contains business sections in bifurcation mode.
+
+**If monolithic:** the tracker description (loaded in Step 2) IS the story — proceed as before.
+
+**Surface sections explicitly to the dev** (display before implementation begins):
 
 ```
 ## Story v2 Spec Snapshot

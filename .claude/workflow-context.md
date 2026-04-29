@@ -36,7 +36,8 @@ fork_remote: origin
 upstream_remote: upstream
 
 # --- Worktree strategy ---
-worktree_reuse_current: auto           # auto = detect + prompt on mismatch (default) | always = reuse without prompt | never = always create conventional sibling
+worktree_enabled: false                # BMAD-METHOD is trunk-based — no worktrees, commits go directly to main
+worktree_reuse_current: auto           # auto = detect + prompt on mismatch (default) | always = reuse without prompt | never = always create conventional sibling (only relevant if worktree_enabled: true)
 
 # --- Worktree naming ---
 worktree_prefix: bmad-method

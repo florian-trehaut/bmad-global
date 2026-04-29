@@ -54,7 +54,7 @@ Search in `ISSUE_DESCRIPTION`:
 
 ### Story-spec v2 optional sections (additive parsing — none halts the workflow)
 
-If the issue follows the **story-spec v2 schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`), the following additional sections may be parsed for richer validation:
+If the issue follows the **story-spec v2 (monolithic) or v3 (bifurcation) schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`), the following additional sections may be parsed for richer validation:
 
 **NFR Registry** — section heading "NFR Registry" or "NFRs". Parse the table for any row marked PRESENT/PARTIAL with a measurable target (Performance latency, Scalability throughput, etc.). For each measurable target, optionally generate a derived validation step (e.g. perf measurement during the test environment session). Marked as **`vm_derived_nfr`** in the structured list.
 

@@ -8,7 +8,7 @@ context: [] # optional: `{project-root}/`-prefixed paths to project-wide standar
 ---
 
 <!--
-  This is the QUICK profile of the story-spec v2 schema (`bmad-shared/spec-completeness-rule.md`).
+  This is the QUICK profile of the story-spec v2 (monolithic) or v3 (bifurcation) schema (`bmad-shared/spec-completeness-rule.md`).
   All mandatory sections from v2 are present here, with terse N/A justifications allowed for
   Real-Data Findings and External Research when the scope is purely internal.
 

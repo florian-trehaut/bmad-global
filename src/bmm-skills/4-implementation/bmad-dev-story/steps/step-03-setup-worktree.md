@@ -66,6 +66,49 @@ fi
 
 The protocol sets `WORKTREE_PATH` and may set `REUSED_CURRENT_WORKTREE=true`.
 
+### 2b. Spec Handoff to Worktree (story-spec v3 bifurcation)
+
+After the worktree protocol returns and `WORKTREE_PATH` is set, perform the bifurcation spec handoff if applicable.
+
+**Determine handoff applicability:**
+
+```
+handoff_required = (spec_split_enabled == true)
+                   AND (worktree_enabled == true)
+                   AND (REUSED_CURRENT_WORKTREE == false)
+                   AND (local spec exists at {MAIN_PROJECT_ROOT}/{TRACKER_STORY_LOCATION}/{story_key}.md)
+                   AND (local spec frontmatter has mode: bifurcation)
+```
+
+The predicate uses **AND** (not OR) on the worktree conditions: handoff fires only when a NEW dev worktree was created (worktree_enabled true AND not reused). This avoids attempting `git mv` of a file from the main repo to itself when:
+
+- Trunk-based projects (`worktree_enabled: false`) — no worktree to hand off into; spec stays in place.
+- The session was already in a dev worktree and the protocol set `REUSED_CURRENT_WORKTREE = true` — the spec has already been handed off (or is already in the worktree alongside the work).
+
+If `handoff_required == false` (any condition fails) → **skip silently** to step 3. Common skip reasons: project trunk-based (`worktree_enabled: false`), legacy v2 spec (no `mode` field), monolithic mode, current worktree was reused (handoff already done or unnecessary), spec already in worktree (move was done in a prior session).
+
+**If `handoff_required == true`:** apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 6 (Worktree handoff — `git mv`):
+
+1. Verify the source file exists at `{MAIN_PROJECT_ROOT}/{TRACKER_STORY_LOCATION}/{story_key}.md`. If absent, HALT with `Spec handoff: source file expected at {path} but not found. Investigate.`.
+2. Verify the worktree is on the dev branch (`{BRANCH_NAME}`). If not (HEAD detached, wrong branch) → HALT with the worktree state.
+3. Execute atomically:
+   ```bash
+   cd {MAIN_PROJECT_ROOT}
+   git mv {TRACKER_STORY_LOCATION}/{story_key}.md {WORKTREE_PATH}/{TRACKER_STORY_LOCATION}/{story_key}.md
+   git -C {WORKTREE_PATH} commit -m "spec: handoff to worktree" -- {TRACKER_STORY_LOCATION}/{story_key}.md
+   ```
+4. Verify the source file is **absent** from the main repo:
+   ```bash
+   git -C {MAIN_PROJECT_ROOT} ls-files -- {TRACKER_STORY_LOCATION}/{story_key}.md
+   ```
+   If output is non-empty → HALT with `Spec handoff: source file still present in main repo after git mv. Investigate.`.
+5. Emit structured echo (per Observability Requirements):
+   ```
+   Spec handoff: {MAIN_PROJECT_ROOT}/{TRACKER_STORY_LOCATION}/{story_key}.md → {WORKTREE_PATH}/{TRACKER_STORY_LOCATION}/{story_key}.md (commit {SHA})
+   ```
+
+**HALT contract:** any failure in steps 1-4 above is a HALT — never force the move, never silently retry, never proceed without the handoff once it has started. The `git mv` is atomic per git semantics: if it fails (uncommitted changes, conflict, fs error), both source and destination remain unchanged.
+
 ### 3. Initialize Progress Tracker
 
 ```bash

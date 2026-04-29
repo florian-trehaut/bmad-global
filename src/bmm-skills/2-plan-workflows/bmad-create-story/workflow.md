@@ -1,8 +1,8 @@
 # Create Story — Workflow (v2)
 
-**BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, dual-mode (Discovery / Enrichment), story-spec v2 schema.**
+**BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, dual-mode (Discovery / Enrichment), story-spec v2 (monolithic) or v3 (bifurcation) schema.**
 
-**Goal:** Produce implementation-ready stories that meet the story-spec v2 schema (`bmad-shared/spec-completeness-rule.md`). The workflow combines real-data confrontation, external research, structured NFR / security / observability, EARS-formatted technical ACs, INVEST self-check, out-of-scope register, risks/assumptions register, and boundaries triple — producing the most rigorous public story-spec pipeline.
+**Goal:** Produce implementation-ready stories that meet the story-spec v2 (monolithic) or v3 (bifurcation) schema (`bmad-shared/spec-completeness-rule.md`). The workflow combines real-data confrontation, external research, structured NFR / security / observability, EARS-formatted technical ACs, INVEST self-check, out-of-scope register, risks/assumptions register, and boundaries triple — producing the most rigorous public story-spec pipeline.
 
 In **Discovery mode**, guide the user through conversational spec engineering to create a new tracker issue. In **Enrichment mode**, load all project context and enrich an existing issue with the same v2 sections. Both modes converge into the same evidence → modeling → audit → plan → multi-validator review → publication pipeline.
 
@@ -46,7 +46,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 - `validation-verdict-protocol.md` — binary verdict semantics (used by Step 9 Security Gate)
 - `workflow-adherence.md` — NO-SKIP discipline + CHK-STEP receipts
 - **`ac-format-rule.md`** — BACs in Given/When/Then; TACs in EARS (5 patterns)
-- **`spec-completeness-rule.md`** — mandatory sections list (story-spec v2 schema)
+- **`spec-completeness-rule.md`** — mandatory sections list (story-spec v2 (monolithic) or v3 (bifurcation) schema)
 - **`boundaries-rule.md`** — boundaries triple (Always / Ask First / Never)
 - **`knowledge-schema.md`** — schema_version v1.1 expected (with optional sections data-sources / compliance-requirements / observability-standards / nfr-defaults / security-baseline)
 

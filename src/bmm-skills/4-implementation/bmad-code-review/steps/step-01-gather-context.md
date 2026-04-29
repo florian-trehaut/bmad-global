@@ -149,10 +149,14 @@ Check `adr_location` in `workflow-context.md`. If set, load ADRs from the config
   `{FORGE_CLI} mr list --state closed --search "{ISSUE_IDENTIFIER}"` → extract rejection reasons and prior approaches. Store as `PRIOR_MRS` — if current MR repeats a rejected approach, flag it.
 </check>
 
-### 3.6 Tracker issue (story-spec v2)
+### 3.6 Tracker issue (story-spec v2 or v3 bifurcation)
 
 <check if="LINKED_TRACKER_ISSUE exists">
-  Load full issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`, include relations). The issue description IS the specs compliance reference, structured per the **story-spec v2 schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`).
+  Load full issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`, include relations). The issue description IS the specs compliance reference, structured per the **story-spec v2 (monolithic) or v3 (bifurcation) schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`).
+
+  **Bifurcation mode detection:** if the MR's diff contains a local spec file at `_bmad-output/implementation-artifacts/{story_key}.md` with frontmatter `mode: bifurcation`, load that file and apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 2 (compose unified view) — fetch the tracker description (business sections) AND read the local file (technical sections + business mirrors), merge them into a single composite spec for review. Drift check (operation 3) on entry: if drift detected, HALT, present `[R]/[I]/[V]` menu.
+
+  In monolithic mode, the tracker description IS the full spec — no compose unified view needed.
 
   Extract these sections (tolerant — missing optional sections noted but do NOT halt; missing mandatory sections produce a meta-1 finding):
 

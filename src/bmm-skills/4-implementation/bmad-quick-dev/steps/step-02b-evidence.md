@@ -2,7 +2,7 @@
 
 **Goal:** Lightweight evidence pass before implementation. Surface Real-Data Findings + External Research from the v2 spec (Mode A) OR conduct a light investigation if user instructions touch a provider / DB / cloud (Mode B). Warn-only — no HALT — to keep quick-dev rapid.
 
-This step exists to align quick-dev on the **story-spec v2 schema** without imposing the full create-story Phase B rigor. For full investigation discipline (HALT on missing access, full provider data sampling, version-specific external research), escalate to `/bmad-create-story`.
+This step exists to align quick-dev on the **story-spec v2 (monolithic) or v3 (bifurcation) schema** without imposing the full create-story Phase B rigor. For full investigation discipline (HALT on missing access, full provider data sampling, version-specific external research), escalate to `/bmad-create-story`.
 
 ---
 

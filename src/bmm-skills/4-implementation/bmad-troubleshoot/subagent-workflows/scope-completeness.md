@@ -75,7 +75,7 @@ If the diff is empty: return a BLOCKER ("No fix found — empty diff against bas
 
 ### 2. Build Independent Coverage Matrix
 
-Extract from the issue body (story-spec v2 schema where applicable — see `~/.claude/skills/bmad-shared/spec-completeness-rule.md`):
+Extract from the issue body (story-spec v2 (monolithic) or v3 (bifurcation) schema where applicable — see `~/.claude/skills/bmad-shared/spec-completeness-rule.md`):
 
 - **Root Cause** (one paragraph from the Diagnosis section)
 - **Causal Chain** (Five Whys or equivalent)

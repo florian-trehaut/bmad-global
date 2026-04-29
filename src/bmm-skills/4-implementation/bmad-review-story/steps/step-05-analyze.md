@@ -39,6 +39,30 @@ Extract hypotheses from the story, verify each against real data gathered in Ste
 
 ## SEQUENCE
 
+### 0. Compose unified view if bifurcation mode (story-spec v3)
+
+Before analysis, determine the spec mode:
+
+```
+spec_mode = bifurcation  IF local spec frontmatter has mode: bifurcation AND tracker_issue_id is set
+spec_mode = monolithic   OTHERWISE (legacy v2 or explicit mode: monolithic)
+```
+
+**If `spec_mode == bifurcation`:**
+
+Apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 2 (Read — get full spec via compose unified view):
+
+1. **Drift check first** — apply protocol operation 3 (lightweight `get issue updatedAt`). If drift detected (tracker `updatedAt > business_synced_at + 60s tolerance`), HALT and present the menu `[R]efresh / [I]gnore / [V]iew diff` per the protocol. Wait for user selection.
+   - On `[R]`: apply protocol operation 4, regenerate mirror, update `business_synced_at` + `business_content_hash`, commit `spec: refresh business sections from tracker`. Then proceed.
+   - On `[I]`: log "ignored drift, continuing with stale local mirror". Proceed.
+   - On `[V]`: display the diff between tracker description and local mirror without modifying. After display, re-present `[R]/[I]` (no `[V]` again).
+2. **Compose unified view** — read local file (technical sections + business mirrors), call `tracker-crud.md` `get_issue` for the full description, replace business mirror sections with the canonical tracker content (preserving heading order from `spec-completeness-rule.md`).
+3. Use the unified view as the input to the analysis below — hypotheses are extracted from the composed view, not the local file alone.
+
+**If `spec_mode == monolithic`:** read the spec file as-is (no tracker fetch). Proceed.
+
+**HALT on any tracker fetch failure** — never silently fall back to the local mirror (zero-fallback rule).
+
 ### 1. Extract hypotheses from the story
 
 Read the story description carefully. For each AC, task, and description paragraph, extract:

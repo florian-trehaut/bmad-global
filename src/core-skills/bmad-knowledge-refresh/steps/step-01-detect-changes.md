@@ -288,6 +288,39 @@ Include workflow-context.md in refresh? [Y/N]
 
 If Y: add `workflow-context.md` to TARGET_FILES with a `context_update` flag.
 
+### 12b. Spec Bifurcation Mode Toggle (story-spec v3, additive UPDATE)
+
+If `tracker ∈ {linear, github, gitlab, jira}` (collaborative tracker), display the current `spec_split_enabled` state and offer to toggle:
+
+```
+Story-spec mode (v3 bifurcation):
+  Current: spec_split_enabled = {true | false | absent}
+
+  - bifurcation: business sections in tracker (collab), technical in local file
+  - monolithic:  full spec in single .md (legacy v2)
+
+Voir ~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md
+
+Action ? [K]eep current / [T]oggle / [S]kip prompt
+```
+
+WAIT for explicit user input (in `{communication_language}`).
+
+**On `[K]eep`:** no change. Log `spec_split_enabled retained: {value}`.
+
+**On `[T]oggle`:**
+- If currently `true` → set to `false`.
+- If currently `false` → set to `true`.
+- If currently absent → ask "Activate ? [O]ui = true, [N]on = false (default N)" and set accordingly.
+
+When the value changes (or is set for the first time), append/update the field in `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` YAML frontmatter using **append** semantics if absent, or **in-place edit** of the value if present (preserving comments, position, and adjacent fields). Log: `Updated workflow-context.md: spec_split_enabled = {true|false} (refresh toggle)`.
+
+**On `[S]kip`:** silent skip. No prompt re-fires this run.
+
+If `tracker == file`, **skip this entire prompt silently** — the flag is irrelevant to file-tracker projects.
+
+This toggle uses the same **additive UPDATE contract** documented in `bmad-knowledge-bootstrap/steps/step-01-preflight.md` step 4b. It is the only field in `workflow-context.md` that bootstrap/refresh manages directly (everything else stays user-managed via project-init).
+
 ### 13. Build TARGET_FILES and Proceed
 
 Persist:

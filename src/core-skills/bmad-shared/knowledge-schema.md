@@ -1,5 +1,5 @@
 ---
-schema_version: "1.1"
+schema_version: "1.2"
 schema_status: stable
 
 # ============================================================
@@ -92,7 +92,7 @@ files:
         title: "Communication Platform"
         description: "Slack, Teams, Discord, etc. — handle and MCP prefix"
         required: false
-      # ----- v1.1 additions (story-spec v2 schema) -----
+      # ----- v1.1 additions (story-spec v2 (monolithic) or v3 (bifurcation) schema) -----
       - id: data-sources
         anchor: "data-sources"
         title: "Data Sources"
@@ -181,6 +181,11 @@ protocols:
     stacks_consumed: ["bmad-shared/stacks/{language}.md#null-safety"]
     consumed_by: "review-story, dev-story, create-story, code-review meta-2 (sub-axis 2e)"
     cross_reference: "bmad-shared/no-fallback-no-false-data.md (business angle, complementary)"
+  spec-bifurcation:
+    file: "~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md"
+    sections_consumed: []
+    consumed_by: "create-story step-13-output, quick-dev step-oneshot, dev-story step-03-setup-worktree, review-story step-05-analyze, validation-{metier,frontend,desktop} step-01-intake, knowledge-bootstrap step-01-preflight, knowledge-refresh step-01-detect-changes, project-init step-03-generate-context"
+    cross_reference: "bmad-shared/spec-completeness-rule.md (v3 schema definition), bmad-shared/protocols/tracker-crud.md (CRUD recipes)"
 
 # ============================================================
 # DIRECT-REFERENCE EXCEPTIONS
@@ -193,7 +198,7 @@ direct_reference_allowed:
   - review-perspectives       # code-review skill specifics
   - investigation-checklist   # troubleshoot / review-story specifics
   - communication-platform    # daily-planning, comm-platform handles
-  # ----- v1.1 additions (story-spec v2 schema, low-consumption) -----
+  # ----- v1.1 additions (story-spec v2 (monolithic) or v3 (bifurcation) schema, low-consumption) -----
   - data-sources              # create-story / quick-dev step-04 access-verification
   - compliance-requirements   # create-story / code-review meta-3 / quick-dev
   - observability-standards   # create-story step-09 / code-review meta-2 / quick-dev
@@ -201,7 +206,7 @@ direct_reference_allowed:
   - security-baseline         # create-story step-09 / code-review meta-3 / quick-dev
 ---
 
-# Knowledge Schema — v1.1
+# Knowledge Schema — v1.2
 
 This document is the **single source of truth** for the project knowledge layout consumed by all bmad-\* workflow skills. It defines:
 
@@ -292,9 +297,9 @@ This pattern is documented in:
 | Make an optional section required | **MAJOR bump** — breaking |
 | Tighten constraints (regex, type) on existing field | **MAJOR bump** — breaking |
 
-### v1.0 → v1.1 changelog (story-spec v2 schema)
+### v1.0 → v1.1 changelog (story-spec v2 (monolithic) or v3 (bifurcation) schema)
 
-Five new optional sections added to `project.md` to support the story-spec v2 schema (real-data confrontation + NFR + security gate + observability + compliance):
+Five new optional sections added to `project.md` to support the story-spec v2 (monolithic) or v3 (bifurcation) schema (real-data confrontation + NFR + security gate + observability + compliance):
 
 - `data-sources` — accessible DB / providers / cloud platforms (consumed by step-04 access-verification in create-story / quick-dev)
 - `compliance-requirements` — GDPR / HIPAA / SOC2 / PCI-DSS / project-specific (consumed by step-09 security gate)
@@ -305,6 +310,20 @@ Five new optional sections added to `project.md` to support the story-spec v2 sc
 All five are **optional** — projects that do not declare them simply produce per-story values without baseline cross-reference. Bundled workflows that consume them read defensively (no HALT if section absent).
 
 `bmad-knowledge-bootstrap` and `bmad-knowledge-refresh` will, on next run, ask the user whether to populate these sections (skippable per section).
+
+### v1.1 → v1.2 changelog (story-spec v3 bifurcation)
+
+Two additive changes to support story-spec v3 bifurcation mode (business sections in collaborative tracker, technical sections in local file):
+
+1. **New protocol registered**: `spec-bifurcation` (additive in the `protocols:` map) — abstracts the section→location mapping, drift detection, sync, and worktree handoff for bifurcation mode. Workflows reference this protocol; they never inline bifurcation logic.
+2. **New `workflow-context.md` field documented**: `spec_split_enabled: true | false` (optional, default `false`). Master switch for bifurcation. Set during `bmad-project-init` step-03-generate-context (initial), or via `bmad-knowledge-bootstrap` / `bmad-knowledge-refresh` (toggle later). Ignored when `tracker == file` (file-based tracker has no collaborative tracker available).
+
+This is a **MINOR bump** because both changes are additive and backward-compatible:
+- Projects without `spec_split_enabled` (or with `spec_split_enabled: false`) keep producing monolithic v2 specs unchanged.
+- Existing v2 specs (with `mode` field absent or `mode: monolithic`) are read as monolithic regardless of project flag.
+- No section was renamed or removed.
+
+`bmad-knowledge-bootstrap` and `bmad-knowledge-refresh` prompt the user for `spec_split_enabled` if `tracker` is collaborative (Linear / GitHub / GitLab / Jira) and the field is absent in `workflow-context.md`. The prompt is skipped on file-based trackers.
 
 Bumping MAJOR requires:
 1. Updating `bmad-knowledge-bootstrap` to emit the new schema_version.

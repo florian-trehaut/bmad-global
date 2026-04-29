@@ -1,0 +1,35 @@
+{
+  "_comment": "Sidebar manifest for the docs site. When the Astro/Starlight site is set up (currently absent from this fork — see CLAUDE.md note about website/), the build script reads this manifest to construct the sidebar. Until then, this file documents the intended placement of docs pages for future wiring.",
+  "_diataxis": "https://diataxis.fr",
+  "sidebars": {
+    "explanation": {
+      "label": "Explanation",
+      "description": "Concept docs — why a feature exists, design rationale, references",
+      "pages": [
+        {
+          "slug": "spec-bifurcation",
+          "title": "Spec Bifurcation — Why and How",
+          "path": "docs/explanation/spec-bifurcation.md",
+          "added_in": "story-spec v3 (2026-04-28)"
+        }
+      ]
+    },
+    "migration": {
+      "label": "Migration",
+      "description": "How-to docs — upgrade paths between schema versions",
+      "pages": [
+        {
+          "slug": "v2-to-v3-bifurcation",
+          "title": "Migrating from story-spec v2 to v3 (Bifurcation Mode)",
+          "path": "docs/migration/v2-to-v3-bifurcation.md",
+          "added_in": "story-spec v3 (2026-04-28)"
+        }
+      ]
+    }
+  },
+  "_wiring_instructions": {
+    "for_astro_starlight": "When website/astro.config.mjs is added (upstream sync or new setup), import this JSON and convert each `sidebars.<group>.pages[]` entry to a Starlight `SidebarItem`. The `path` is relative to the repo root.",
+    "for_other_static_site_generators": "The structure { sidebars: { <group>: { label, description, pages: [{ slug, title, path }] } } } is generic — adapt the loader to your generator (Docusaurus, MkDocs, VitePress, etc.).",
+    "current_status": "This fork (florian-trehaut/bmad-global) does NOT yet have an Astro Starlight site. The docs/ pages are standalone Markdown — readable directly on GitHub, in IDEs, or via any MD viewer. Wiring will happen when the docs site is imported from upstream (bmad-code-org/BMAD-METHOD)."
+  }
+}

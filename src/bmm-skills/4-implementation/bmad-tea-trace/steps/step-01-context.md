@@ -53,7 +53,7 @@ WAIT for user response if not already specified.
 
 **If user specifies a story or requirement source:**
 
-Read the file or tracker issue. If the story follows the **story-spec v2 schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`), distinguish two AC types:
+Read the file or tracker issue. If the story follows the **story-spec v2 (monolithic) or v3 (bifurcation) schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`), distinguish two AC types:
 
 - **BACs (Business Acceptance Criteria)** — Given/When/Then format. Assign IDs `BAC-01`, `BAC-02`, ... — these are verified at production time by Validation Metier (VM-N) AND by integration / journey tests pre-production.
 - **TACs (Technical Acceptance Criteria)** — EARS notation (Ubiquitous / Event-driven / State-driven / Optional / Unwanted). Assign IDs `TAC-01`, `TAC-02`, ... and capture the EARS pattern + the BAC reference (`refs_bacs: [BAC-1, BAC-2]`) for each.
