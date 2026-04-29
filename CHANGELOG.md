@@ -2,103 +2,84 @@
 
 ## v1.11.0 - 2026-04-29
 
-### 🔥 Highlight: Workflow hardening goes mandatory — `npm run validate:skills --strict` blocks any non-conformant skill
+### 🔥 Highlight: Claude can no longer silently skip steps in your workflows
 
-v1.10.0 shipped `workflow-adherence.md` as **opt-in doctrine**, applied to 2 workflows. Step-skipping happened anyway: the "Phase 3 / overhead-sensitive" classification of `bmad-quick-dev` was used as a porte-de-sortie to skip steps 02-06 of an actual workflow execution. Doctrine without enforcement was the gap, not awareness. v1.11.0 closes the loop — the validator enforces the doctrine in `--strict` mode (CI runs strict), the loophole classification is killed, and the rationalization that triggered the incident is preserved in a closed list **as the cautionary tale**.
+You know that moment where Claude runs a long workflow and you realize it skipped 3 steps "because they looked simple"? Done. v1.11.0 makes the anti-skip mechanism **mandatory and machine-checked** instead of doctrine-only.
 
-- **HARD-01..HARD-08 validator rules** in `tools/validate-skills.js:615-775` (HIGH severity, exit 1 in strict). 7 rules emitted in code (HARD-02 collapsed into HARD-07 anti-skim category):
-  - `HARD-01` — `workflow.md` declares `CHK-INIT` Read Receipt at end of `## INITIALIZATION`
-  - `HARD-03` — every step file opens with `## NO-SKIP CLAUSE` (mandates verbatim French wording naming the 12 rejected rationalizations)
-  - `HARD-04` / `HARD-05` — every step emits `CHK-STEP-NN-EXIT` and `CHK-STEP-NN-ENTRY` (case-insensitive, supports compound numbers like `02d`, `01b`)
-  - `HARD-06` — last step OR workflow.md declares `CHK-WORKFLOW-COMPLETE` enumerating every `CHK-STEP-NN-EXIT` emitted in the conversation
-  - `HARD-07` — every `Next:` line uses the canonical `**Next:** Read FULLY and apply: …` prefix
-  - `HARD-08` — every `Next:` line includes the literal phrase `do not summarise from memory, do not skip sections`
-  - Code-fence-aware: `Next:` references inside fenced examples are NOT rewritten/checked. Terminal-state aware: `final step / workflow ends / no next step / nothing to load` patterns skip the check.
-- **Mass migration via idempotent codemod** (`tools/migrate-workflow-hardening.js`, 462 lines, kept in tree for future re-runs): 49 workflows + 283 step files updated in one atomic commit. `--dry-run` and `--workflow=<name>` filters supported. Two independent paths to compliance now: write-time (pre-hardened `bmad-create-skill` templates) + retrofit (codemod).
-- **Anti-skim retrofit at the SKILL.md → workflow.md boundary** (49 `SKILL.md` files): `SKILL.md` is the only file Claude Code mechanically loads at skill invocation, so weak phrasing there ("Follow the instructions in `./workflow.md`.") let Claude infer workflow content from prior context and skip the `Read` tool call — making `CHK-INIT` *fakeable*. All transitions now use the canonical anti-skim wording.
-- **Closed list R-01..R-12 with verbatim-citation exception clause** (`src/core-skills/bmad-shared/workflow-adherence.md:166-280`): simplicité perçue · type de fichier · validators verts · profil utilisateur · compréhension auto-déclarée · disproportion ressentie · conditionalité bidouillée · substitution par autre · pression efficacité · implicite vs explicite · échappatoire de classification (R-11, **deprecated** — was the v1.10.0 incident trigger, kept on the list as a fossil) · compaction. **Sole valid skip:** explicit user instruction in the current conversation, with verbatim citation: `User said in this conversation, verbatim: "{quote}", which explicitly requests skipping {step_NN_or_workflow_section}.`
-- **Phase 3 / overhead-sensitive loophole removed** from `workflow-adherence.md` (was lines 169-176 of v1.10.0). Any classification saying "this workflow is allowed to be lighter" becomes the porte-de-sortie for ALL rationalisation patterns.
-- **Bonus — atomic delivery of 2 unrelated `bmad-create-story` features** rode this hardening commit per planning decision:
-  - **Change A — Example Mapping brainstorm** (`step-02d-discover.md`, +137 lines): new `[B] Brainstorm spec (Example Mapping)` in Discovery menu. Smart-suggestion logic counts 4 sparse-spec signals (BACs <3, examples=0, deps missing, VMs <2) — ≥2 match → menu prefixed with French recommendation. 8-card BDD discovery (Matt Wynne): D1 frame → D2 yellow=story → D3 blue=rules (max 7, warns "story too big") → D4 green=examples → D5 red=open questions → D6 loop → D7 synthesize back into PART B → D8 return.
-  - **Change B — Business Comprehension Gate** (`step-09-output.md`, +116 lines): new PART 0 inserted **before** Discovery/Enrichment paths. Counters "vibe coding" — explicit citation of *Microsoft Research 2025 (Lee et al.) on cognitive friction*: passive approval ("looks good ✓") produces compliance theater without genuine engagement. Distills 3-5 critical decisions, presents per-item `[Y] Conforme / [N] A rediscuter / [?] Donne-moi un exemple concret`, **HALTs and waits per item**. Tracker writes (D*/E*) BLOCKED until the gate passes.
+**What changes for you:**
 
-### ✨ Story-spec v2 — Phase B (Evidence) shifts left, binary security gate, EARS-format TACs
+- Run a BMAD workflow → Claude must emit a receipt at every step boundary. No receipt = the skip is visible immediately, not buried in the diff after the fact.
+- Got a custom skill of your own? `npm run validate:skills --strict` now blocks any skill missing the required structure. CI runs strict, so a non-conformant skill won't merge.
+- The `bmad-quick-dev` "Phase 3 / overhead-sensitive" classification that was used last release as an excuse to skip steps 02-06 is **gone**. All workflows are equal now.
+- All 49 bundled workflows + 283 step files were retrofitted in this release. Your custom skills can be retrofitted in one command: `node tools/migrate-workflow-hardening.js` (idempotent, safe to re-run).
+- New skills scaffolded via `/bmad-create-skill` are pre-hardened — they pass the validator out of the box.
 
-Until v2, evidence work (access verification, real-data investigation, external research) was done at review time by `bmad-review-story` — too late to reshape the plan. v2 lifts Phase B **to spec creation**, transforms `bmad-create-story` from 10 to 14 steps, and adds 6 new mandatory sections (NFR Registry, Security Gate, Observability, Out-of-Scope register, Risks/Assumptions, Boundaries Triple, INVEST). Heavier specs — but every downstream consumer (`dev-story`, `code-review`, `validation-*`, `tea-*`, `review-story`) consumes them deterministically without re-deriving.
+**Bonus features inside `bmad-create-story`:**
 
-- **`bmad-create-story` 10→14 steps** with Phase B cloned from `review-story` (`src/bmm-skills/2-plan-workflows/bmad-create-story/steps/`):
-  - `step-04-access-verification.md` (167 lines, NEW) — pure HALT gate: PASS / FAIL / EXEMPTED only. **No "investigation via code" backdoor** (line 41).
-  - `step-05-real-data-investigation.md` (180 lines, NEW) — uses `data/investigation-checklist.md` (96 lines, skill-internal).
-  - `step-06-external-research.md` (158 lines, NEW) — WebSearch + WebFetch + Context7. Version-specific findings only.
-  - `step-09-nfr-security-observability.md` (197 lines, NEW) — 8-row NFR Registry, binary Security Gate, Observability Requirements (logs/metrics/traces/alerts/dashboards/SLOs).
-  - `step-11-plan.md` rewritten (was 285 lines → 410 lines, +44%) — composes BACs/TACs/OOS/Risks/Boundaries/INVEST.
-  - `step-12-review.md` rewritten (was 128 → 244 lines, +90%) — three independent validators (Requirements / Design / Tasks), BLOCKER gate before step 13.
-- **Binary security gate — no escape valves** (`bmad-shared/data/security-gate-template.md`, 56 lines): `Verdict: PASS | FAIL | N/A` only. Validator regex literally rejects "PARTIAL" or "PASS with caveats" (`tools/validate-story-spec.js:281-292`). Template explicitly tags rationalizations like "we use HTTPS so PASS" or "FAIL is fine because the existing system is also FAIL" as anti-patterns. 11 compliance items (auth / authz / data exposure / sanitization / secrets / audit / GDPR / HIPAA / SOC2 / PCI-DSS / Other) with per-row verdicts.
-- **AC format enforced via regex** (`bmad-shared/ac-format-rule.md`, 70 lines):
-  - BACs MUST use `Given … When … Then …` (Specification by Example / BDD).
-  - TACs MUST use one of the 5 EARS patterns: **Ubiquitous** `The {system} shall …` / **Event-driven** `When {trigger}, the {system} shall …` / **State-driven** `While {state}, the {system} shall …` / **Optional** `Where {feature is enabled}, the {system} shall …` / **Unwanted** `If {undesired condition}, then the {system} shall {prevent / handle} …`.
-  - TACs MUST reference `BAC-N`. Orphan TAC = MAJOR. Multi-`shall` TAC = MAJOR. BAC written in EARS = MAJOR.
-- **Boundaries Triple** (Always Do / Ask First / Never Do) per Addy Osmani's "good spec for AI agents" framework — `bmad-shared/boundaries-rule.md` (88 lines). 3+ items per bucket required. Project baseline embedded (e.g. **Never Do**: `--no-verify`, edit `node_modules/`, push to main without PR). Validator emits `SPEC-BOUNDARIES-MISSING-BUCKET` MAJOR if any of the 3 emoji headers (✅/⚠️/🚫) is missing. User can grant one-shot waiver on **Ask First**, never on **Never Do**.
-- **`tools/validate-story-spec.js`** (354 lines, NEW) — 8 validators with severity matrix `BLOCKER/MAJOR/MINOR/INFO`:
-  - `validateMandatorySections` — 20 H2 regexes, `SPEC-MISSING-SECTION` BLOCKER per missing.
-  - `validateAcFormat` — `SPEC-BAC-FORMAT` BLOCKER (BACs need Given/when/then keywords), `SPEC-TAC-EARS-PATTERN` BLOCKER (label match), `SPEC-TAC-MISSING-BAC-REF` BLOCKER.
-  - `validateInvest` — 6 criteria words present, no `?`/`-` cells (MAJOR).
-  - `validateBoundaries` — 3 buckets with emoji headers (MAJOR each).
-  - `validateOutOfScope` — ≥2 OOS-N items (MAJOR if <2).
-  - `validateVm` — ≥1 VM-N (BLOCKER if 0).
-  - `validateRealDataAndResearch` — full profile <200 chars without justified `N/A — …` = MAJOR; quick profile <30 chars = MINOR.
-  - `validateSecurityGate` — regex `Verdict:\**\s*(PASS|FAIL|N\/A)` (BLOCKER if missing).
-  - `validateNfrRegistry` — 6 required categories (Performance / Scalability / Availability / Reliability / Maintainability / Usability).
-  - Modes: `--profile=full|quick`, `--strict` (exit 1 on MAJOR), `--warn-only`, `--json`. Wired into `npm run quality` AND `npm test` (`package.json:36-37,42,48`). Test fixtures: `valid-full.md` (220 lines, must pass with 0 BLOCKERs) + `broken-missing-sections.md` (26 lines, regression coverage).
-- **`bmad-quick-dev` v2 alignment** — first warn-only step in the pipeline:
-  - `step-02b-evidence.md` (129 lines, NEW). Mode A reads existing tech-spec; Mode B is light investigation on direct instructions, with `[V]erify / [A]cknowledge / [E]scalate` per trigger. `[E]` exits quick-dev to `/bmad-create-story`. Acknowledgements logged to `{wipFile}` so `code-review` meta-1c (Decision Documentation) audits later.
-  - `spec-template.md` (+236 lines) — embeds all 22 v2 sections.
-  - **Cleanest "fast lane with traceable shortcuts" pattern in the codebase.**
-- **Cross-workflow consumer rewiring** (not just a spec change — 9 workflows touched):
-  - `bmad-code-review` meta-1: **OOS-N violations now BLOCKER (was QUESTION in v1)**. `Never Do` boundary violations detected in `git diff` → BLOCKER. HIGH-impact risks without implemented mitigation → BLOCKER.
-  - `bmad-code-review` meta-2: new `pattern_scaffold_match` boolean per TAC (TAC test that doesn't match its EARS pattern → MINOR even if the test passes).
-  - `bmad-code-review` meta-3: cross-checks Security Gate verdict against actual diff.
-  - `bmad-dev-story` step-12-traceability: matrix splits `bacs:` / `tacs:` with EARS pattern + `pattern_scaffold_match`.
-  - `bmad-review-story` step-05-analyze: new section 1c — Phase B quality audit (verifies Real-Data Findings has concrete sources, External Research has versioned citations, NFR has all 7 categories, Security has binary verdict, Observability has runbook URLs/SLOs). Shallow Phase B = MAJOR.
-  - `bmad-tea-atdd` / `tea-test-review` / `tea-trace`: assign `BAC-N` / `TAC-N` IDs, EARS-pattern-aware test scaffold selection.
-  - `bmad-validation-{frontend,desktop,metier}` (intake): VMs derived from BACs (G/W/T friendly).
-- **Knowledge schema v1.0 → v1.1**: 5 **optional** additive sections in `project.md` (read defensively — workflows fall back to per-story values if the baseline is absent): `data-sources` (DB/providers, read by step-04 access verification), `compliance-requirements` (GDPR/HIPAA/SOC2/PCI-DSS, step-09), `observability-standards` (log fields, metric naming, SLO baselines, step-09), `nfr-defaults` (perf p95, scalability targets, availability SLO, step-09), `security-baseline` (auth/authz/secret patterns, step-09).
-- **9 new shared data templates** in `bmad-shared/data/`: `nfr-registry-template.md` (8-row table) · `security-gate-template.md` (11-item checklist) · `ears-acceptance-criteria-template.md` (5 patterns + scaffold mapping) · `boundaries-triple-template.md` · `out-of-scope-template.md` (4-column with min-2 items) · `observability-requirements-template.md` (5 subsections) · `invest-checklist-template.md` (6-row YES/NO + Evidence) · `risks-assumptions-register-template.md` (HIGH-impact unverified assumption MUST become VERIFIED in step-05 OR a RISK; HIGH-impact RISK without executable mitigation = BLOCKER) · `real-data-findings-template.md` · `external-research-template.md`.
+- **Example Mapping brainstorm** — when you start a story with too-thin acceptance criteria (less than 3 BACs, no examples, missing dependencies, less than 2 VMs), the discovery menu now suggests `[B] Brainstorm spec`. It runs Matt Wynne's 8-card BDD discovery (story → rules → examples → open questions) and folds the output back into the spec automatically.
+- **Business Comprehension Gate** — before writing a single line to the tracker, `step-09-output` now distills 3-5 critical decisions from your spec and asks you `[Y] Conforme / [N] A rediscuter / [?] Donne-moi un exemple concret` per item. HALT and wait per item. The goal: kill the "looks good ✓" passive-approval reflex (Microsoft Research 2025 on cognitive friction). Tracker writes are blocked until the gate passes.
 
-### ✨ Story-spec v3 bifurcation — opt-in business/technical split, two-signal drift detection
+### ✨ Story-spec v2 — discover problems at spec time, not at review time
 
-Builds on v2 with an **opt-in** mode where business sections (DoD, Problem, Solution, Scope, OOS, Business Context with BACs G/W/T, Validation Metier) live in the collaborative tracker (Linear / GitHub / GitLab / Jira), and technical sections (NFR, Security Gate, EARS TACs, INVEST, Test Strategy, File List, Boundaries, Risks, Real-Data Findings, External Research, Data Model/API/Infra, Guardrails, Observability) live in the local `.md` file with a non-canonical mirror of business sections for fast Claude context. **Why:** PMs and stakeholders read/edit business sections naturally in their tracker UI; developers and Claude read code-versioned technical sections in git. Audience drives location.
+Before: you wrote a spec, dev-story started, and review-story discovered halfway through that production credentials weren't accessible, that the lib you planned on had a CVE, or that nobody had specified observability. Too late, plan torched.
 
-- **Backward-compat absolute**: legacy v2 monolithic specs continue to work unchanged. `mode: bifurcation` in spec frontmatter + `spec_split_enabled: true` in `workflow-context.md` opts in. `tracker == file` always uses monolithic.
-- **New shared protocol `bmad-shared/protocols/spec-bifurcation.md`** (284 lines) — 6 atomic operations:
-  - **Op 1 Create** — idempotency check (existing `tracker_issue_id` → reuse) → compose business markdown → byte-size pre-check → tracker write → `business_content_hash = MD5().hex()[:8]` → write local file with v3 frontmatter + mirrors with marker + technical sections.
-  - **Op 2 Read** (compose unified view) — local frontmatter check → if `mode == bifurcation`: fetch tracker → splice canonical business sections over local mirrors. **Never silently fall back to mirror** on tracker fetch failure.
-  - **Op 3 Drift check** — lightweight `get_issue_updated_at` (timestamp only) compared with frontmatter `business_synced_at`. **60s clock-skew tolerance** hard-coded. On drift: HALT + `[R]efresh / [I]gnore / [V]iew diff` menu. **No default selection. No timeout.** Invalid input redisplays the menu.
-  - **Op 4 Refresh** — null-safety check on `description / updatedAt / id / url` → regenerate mirrors → recompute hash → update `business_synced_at` → commit `spec: refresh business sections from tracker`.
-  - **Op 5 Update tracker preserving non-managed** — read-modify-write: parse current tracker H2 → replace BMAD-managed business sections only → keep PO-added non-managed sections verbatim.
-  - **Op 6 Worktree handoff** — atomic `git mv` main → worktree branch + commit `spec: handoff to worktree` + post-verify source absent in main. No-op on trunk-based projects.
-- **Per-tracker size limits with HALT contract** (no silent truncation): GitHub Issues 60,000 chars (vs documented 65,536 limit, gzipped) · Linear schema-introspected with `detected × 0.92` margin, cached at `~/.claude/skills/bmad-shared/data/tracker-limits.cache.json` · GitLab Issues 950,000 (vs ~1M docs) · Jira 32,000 default per-instance configurable.
-- **Two-signal drift detection** — `business_synced_at` (timestamp gap > 60s) **AND** `business_content_hash` (8-char MD5). Independent: either tripping triggers drift. Catches the case where a PM edits the tracker description and reverts (`updatedAt` bumps but content equals previous), or content changes without `updatedAt` propagating.
-- **Mirror marker contract**: every business section in the local file starts with `> Mirror — see tracker for canonical: {tracker_url}` + ≤200-char synopsis. Workflows reading the local file MUST treat mirrored content as non-canonical. Missing marker = corruption → workflow HALTs and proposes refresh.
-- **Worktree handoff `git mv`** in `bmad-dev-story/step-03-setup-worktree.md` (+43 lines) — `handoff_required` predicate uses **AND** on: `spec_split_enabled` ∧ `worktree_enabled` ∧ `REUSED_CURRENT_WORKTREE == false` ∧ local-spec-exists ∧ frontmatter-has-`mode: bifurcation`. By design, toggling `worktree_enabled: true` on a downstream project automatically activates handoff without further changes. (This fork explicitly declares `worktree_enabled: false` in its `.claude/workflow-context.md` so the handoff never fires here.)
-- **Knowledge schema v1.1 → v1.2**: registers the new `spec-bifurcation` protocol in `protocols:` map of `knowledge-schema.md`; documents `spec_split_enabled` flag.
-- **`tracker-crud.md` extensions** (+90 lines):
-  - **Op 7 `update_preserve`** — defensive read-modify-write: if managed heading present in tracker but absent from new local content → keep as-is, never delete.
-  - **Op 8 `get_issue_updated_at`** — field-projection per tracker (Linear MCP / `gh api`+jq / `glab api`+jq / Jira `?fields=updated`).
-  - **Mandatory observability echoes**: every tracker call now emits `tracker call: {tracker_type}.{operation} {target_id|n/a} → starting` then same line with `→ {OK|FAIL <code>} ({duration_ms}ms{, error: <msg>})`. Permanent instrumentation — no separate timing layer needed.
-- **Validators**:
-  - `tools/validate-story-spec.js` (+253 lines) — new flags `--split`, `--tracker-fixture`, `--tracker-id`, `--check-drift`. New rules: `SPEC-SPLIT-NO-TRACKER-ID` (MAJOR) · `SPEC-SPLIT-TRACKER-FETCH-FAILED` (BLOCKER) · `SPEC-SPLIT-TRACKER-FIELD-MISSING` (BLOCKER, null-safety) · `SPEC-SPLIT-MISSING-TRACKER-SECTION` (BLOCKER) · `SPEC-SPLIT-MISSING-LOCAL-SECTION` (BLOCKER) · `SPEC-SPLIT-MISSING-MIRROR` (MAJOR) · `SPEC-SPLIT-INVALID-MIRROR-MARKER` (MAJOR) · `SPEC-SPLIT-NO-CONTENT-HASH` (MAJOR) · `SPEC-SPLIT-DRIFT` (MAJOR). **Critical correctness detail**: in bifurcation mode, business-side validators (`validateMandatorySections`, `validateAcFormat`, `validateOutOfScope`, `validateVm`) are **suppressed on the local file** (lines 546-553) — running them would falsely flag the 1-line mirror synopses. Business validation is delegated to `validateSplit` operating on the tracker fixture.
-  - `tools/validate-knowledge-refs.js` (+81 lines) — new `REF-04` rule: parses YAML frontmatter `protocols:` of `knowledge-schema.md` to discover registered protocols. Adding a protocol to the schema = validator picks it up automatically; an unknown protocol ref becomes a HIGH-severity finding listing all registered protocols. **L1-schema → L4-validator coupling synchronized without manual updates to validator code.**
-- **Tests + offline fixtures**: `test/test-validate-story-spec-split.js` (212 lines, 11 assertions across 6 groups: sanity / valid spec / missing tracker section / missing local section / no tracker_issue_id / drift no-drift+drift / legacy v2 passthrough). **Drift determinism via probe extraction** — runs validator with deliberately wrong hash, regex-extracts validator's own computed hash from diagnostic message (`/MD5\(canonical_business\)\[:8\] \(([a-f0-9]{8})\)/`), then injects that hash for the no-drift case. Eliminates whole class of test flakiness from whitespace-handling differences. Pattern reusable for any cross-impl hash test.
-- **Bootstrap / refresh / init prompts** — `bmad-knowledge-bootstrap` step-01-preflight introduces a **NEW CONTRACT**: bootstrap **MAY ADDITIVELY UPDATE** schema-governed fields in `workflow-context.md` (currently only `spec_split_enabled`) using append-only semantics. Previously documented as "does NOT create workflow-context.md" — this is a deliberate scope expansion. `bmad-knowledge-refresh` step-01 adds a `[K]eep / [T]oggle / [S]kip` prompt for current state. `bmad-project-init` step-03 prompts on first init if tracker is collaborative.
-- **Documentation**: `docs/migration/v2-to-v3-bifurcation.md` (190 lines, Diataxis how-to with TL;DR + decision matrix + 8-step manual upgrade procedure for legacy v2) + `docs/explanation/spec-bifurcation.md` (177 lines, Diataxis explanation with two-audience problem + ASCII split diagram + 10-row design-choices-vs-alternatives table + references to Adzic 2011, Spec Kit, Fowler 2026, AWS Drift Detection, Addy Osmani Boundaries Triple) + `docs/_sidebar.json` (35 lines, generic manifest with `_wiring_instructions` for Astro Starlight — site does NOT yet exist on this fork; manifest is forward-wiring only).
-- **Performance plan p95 targets** (`spec-bifurcation.md:242-265`): `create_issue < 5s` · `get_issue_updated_at < 1s` · `git mv + commit < 500ms` · `drift check full cycle < 1s`. Permanent instrumentation = the observability echoes in `tracker-crud.md` — no separate timing layer. **Measurement deferred to first downstream consumer** — BMAD-METHOD itself uses `tracker: file` so bifurcation paths are structurally inactive. 6-step measurement procedure documented (sandbox Linear workspace recommended).
+Now: `/bmad-create-story` runs evidence work **at spec creation**. The new flow gives you 14 steps instead of 10:
+
+- **Access verification first** — HALT immediately if you don't have access to the providers, DBs, or services the story touches. PASS / FAIL / EXEMPTED only — no "I'll figure it out later".
+- **Real-data investigation** — pull a concrete sample of existing data (production / staging / fixtures) before designing the change. Stops you from designing against an imagined schema.
+- **External research** — Context7 + WebSearch + WebFetch for version-specific findings on the libraries and APIs you'll use.
+- **NFR Registry + Security Gate + Observability Requirements** — every spec now declares its non-functional posture (performance, scalability, availability, reliability, maintainability, usability), a binary `PASS / FAIL / N/A` security verdict (no "PARTIAL", no "PASS with caveats"), and what to log / measure / alert on.
+
+**Acceptance criteria are now format-bounded:**
+
+- Business ACs (BACs) MUST be `Given … When … Then …` — Specification by Example / BDD.
+- Technical ACs (TACs) MUST follow one of the 5 EARS patterns:
+  - **Ubiquitous** — `The {system} shall {action}.`
+  - **Event-driven** — `When {trigger}, the {system} shall {action}.`
+  - **State-driven** — `While {state}, the {system} shall {action}.`
+  - **Optional** — `Where {feature is enabled}, the {system} shall {action}.`
+  - **Unwanted** — `If {undesired condition}, then the {system} shall {prevent / handle} …`
+- Every TAC must reference at least one BAC. Orphan TACs fail validation.
+
+**Other new mandatory sections:**
+
+- **Out of Scope register** — explicit non-goals. `bmad-code-review` will flag any change that violates an OOS item as a BLOCKER (was a soft QUESTION in v1.10).
+- **Boundaries Triple** (Always Do / Ask First / Never Do, per Addy Osmani's framework) — `Never Do` violations spotted in your diff are auto-BLOCKERs at code review.
+- **Risks & Assumptions register** — high-impact unverified assumptions must become either VERIFIED (proof recorded in step-05) or a RISK with an executable mitigation. No mitigation on a high-impact risk = BLOCKER.
+- **INVEST self-check** — 6-question quality gate on the story itself.
+
+`/bmad-quick-dev` gets the same shape in **warn-only mode**: a new evidence step (`step-02b`) detects missing real-data and external-research signals and prompts `[V]erify / [A]cknowledge / [E]scalate`. `[E]` reroutes you to the full `/bmad-create-story` flow. Acknowledgements are logged so they show up in the next code review.
+
+A new validator (`npm run validate:story-spec`) checks all of the above and is wired into `npm run quality` and `npm test`.
+
+### ✨ Story-spec v3 bifurcation (opt-in) — your PM edits in Linear, you code against the local file
+
+If you work with a PM who lives in Linear / GitHub Issues / GitLab / Jira and you've felt the pain of either (a) PM edits getting lost in PR review or (b) developers not seeing PM edits because they live in the wrong tool, this release adds a clean split.
+
+**Turn it on with `spec_split_enabled: true` in `workflow-context.md`.** Then a story spec is split by audience:
+
+- **Business sections** (DoD, problem, solution, scope, business context with BACs G/W/T, validation metier) → live as the canonical version in your tracker. Your PM edits them in Linear's UI, no Git involvement.
+- **Technical sections** (NFR, security gate, EARS TACs, INVEST, file list, boundaries, risks, etc.) → live in a local `.md` file versioned with the code in your worktree.
+- **Mirror** of the business sections lives in the local file too (with a marker tagging them as non-canonical) so Claude has fast context without round-tripping the tracker on every read.
+
+**Drift detection** — if your PM edits the tracker while you're working, you don't get silent divergence. The next time `dev-story` / `review-story` / `validation-*` runs, it checks `tracker.updatedAt` and an MD5 content hash against your local file. On drift: HALT with a `[R]efresh / [I]gnore / [V]iew diff` menu. No silent fallback, no auto-pull.
+
+**Worktree handoff** — when `dev-story` creates the worktree, the local spec file is `git mv`'d from main → worktree branch atomically and committed. After handoff the spec lives only on the dev branch.
+
+**Backward-compatible.** If you don't enable the flag, every existing v2 monolithic spec keeps working unchanged. Projects using a file-based tracker stay monolithic by design (bifurcation requires a collaborative tracker).
+
+**On-ramps:**
+
+- New project → `/bmad-project-init` will prompt for `spec_split_enabled` if you have a collaborative tracker.
+- Existing project → `/bmad-knowledge-refresh` adds a `[K]eep / [T]oggle / [S]kip` prompt for the flag.
+- Migration guide: `docs/migration/v2-to-v3-bifurcation.md` walks through enabling the flag on an existing project.
+- Conceptual deep-dive: `docs/explanation/spec-bifurcation.md`.
 
 ### Post-upgrade
 
-1. `npx @florian-trehaut/bmad-global install --force` — re-deploys 49 hardened workflows + 283 hardened step files, the new `protocols/spec-bifurcation.md`, the v3 `spec-completeness-rule.md`, the new shared rules (`ac-format-rule.md`, `boundaries-rule.md`), the 9 new data templates, and the v1.2 `knowledge-schema.md` to `~/.claude/skills/bmad/`. **Required**: this release ships substantially new files + rule wording; running outdated globally-installed skills against the new validators will fail.
-2. `/bmad-knowledge-refresh` _(recommended on existing projects with collaborative trackers)_ — propagates v1.1/v1.2 schema additions (5 new optional sections in `project.md`) and prompts `[K]eep / [T]oggle / [S]kip` for `spec_split_enabled` (opt-in to bifurcation). Custom H2 sections are preserved. Bootstrap/refresh now **additively update** `workflow-context.md` for schema-governed fields — previously read-only.
-3. _(New skill authors)_ `/bmad-create-skill` — templates are pre-hardened with `CHK-INIT`, `NO-SKIP CLAUSE`, `CHK-STEP-NN-ENTRY/EXIT`, `CHK-WORKFLOW-COMPLETE`, and canonical anti-skim phrasing. New skills pass `npm run validate:skills --strict` out of the box. Existing custom skills can be retrofitted via `node tools/migrate-workflow-hardening.js --workflow=<name>` (idempotent).
+1. **`npx @florian-trehaut/bmad-global install --force`** — required. v1.11.0 ships substantially new shared rules and templates; running v1.10.0 globally-installed skills against the v1.11.0 validators will fail.
+2. **`/bmad-knowledge-refresh`** (recommended on existing projects) — propagates the new optional schema sections in `project.md` (data sources, compliance, observability standards, NFR defaults, security baseline) and prompts for `spec_split_enabled` opt-in. Your custom edits are preserved.
+3. **(Custom skill authors)** `node tools/migrate-workflow-hardening.js` to retrofit your skills, or `/bmad-create-skill` to scaffold a new one — both produce skills that pass `npm run validate:skills --strict`.
 
 ## v1.10.0 - 2026-04-28
 
