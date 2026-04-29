@@ -64,6 +64,21 @@ Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 - Escalation to full method: `/bmad-create-prd` (PRD workflow)
 - Spec template (v2 quick profile): `templates/spec-template.md`
 
+### 5. Detect teammate mode (inserted AFTER Configuration Loading, BEFORE CHK-INIT — non-canonical INIT structure per F-005)
+
+Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. This sets:
+
+- `TEAMMATE_MODE` (boolean)
+- `ORCH_AUTHORIZED` (boolean — only meaningful when TEAMMATE_MODE=true)
+- `LEAD_NAME`, `TASK_ID`, `WORKTREE_PATH`, `TRACKER_WRITES_ENABLED` (when TEAMMATE_MODE=true)
+
+If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (D16 strict; only orchestrator-spawned teammates may run quick-dev).
+
+When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+- step-01-mode-detection skips user mode prompt — reads `tech_spec_path` (or DIRECT mode tasks) from `task_contract.input_artifacts[type=document]`
+- step-05-adversarial-review reroutes review prompts via SendMessage (per `teammate-mode-routing.md` §A)
+- step-06-resolve-findings reroutes finding-resolution prompts via SendMessage; tracker writes go through `tracker_write_request` (§B)
+
 ---
 
 
@@ -87,6 +102,8 @@ CHK-INIT PASSED — Initialization complete:
     - security-baseline: {"present" | "absent"}
   worktree_path: {WORKTREE_PATH or "n/a"}
   team_mode: {true | false}
+  teammate_mode: {true | false}
+  orch_authorized: {true | false | "n/a"}
   user_name: {USER_NAME}
   communication_language: {LANGUAGE}
   spec_profile: "quick" (use /bmad-create-story for "full" profile)

@@ -33,6 +33,17 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Update tracker status and load or auto-generate the test strategy from the issue description.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
+
+- Do NOT update the tracker directly.
+- Emit a `tracker_write_request` SendMessage with `operation: 'update_status'`, `args: {issue_id: ISSUE_ID, target_status: TRACKER_STATES.in_progress}`.
+- Wait for `tracker_write_ack`. On `failed`, emit a `blocker` SendMessage and HALT.
+- Test strategy parsing in §2 still happens locally (no tracker write involved).
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## MANDATORY SEQUENCE
 
 ### 1. Update Tracker Status

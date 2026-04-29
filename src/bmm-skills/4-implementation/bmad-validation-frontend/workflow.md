@@ -71,6 +71,15 @@ Use this knowledge to:
 - `ENVIRONMENT = dev_server` (overridable by user in step-01)
 - `VM_RESULTS = []` (populated during step-04)
 
+### 7. Detect teammate mode
+
+Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+- step-01-intake reads `ISSUE_IDENTIFIER` and `ENVIRONMENT` from `task_contract` (no user prompt)
+- step-03-setup-worktree consumes `WORKTREE_PATH` from `task_contract.constraints.worktree_path` via worktree-lifecycle Branch D (HALT if null)
+- step-05-verdict emits `tracker_write_request` SendMessage instead of writing tracker, then `phase_complete` with PASS/FAIL
+
+If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (D16 strict).
+
 ---
 
 
@@ -88,6 +97,8 @@ CHK-INIT PASSED — Initialization complete:
     - api.md ({"loaded" | "not required" | "required-but-missing"})
   worktree_path: {WORKTREE_PATH or "n/a"}
   team_mode: {true | false}
+  teammate_mode: {true | false}
+  orch_authorized: {true | false | "n/a"}
   user_name: {USER_NAME}
   communication_language: {LANGUAGE}
 ```

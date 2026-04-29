@@ -2,6 +2,16 @@
 
 **Goal:** Construct diff of all changes, perform adversarial review, present findings.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §A, when TEAMMATE_MODE=true:
+
+- The "present findings" interactive prompt is rerouted via `SendMessage` (a `question` payload with the findings list and per-finding options ACCEPTED/REJECTED/MODIFIED/SKIPPED).
+- Block on `question_reply` from the lead.
+- TAC-18 unwanted-pattern: invoking AskUserQuestion directly while TEAMMATE_MODE=true → HALT.
+
+When TEAMMATE_MODE=false, proceed below as normal.
+
 ---
 
 

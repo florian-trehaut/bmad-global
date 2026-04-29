@@ -65,6 +65,22 @@ HALT if either file is missing with the message defined in `knowledge-loading.md
 - `EXECUTION_MODE = SOLO` (always solo — no team mode)
 - `MR_IID = null` (populated by step-04)
 
+### 4b. Detect teammate mode
+
+Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. This sets:
+
+- `TEAMMATE_MODE` (boolean — true when invoked by an Agent Teams orchestrator's dev phase)
+- `ORCH_AUTHORIZED` (only meaningful when TEAMMATE_MODE=true)
+- `LEAD_NAME`, `TASK_ID`, `WORKTREE_PATH`, `TRACKER_WRITES_ENABLED` (when TEAMMATE_MODE=true)
+
+If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (D16 strict applies; only orchestrator-spawned teammates may run dev-story).
+
+When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+- step-01-discover skips user selection — reads `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[].identifier` (HALT with TAC-28 if missing/null/malformed)
+- step-03-setup-worktree consumes the provided `WORKTREE_PATH` via `worktree-lifecycle.md` Branch D (no new worktree created; Branch D supersedes Branch A)
+- step-06-mark-in-progress, step-13-push-mr, step-14-complete emit `tracker_write_request` SendMessage instead of direct tracker writes (per `teammate-mode-routing.md` §B)
+- step-07-plan-approval reroutes the plan-approval AskUserQuestion via SendMessage (§A) — TAC-18 enforcement
+
 ### 5. CHK-INIT — Initialization Read Receipt
 
 Per `~/.claude/skills/bmad-shared/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
@@ -79,6 +95,8 @@ CHK-INIT PASSED — bmad-dev-story initialization complete:
     - domain.md ({"loaded" | "not required"})
   worktree_template: {WORKTREE_TEMPLATE_DEV}
   team_mode: {true | false}
+  teammate_mode: {true | false}
+  orch_authorized: {true | false | "n/a"}
   user_name: {USER_NAME}
   communication_language: {COMMUNICATION_LANGUAGE}
   defaults: EXECUTION_MODE=SOLO, MR_IID=null

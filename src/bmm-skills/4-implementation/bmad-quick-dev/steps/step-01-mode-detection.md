@@ -29,6 +29,18 @@ CHK-STEP-01-ENTRY PASSED — entering Step 1: Mode Detection with {var=value, ..
 
 Si une precondition manque => HALT, signaler quelle precondition.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+
+- Skip user prompt for execution mode. Read mode + tech-spec path (or direct task description) from `task_contract`:
+  - If `task_contract.input_artifacts[type=document]` is present → mode=`tech-spec`, `tech_spec_path` = `document.path`
+  - Else → mode=`direct`, tasks read from `task_contract.scope_domain` or `task_contract.input_artifacts[type=custom].data.tasks`
+- HALT TAC-28 if neither artifact form is present.
+- Skip the escalation menu (the orchestrator already chose `quick-dev` vs `dev-story` per BAC-13 of story `auto-flow-orchestrator`).
+
+When TEAMMATE_MODE=false, proceed with the State Variables section below as normal.
+
 ## STATE VARIABLES (capture now, persist throughout)
 
 These variables MUST be set in this step and available to all subsequent steps:

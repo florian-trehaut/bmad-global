@@ -29,6 +29,15 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Propose updates to Definition of Done (product), BACs (Business Acceptance Criteria), and Validation Metier based on accepted findings from Step 6. These sections are the CONTRACT between dev and business — if the spec review changed the story's scope, behavior, or edge cases, they MUST be updated to match.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
+
+- Each proposed DoD/BAC/VM update is presented to the lead via a `question` SendMessage instead of `AskUserQuestion`. The lead either approves directly (from its context) or batches and forwards to the user.
+- TAC-18 unwanted-pattern enforcement applies — direct AskUserQuestion in TEAMMATE_MODE → HALT.
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## RULES
 
 - Only propose updates driven by ACCEPTED or MODIFIED findings from Step 6

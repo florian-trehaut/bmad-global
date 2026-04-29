@@ -54,6 +54,24 @@ The generic investigation checklist at `./data/investigation-checklist.md` (skil
 
 - `ISSUE_IDENTIFIER = ""` (populated by step-01 from user or discovery)
 
+### 5. Detect teammate mode
+
+Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. This sets:
+
+- `TEAMMATE_MODE` (boolean — true when this workflow is running inside an Agent Teams teammate spawned by a registered orchestrator)
+- `ORCH_AUTHORIZED` (boolean — only meaningful when TEAMMATE_MODE=true)
+- `LEAD_NAME`, `TASK_ID` (only when TEAMMATE_MODE=true)
+- `TRACKER_WRITES_ENABLED` (default `false` in TEAMMATE_MODE per `task_contract.constraints.tracker_writes`)
+- `WORKTREE_PATH` (consumed by step-01 if provided via task contract → worktree-lifecycle.md Branch D)
+
+If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (this workflow is not allowed to run as a non-orchestrator teammate per Decision D16).
+
+When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+- step-01-intake reads `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[].identifier` (no user prompt)
+- step-06-interactive-review reroutes per-finding decisions via SendMessage (per `teammate-mode-routing.md` §A)
+- step-06b-dod-update reroutes DoD/BAC/VM update approvals via SendMessage
+- step-07-finalize emits `tracker_write_request` SendMessage instead of writing the tracker directly (per §B)
+
 ---
 
 
@@ -63,7 +81,7 @@ Emit EXACTLY this block (filling in actual values you read), then proceed to the
 
 ```
 CHK-INIT PASSED — Initialization complete:
-  shared_rules_loaded: {N} files (list filenames)
+  shared_rules_loaded: {N} files (list filenames; must include teammate-mode-routing.md)
   project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
   project_knowledge:
     - project.md (schema_version: {X})
@@ -71,6 +89,8 @@ CHK-INIT PASSED — Initialization complete:
     - api.md ({"loaded" | "not required" | "required-but-missing"})
   worktree_path: {WORKTREE_PATH or "n/a"}
   team_mode: {true | false}
+  teammate_mode: {true | false}
+  orch_authorized: {true | false | "n/a"}
   user_name: {USER_NAME}
   communication_language: {LANGUAGE}
 ```

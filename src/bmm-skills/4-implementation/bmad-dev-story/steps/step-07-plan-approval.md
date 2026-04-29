@@ -35,6 +35,17 @@ Enter plan mode BEFORE writing any code. The user must approve the implementatio
 
 The end-of-workflow scope-completeness check (impartial subagent) runs in step-12 against the actual implementation, not at plan time — see `step-12-traceability.md`.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §A, when TEAMMATE_MODE=true:
+
+- Do NOT call `EnterPlanMode` / `AskUserQuestion` directly (TAC-18 unwanted-pattern HALT trigger).
+- Compose the implementation plan as in standalone mode (steps 1-2 below).
+- Emit a `question` SendMessage to `LEAD_NAME` with the plan as the payload `text:` and options `[A]pprove / [M]odify / [R]eject`.
+- Block on `question_reply`. On `[A]` → proceed to step-08. On `[M]` → receive modifications, apply, re-emit `question`. On `[R]` → emit `blocker` and HALT.
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## MANDATORY SEQUENCE
 
 ### 1. Enter Plan Mode

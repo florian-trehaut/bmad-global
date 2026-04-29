@@ -29,6 +29,15 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Identify the issue to validate (provided by the user or discovered via tracker), verify it is in the correct status for validation, extract the Validation Metier (VM) and Definition of Done (DoD) sections.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+
+- Skip user selection — read `ISSUE_IDENTIFIER`, `ENVIRONMENT` from `task_contract` (HALT TAC-28 if missing)
+- Read VM and DoD from `task_contract.input_artifacts[type=document]`
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## RULES
 
 - Load `~/.claude/skills/bmad-shared/validation-intake-protocol.md` and apply its protocol as baseline rules for this step

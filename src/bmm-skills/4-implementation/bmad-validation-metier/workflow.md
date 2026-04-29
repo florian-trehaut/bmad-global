@@ -44,6 +44,20 @@ If this file does not exist, the preflight step will discover environment access
 - `ENVIRONMENT = staging` (overridable by user in step-01)
 - `VM_RESULTS = []` (populated during step-04)
 
+### 5. Detect teammate mode
+
+Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. This sets:
+
+- `TEAMMATE_MODE` (boolean)
+- `ORCH_AUTHORIZED` (boolean, only meaningful when TEAMMATE_MODE=true)
+- `LEAD_NAME`, `TASK_ID`, `WORKTREE_PATH`, `TRACKER_WRITES_ENABLED` (when TEAMMATE_MODE=true)
+
+If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (D16 strict).
+
+When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+- step-01-intake reads `ISSUE_IDENTIFIER` and `ENVIRONMENT` from `task_contract` (no user prompt) — HALT TAC-28 if identifier null/missing
+- step-05-verdict emits `tracker_write_request` SendMessage instead of writing tracker directly, then emits `phase_complete` with verdict PASS / FAIL
+
 ---
 
 
@@ -61,6 +75,8 @@ CHK-INIT PASSED — Initialization complete:
     - api.md ({"loaded" | "not required" | "required-but-missing"})
   worktree_path: {WORKTREE_PATH or "n/a"}
   team_mode: {true | false}
+  teammate_mode: {true | false}
+  orch_authorized: {true | false | "n/a"}
   user_name: {USER_NAME}
   communication_language: {LANGUAGE}
 ```

@@ -25,6 +25,14 @@ agent_teams:
   default_lead_model: 'opus'         # Model hint for lead/orchestrator
   max_teammates: 5                   # Maximum concurrent teammates per team
 
+  # Orchestrator-specific sizing (consumed by bmad-auto-flow per BAC-11/BAC-12)
+  dev_team_size: 1                   # NEW. Default: 1. Clamped to [1, max_teammates]. Number of dev teammates spawned at the dev phase.
+  code_review_team_size: 3           # NEW. Default: 3. Clamped to [1, max_teammates]. Number of distinct single-perspective teammates spawned at the code-review phase.
+  phase_timeout_minutes: 30          # NEW. Default: 30. Per-phase wall-clock timeout. Triggers TAC-14 unwanted-pattern handler if a teammate emits no SendMessage within this window.
+
+  # Optional audit log (T-SEC-1, low priority)
+  audit_log_enabled: false           # NEW. Default: false. When true, the orchestrator writes phase transitions and decisions to _bmad-output/auto-flow/{ISO-timestamp}-{slug}.log
+
   # Per-role knowledge files — loaded JIT by each teammate
   # Values are filenames (not anchors) in .claude/workflow-knowledge/.
   # Since the consolidation, the only files are project.md, domain.md, api.md.
@@ -42,6 +50,29 @@ agent_teams:
       - project.md          # #investigation-checklist, #infrastructure
     scanner:
       - project.md          # #tech-stack, #conventions
+    # Roles for bmad-auto-flow (per BAC-3, BAC-11, BAC-12, BAC-13)
+    spec-reviewer:
+      - project.md
+      - domain.md
+    dev:
+      - project.md
+      - api.md
+    validator:
+      - project.md
+    # Per-perspective code review roles (single-perspective teammates per BAC-12 / TAC-9)
+    code-reviewer-specs:
+      - project.md
+    code-reviewer-correctness:
+      - project.md
+    code-reviewer-security:
+      - project.md
+      - api.md
+    code-reviewer-engineering-quality:
+      - project.md
+    code-reviewer-operations:
+      - project.md
+    code-reviewer-user-facing:
+      - project.md
 
   # Knowledge files loaded by ALL teammates regardless of role
   global_knowledge:
@@ -59,6 +90,10 @@ agent_teams:
 | `default_worker_model` | string | NO | `sonnet` | Model suggestion for worker teammates. Informational — Claude Code may override |
 | `default_lead_model` | string | NO | `opus` | Model suggestion for lead/orchestrator |
 | `max_teammates` | integer | NO | `5` | Upper bound on concurrent teammates. Prevents runaway token usage |
+| `dev_team_size` | integer | NO | `1` | Number of dev teammates spawned at the dev phase by `bmad-auto-flow`. Clamped to `[1, max_teammates]`. Validated at orchestrator startup (TAC-26) |
+| `code_review_team_size` | integer | NO | `3` | Number of distinct single-perspective teammates spawned at the code-review phase. Clamped to `[1, max_teammates]`. Each teammate executes ONE extracted meta-perspective subskill (per BAC-12 / TAC-9) |
+| `phase_timeout_minutes` | integer | NO | `30` | Per-phase wall-clock timeout. If no SendMessage from any teammate of the current phase arrives within this window, the orchestrator triggers TAC-14 (`[R]etry / [N]udge / [A]bandon`). Must be a positive integer |
+| `audit_log_enabled` | boolean | NO | `false` | Optional. When `true`, the orchestrator writes phase transitions and decisions to `_bmad-output/auto-flow/{ISO-timestamp}-{slug}.log`. T-SEC-1 remediation, low priority |
 | `knowledge_mapping` | map | NO | `{}` | Role key → list of knowledge filenames in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` |
 | `global_knowledge` | list | NO | `[]` | Knowledge files loaded by every teammate regardless of role |
 
@@ -133,4 +168,10 @@ The team router validates this section during initialization:
 2. If `enabled` is absent or `false` → `TEAM_MODE = false` (no error)
 3. If `enabled` is `true` but `teammate_mode` has an invalid value → HALT with error
 4. If `max_teammates` is present but not a positive integer → HALT with error
-5. Knowledge files in `knowledge_mapping` and `global_knowledge` are validated at spawn time (missing files trigger the Knowledge Generation Mandate)
+5. If `dev_team_size` is present but not in `[1, max_teammates]` → HALT with error citing both fields
+6. If `code_review_team_size` is present but not in `[1, max_teammates]` → HALT with error
+7. If `phase_timeout_minutes` is present but not a positive integer → HALT with error
+8. If `audit_log_enabled` is present but not boolean → HALT with error
+9. Knowledge files in `knowledge_mapping` and `global_knowledge` are validated at spawn time (missing files trigger the Knowledge Generation Mandate)
+
+Validations 5–8 are performed by `bmad-auto-flow` during its `step-01-entry` (orchestrator-specific fields, not used by other workflows).

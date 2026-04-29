@@ -32,6 +32,17 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Update tracker status, add completion comment with traceability report, and communicate completion to the user.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B and §D, when TEAMMATE_MODE=true:
+
+- Do NOT update the tracker status directly. Emit `tracker_write_request` SendMessage with `operation: 'update_status'`, `args: {issue_id: ISSUE_ID, target_status: TRACKER_STATES.in_review}`. Wait for ack.
+- Do NOT add the completion comment directly. Emit `tracker_write_request` with `operation: 'comment'`, `args: {issue_id: ISSUE_ID, body: COMPLETION_COMMENT}`. Wait for ack.
+- After both writes are acknowledged, emit `phase_complete` SendMessage to `LEAD_NAME` per §D with: `verdict: 'DONE'`, `deliverable: {format: 'tracker_update', artifacts: [{path: MR_URL, kind: 'mr'}, {path: WORKTREE_PATH, kind: 'worktree'}], summary: <2-5 lines>}`.
+- The orchestrator handles user communication (this teammate does not address the user directly).
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## MANDATORY SEQUENCE
 
 ### 1. Update Tracker Status

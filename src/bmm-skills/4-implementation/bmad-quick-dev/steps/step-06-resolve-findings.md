@@ -2,6 +2,16 @@
 
 **Goal:** Handle adversarial review findings interactively, apply fixes, finalize.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
+
+- §A — every per-finding interactive prompt is rerouted via SendMessage `question` payload; block on reply.
+- §B — any tracker write (status update, MR creation) goes through `tracker_write_request` SendMessage (constraint `tracker_writes: false` enforced).
+- §D — the workflow ends with a `phase_complete` SendMessage to the lead with verdict DONE / FINDINGS, the MR URL (if created) as a deliverable, and the resolved findings summary.
+
+When TEAMMATE_MODE=false, proceed below as normal.
+
 ---
 
 

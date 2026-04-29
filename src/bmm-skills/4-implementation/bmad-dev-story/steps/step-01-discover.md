@@ -34,6 +34,17 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Collect all actionable candidates — tracker issues (In Progress / Todo) and forge MRs needing attention — then present a unified selection menu to the user.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+
+- **Skip discovery and user selection** entirely.
+- Read `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[].identifier` (filter to type=`tracker_issue`).
+- HALT (TAC-28) if missing/null/malformed: `task_contract.input_artifacts.tracker_issue.identifier is null/missing/malformed when spawning the teammate`.
+- Skip the unified selection menu. Proceed directly to `{nextStepFile}` Step 2.
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below.
+
 ## MANDATORY EXECUTION RULES:
 
 - Execute ALL steps in exact order — NO skipping

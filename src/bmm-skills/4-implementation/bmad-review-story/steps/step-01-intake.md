@@ -29,6 +29,16 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Select the story to review, setup a read-only investigation worktree, load the story and all related context from the tracker.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
+
+- **Skip user selection**: read `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[].identifier` (filter to type=`tracker_issue`); HALT with TAC-28 message if absent/null/malformed
+- **Skip worktree creation**: read `WORKTREE_PATH` from `task_contract.constraints.worktree_path`; consumed by `worktree-lifecycle.md` Branch D (provided path mode); HALT if null in TEAMMATE_MODE
+- **Use task contract scope**: load the spec content from `task_contract.input_artifacts[].content` (or read the file at the `document.path` artifact) instead of querying the tracker directly
+
+When TEAMMATE_MODE=false (standalone), proceed with the Mandatory Sequence below as normal.
+
 ## RULES
 
 - NEVER auto-select a story without user confirmation

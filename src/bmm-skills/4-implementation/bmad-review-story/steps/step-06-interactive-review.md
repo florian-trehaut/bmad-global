@@ -29,6 +29,16 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Present ALL findings at once to the user, then collect decisions on each. Before presenting, resolve any findings that propose multiple options by proactively investigating to determine the best recommendation.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
+
+- **Reroute the AskUserQuestion call**: emit a `question` SendMessage to `LEAD_NAME` with all findings as the payload. Block on the reply (which contains the user's per-finding decisions).
+- The reply is delivered via SendMessage with `type: question_reply`, mapping each finding to ACCEPTED / REJECTED / MODIFIED / SKIPPED.
+- TAC-18 unwanted-pattern: invoking AskUserQuestion directly while TEAMMATE_MODE=true → HALT.
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## RULES
 
 - Present ALL findings in a single message — do not drip-feed one by one

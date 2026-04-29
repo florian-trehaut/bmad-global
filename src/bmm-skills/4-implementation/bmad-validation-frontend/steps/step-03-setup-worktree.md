@@ -29,6 +29,16 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Create a read-only worktree on `origin/main` to read source code for test identification and UI analysis. This worktree is used to understand the codebase — NOT to run tests (tests run in the main project directory).
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+
+- The orchestrator has already provided a worktree via `task_contract.constraints.worktree_path`. Apply `worktree-lifecycle.md` Branch D (provided path mode) — the orchestrator owns this worktree.
+- Set `worktree_use_provided=true` in the contract parameters; HALT if `worktree_path` is null.
+- Skip §2 onwards (cleanup, etc.) — the orchestrator handles cleanup.
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## RULES
 
 - The worktree is for CODE READING ONLY — understanding components, routes, test files

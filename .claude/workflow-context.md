@@ -74,6 +74,46 @@ user_skill_level: expert
 labels:
   spec_reviewed: "spec-reviewed"
   client_prefix: ""
+
+# --- Agent Teams (research preview, requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) ---
+# Schema documented in src/core-skills/bmad-shared/agent-teams-config-schema.md.
+# Activated for the bmad-auto-flow self-test (T-G1) and the cross-workflow lifecycle automation.
+agent_teams:
+  enabled: true
+  teammate_mode: 'self-service'
+  default_worker_model: 'sonnet'
+  default_lead_model: 'opus'
+  max_teammates: 5
+  dev_team_size: 1                    # BAC-11
+  code_review_team_size: 3            # BAC-12
+  phase_timeout_minutes: 30           # TAC-14
+  audit_log_enabled: false            # T-SEC-1 (optional)
+  knowledge_mapping:
+    spec-reviewer:
+      - project.md
+      - domain.md
+    dev:
+      - project.md
+      - api.md
+    code-reviewer:
+      - project.md
+    code-reviewer-specs:
+      - project.md
+    code-reviewer-correctness:
+      - project.md
+    code-reviewer-security:
+      - project.md
+      - api.md
+    code-reviewer-engineering-quality:
+      - project.md
+    code-reviewer-operations:
+      - project.md
+    code-reviewer-user-facing:
+      - project.md
+    validator:
+      - project.md
+  global_knowledge:
+    - project.md
 ---
 
 # BMAD-METHOD Workflow Context

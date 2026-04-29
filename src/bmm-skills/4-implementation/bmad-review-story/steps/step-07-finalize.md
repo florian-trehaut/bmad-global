@@ -29,6 +29,17 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Apply accepted modifications to the tracker issue description, add the spec-reviewed label, cleanup the investigation worktree.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
+
+- Do NOT write the tracker directly. Emit a `tracker_write_request` SendMessage per §B with the operation (`update_status`, `update_description`, `label_add`) and args.
+- Wait for `tracker_write_ack`. On `failed`, emit `blocker` and HALT.
+- Then emit the workflow's `phase_complete` SendMessage per §D with verdict APPROVE / FINDINGS, the modified spec path as the deliverable, and the findings list.
+- Do NOT call cleanup hooks for the worktree — `worktree_path` was provided by the orchestrator (Branch D), the orchestrator owns its lifecycle.
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## RULES
 
 - NEVER modify the story without explicit user confirmation (obtained in Steps 6 and 6b)

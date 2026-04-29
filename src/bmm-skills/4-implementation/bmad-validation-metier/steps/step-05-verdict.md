@@ -29,6 +29,17 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Compile the final verdict, compose a structured tracker comment, post the comment, and update the issue status.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B and §D, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
+
+- Compute the verdict (PASS / FAIL) locally as in standalone.
+- Do NOT post the tracker comment directly. Emit `tracker_write_request` SendMessage with `operation: 'comment'`, `args: {issue_id: ISSUE_ID, body: VERDICT_COMMENT}`. Wait for ack.
+- Do NOT update the tracker status directly. Emit `tracker_write_request` with `operation: 'update_status'`, `args: {issue_id: ISSUE_ID, target_status: TRACKER_STATES.done if PASS else TRACKER_STATES.in_progress}`. Wait for ack.
+- After both writes acknowledged, emit `phase_complete` SendMessage with: `verdict: '{PASS | FAIL}'`, `deliverable: {format: 'tracker_update', summary: <2-5 lines>}`, `findings: [...]` (one per failed VM if FAIL).
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## RULES
 
 - Load `~/.claude/skills/bmad-shared/validation-verdict-protocol.md` and apply its protocol as baseline rules for this step

@@ -33,6 +33,17 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 Push the branch and create or update the forge Merge Request.
 
+## TEAMMATE_MODE branch
+
+Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B, when TEAMMATE_MODE=true:
+
+- Push the branch from `WORKTREE_PATH` directly (the orchestrator owns the worktree, not the tracker — push is a code-level operation, not a tracker write).
+- Do NOT create the MR/PR via the forge CLI directly. Emit a `tracker_write_request` SendMessage with `operation: 'create_mr'`, `args: {branch: BRANCH_NAME, title: MR_TITLE, body: MR_BODY, target: 'main'}`.
+- Wait for `tracker_write_ack` containing the MR_IID and MR_URL. On `failed`, emit a `blocker` and HALT.
+- Store the returned `MR_IID` for the final report (step-14).
+
+When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
+
 ## MANDATORY SEQUENCE
 
 ### 1. Push Branch

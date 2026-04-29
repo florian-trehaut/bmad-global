@@ -61,6 +61,21 @@ HALT if either file is missing (run `/bmad-knowledge-bootstrap`).
 - `MR_IID = null` (populated by step-01)
 - `CURRENT_USER = null` (detected in step-01)
 
+### 5. Detect teammate mode
+
+Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. **Important:** standalone `bmad-code-review` uses `Agent()` for parallel meta dispatch (preserved unchanged for backward compatibility per VM-NR-4 of story `auto-flow-orchestrator`). When invoked as a teammate (TEAMMATE_MODE=true), the Agent tool is removed at spawn time per Anthropic platform contract — running this workflow inside a teammate would FAIL at step-02.
+
+Therefore: when TEAMMATE_MODE=true, this workflow MUST HALT in INITIALIZATION with:
+
+```
+HALT — bmad-code-review is not designed to run as a teammate.
+  reason: bmad-code-review's step-02 spawns 5–7 metas via Agent(), which is removed from teammates at spawn time per Anthropic platform contract.
+  action: orchestrators (bmad-auto-flow) MUST spawn the per-perspective subskills instead — see src/bmm-skills/4-implementation/bmad-code-review-perspective-{specs,correctness,security,engineering-quality,operations,user-facing}/.
+  reference: spec auto-flow-orchestrator BAC-12, TAC-9, Risk-4.
+```
+
+When TEAMMATE_MODE=false (standalone), this workflow runs unchanged with full Agent() parallel dispatch.
+
 ---
 
 
@@ -78,6 +93,7 @@ CHK-INIT PASSED — Initialization complete:
     - api.md ({"loaded" | "not required" | "required-but-missing"})
   worktree_path: {WORKTREE_PATH or "n/a"}
   team_mode: {true | false}
+  teammate_mode: {must be false — HALT if true, see §5}
   user_name: {USER_NAME}
   communication_language: {LANGUAGE}
 ```

@@ -24,6 +24,7 @@ Every step-file that applies this rule MUST declare the following parameters bef
 | `worktree_branch_name` | branch name (or `null` for detached) | Local branch to create/use |
 | `worktree_branch_strategy` | `feature-branch` \| `match-remote` \| `detached` | How to wire the local branch on creation |
 | `worktree_alignment_check` | human-readable predicate | How to decide whether the current worktree's branch is "compatible" with this workflow |
+| `worktree_use_provided` | boolean (default `false`) | When `true` and `worktree_path_expected` is non-null, skip detection and use the provided path verbatim (Branch D). Set by Agent Teams teammates that received a worktree path via `task_contract.constraints.worktree_path`. |
 
 ### Purpose semantics
 
@@ -74,7 +75,46 @@ fi
 
 ## 1. Setup Protocol — Unified
 
-The protocol branches on two flags. Execute exactly one of the three branches below.
+The protocol branches on two flags. Execute exactly one of the four branches below.
+
+### Precedence (when multiple branches could apply)
+
+```
+D > A > B > C
+```
+
+- **Branch D** (`worktree_use_provided == true` AND `worktree_path_expected` non-null) — applies first. Used by Agent Teams teammates that received a worktree path via `task_contract.constraints.worktree_path`. The orchestrator has already resolved the project's `worktree_enabled` choice; the teammate MUST honor the provided path and MUST NOT re-evaluate `worktree_enabled` or attempt to create a sibling.
+- **Branch A** (`worktree_enabled == false`) — applies when D does not. Trunk-based projects skip worktrees entirely.
+- **Branch B** (`IN_WORKTREE == false` OR `worktree_reuse_current == never`) — applies when D and A do not. Creates the conventional sibling.
+- **Branch C** (default — `IN_WORKTREE == true` AND `worktree_reuse_current != never`) — applies when D, A, and B do not. Reuse the current worktree.
+
+The precedence is unconditional — D supersedes A even when `worktree_enabled` is `false`. This is the correct behavior because the orchestrator that set `worktree_path` already accounted for `worktree_enabled` when deciding whether to create the worktree at all. A teammate that re-evaluates `worktree_enabled` would either (a) refuse to use the provided path on a trunk-based project — but the orchestrator already created one because it's running multi-teammate work — or (b) create a sibling redundant to the provided path. Both are wrong.
+
+### Branch D — `worktree_use_provided == true` AND `worktree_path_expected` non-null
+
+The orchestrator passed a pre-resolved worktree path. Use it verbatim.
+
+```bash
+WORKTREE_PATH={worktree_path_expected}
+
+# Verify the path exists and is a git worktree
+if [ ! -d "$WORKTREE_PATH/.git" ] && [ ! -f "$WORKTREE_PATH/.git" ]; then
+  # HALT: "Provided worktree_path={path} does not exist or is not a git worktree. Orchestrator failed to set up the worktree before spawning the teammate."
+  exit 1
+fi
+
+cd "$WORKTREE_PATH"
+CURRENT_BRANCH=$(git branch --show-current)
+```
+
+Verify branch alignment per the declared `worktree_alignment_check`:
+
+- **For `feature-branch` / `match-remote` strategies**: `CURRENT_BRANCH == {worktree_branch_name}` MUST hold. If not, HALT — the orchestrator and teammate disagree on branch state, which is a contract violation.
+- **For `detached` strategy**: `CURRENT_BRANCH == ""` (empty) MUST hold. If not, HALT.
+
+Set `REUSED_CURRENT_WORKTREE=true` so cleanup (§3) skips worktree removal — the orchestrator owns this worktree's lifecycle, not the teammate.
+
+Proceed to **§2 Post-Creation Setup**.
 
 ### Branch A — `worktree_enabled == false`
 
@@ -243,9 +283,9 @@ Lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `poetry.lock`, `Cargo.lock`) m
 
 When a workflow completes and needs to tear down its working environment:
 
-### If `REUSED_CURRENT_WORKTREE == true` (Branch C was taken)
+### If `REUSED_CURRENT_WORKTREE == true` (Branch C or Branch D was taken)
 
-**Do NOT remove the worktree.** The user owns this worktree's lifecycle — the workflow merely borrowed it. Log: `"Worktree reused — cleanup skipped (user's worktree)."` Branch handling also deferred to the user.
+**Do NOT remove the worktree.** Either the user (Branch C) or the orchestrator (Branch D) owns this worktree's lifecycle — the workflow merely borrowed it. Log: `"Worktree reused — cleanup skipped (owned by {user|orchestrator})."` Branch handling is deferred to the owner.
 
 ### Else, if `worktree_enabled == true` (Branch B was taken)
 
