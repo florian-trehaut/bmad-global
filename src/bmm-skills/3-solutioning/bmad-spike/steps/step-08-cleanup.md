@@ -73,7 +73,7 @@ WAIT for input. Default to **K** if user just presses enter or says "keep".
 
 ### 2. Remove Worktree
 
-**Apply §3 Cleanup from `bmad-shared/worktree-lifecycle.md`.**
+**Apply §3 Cleanup from `bmad-shared/lifecycle/worktree-lifecycle.md`.**
 
 <check if="REUSED_CURRENT_WORKTREE == true">
   The workflow reused the user's current worktree. Do NOT remove it — log "Worktree reused — cleanup skipped (user's worktree)." and skip branch deletion below (the user owns the branch lifecycle).

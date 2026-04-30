@@ -269,7 +269,7 @@ consolidated_report:
   failed_layers: [all_meta_names]
 ```
 
-The orchestrator treats this as a HALT condition per `bmad-shared/no-fallback-no-false-data.md` — it does NOT fall back to presenting raw reports.
+The orchestrator treats this as a HALT condition per `bmad-shared/core/no-fallback-no-false-data.md` — it does NOT fall back to presenting raw reports.
 
 ---
 

@@ -266,11 +266,11 @@ The NFR Registry for the v3 bifurcation story declares the following performance
 
 ## Cross-references
 
-- `~/.claude/skills/bmad-shared/spec-completeness-rule.md` — canonical mandatory section list (v3 schema definition, including this protocol's section → location mapping)
+- `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md` — canonical mandatory section list (v3 schema definition, including this protocol's section → location mapping)
 - `~/.claude/skills/bmad-shared/protocols/tracker-crud.md` — CRUD operations and per-tracker recipes (this protocol composes them)
-- `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` — zero-fallback rule that the HALT contract above implements
-- `~/.claude/skills/bmad-shared/worktree-lifecycle.md` — worktree creation lifecycle (operation 6 plugs into Branch B)
-- `~/.claude/skills/bmad-shared/knowledge-schema.md` — `spec_split_enabled` is documented in v1.2
+- `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md` — zero-fallback rule that the HALT contract above implements
+- `~/.claude/skills/bmad-shared/lifecycle/worktree-lifecycle.md` — worktree creation lifecycle (operation 6 plugs into Branch B)
+- `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` — `spec_split_enabled` is documented in v1.2
 
 ---
 
@@ -281,4 +281,4 @@ The NFR Registry for the v3 bifurcation story declares the following performance
 - **Maintainability**: bifurcation is opt-in (project flag) and additive (legacy v2 monolithic preserved). New tracker types only require updating `tracker-crud.md` recipes — this protocol stays stable.
 - **Audit trail**: business edits live in the tracker history (Linear / GitHub / GitLab / Jira timeline). Technical edits live in git history. The `business_synced_at` + `business_content_hash` frontmatter document each sync moment for drift detection.
 
-See `~/.claude/skills/bmad-shared/knowledge-schema.md` for the broader knowledge architecture rationale.
+See `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` for the broader knowledge architecture rationale.

@@ -100,7 +100,7 @@ Store: `MR_IID`, `MR_URL`, `MR_AUTHOR`, `MR_SOURCE_BRANCH`, `MR_TARGET_BRANCH`, 
 
 Derive `REVIEW_WORKTREE_PATH_EXPECTED` from `{WORKTREE_TEMPLATE_REVIEW}` with `{MR_IID}` substituted.
 
-**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
+**Apply the full protocol from `bmad-shared/lifecycle/worktree-lifecycle.md` with the following contract parameters:**
 
 | Parameter | Value |
 |-----------|-------|
@@ -121,7 +121,7 @@ After the protocol completes, set `REVIEW_WORKTREE_PATH = WORKTREE_PATH` (the pr
 
 ### 3.1 Shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. Load `bmad-shared/no-fallback-no-false-data.md` first (applied throughout the review).
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 ### 3.2 Project knowledge (optional)
 
@@ -152,7 +152,7 @@ Check `adr_location` in `workflow-context.md`. If set, load ADRs from the config
 ### 3.6 Tracker issue (story-spec v2 or v3 bifurcation)
 
 <check if="LINKED_TRACKER_ISSUE exists">
-  Load full issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`, include relations). The issue description IS the specs compliance reference, structured per the **story-spec v2 (monolithic) or v3 (bifurcation) schema** (`~/.claude/skills/bmad-shared/spec-completeness-rule.md`).
+  Load full issue (per `~/.claude/skills/bmad-shared/protocols/tracker-crud.md`, include relations). The issue description IS the specs compliance reference, structured per the **story-spec v2 (monolithic) or v3 (bifurcation) schema** (`~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`).
 
   **Bifurcation mode detection:** if the MR's diff contains a local spec file at `_bmad-output/implementation-artifacts/{story_key}.md` with frontmatter `mode: bifurcation`, load that file and apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 2 (compose unified view) — fetch the tracker description (business sections) AND read the local file (technical sections + business mirrors), merge them into a single composite spec for review. Drift check (operation 3) on entry: if drift detected, HALT, present `[R]/[I]/[V]` menu.
 

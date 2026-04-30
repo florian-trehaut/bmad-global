@@ -31,7 +31,7 @@ Apply accepted modifications to the tracker issue description, add the spec-revi
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
 
 - Do NOT write the tracker directly. Emit a `tracker_write_request` SendMessage per §B with the operation (`update_status`, `update_description`, `label_add`) and args.
 - Wait for `tracker_write_ack`. On `failed`, emit `blocker` and HALT.

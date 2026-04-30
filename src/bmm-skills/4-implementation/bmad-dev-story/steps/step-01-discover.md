@@ -36,7 +36,7 @@ Collect all actionable candidates — tracker issues (In Progress / Todo) and fo
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 
 - **Skip discovery and user selection** entirely.
 - Read `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[].identifier` (filter to type=`tracker_issue`).

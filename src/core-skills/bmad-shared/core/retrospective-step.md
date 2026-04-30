@@ -54,7 +54,7 @@ Friction point {N}: {short title}
 
 **PATH RULES — CRITICAL:**
 - Use **relative framework paths** from the skill root: `bmad-code-review/steps/step-01-discover.md`
-- For shared files: `bmad-shared/retrospective-step.md`
+- For shared files: `bmad-shared/core/retrospective-step.md`
 - For project-level files: `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`, `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/{file}.md`
 - **NEVER** use absolute installed paths like `~/.claude/skills/bmad-{skill}/...`
 - The retrospective is consumed by the framework developer — installed paths point to the wrong files

@@ -60,7 +60,7 @@ Clean up worktree (with user consent), delete WIP file, and present final summar
 
 ### 1. Worktree Cleanup
 
-**Apply §3 Cleanup from `bmad-shared/worktree-lifecycle.md`.**
+**Apply §3 Cleanup from `bmad-shared/lifecycle/worktree-lifecycle.md`.**
 
 <check if="REUSED_CURRENT_WORKTREE == true">
   The workflow reused the user's current worktree. Do NOT remove it — log "Worktree reused — cleanup skipped (user's worktree)." and skip the prompt below.

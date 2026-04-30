@@ -31,7 +31,7 @@ Propose updates to Definition of Done (product), BACs (Business Acceptance Crite
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
 
 - Each proposed DoD/BAC/VM update is presented to the lead via a `question` SendMessage instead of `AskUserQuestion`. The lead either approves directly (from its context) or batches and forwards to the user.
 - TAC-18 unwanted-pattern enforcement applies — direct AskUserQuestion in TEAMMATE_MODE → HALT.

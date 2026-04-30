@@ -31,7 +31,7 @@ Present ALL findings at once to the user, then collect decisions on each. Before
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
 
 - **Reroute the AskUserQuestion call**: emit a `question` SendMessage to `LEAD_NAME` with all findings as the payload. Block on the reply (which contains the user's per-finding decisions).
 - The reply is delivered via SendMessage with `type: question_reply`, mapping each finding to ACCEPTED / REJECTED / MODIFIED / SKIPPED.

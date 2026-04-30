@@ -31,7 +31,7 @@ Compile the final verdict, compose a structured tracker comment, post the commen
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B and §D, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §B and §D, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
 
 - Compute the verdict locally; emit `tracker_write_request` SendMessage for the comment + status update; emit `phase_complete` SendMessage with PASS/FAIL + findings.
 - See bmad-validation-metier/steps/step-05-verdict.md for the full payload structure (identical pattern).
@@ -40,7 +40,7 @@ When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
 
 ## RULES
 
-- Load `~/.claude/skills/bmad-shared/validation-verdict-protocol.md` and apply its protocol as baseline rules for this step
+- Load `~/.claude/skills/bmad-shared/validation/validation-protocol.md#verdict` and apply its protocol as baseline rules for this step
 - The verdict is BINARY: ALL PASS = PASS / ANY FAIL = FAIL
 - Load `../data/tracker-comment-template.md` for the comment format
 - NEVER move to "Done" an issue with a failed VM item

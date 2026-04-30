@@ -30,7 +30,7 @@ This uses **step-file architecture** for focused execution:
 
 ### 1. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Apply these rules for the entire workflow execution. Key rules for this workflow:
 
@@ -46,7 +46,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 2. Configuration Loading (REQUIRED)
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` — resolve `user_name`, `communication_language`, `user_skill_level`, tracker, forge, quality gate. HALT if missing.
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — conventions (`#conventions`), test rules (`#test-rules`), tech stack (`#tech-stack`), validation tooling (`#validation-tooling`). HALT if missing.
@@ -66,7 +66,7 @@ Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
 ### 5. Detect teammate mode (inserted AFTER Configuration Loading, BEFORE CHK-INIT — non-canonical INIT structure per F-005)
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. This sets:
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. This sets:
 
 - `TEAMMATE_MODE` (boolean)
 - `ORCH_AUTHORIZED` (boolean — only meaningful when TEAMMATE_MODE=true)
@@ -130,6 +130,6 @@ Read fully and follow: `steps/step-01-mode-detection.md` to begin the workflow.
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements. **This step is CONDITIONAL** — it only activates if difficulties were encountered.

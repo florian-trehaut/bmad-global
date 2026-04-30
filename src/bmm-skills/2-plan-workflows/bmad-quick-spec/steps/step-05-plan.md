@@ -49,7 +49,7 @@ Store as `TASKS`.
 
 ### 2. Technical Acceptance Criteria — EARS
 
-For each TAC, use one of the 5 EARS patterns per `~/.claude/skills/bmad-shared/ac-format-rule.md`:
+For each TAC, use one of the 5 EARS patterns per `~/.claude/skills/bmad-shared/spec/ac-format-rule.md`:
 
 | Pattern | Form |
 |---------|------|
@@ -91,7 +91,7 @@ Store as `GUARDRAILS`.
 
 ### 5. Boundaries Triple
 
-Per `~/.claude/skills/bmad-shared/boundaries-rule.md`, each bucket has ≥ 3 items.
+Per `~/.claude/skills/bmad-shared/spec/boundaries-rule.md`, each bucket has ≥ 3 items.
 
 **✅ Always Do** (no approval needed):
 - {project_baseline_items} (3+)

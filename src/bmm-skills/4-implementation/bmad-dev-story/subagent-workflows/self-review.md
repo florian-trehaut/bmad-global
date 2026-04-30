@@ -45,7 +45,7 @@ Load all standards and knowledge files JIT:
 # Load dev standards from project workflow-knowledge
 Read({MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md)                    # if exists
 Read({MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md)      # if exists — project-specific checklists
-Read(~/.claude/skills/bmad-shared/no-fallback-no-false-data.md)  # always
+Read(~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md)  # always
 ```
 
 ### 2. Construct Diff
@@ -85,7 +85,7 @@ Scope analysis: creep (MORE than asked -> QUESTION), missing (LESS -> BLOCKER), 
 
 #### P1.5.a: Zero Fallback
 
-**Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`**
+**Load and apply `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md`**
 
 Grep for silent fallbacks on business-critical fields:
 

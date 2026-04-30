@@ -31,7 +31,7 @@ Create a read-only worktree on `origin/main` to read source code for test identi
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 
 - The orchestrator has already provided a worktree via `task_contract.constraints.worktree_path`. Apply `worktree-lifecycle.md` Branch D (provided path mode) — the orchestrator owns this worktree.
 - Set `worktree_use_provided=true` in the contract parameters; HALT if `worktree_path` is null.

@@ -2,7 +2,7 @@
 
 **Loaded by:** Validation workflows (`bmad-validation-frontend`, `bmad-validation-desktop`, `bmad-validation-metier`) and any workflow needing staging/production URLs, deployment topology, or environment-specific configuration.
 
-**Indirection layer for** the schema sections `environments` and `infrastructure` (per `~/.claude/skills/bmad-shared/knowledge-schema.md` v1).
+**Indirection layer for** the schema sections `environments` and `infrastructure` (per `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` v1).
 
 ---
 
@@ -82,4 +82,4 @@ This is a hard rule independent of project configuration.
 - **Maintainability**: 8 previous workflow refs (validation-frontend, validation-desktop, validation-metier, etc.) consolidated.
 - **Production safety**: a single place to enforce the "explicit authorisation" rule on production writes.
 
-See `~/.claude/skills/bmad-shared/knowledge-schema.md` for the full architecture rationale.
+See `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` for the full architecture rationale.

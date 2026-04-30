@@ -1,4 +1,4 @@
-# Pattern Reference Schema (extension to the tech-stack section described in `~/.claude/skills/bmad-shared/knowledge-schema.md`)
+# Pattern Reference Schema (extension to the tech-stack section described in `~/.claude/skills/bmad-shared/schema/knowledge-schema.md`)
 
 **Consumed by:** sub-axis 4c (Pattern Consistency).
 

@@ -21,7 +21,7 @@
 
 ### 1. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Apply these rules for the entire workflow execution. Key rules for this workflow:
 
@@ -35,7 +35,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 2. Load project context (REQUIRED)
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` — resolve `user_name`, `communication_language`, `tracker`, `tracker_story_location`, quality gate. HALT if missing.
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — conventions (`#conventions`), test rules (`#test-rules`), tech stack (`#tech-stack`), validation tooling (`#validation-tooling`). HALT if missing.
@@ -43,7 +43,7 @@ Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
 ### 3. Detect teammate mode
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (this skill is not allowed in non-orchestrator teammate context). If TEAMMATE_MODE=true and ORCH_AUTHORIZED=true → enable interactive rerouting + tracker write deferral for steps 02–06.
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (this skill is not allowed in non-orchestrator teammate context). If TEAMMATE_MODE=true and ORCH_AUTHORIZED=true → enable interactive rerouting + tracker write deferral for steps 02–06.
 
 ### 4. Set defaults
 
@@ -52,7 +52,7 @@ Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. If TEAMMATE_MODE=
 
 ### 5. CHK-INIT — Initialization Read Receipt
 
-Per `~/.claude/skills/bmad-shared/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
+Per `~/.claude/skills/bmad-shared/core/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
 
 ```
 CHK-INIT PASSED — bmad-quick-spec initialization complete:
@@ -124,4 +124,4 @@ After CHK-INIT is emitted, **Read FULLY and apply**: `./steps/step-01-entry.md` 
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes, read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`. The retrospective is **CONDITIONAL** — it only activates if difficulties were encountered.
+After the final step completes, read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`. The retrospective is **CONDITIONAL** — it only activates if difficulties were encountered.

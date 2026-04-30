@@ -24,7 +24,7 @@ const path = require('node:path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const SRC_DIR = path.join(PROJECT_ROOT, 'src');
-const SCHEMA_PATH = path.join(SRC_DIR, 'core-skills/bmad-shared/knowledge-schema.md');
+const SCHEMA_PATH = path.join(SRC_DIR, 'core-skills/bmad-shared/schema/knowledge-schema.md');
 
 const args = new Set(process.argv.slice(2));
 const STRICT = args.has('--strict');
@@ -36,8 +36,8 @@ const ALLOWED_LEGACY_PATHS = [
   'src/core-skills/bmad-knowledge-refresh/',
   'src/core-skills/bmad-project-init/steps/step-01-preflight.md',
   'src/core-skills/bmad-project-init/steps/step-04-finalize.md',
-  'src/core-skills/bmad-shared/knowledge-loading.md',
-  'src/core-skills/bmad-shared/knowledge-schema.md',
+  'src/core-skills/bmad-shared/core/knowledge-loading.md',
+  'src/core-skills/bmad-shared/schema/knowledge-schema.md',
   // Skill-internal data files unrelated to project knowledge.
   'src/core-skills/bmad-create-skill/data/skill-conventions.md',
   // Step file *names* that contain a legacy substring; these are filenames, not refs.
@@ -127,7 +127,7 @@ function loadRegisteredProtocols() {
 
 function checkProtocolRefs(absPath, content, findings, registeredProtocols) {
   const relPath = path.relative(PROJECT_ROOT, absPath);
-  if (relPath.startsWith('src/core-skills/bmad-shared/knowledge-schema.md')) return;
+  if (relPath.startsWith('src/core-skills/bmad-shared/schema/knowledge-schema.md')) return;
   if (relPath.startsWith('src/core-skills/bmad-shared/protocols/')) return;
 
   const PROTOCOL_REF_RE = /~\/\.claude\/skills\/bmad-shared\/protocols\/([a-z][a-z0-9-]*)\.md/g;

@@ -185,6 +185,6 @@ node tools/validate-story-spec.js path/to/spec.md --split --tracker-id="ABC-123"
 
 - [Spec Bifurcation Concept](../explanation/spec-bifurcation.md) — design rationale and audience model
 - [`spec-bifurcation.md` protocol](../../src/core-skills/bmad-shared/protocols/spec-bifurcation.md) — canonical operations and HALT contracts
-- [`spec-completeness-rule.md` v3](../../src/core-skills/bmad-shared/spec-completeness-rule.md) — schema definition and section→location mapping
+- [`spec-completeness-rule.md` v3](../../src/core-skills/bmad-shared/spec/spec-completeness-rule.md) — schema definition and section→location mapping
 - [`tracker-crud.md` v1.2](../../src/core-skills/bmad-shared/protocols/tracker-crud.md) — operations 7+8 (preserve non-managed sections, lightweight drift check)
-- [`knowledge-schema.md` v1.2](../../src/core-skills/bmad-shared/knowledge-schema.md) — registry of `spec-bifurcation` protocol and `spec_split_enabled` field
+- [`knowledge-schema.md` v1.2](../../src/core-skills/bmad-shared/schema/knowledge-schema.md) — registry of `spec-bifurcation` protocol and `spec_split_enabled` field

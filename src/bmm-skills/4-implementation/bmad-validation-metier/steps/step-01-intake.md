@@ -31,7 +31,7 @@ Identify the issue to validate (provided by the user or discovered via tracker),
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 
 - **Skip user selection** entirely. Read `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[type=tracker_issue].identifier` (HALT TAC-28 if null/missing/malformed).
 - Read `ENVIRONMENT` from `task_contract.metadata.environment` (default `staging` if absent).
@@ -41,7 +41,7 @@ When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
 
 ## RULES
 
-- Load `~/.claude/skills/bmad-shared/validation-intake-protocol.md` and apply its protocol as baseline rules for this step
+- Load `~/.claude/skills/bmad-shared/validation/validation-protocol.md#intake` and apply its protocol as baseline rules for this step
 - HALT if the issue is not in the "to test" status (using `TRACKER_STATES.to_test`)
 - HALT if the VM and DoD sections are absent (propose to infer ONLY with explicit user authorization)
 - NEVER invent VM items — they come from the issue or the user

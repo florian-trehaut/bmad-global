@@ -172,6 +172,6 @@ The bifurcation pattern is informed by:
 
 - [v2 → v3 Migration Guide](../migration/v2-to-v3-bifurcation.md) — how to enable bifurcation, manual migration of legacy specs
 - [`spec-bifurcation.md` protocol](../../src/core-skills/bmad-shared/protocols/spec-bifurcation.md) — canonical operations: create, read (compose unified view), drift check, refresh, sync, worktree handoff, size limits
-- [`spec-completeness-rule.md` v3](../../src/core-skills/bmad-shared/spec-completeness-rule.md) — section list and section→location mapping
+- [`spec-completeness-rule.md` v3](../../src/core-skills/bmad-shared/spec/spec-completeness-rule.md) — section list and section→location mapping
 - [`tracker-crud.md` v1.2](../../src/core-skills/bmad-shared/protocols/tracker-crud.md) — tracker operations including the two new ones (preserve non-managed sections, lightweight `updatedAt` fetch) added for bifurcation
-- [`knowledge-schema.md` v1.2](../../src/core-skills/bmad-shared/knowledge-schema.md) — protocol registry and `spec_split_enabled` field documentation
+- [`knowledge-schema.md` v1.2](../../src/core-skills/bmad-shared/schema/knowledge-schema.md) — protocol registry and `spec_split_enabled` field documentation

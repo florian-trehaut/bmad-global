@@ -4,7 +4,7 @@
 
 **Loaded by:** `team-router.md` during INITIALIZATION when the parent skill is invoked, AND by the parent skill's `step-04-team-create.md` (or equivalent) to build the `TeamCreate` payload.
 
-**Reminder:** Adding a new orchestrator requires registration in `src/core-skills/bmad-shared/orchestrator-registry.md` (see that file's "How to Add a New Orchestrator Skill" section). Skills NOT in the registry MUST NOT set `metadata.orchestrator_invoked: true`.
+**Reminder:** Adding a new orchestrator requires registration in `src/core-skills/bmad-shared/teams/orchestrator-registry.md` (see that file's "How to Add a New Orchestrator Skill" section). Skills NOT in the registry MUST NOT set `metadata.orchestrator_invoked: true`.
 
 ---
 
@@ -104,7 +104,7 @@ fallback:
 
 ## Cross-references
 
-- `~/.claude/skills/bmad-shared/orchestrator-registry.md` — register this skill before deployment
-- `~/.claude/skills/bmad-shared/teammate-mode-routing.md`
-- `~/.claude/skills/bmad-shared/task-contract-schema.md`
-- `~/.claude/skills/bmad-shared/agent-teams-config-schema.md`
+- `~/.claude/skills/bmad-shared/teams/orchestrator-registry.md` — register this skill before deployment
+- `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`
+- `~/.claude/skills/bmad-shared/teams/task-contract-schema.md`
+- `~/.claude/skills/bmad-shared/teams/agent-teams-config-schema.md`

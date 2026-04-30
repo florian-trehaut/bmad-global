@@ -36,7 +36,7 @@ Single-validator review pass over the assembled spec content. Write the spec fil
 
 ### 1. Assemble spec content
 
-Apply the template `templates/spec-template-quick.md` and substitute all placeholders with the artefacts produced in steps 01-05. The result MUST contain all 22 mandatory sections per `~/.claude/skills/bmad-shared/spec-completeness-rule.md`:
+Apply the template `templates/spec-template-quick.md` and substitute all placeholders with the artefacts produced in steps 01-05. The result MUST contain all 22 mandatory sections per `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`:
 
 1. Definition of Done (Feature + Non-regression)
 2. Problem

@@ -284,7 +284,7 @@ The skip is **never silent**. The condition is **always cited** with its source 
 ### CHK-INIT — Initialization Read Receipt
 
 CHK-INIT PASSED — Initialization complete:
-  shared_rules_loaded: 17 files (knowledge-loading.md, no-fallback-no-false-data.md, project-root-resolution.md, retrospective-step.md, spawn-protocol.md, task-contract-schema.md, team-router.md, validation-intake-protocol.md, validation-proof-principles.md, validation-verdict-protocol.md, worktree-lifecycle.md, knowledge-schema.md, agent-teams-config-schema.md, daily-planning-awareness.md, evidence-based-debugging.md, workflow-adherence.md, SKILL.md)
+  shared_rules_loaded: 5 core files (core/knowledge-loading.md, core/no-fallback-no-false-data.md, core/project-root-resolution.md, core/retrospective-step.md, core/workflow-adherence.md) + JIT-loaded subdirs per workflow type (spec/, lifecycle/ for troubleshoot)
   project_context: /Users/florian/projects/myapp/.claude/workflow-context.md (schema_version: 1.0)
   project_knowledge:
     - project.md (schema_version: 1.0)
@@ -377,13 +377,13 @@ Then proceed to the SEQUENCE below.
 - It does NOT replace HALT directives — HALTs remain the primary stop mechanism
 - It does NOT enforce execution mechanically — that requires hooks (out of scope for skill markdown)
 - It does NOT solve every adherence issue — it raises the floor from "I think Claude read it" to "Claude emitted a receipt confirming it"
-- It does NOT apply to subagent contracts — those have their own anti-deviation contracts (see `bmad-shared/spawn-protocol.md`, `bmad-shared/task-contract-schema.md`)
+- It does NOT apply to subagent contracts — those have their own anti-deviation contracts (see `bmad-shared/teams/spawn-protocol.md`, `bmad-shared/teams/task-contract-schema.md`)
 
 ---
 
 ## Cross-references
 
-- `knowledge-loading.md` — what files MUST be loaded (source of truth for the read-receipt content)
-- `no-fallback-no-false-data.md` — applies to data integrity; this rule applies to process integrity
-- `validation-proof-principles.md` — "code analysis is NEVER proof"; this rule applies the same idea to workflow execution: "claiming you read the workflow is not proof — emit the receipt"
-- `evidence-based-debugging.md` — companion rule for the troubleshoot workflow specifically (proof via reproduction)
+- `core/knowledge-loading.md` — what files MUST be loaded (source of truth for the read-receipt content)
+- `core/no-fallback-no-false-data.md` — applies to data integrity; this rule applies to process integrity
+- `validation/validation-protocol.md#proof-principles` — "code analysis is NEVER proof"; this rule applies the same idea to workflow execution: "claiming you read the workflow is not proof — emit the receipt"
+- `spec/evidence-based-debugging.md` — companion rule for the troubleshoot workflow specifically (proof via reproduction)

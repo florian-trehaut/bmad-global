@@ -34,7 +34,7 @@ Use sub-agents for parallelization when beneficial.
 
 ## RULES
 
-- **REAL DATA MANDATORY** — code analysis is NEVER a substitute for real data (provider files, DB queries, cloud logs). See `bmad-shared/no-fallback-no-false-data.md` and `bmad-shared/evidence-based-debugging.md`.
+- **REAL DATA MANDATORY** — code analysis is NEVER a substitute for real data (provider files, DB queries, cloud logs). See `bmad-shared/core/no-fallback-no-false-data.md` and `bmad-shared/spec/evidence-based-debugging.md`.
 - Load the generic investigation checklist from `../data/investigation-checklist.md` (skill-internal)
 - Load the project-specific investigation checklist from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md#investigation-checklist` (if exists) — extends the generic checklist
 - Document ALL findings with file:line references and concrete evidence

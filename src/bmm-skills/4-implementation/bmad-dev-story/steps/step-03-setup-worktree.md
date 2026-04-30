@@ -31,11 +31,11 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 ## STEP GOAL:
 
-Set up the working environment for this story by applying the unified worktree lifecycle protocol from `bmad-shared/worktree-lifecycle.md`. All implementation work MUST happen inside `WORKTREE_PATH`.
+Set up the working environment for this story by applying the unified worktree lifecycle protocol from `bmad-shared/lifecycle/worktree-lifecycle.md`. All implementation work MUST happen inside `WORKTREE_PATH`.
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 
 - The orchestrator has already created and configured a worktree before spawning this teammate. `WORKTREE_PATH` is provided via `task_contract.constraints.worktree_path`.
 - Set `worktree_use_provided=true` in the contract parameters passed to `worktree-lifecycle.md`. This activates **Branch D** (provided path mode) which supersedes Branch A (TAC-19, TAC-20).
@@ -54,7 +54,7 @@ When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
 
 ### 2. Apply the Worktree Lifecycle Protocol
 
-**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
+**Apply the full protocol from `bmad-shared/lifecycle/worktree-lifecycle.md` with the following contract parameters:**
 
 | Parameter | Value |
 |-----------|-------|

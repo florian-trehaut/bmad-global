@@ -4,7 +4,7 @@
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §A, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §A, when TEAMMATE_MODE=true:
 
 - The "present findings" interactive prompt is rerouted via `SendMessage` (a `question` payload with the findings list and per-finding options ACCEPTED/REJECTED/MODIFIED/SKIPPED).
 - Block on `question_reply` from the lead.
@@ -59,7 +59,7 @@ The adversarial review takes the **story-spec v2 contract** into account:
 - **Security Gate FAIL items** — verify each remediation task in the spec has a corresponding implementation in the diff
 - **Observability Requirements** — verify mandatory log events / metrics / alerts are wired up
 
-For Mode B (no spec), apply project-baseline boundaries from `~/.claude/skills/bmad-shared/boundaries-rule.md` and the standard adversarial perspectives.
+For Mode B (no spec), apply project-baseline boundaries from `~/.claude/skills/bmad-shared/spec/boundaries-rule.md` and the standard adversarial perspectives.
 
 ---
 

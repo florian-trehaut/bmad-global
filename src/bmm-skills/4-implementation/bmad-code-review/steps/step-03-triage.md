@@ -114,7 +114,7 @@ consolidated_report:
   failed_layers: [...]
 ```
 
-→ HALT the workflow. Per `bmad-shared/no-fallback-no-false-data.md` and G1 of the Tech Spec, the orchestrator does NOT fall back to presenting raw reports. Report the failure to the user with the reason and propose:
+→ HALT the workflow. Per `bmad-shared/core/no-fallback-no-false-data.md` and G1 of the Tech Spec, the orchestrator does NOT fall back to presenting raw reports. Report the failure to the user with the reason and propose:
 
 1. Retry judge-triage (transient failure)
 2. Abort the review (judge unreachable, user investigates the model tier / context)

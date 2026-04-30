@@ -345,7 +345,7 @@ The worktree IS the MR branch — commits push directly.
 
 ## 12. Retrospective (MANDATORY)
 
-After the final report is presented, execute the retrospective step: read and follow `~/.claude/skills/bmad-shared/retrospective-step.md`. NOT optional — runs after every execution (silently skips if no friction was encountered per G8).
+After the final report is presented, execute the retrospective step: read and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`. NOT optional — runs after every execution (silently skips if no friction was encountered per G8).
 
 ## SUCCESS/FAILURE:
 

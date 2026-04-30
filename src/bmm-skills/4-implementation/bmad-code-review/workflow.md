@@ -42,13 +42,13 @@ Extract the following from the YAML frontmatter:
 
 ### 2. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **code must throw on unexpected values, never silently degrade. A log is NOT an alert.**
 
 ### 3. Load project knowledge (REQUIRED)
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — review perspectives (`#review-perspectives`), tech stack (`#tech-stack`), conventions (`#conventions`), test rules (`#test-rules`), investigation checklist (`#investigation-checklist`).
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` — API surface for endpoints under review.
@@ -63,7 +63,7 @@ HALT if either file is missing (run `/bmad-knowledge-bootstrap`).
 
 ### 5. Detect teammate mode
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. **Important:** standalone `bmad-code-review` uses `Agent()` for parallel meta dispatch (preserved unchanged for backward compatibility per VM-NR-4 of story `auto-flow-orchestrator`). When invoked as a teammate (TEAMMATE_MODE=true), the Agent tool is removed at spawn time per Anthropic platform contract — running this workflow inside a teammate would FAIL at step-02.
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. **Important:** standalone `bmad-code-review` uses `Agent()` for parallel meta dispatch (preserved unchanged for backward compatibility per VM-NR-4 of story `auto-flow-orchestrator`). When invoked as a teammate (TEAMMATE_MODE=true), the Agent tool is removed at spawn time per Anthropic platform contract — running this workflow inside a teammate would FAIL at step-02.
 
 Therefore: when TEAMMATE_MODE=true, this workflow MUST HALT in INITIALIZATION with:
 
@@ -126,7 +126,7 @@ The orchestration uses the Claude Code `Agent` tool directly — N calls in a SI
 - **ALL review work MUST happen inside a worktree** — NEVER in the main repo
 - **NEVER stop for "milestones" or "session boundaries"** — continue until COMPLETE or HALT
 - Execute ALL steps in exact order — NO skipping
-- **RETROSPECTIVE IS MANDATORY** — after step-08 completes, execute `~/.claude/skills/bmad-shared/retrospective-step.md`. Do NOT end the workflow without it.
+- **RETROSPECTIVE IS MANDATORY** — after step-08 completes, execute `~/.claude/skills/bmad-shared/core/retrospective-step.md`. Do NOT end the workflow without it.
 
 ---
 
@@ -177,7 +177,7 @@ These apply at ANY step:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)

@@ -79,7 +79,7 @@ Else (mode: monolithic, or absent for legacy v2) → monolithic mode.
 - INVEST: {n_yes}/6 YES
 ```
 
-If the spec is missing v2 mandatory sections (per `~/.claude/skills/bmad-shared/spec-completeness-rule.md`), HALT and prompt the user to either fix the spec via `/bmad-create-story` (Enrichment mode) or grant explicit waiver per section.
+If the spec is missing v2 mandatory sections (per `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`), HALT and prompt the user to either fix the spec via `/bmad-create-story` (Enrichment mode) or grant explicit waiver per section.
 
 ### 2. Load Project Context
 

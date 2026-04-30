@@ -37,7 +37,7 @@ The end-of-workflow scope-completeness check (impartial subagent) runs in step-1
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §A, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §A, when TEAMMATE_MODE=true:
 
 - Do NOT call `EnterPlanMode` / `AskUserQuestion` directly (TAC-18 unwanted-pattern HALT trigger).
 - Compose the implementation plan as in standalone mode (steps 1-2 below).

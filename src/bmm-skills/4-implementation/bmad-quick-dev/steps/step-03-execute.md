@@ -54,7 +54,7 @@ If Mode A and the spec contains a `## Boundaries` section, load it now and confi
 - **⚠️ Ask First** — when about to perform any action listed here (or matching the pattern), HALT and ask user explicitly
 - **🚫 Never Do** — refuse outright, even if instructed
 
-Mode B (direct): apply project-baseline boundaries from `~/.claude/skills/bmad-shared/boundaries-rule.md` (always-do baseline + project-level Ask-First / Never-Do triggers).
+Mode B (direct): apply project-baseline boundaries from `~/.claude/skills/bmad-shared/spec/boundaries-rule.md` (always-do baseline + project-level Ask-First / Never-Do triggers).
 
 For each task:
 

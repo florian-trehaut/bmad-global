@@ -2,7 +2,7 @@
 
 **BMAD orchestrator for the full story lifecycle.** Composes 5 sub-workflows (spec → review → dev → code-review → validation) into a single user-facing entry point. The orchestrator runs the spec phase inline (interactive with the user) and delegates the other 4 phases to isolated Agent Teams teammates for impartial review and context isolation.
 
-**This is the FIRST registered orchestrator skill** authorized to override Decision D16 of `spec-agent-teams-integration.md` (per `src/core-skills/bmad-shared/orchestrator-registry.md`).
+**This is the FIRST registered orchestrator skill** authorized to override Decision D16 of `spec-agent-teams-integration.md` (per `src/core-skills/bmad-shared/teams/orchestrator-registry.md`).
 
 **Use when:** the user wants to run a full BMAD story lifecycle without manually invoking each phase. The orchestrator handles tracker transitions, question routing, phase failures, and worktree lifecycle.
 
@@ -22,7 +22,7 @@ Extract: `PROJECT_NAME`, `ISSUE_PREFIX`, `TRACKER`, `TRACKER_STATES`, `FORGE`, `
 
 ### 2. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually.
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Key rules:
 - `no-fallback-no-false-data.md` — Zero Fallback / Zero False Data
@@ -38,14 +38,14 @@ Key rules:
 
 ### 3. Load project knowledge (REQUIRED)
 
-Apply `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`. HALT if missing.
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md`. HALT if missing (orchestrator may invoke create-story which needs domain context).
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md`. HALT if missing.
 
 ### 4. Detect TEAM_MODE
 
-Apply `~/.claude/skills/bmad-shared/team-router.md`. This sets:
+Apply `~/.claude/skills/bmad-shared/teams/team-router.md`. This sets:
 
 - `TEAM_MODE` (boolean — Agent Teams tools available + project config enabled)
 - `MAX_TEAMMATES`, `TEAMMATE_MODE` (self-service vs assigned)
@@ -193,4 +193,4 @@ CHK-WORKFLOW-COMPLETE PASSED — workflow bmad-auto-flow executed end-to-end:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After step-09 emits, read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`. Conditional — only activates if difficulties were encountered.
+After step-09 emits, read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`. Conditional — only activates if difficulties were encountered.

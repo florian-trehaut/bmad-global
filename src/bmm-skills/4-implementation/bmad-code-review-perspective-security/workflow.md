@@ -12,7 +12,7 @@
 
 ### 1. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually.
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Key rules: `no-fallback-no-false-data.md`, `validation-proof-principles.md`, `validation-verdict-protocol.md`, `workflow-adherence.md`, `teammate-mode-routing.md`.
 
@@ -24,7 +24,7 @@ Key rules: `no-fallback-no-false-data.md`, `validation-proof-principles.md`, `va
 
 ### 3. Detect teammate mode
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. Expected: TEAMMATE_MODE=true with `task_contract.role = 'code-reviewer-security'`. Standalone supported. HALT if TEAMMATE_MODE=true and ORCH_AUTHORIZED=false.
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. Expected: TEAMMATE_MODE=true with `task_contract.role = 'code-reviewer-security'`. Standalone supported. HALT if TEAMMATE_MODE=true and ORCH_AUTHORIZED=false.
 
 ### 4. Resolve review contract
 

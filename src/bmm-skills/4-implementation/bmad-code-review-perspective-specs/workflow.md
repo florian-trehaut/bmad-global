@@ -12,13 +12,13 @@
 
 ### 1. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually.
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Key rules: `no-fallback-no-false-data.md`, `validation-proof-principles.md`, `validation-verdict-protocol.md`, `workflow-adherence.md`, `teammate-mode-routing.md`, `task-contract-schema.md`.
 
 ### 2. Load project context
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`. HALT if missing.
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`. HALT if missing.
@@ -26,7 +26,7 @@ Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
 
 ### 3. Detect teammate mode
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. The expected calling context is TEAMMATE_MODE=true with `task_contract.role = 'code-reviewer-specs'`. Standalone invocation is also supported (TEAMMATE_MODE=false).
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. The expected calling context is TEAMMATE_MODE=true with `task_contract.role = 'code-reviewer-specs'`. Standalone invocation is also supported (TEAMMATE_MODE=false).
 
 If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (D16 strict applies; orchestrator-spawned only).
 

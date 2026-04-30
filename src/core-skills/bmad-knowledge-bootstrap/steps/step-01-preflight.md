@@ -145,7 +145,7 @@ This is a **NEW contract for bootstrap**: the skill description above states "Th
 
 > Bootstrap **does NOT create** `workflow-context.md` (still true — that's `bmad-project-init`'s job). However, bootstrap **MAY UPDATE** specific known fields additively when those fields are governed by the knowledge schema (currently: `spec_split_enabled`). All UPDATEs are additive (append a new field), never structural rewrites.
 
-This is a **clear new contract** documented here and in `bmad-shared/knowledge-schema.md` v1.2 changelog. It is **never** used to mutate fields outside the knowledge-schema-governed set.
+This is a **clear new contract** documented here and in `bmad-shared/schema/knowledge-schema.md` v1.2 changelog. It is **never** used to mutate fields outside the knowledge-schema-governed set.
 
 **When to prompt:**
 

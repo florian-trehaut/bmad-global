@@ -28,7 +28,7 @@ You received a `review_contract` embedded in the `Agent()` prompt from the orche
 
 - Execute ONLY the sub-axes listed in `contract.active_sub_axes` (may subset of 1a/1b/1c/1d)
 - Review ONLY files listed in `contract.changed_files`
-- Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` (always)
+- Load and apply `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md` (always)
 - Report findings with exact `file:line` references
 - You are **READ-ONLY** — do NOT edit, fix, commit, or modify anything
 - Do NOT run format, lint --fix, or any write operation

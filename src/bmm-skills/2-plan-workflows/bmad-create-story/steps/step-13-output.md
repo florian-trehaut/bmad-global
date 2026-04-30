@@ -54,7 +54,7 @@ Scan the composed spec from Step 7. Select between **3 and 5** items maximizing 
 
 Prioritized candidate sources (in order):
 
-1. **Status / enum / mapping decisions with unknown handling** — every place the spec says "throw on unknown" or "fallback to default" (zero-fallback rule from `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`).
+1. **Status / enum / mapping decisions with unknown handling** — every place the spec says "throw on unknown" or "fallback to default" (zero-fallback rule from `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md`).
 2. **External dependencies marked Blocking** — gates on partners, legal, compliance, third-party APIs.
 3. **Out-of-scope frontiers** — items from the explicit Out-of-Scope register (OOS-N) that an outside reader might assume is in.
 4. **BACs with non-trivial business logic** — anything beyond CRUD page renders; especially conditional flows, time/date handling, money, multi-actor permissions, regulatory constraints.

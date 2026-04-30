@@ -2,7 +2,7 @@
 
 **BMAD v6.2.0 — Step-file architecture, JIT loading, sequential execution, dual-mode (Discovery / Enrichment), story-spec v2 (monolithic) or v3 (bifurcation) schema.**
 
-**Goal:** Produce implementation-ready stories that meet the story-spec v2 (monolithic) or v3 (bifurcation) schema (`bmad-shared/spec-completeness-rule.md`). The workflow combines real-data confrontation, external research, structured NFR / security / observability, EARS-formatted technical ACs, INVEST self-check, out-of-scope register, risks/assumptions register, and boundaries triple — producing the most rigorous public story-spec pipeline.
+**Goal:** Produce implementation-ready stories that meet the story-spec v2 (monolithic) or v3 (bifurcation) schema (`bmad-shared/spec/spec-completeness-rule.md`). The workflow combines real-data confrontation, external research, structured NFR / security / observability, EARS-formatted technical ACs, INVEST self-check, out-of-scope register, risks/assumptions register, and boundaries triple — producing the most rigorous public story-spec pipeline.
 
 In **Discovery mode**, guide the user through conversational spec engineering to create a new tracker issue. In **Enrichment mode**, load all project context and enrich an existing issue with the same v2 sections. Both modes converge into the same evidence → modeling → audit → plan → multi-validator review → publication pipeline.
 
@@ -36,7 +36,7 @@ Extract the following from the YAML frontmatter:
 
 ### 2. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Apply these rules for the entire workflow execution. Key rules for this workflow:
 
@@ -52,7 +52,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 3. Load knowledge files
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`. For this workflow:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`. For this workflow:
 
 - **Required (HALT if missing):** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — tracker patterns (`#tracker-patterns`), tech stack (`#tech-stack`), conventions (`#conventions`), validation tooling (`#validation-tooling`), test rules (`#test-rules`)
 - **Required (HALT if missing):** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md` — ubiquitous language and domain rules used to phrase stories
@@ -199,7 +199,7 @@ These apply at ANY step:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 

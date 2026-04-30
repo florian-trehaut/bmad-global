@@ -77,7 +77,7 @@ task_contract:
 #### TEAM_MODE=true: TaskCreate
 
 ```
-Build the spawn prompt per ~/.claude/skills/bmad-shared/spawn-protocol.md, embedding the task_contract above.
+Build the spawn prompt per ~/.claude/skills/bmad-shared/teams/spawn-protocol.md, embedding the task_contract above.
 Invoke TaskCreate with the prompt.
 ```
 

@@ -47,13 +47,13 @@ Extract the following from the YAML frontmatter:
 
 ### 2. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **code must throw on unexpected values, never silently degrade.**
 
 ### 3. Load project knowledge (REQUIRED)
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — tech stack (`#tech-stack`), conventions (`#conventions`), test rules (`#test-rules`), validation tooling (`#validation-tooling`), infrastructure (`#infrastructure`), tracker patterns (`#tracker-patterns`).
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` — API contracts the story may touch.
@@ -67,7 +67,7 @@ HALT if either file is missing with the message defined in `knowledge-loading.md
 
 ### 4b. Detect teammate mode
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. This sets:
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. This sets:
 
 - `TEAMMATE_MODE` (boolean — true when invoked by an Agent Teams orchestrator's dev phase)
 - `ORCH_AUTHORIZED` (only meaningful when TEAMMATE_MODE=true)
@@ -83,7 +83,7 @@ When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 
 ### 5. CHK-INIT — Initialization Read Receipt
 
-Per `~/.claude/skills/bmad-shared/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
+Per `~/.claude/skills/bmad-shared/core/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
 
 ```
 CHK-INIT PASSED — bmad-dev-story initialization complete:
@@ -178,7 +178,7 @@ These apply at ANY step:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)

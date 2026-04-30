@@ -134,4 +134,4 @@ CHK-STEP-09-EXIT PASSED — completed Step 9: Finalize
   next_step: WORKFLOW-COMPLETE
 ```
 
-This is the LAST step of `bmad-auto-flow`. After CHK-STEP-09-EXIT, the workflow exits cleanly. The retrospective step (per `~/.claude/skills/bmad-shared/retrospective-step.md`) may activate next if difficulties were encountered.
+This is the LAST step of `bmad-auto-flow`. After CHK-STEP-09-EXIT, the workflow exits cleanly. The retrospective step (per `~/.claude/skills/bmad-shared/core/retrospective-step.md`) may activate next if difficulties were encountered.

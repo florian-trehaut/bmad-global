@@ -70,7 +70,7 @@ task_contract:
                                      # of spec-agent-teams-integration.md (teammates may execute top-level workflows).
                                      # The teammate's INITIALIZATION (via teammate-mode-routing.md) validates this against orchestrator-registry.md.
     orchestrator_skill: 'bmad-auto-flow'  # NEW. String. REQUIRED when orchestrator_invoked=true.
-                                          # Must match a skill listed in src/core-skills/bmad-shared/orchestrator-registry.md.
+                                          # Must match a skill listed in src/core-skills/bmad-shared/teams/orchestrator-registry.md.
                                           # Mismatch → HALT in INITIALIZATION (TAC-30).
     parent_phase: 'review'           # NEW. String. One of: spec | review | dev | code-review | validation.
                                      # The phase of the orchestrator that spawned this teammate. Used by the teammate to decide
@@ -97,7 +97,7 @@ task_contract:
 | `constraints.tracker_writes` | NO | boolean | Default `false` in TEAMMATE_MODE, `true` otherwise. When `false`, the teammate MUST emit `tracker_write_request` SendMessage instead of writing the tracker directly. Enforces BAC-8 of story `auto-flow-orchestrator` |
 | `constraints.halt_conditions` | NO | list | Skill-specific halt triggers beyond global HALT rules |
 | `metadata.orchestrator_invoked` | NO | boolean | Default `false`. When `true`, signals the spawning skill is an authorized orchestrator that may override Decision D16. Validated against `orchestrator-registry.md` by `teammate-mode-routing.md` |
-| `metadata.orchestrator_skill` | conditional | string | REQUIRED when `metadata.orchestrator_invoked=true`. Must match a skill name listed in `src/core-skills/bmad-shared/orchestrator-registry.md`. Mismatch → HALT (TAC-30) |
+| `metadata.orchestrator_skill` | conditional | string | REQUIRED when `metadata.orchestrator_invoked=true`. Must match a skill name listed in `src/core-skills/bmad-shared/teams/orchestrator-registry.md`. Mismatch → HALT (TAC-30) |
 | `metadata.parent_phase` | NO | enum | One of `spec` \| `review` \| `dev` \| `code-review` \| `validation`. Used by the teammate to determine which sub-workflow to invoke when the role is generic |
 
 ### Scope Type Semantics
@@ -180,7 +180,7 @@ A task contract is **invalid** if any of these conditions are true:
 4. `scope_type` value is not in the enum
 5. `deliverable.format` value is not in the enum
 6. `metadata.orchestrator_invoked` is `true` but `metadata.orchestrator_skill` is missing or empty (TAC-30)
-7. `metadata.orchestrator_invoked` is `true` but `metadata.orchestrator_skill` is not listed in `src/core-skills/bmad-shared/orchestrator-registry.md` (TAC-30)
+7. `metadata.orchestrator_invoked` is `true` but `metadata.orchestrator_skill` is not listed in `src/core-skills/bmad-shared/teams/orchestrator-registry.md` (TAC-30)
 8. `input_artifacts` contains a `tracker_issue` artifact whose `identifier` is null/missing/malformed (TAC-28)
 
 An invalid contract MUST cause the teammate to HALT immediately and report the validation failure to the lead via SendMessage. For violations 6–8, the HALT message MUST cite the registry path or the missing field per the `teammate-mode-routing.md` HALT messages section.

@@ -89,7 +89,7 @@ If you work with a PM who lives in Linear / GitHub Issues / GitLab / Jira and yo
 
 ### 🔥 Highlight: Workflow adherence rule + mechanical anti-skim countermeasures
 
-A new shared rule (`bmad-shared/workflow-adherence.md`) addresses Claude's documented tendency to skim long workflows and skip "simple" steps — a failure mode verified across 7 community sources (anthropics/claude-code#36997, #20024, #32290, #18454, #21187, bmad-code-org/BMAD-METHOD#387, HumanLayer 2026 blog, HN thread #46102048). Skim-and-skip is invisible the moment it happens, so the countermeasures are mechanical rather than exhortatory.
+A new shared rule (`bmad-shared/core/workflow-adherence.md`) addresses Claude's documented tendency to skim long workflows and skip "simple" steps — a failure mode verified across 7 community sources (anthropics/claude-code#36997, #20024, #32290, #18454, #21187, bmad-code-org/BMAD-METHOD#387, HumanLayer 2026 blog, HN thread #46102048). Skim-and-skip is invisible the moment it happens, so the countermeasures are mechanical rather than exhortatory.
 
 - **5 mandatory mechanisms**, all expressible in markdown (no `settings.json` hooks needed):
   - `CHK-{N}` named checkpoints with literal echo lines that must appear verbatim in output;
@@ -113,7 +113,7 @@ Mirrors the dev-story scope-completeness audit added in v1.9.0, this time tuned 
 
 ### 🔬 Evidence-based debugging shared rule
 
-A new shared rule (`bmad-shared/evidence-based-debugging.md`) turns "I read the code and it should work" into a non-acceptable form of proof, replacing it with a 5-rung Reproduction Hierarchy.
+A new shared rule (`bmad-shared/spec/evidence-based-debugging.md`) turns "I read the code and it should work" into a non-acceptable form of proof, replacing it with a 5-rung Reproduction Hierarchy.
 
 - **Cardinal principle**: code reading is never proof of a bug or a fix; reproduction is.
 - **5-rung Reproduction Hierarchy** (in descending preference): rung 1 — local automated test against real dependencies (the target); rung 2 — manual reproduction (CLI / curl / browser); rung 3 — captured production artifact (log, trace, dump); rung 4 — live observation (screen-share, paired session); rung 5 — user report only (never as final proof).
@@ -168,7 +168,7 @@ This release replaces those refs with a **5-layer architecture** that decouples 
 
 | Layer | What it is | Where it lives |
 |-------|------------|----------------|
-| **L1 — Schema** | Single source of truth: file list, section list, semantic IDs, anchors, required flags, `direct_reference_allowed` set, versioning rules | `bmad-shared/knowledge-schema.md` (`schema_version: "1.0"`) |
+| **L1 — Schema** | Single source of truth: file list, section list, semantic IDs, anchors, required flags, `direct_reference_allowed` set, versioning rules | `bmad-shared/schema/knowledge-schema.md` (`schema_version: "1.0"`) |
 | **L2 — Protocols** | JIT-loaded capability files. Workflows reference protocols, not anchors | `bmad-shared/protocols/{tracker-crud,tech-stack-lookup,environments-lookup,validation-tooling-lookup}.md` |
 | **L3 — Workflows** | Consumer files. Direct anchor refs are forbidden by REF-03 | `src/bmm-skills/**/{workflow,steps/*,subagent-workflows/*}.md` |
 | **L4 — Validator** | Enforces REF-01 (no legacy filenames), REF-02 (no soft loads on required files), REF-03 (no direct anchor refs in consumer files) | `tools/validate-knowledge-refs.js` (`npm run validate:knowledge-refs`, hooked into `npm run quality`) |
@@ -437,7 +437,7 @@ This release centralizes worktree management across all workflows, makes worktre
 
 #### Worktree Lifecycle — Centralized shared rule (NEW)
 
-New `bmad-shared/worktree-lifecycle.md` shared rule loaded by all workflows. Addresses the chronic issue of Claude forgetting to install dependencies after creating worktrees.
+New `bmad-shared/lifecycle/worktree-lifecycle.md` shared rule loaded by all workflows. Addresses the chronic issue of Claude forgetting to install dependencies after creating worktrees.
 
 - **`worktree_enabled` flag** — Projects can now opt out of worktrees by setting `worktree_enabled: false` in `workflow-context.md`. Solo projects working on `main` skip worktree creation entirely, using branch-based fallbacks instead. Knowledge-bootstrap now asks about worktree strategy during project detection.
 - **Mandatory post-creation setup** — Every worktree creation now triggers: `{install_command}` (HALT on failure) → `{build_command}` (HALT on failure) → `{typecheck_command}` (WARN on failure). Previously only 2 of 7 workflows ran install, and none ran build.

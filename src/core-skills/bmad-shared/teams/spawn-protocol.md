@@ -55,9 +55,9 @@ Read these files BEFORE starting work:
 {endfor}
 
 ### Schema and rules (REQUIRED)
-- ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
-- ~/.claude/skills/bmad-shared/knowledge-loading.md
-- ~/.claude/skills/bmad-shared/knowledge-schema.md
+- ~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md
+- ~/.claude/skills/bmad-shared/core/knowledge-loading.md
+- ~/.claude/skills/bmad-shared/schema/knowledge-schema.md
 
 ### Protocols (JIT — load only when needed)
 The teammate may consult these shared protocols when its task requires:

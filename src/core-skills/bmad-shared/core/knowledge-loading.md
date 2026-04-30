@@ -17,7 +17,7 @@ Skipping this protocol means the workflow operates blind — without tech stack,
 | `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md` | Ubiquitous language, bounded contexts, entity relationships, domain rules, external systems | `/bmad-knowledge-bootstrap` |
 | `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/api.md` | API style, endpoints, request/response schemas, authentication, integrations | `/bmad-knowledge-bootstrap` |
 
-The exact section structure of `project.md` is defined by the schema in `~/.claude/skills/bmad-shared/knowledge-schema.md`. Workflows must NEVER hard-code section anchors — see [Forbidden Patterns](#forbidden-patterns) below.
+The exact section structure of `project.md` is defined by the schema in `~/.claude/skills/bmad-shared/schema/knowledge-schema.md`. Workflows must NEVER hard-code section anchors — see [Forbidden Patterns](#forbidden-patterns) below.
 
 ---
 
@@ -148,7 +148,7 @@ Canonical INITIALIZATION pattern for any new bmad-\* workflow:
 
 ### 1. Resolve project root
 
-Apply the rule from `~/.claude/skills/bmad-shared/project-root-resolution.md`:
+Apply the rule from `~/.claude/skills/bmad-shared/core/project-root-resolution.md`:
 
 ```bash
 MAIN_PROJECT_ROOT=$(dirname "$(git rev-parse --git-common-dir)")
@@ -156,7 +156,26 @@ MAIN_PROJECT_ROOT=$(dirname "$(git rev-parse --git-common-dir)")
 
 ### 2. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file. (Subdirectories like `protocols/` and `data/` are NOT loaded here — they are JIT-loaded when needed.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file. The 5 core rules are universal (`no-fallback-no-false-data.md`, `workflow-adherence.md`, `knowledge-loading.md`, `retrospective-step.md`, `project-root-resolution.md`).
+
+Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are NOT loaded at INIT — they are JIT-loaded by the workflows that need them. See `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
+
+### 2b. JIT loading per subdirectory
+
+When a workflow needs additional shared rules during execution, it Reads the specific file at the moment of need:
+
+| Subdirectory | When to load | Examples |
+|--------------|-------------|----------|
+| `spec/` | Workflows producing or consuming story specs | `bmad-create-story`, `bmad-review-story`, `bmad-dev-story`, `bmad-code-review` |
+| `teams/` | Workflows spawning teammates or running inside an Agent Teams orchestrator | `bmad-auto-flow`, `bmad-code-review` (colleague mode), any teammate-spawned workflow |
+| `validation/` | bmad-validation-* skills only | `bmad-validation-metier`, `bmad-validation-frontend`, `bmad-validation-desktop` |
+| `lifecycle/` | Workflows performing worktree setup/teardown | `bmad-dev-story`, `bmad-code-review`, `bmad-troubleshoot`, `bmad-create-story` |
+| `schema/` | Knowledge-aware skills | `bmad-knowledge-bootstrap`, `bmad-knowledge-refresh` |
+| `protocols/` | On first use of a capability (tracker CRUD, tech-stack lookup, etc.) | All workflows performing tracker operations |
+| `data/` | When a specific reference data file is needed | Templates, lookup tables |
+| `stacks/` | When the project's language is detected | Concurrency / null-safety reviews per language |
+
+This matches the [progressive disclosure pattern](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices) — load reference material only when needed.
 
 ### 3. Load required knowledge (HALT if missing)
 
@@ -176,7 +195,7 @@ HALT if a declared conditional file is missing.
 
 ### 5. Load relevant protocols (JIT, on first use)
 
-Steps that need tracker CRUD, tech-stack lookups, environments, or validation tooling load the corresponding protocol from `~/.claude/skills/bmad-shared/protocols/` when first invoked. The full list is in `knowledge-schema.md`.
+Steps that need tracker CRUD, tech-stack lookups, environments, or validation tooling load the corresponding protocol from `~/.claude/skills/bmad-shared/protocols/` when first invoked. The full list is in `~/.claude/skills/bmad-shared/schema/knowledge-schema.md`.
 ```
 
 Workflows that already have a different INITIALIZATION structure should align to this pattern incrementally — but the **required reads + HALT condition + protocol-first rule applies unconditionally**.

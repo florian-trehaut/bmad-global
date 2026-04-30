@@ -148,7 +148,7 @@ Get the spike question as a clear statement. Derive a URL-safe slug (lowercase, 
 
 Derive `WORKTREE_PATH_EXPECTED` from `{WORKTREE_TEMPLATE_SPIKE}` (resolved from `workflow-context.md` `worktree_templates.spike`), replacing `{slug}` with the derived slug.
 
-**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
+**Apply the full protocol from `bmad-shared/lifecycle/worktree-lifecycle.md` with the following contract parameters:**
 
 | Parameter | Value |
 |-----------|-------|

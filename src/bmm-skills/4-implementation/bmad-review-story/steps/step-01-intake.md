@@ -31,7 +31,7 @@ Select the story to review, setup a read-only investigation worktree, load the s
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
 
 - **Skip user selection**: read `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[].identifier` (filter to type=`tracker_issue`); HALT with TAC-28 message if absent/null/malformed
 - **Skip worktree creation**: read `WORKTREE_PATH` from `task_contract.constraints.worktree_path`; consumed by `worktree-lifecycle.md` Branch D (provided path mode); HALT if null in TEAMMATE_MODE

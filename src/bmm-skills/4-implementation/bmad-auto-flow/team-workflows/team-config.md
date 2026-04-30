@@ -89,7 +89,7 @@ If `teammate_mode: 'assigned'` is configured in workflow-context.md, the orchest
 
 ## Spawn template
 
-Every teammate spawn prompt follows `~/.claude/skills/bmad-shared/spawn-protocol.md` with these orchestrator-specific additions:
+Every teammate spawn prompt follows `~/.claude/skills/bmad-shared/teams/spawn-protocol.md` with these orchestrator-specific additions:
 
 ```yaml
 task_contract:
@@ -153,9 +153,9 @@ fallback:
 
 ## Cross-references
 
-- `~/.claude/skills/bmad-shared/orchestrator-registry.md` — registry where `bmad-auto-flow` is the only authorized orchestrator
-- `~/.claude/skills/bmad-shared/teammate-mode-routing.md` — teammate-side detection and rerouting protocol
-- `~/.claude/skills/bmad-shared/task-contract-schema.md` — task contract schema with `metadata` block
-- `~/.claude/skills/bmad-shared/agent-teams-config-schema.md` — `agent_teams` configuration schema
+- `~/.claude/skills/bmad-shared/teams/orchestrator-registry.md` — registry where `bmad-auto-flow` is the only authorized orchestrator
+- `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` — teammate-side detection and rerouting protocol
+- `~/.claude/skills/bmad-shared/teams/task-contract-schema.md` — task contract schema with `metadata` block
+- `~/.claude/skills/bmad-shared/teams/agent-teams-config-schema.md` — `agent_teams` configuration schema
 - `data/question-routing.md` — orchestrator-side question batching protocol
 - `templates/team-config-template.md` — empty template for future orchestrator skills to mimic this pattern

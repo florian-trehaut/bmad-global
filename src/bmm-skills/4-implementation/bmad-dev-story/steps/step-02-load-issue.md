@@ -44,7 +44,7 @@ Fetch the issue from the tracker (using CRUD patterns from workflow-knowledge/pr
 
 Store:
 - ISSUE_ID, ISSUE_IDENTIFIER, ISSUE_TITLE, PROJECT_NAME, PROJECT_ID
-- The issue description IS the story — it contains, per the **story-spec v2 (monolithic) or v3 (bifurcation) schema** (see `~/.claude/skills/bmad-shared/spec-completeness-rule.md`):
+- The issue description IS the story — it contains, per the **story-spec v2 (monolithic) or v3 (bifurcation) schema** (see `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`):
   - Definition of Done (Feature + Non-regression)
   - Problem / Proposed Solution / Scope (Included/Excluded) / **Out of Scope (OOS-N)**
   - Business Context (User Journey + BACs in Given/When/Then + External Dependencies)

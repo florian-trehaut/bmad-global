@@ -2,7 +2,7 @@
  * Worktree Lifecycle Harmony — Acceptance Criteria Test Runner
  *
  * Asserts that the unified worktree lifecycle protocol in
- * src/core-skills/bmad-shared/worktree-lifecycle.md is correctly adopted
+ * src/core-skills/bmad-shared/lifecycle/worktree-lifecycle.md is correctly adopted
  * by all 7 consumer workflows. Blocks any future regression that:
  *   - Inlines `git worktree add` outside the shared rule
  *   - Drops the current-worktree detection (§0)
@@ -25,7 +25,7 @@ const colors = {
 };
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const SHARED_RULE = path.join(PROJECT_ROOT, 'src/core-skills/bmad-shared/worktree-lifecycle.md');
+const SHARED_RULE = path.join(PROJECT_ROOT, 'src/core-skills/bmad-shared/lifecycle/worktree-lifecycle.md');
 const PROJECT_INIT_STEP = path.join(PROJECT_ROOT, 'src/core-skills/bmad-project-init/steps/step-03-generate-context.md');
 
 // 7 consumer step-files (the exact locations that invoke the protocol)
@@ -198,12 +198,12 @@ console.log(`\n${colors.cyan}Consumer step-files — harmonized invocation${colo
 for (const consumer of CONSUMER_STEPS) {
   const absPath = path.join(PROJECT_ROOT, consumer.file);
 
-  test(`AC: ${consumer.workflow} — step-file references bmad-shared/worktree-lifecycle.md`, () => {
+  test(`AC: ${consumer.workflow} — step-file references bmad-shared/lifecycle/worktree-lifecycle.md`, () => {
     assert(fs.existsSync(absPath), `Missing: ${absPath}`);
     const content = fileContent(absPath);
     assert(
-      /bmad-shared\/worktree-lifecycle\.md/.test(content),
-      `Missing reference to bmad-shared/worktree-lifecycle.md in ${consumer.file}`,
+      /bmad-shared\/lifecycle\/worktree-lifecycle\.md/.test(content),
+      `Missing reference to bmad-shared/lifecycle/worktree-lifecycle.md in ${consumer.file}`,
     );
   });
 

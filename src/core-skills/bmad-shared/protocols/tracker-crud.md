@@ -2,7 +2,7 @@
 
 **Loaded by:** Any bmad-\* workflow performing CRUD operations on the project's issue tracker (queries, issue creation, updates, comments, document storage).
 
-**Indirection layer for** the schema section `tracker-patterns` (per `~/.claude/skills/bmad-shared/knowledge-schema.md` v1).
+**Indirection layer for** the schema section `tracker-patterns` (per `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` v1).
 
 ---
 
@@ -198,4 +198,4 @@ These follow the [zero-fallback rule](../no-fallback-no-false-data.md).
 - **Maintainability**: 100+ previous workflow refs to one anchor are now refs to one protocol file.
 - **Extensibility**: a new tracker type only requires updating `bmad-knowledge-bootstrap` (to populate the new section) and this protocol — workflows remain stable.
 
-See `~/.claude/skills/bmad-shared/knowledge-schema.md` for the full architecture rationale.
+See `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` for the full architecture rationale.

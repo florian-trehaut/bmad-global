@@ -68,7 +68,7 @@ For each TAC (EARS pattern):
 
 If `{execution_mode}` is "tech-spec" and the spec follows the v2 quick profile:
 
-- [ ] BACs use Given/When/Then format (per `bmad-shared/ac-format-rule.md`)
+- [ ] BACs use Given/When/Then format (per `bmad-shared/spec/ac-format-rule.md`)
 - [ ] TACs use one of the 5 EARS patterns AND reference at least one BAC
 - [ ] Security Gate items addressed in implementation (auth, authz, input sanitization, secrets handling); if any FAIL in spec → remediation tasks completed
 - [ ] Observability requirements implemented (mandatory log events with structured fields, metrics, alerts as declared)

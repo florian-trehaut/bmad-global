@@ -180,12 +180,12 @@ protocols:
     sections_consumed: []
     stacks_consumed: ["bmad-shared/stacks/{language}.md#null-safety"]
     consumed_by: "review-story, dev-story, create-story, code-review meta-2 (sub-axis 2e)"
-    cross_reference: "bmad-shared/no-fallback-no-false-data.md (business angle, complementary)"
+    cross_reference: "bmad-shared/core/no-fallback-no-false-data.md (business angle, complementary)"
   spec-bifurcation:
     file: "~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md"
     sections_consumed: []
     consumed_by: "create-story step-13-output, quick-dev step-oneshot, dev-story step-03-setup-worktree, review-story step-05-analyze, validation-{metier,frontend,desktop} step-01-intake, knowledge-bootstrap step-01-preflight, knowledge-refresh step-01-detect-changes, project-init step-03-generate-context"
-    cross_reference: "bmad-shared/spec-completeness-rule.md (v3 schema definition), bmad-shared/protocols/tracker-crud.md (CRUD recipes)"
+    cross_reference: "bmad-shared/spec/spec-completeness-rule.md (v3 schema definition), bmad-shared/protocols/tracker-crud.md (CRUD recipes)"
 
 # ============================================================
 # DIRECT-REFERENCE EXCEPTIONS
@@ -341,7 +341,7 @@ The YAML frontmatter above is the machine-readable contract. The validator parse
 
 ```bash
 # Find the schema (always at this path post-install)
-SCHEMA="$HOME/.claude/skills/bmad-shared/knowledge-schema.md"
+SCHEMA="$HOME/.claude/skills/bmad-shared/schema/knowledge-schema.md"
 
 # Extract the YAML frontmatter block
 sed -n '/^---$/,/^---$/p' "$SCHEMA" | sed '1d;$d'

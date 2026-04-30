@@ -8,7 +8,7 @@
 
 ## Purpose
 
-The shared rule `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` covers the **business angle** of missing data: do NOT fabricate fake values for missing business-critical fields (e.g., `price ?? 0` for a required field). That rule remains authoritative for that concern.
+The shared rule `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md` covers the **business angle** of missing data: do NOT fabricate fake values for missing business-critical fields (e.g., `price ?? 0` for a required field). That rule remains authoritative for that concern.
 
 This protocol covers a **distinct, complementary concern**: the **runtime-robustness angle**. Not "don't fabricate," but "don't crash because you forgot the value could be missing." Validate at boundaries, propagate optionality through types, fail loudly at the right level — never silently at the wrong level.
 
@@ -131,4 +131,4 @@ The `also_violates_zero_fallback` field is set when the same code line ALSO viol
 - **Extensibility**: adding a language = creating `stacks/{lang}.md#null-safety`. Zero workflow changes.
 - **Coverage transparency**: each consumer reports which stacks were loaded vs missing.
 
-See `~/.claude/skills/bmad-shared/knowledge-schema.md` for the architecture rationale and `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` for the complementary business rule.
+See `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` for the architecture rationale and `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md` for the complementary business rule.

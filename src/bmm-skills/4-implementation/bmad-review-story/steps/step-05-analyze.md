@@ -150,7 +150,7 @@ For Observability Requirements:
 - [ ] Alerts have runbook URL or task to create one
 - [ ] SLO/SLI defined for user-facing operations (or N/A justified)
 
-For Out-of-Scope, Risks Register, Boundaries, INVEST: verify presence, completeness, and absence of contradictions per `~/.claude/skills/bmad-shared/spec-completeness-rule.md`.
+For Out-of-Scope, Risks Register, Boundaries, INVEST: verify presence, completeness, and absence of contradictions per `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`.
 
 ### 2. The production chain hypothesis
 

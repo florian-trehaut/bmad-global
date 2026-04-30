@@ -2,7 +2,7 @@
  * Story Spec Validator (story-spec v2 + v3 bifurcation)
  *
  * Validates that a story spec (markdown file or tracker issue body) conforms to the
- * v2 / v3 schema declared in `src/core-skills/bmad-shared/spec-completeness-rule.md`.
+ * v2 / v3 schema declared in `src/core-skills/bmad-shared/spec/spec-completeness-rule.md`.
  *
  * Two profiles:
  *   --profile=full   (default for /bmad-create-story output)

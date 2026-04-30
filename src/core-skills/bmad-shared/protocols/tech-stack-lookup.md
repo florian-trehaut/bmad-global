@@ -2,7 +2,7 @@
 
 **Loaded by:** Any bmad-\* workflow that needs to know the project's languages, frameworks, runtime versions, source/test file patterns, or architecture patterns.
 
-**Indirection layer for** the schema sections `tech-stack`, `source-file-patterns`, `architecture-patterns` (per `~/.claude/skills/bmad-shared/knowledge-schema.md` v1).
+**Indirection layer for** the schema sections `tech-stack`, `source-file-patterns`, `architecture-patterns` (per `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` v1).
 
 ---
 
@@ -69,4 +69,4 @@ Read the architecture-patterns section (when present) to obtain:
 - **Maintainability**: ~33 previous workflow refs to `#tech-stack` (plus refs to `source-file-patterns` and `architecture-patterns`) are now refs to one protocol file.
 - **Composability**: protocols downstream (e.g., `validation-tooling-lookup`) compose this protocol when they need stack info too.
 
-See `~/.claude/skills/bmad-shared/knowledge-schema.md` for the full architecture rationale.
+See `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` for the full architecture rationale.

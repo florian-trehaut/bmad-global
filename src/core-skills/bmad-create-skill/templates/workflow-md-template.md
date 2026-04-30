@@ -77,7 +77,7 @@ These apply at ANY step:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)
@@ -114,7 +114,7 @@ Apply these rules for the entire workflow execution. Key rule for this workflow:
 
 ### 3. Load project knowledge (REQUIRED)
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — {PURPOSE}.
 {ADDITIONAL_KNOWLEDGE_LINES — e.g. domain.md or api.md if this skill needs them}

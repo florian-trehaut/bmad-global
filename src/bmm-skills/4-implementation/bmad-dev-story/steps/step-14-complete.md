@@ -34,7 +34,7 @@ Update tracker status, add completion comment with traceability report, and comm
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B and §D, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §B and §D, when TEAMMATE_MODE=true:
 
 - Do NOT update the tracker status directly. Emit `tracker_write_request` SendMessage with `operation: 'update_status'`, `args: {issue_id: ISSUE_ID, target_status: TRACKER_STATES.in_review}`. Wait for ack.
 - Do NOT add the completion comment directly. Emit `tracker_write_request` with `operation: 'comment'`, `args: {issue_id: ISSUE_ID, body: COMPLETION_COMMENT}`. Wait for ack.

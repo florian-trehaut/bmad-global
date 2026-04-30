@@ -27,11 +27,11 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 ## STEP GOAL
 
-Set up a read-only working environment on `origin/main` to read code during validation (test identification, UI component structure, log format patterns, integration point protocols). Apply the unified worktree lifecycle protocol from `bmad-shared/worktree-lifecycle.md`.
+Set up a read-only working environment on `origin/main` to read code during validation (test identification, UI component structure, log format patterns, integration point protocols). Apply the unified worktree lifecycle protocol from `bmad-shared/lifecycle/worktree-lifecycle.md`.
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 
 - The orchestrator has already provided a worktree via `task_contract.constraints.worktree_path`. Apply `worktree-lifecycle.md` Branch D (provided path mode); the orchestrator owns this worktree.
 - Set `worktree_use_provided=true` in the contract parameters; HALT if `worktree_path` is null.
@@ -52,7 +52,7 @@ When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
 
 ### 2. Apply the Worktree Lifecycle Protocol
 
-**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
+**Apply the full protocol from `bmad-shared/lifecycle/worktree-lifecycle.md` with the following contract parameters:**
 
 | Parameter | Value |
 |-----------|-------|

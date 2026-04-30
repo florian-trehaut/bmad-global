@@ -60,7 +60,7 @@ Same as Meta-1. READ-ONLY, execute only `contract.active_sub_axes`, report with 
 
 **Condition:** ALWAYS executed — this is the highest-impact correctness axis (w=0.15 inside M2).
 
-**Load and apply `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`.**
+**Load and apply `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md`.**
 
 ### Grep scans (stack-agnostic — see `data/stack-grep-bank/*.md` for stack-specific patterns)
 

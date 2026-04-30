@@ -179,7 +179,7 @@ Projects using BMAD that want this principle visible globally (not only inside w
 ```markdown
 ## Evidence-Based Debugging
 
-When investigating any bug, error, or unexpected behaviour, follow `~/.claude/skills/bmad-shared/evidence-based-debugging.md`. The cardinal principle: code reading is never proof. Reproduce locally via test (rung 1) before presenting a diagnosis. If rung 1 is unreachable, document the exception class and climb to the highest reachable rung.
+When investigating any bug, error, or unexpected behaviour, follow `~/.claude/skills/bmad-shared/spec/evidence-based-debugging.md`. The cardinal principle: code reading is never proof. Reproduce locally via test (rung 1) before presenting a diagnosis. If rung 1 is unreachable, document the exception class and climb to the highest reachable rung.
 ```
 
 This makes the rule applicable in ad-hoc debugging conversations (not only inside `/bmad-troubleshoot` invocations).

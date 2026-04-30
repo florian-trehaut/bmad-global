@@ -32,7 +32,7 @@ Extract the following from the YAML frontmatter:
 
 ### 2. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Apply these rules for the entire workflow execution. Key rules for this workflow:
 - **Real execution output only — code analysis is NEVER proof** (from no-fallback-no-false-data.md)
@@ -42,7 +42,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 ### 3. Load stack knowledge (optional)
 
-Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). This file contains project-specific test commands, build tools, test conventions, and framework details needed to construct the right test invocations.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/core/knowledge-loading.md`). This file contains project-specific test commands, build tools, test conventions, and framework details needed to construct the right test invocations.
 
 ### 4. Set defaults
 
@@ -51,7 +51,7 @@ Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missin
 
 ### 5. Detect teammate mode
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md`. When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 - step-01-intake reads `ISSUE_IDENTIFIER` and `ENVIRONMENT` from `task_contract` (no user prompt)
 - step-03-setup-worktree consumes `WORKTREE_PATH` from `task_contract.constraints.worktree_path` via worktree-lifecycle Branch D (HALT if null)
 - step-05-verdict emits `tracker_write_request` SendMessage instead of writing tracker, then `phase_complete` with PASS/FAIL
@@ -143,7 +143,7 @@ Load and execute `./steps/step-01-intake.md`.
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)

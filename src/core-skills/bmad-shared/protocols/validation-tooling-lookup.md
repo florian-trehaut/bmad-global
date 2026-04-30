@@ -2,7 +2,7 @@
 
 **Loaded by:** Test design (`bmad-test-design`), validation workflows (`bmad-validation-*`), TEA workflows (`bmad-tea-*`), code-review (`bmad-code-review`), dev-story validation steps.
 
-**Indirection layer for** the schema sections `validation-tooling` and `test-rules` (per `~/.claude/skills/bmad-shared/knowledge-schema.md` v1).
+**Indirection layer for** the schema sections `validation-tooling` and `test-rules` (per `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` v1).
 
 ---
 
@@ -92,4 +92,4 @@ Both read from project.md (already loaded). No duplicate file access needed.
 - **Maintainability**: 4 previous workflow refs consolidated; future refs land here automatically.
 - **Composability**: pairs cleanly with `tech-stack-lookup` for workflows needing both.
 
-See `~/.claude/skills/bmad-shared/knowledge-schema.md` for the full architecture rationale.
+See `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` for the full architecture rationale.

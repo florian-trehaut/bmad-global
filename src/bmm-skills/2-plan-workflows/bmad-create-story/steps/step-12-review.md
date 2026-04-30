@@ -2,9 +2,9 @@
 advancedElicitationTask: '~/.claude/skills/bmad-advanced-elicitation/SKILL.md'
 partyModeWorkflow: '~/.claude/skills/bmad-party-mode/workflow.md'
 adversarialReview: '~/.claude/skills/bmad-review-adversarial-general/SKILL.md'
-specCompletenessRule: '~/.claude/skills/bmad-shared/spec-completeness-rule.md'
-acFormatRule: '~/.claude/skills/bmad-shared/ac-format-rule.md'
-boundariesRule: '~/.claude/skills/bmad-shared/boundaries-rule.md'
+specCompletenessRule: '~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md'
+acFormatRule: '~/.claude/skills/bmad-shared/spec/ac-format-rule.md'
+boundariesRule: '~/.claude/skills/bmad-shared/spec/boundaries-rule.md'
 ---
 
 # Step 12: Multi-Validator Review (Both Modes)

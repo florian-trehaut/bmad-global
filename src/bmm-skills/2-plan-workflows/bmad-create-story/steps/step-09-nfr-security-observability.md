@@ -43,7 +43,7 @@ Each artefact is mandatory; each item within is mandatory; N/A is allowed only w
 
 ## RULES
 
-- Apply `bmad-shared/no-fallback-no-false-data.md`, `bmad-shared/validation-proof-principles.md`, `bmad-shared/validation-verdict-protocol.md` (binary verdict semantics for the security gate)
+- Apply `bmad-shared/core/no-fallback-no-false-data.md`, `bmad-shared/validation/validation-protocol.md#proof-principles`, `bmad-shared/validation/validation-protocol.md#verdict` (binary verdict semantics for the security gate)
 - Cross-reference `project.md#nfr-defaults` / `#observability-standards` / `#compliance-requirements` / `#security-baseline` (schema v1.1+)
 - Outputs follow templates: {nfrRegistryTemplate}, {securityGateTemplate}, {observabilityRequirementsTemplate}
 - Targets must be quantifiable — no "fast", no "secure", no "good UX"

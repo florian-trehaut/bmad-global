@@ -103,7 +103,7 @@ The teammate resumes execution as if the user had answered. **Forbidden** (TAC-1
 HALT — TEAMMATE_MODE protocol violation
   reason: AskUserQuestion was invoked in TEAMMATE_MODE — interactive prompts must be rerouted via SendMessage(lead)
   step: {current step file}
-  reference: src/core-skills/bmad-shared/teammate-mode-routing.md §A
+  reference: src/core-skills/bmad-shared/teams/teammate-mode-routing.md §A
 ```
 
 ### B. Defer tracker writes → `tracker_write_request` SendMessage (TAC-17, BAC-8)
@@ -184,6 +184,34 @@ The four message types — `question`, `tracker_write_request`, `phase_complete`
 
 ---
 
+## Required Workflow Application
+
+**Loaded by every teammate at INITIALIZATION end (after this rule's authorization step succeeds).** Mandates that teammates execute the prescribed sub-workflow step-by-step — not skim it from memory, not "get the gist". This addresses the documented Phase 2 failure mode of `bmad-auto-flow` where a teammate read `workflow.md` only, loaded zero step files, emitted zero CHK receipts, and never invoked `SendMessage(phase_complete)`.
+
+When a teammate's `task_contract.workflow_to_invoke` (or `task_contract.metadata.parent_phase` mapped to the corresponding workflow) specifies a workflow to apply, the teammate MUST:
+
+1. **Read the workflow's `workflow.md` AND each step file referenced in the STEP SEQUENCE table.** Do not skim. Do not assume "the workflow does X" — Read the file with the Read tool. The forbidden rationalizations from `core/workflow-adherence.md` (R-01..R-12) apply identically to teammates.
+
+2. **Emit `CHK-INIT` Read Receipt** at the end of INITIALIZATION (per `core/workflow-adherence.md` Rule 2). The receipt MUST include `teammate_mode: true`, `orch_authorized: {true|false}`, `lead_name`, `task_id` populated.
+
+3. **Emit `CHK-STEP-NN-ENTRY` and `CHK-STEP-NN-EXIT` receipts** for each step (per `core/workflow-adherence.md` Rule 4). Skipping a step requires explicit user instruction citation per the closed list — but a teammate has no user, so the only valid skip path is the step's own conditional branch logic (e.g., TEAMMATE_MODE branches that explicitly defer or skip a sub-step).
+
+4. **Emit `CHK-WORKFLOW-COMPLETE` receipt** at the end of the last step (per `core/workflow-adherence.md` Rule 7). The receipt MUST enumerate every CHK-STEP-NN-EXIT emitted in the conversation. Mismatched sequences (gaps, out-of-order, missing steps) are a contract violation.
+
+5. **MANDATORY: Invoke `SendMessage(phase_complete)` to the lead** as the FINAL action of the task. Failure to invoke is a contract violation regardless of whether the code/artifacts were produced. The orchestrator-side gate (per `bmad-auto-flow/data/teammate-completion-gate.md`, Task 26 of `standalone-bmad-shared-restructure.md`) does NOT consider `task_complete` claims valid without a corresponding `phase_complete` SendMessage.
+
+   Self-narration of completion (e.g., "Report sent to team-lead", "Phase complete", "Done") **without** an actual SendMessage invocation is a forbidden rationalization (R-10 implicite vs explicite). The orchestrator detects the absence of the SendMessage and flags the task as INCOMPLETE.
+
+6. **Address task reminders normally.** Writing "Silently ignoring task reminder" or any equivalent self-instruction to ignore a system-level prompt is a forbidden rationalization (R-09 pression efficacité + R-12 compaction).
+
+These six requirements are the **process integrity contract** for teammates. They are mechanically verifiable from the conversation transcript (presence of CHK lines, presence of SendMessage call). The orchestrator MAY perform this verification before accepting `task_complete` claims.
+
+**Cross-references:**
+- `core/workflow-adherence.md` Rules 1-7 (the workflow-level rules these mandates extend to the teammate level)
+- `bmad-auto-flow/data/teammate-completion-gate.md` (the orchestrator-side gate documenting verification)
+
+---
+
 ## Message Format Validation
 
 All SendMessage payloads emitted by a teammate following this rule MUST be:
@@ -212,7 +240,7 @@ Every workflow whose `workflow.md` declares TEAMMATE_MODE-aware behavior should 
 ```markdown
 ### N. Detect teammate mode
 
-Apply `~/.claude/skills/bmad-shared/teammate-mode-routing.md` to detect whether this workflow is running inside an Agent Teams teammate context.
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` to detect whether this workflow is running inside an Agent Teams teammate context.
 
 This sets:
 - `TEAMMATE_MODE` (boolean)
@@ -229,9 +257,9 @@ If TEAMMATE_MODE=true and ORCH_AUTHORIZED=true, every subsequent step branches o
 
 ## Cross-References
 
-- `src/core-skills/bmad-shared/orchestrator-registry.md` — the closed list of authorized orchestrator skills (consumed by this rule's authorization step)
-- `src/core-skills/bmad-shared/task-contract-schema.md` — defines the `metadata.{orchestrator_invoked, orchestrator_skill, parent_phase}` block and `constraints.tracker_writes` field consumed by this rule
-- `src/core-skills/bmad-shared/worktree-lifecycle.md` — defines Branch D (Provided Path Mode) consumed when `worktree_path` is provided
-- `src/core-skills/bmad-shared/spawn-protocol.md` — the orchestrator-side counterpart that builds the spawn prompt with these contract fields
+- `src/core-skills/bmad-shared/teams/orchestrator-registry.md` — the closed list of authorized orchestrator skills (consumed by this rule's authorization step)
+- `src/core-skills/bmad-shared/teams/task-contract-schema.md` — defines the `metadata.{orchestrator_invoked, orchestrator_skill, parent_phase}` block and `constraints.tracker_writes` field consumed by this rule
+- `src/core-skills/bmad-shared/lifecycle/worktree-lifecycle.md` — defines Branch D (Provided Path Mode) consumed when `worktree_path` is provided
+- `src/core-skills/bmad-shared/teams/spawn-protocol.md` — the orchestrator-side counterpart that builds the spawn prompt with these contract fields
 - `_bmad-output/planning-artifacts/spec-agent-teams-integration.md` §8.1 Amendments — the architectural authorization for the D16 override
 - `src/bmm-skills/4-implementation/bmad-auto-flow/` — the only currently-registered orchestrator (per `orchestrator-registry.md`)

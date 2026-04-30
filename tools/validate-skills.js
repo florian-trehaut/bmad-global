@@ -618,7 +618,7 @@ function validateSkill(skillDir) {
   // ============================================================
   // HARD-01..08 — Workflow Adherence Hardening
   // Enforces the canonical anti-rationalization countermeasures
-  // documented in src/core-skills/bmad-shared/workflow-adherence.md.
+  // documented in src/core-skills/bmad-shared/core/workflow-adherence.md.
   // Severity HIGH => exit 1 in --strict mode.
   // Only applied to skills that HAVE a workflow.md (workflow-style skills).
   // ============================================================
@@ -637,7 +637,7 @@ function validateSkill(skillDir) {
           file: 'workflow.md',
           detail:
             'INITIALIZATION section present but no CHK-INIT Read Receipt block found. Per workflow-adherence Rule 2, every workflow must emit a structured CHK-INIT receipt enumerating loaded files.',
-          fix: 'Add a CHK-INIT block at the end of INITIALIZATION (template in src/core-skills/bmad-shared/workflow-adherence.md "Rule 2 — Read Receipt at INITIALIZATION").',
+          fix: 'Add a CHK-INIT block at the end of INITIALIZATION (template in src/core-skills/bmad-shared/core/workflow-adherence.md "Rule 2 — Read Receipt at INITIALIZATION").',
         });
       }
     }
@@ -668,7 +668,7 @@ function validateSkill(skillDir) {
             file: relStepFile,
             detail:
               'Missing "## NO-SKIP CLAUSE" block. Per workflow-adherence Rule 6, every step file must declare the no-skip clause to block rationalizations.',
-            fix: 'Insert the canonical "## NO-SKIP CLAUSE (workflow-adherence Rule 1)" block right after the H1 header. Template in src/core-skills/bmad-shared/workflow-adherence.md.',
+            fix: 'Insert the canonical "## NO-SKIP CLAUSE (workflow-adherence Rule 1)" block right after the H1 header. Template in src/core-skills/bmad-shared/core/workflow-adherence.md.',
           });
         }
 
@@ -681,7 +681,7 @@ function validateSkill(skillDir) {
             severity: 'HIGH',
             file: relStepFile,
             detail: `Missing CHK-STEP-${stepNum}-ENTRY checkpoint. Per workflow-adherence Rule 4, every step must verify its preconditions and emit an entry receipt.`,
-            fix: `Insert a "## STEP ENTRY (CHK-STEP-${stepNum}-ENTRY)" block after the NO-SKIP CLAUSE. Template in src/core-skills/bmad-shared/workflow-adherence.md.`,
+            fix: `Insert a "## STEP ENTRY (CHK-STEP-${stepNum}-ENTRY)" block after the NO-SKIP CLAUSE. Template in src/core-skills/bmad-shared/core/workflow-adherence.md.`,
           });
         }
 
@@ -694,7 +694,7 @@ function validateSkill(skillDir) {
             severity: 'HIGH',
             file: relStepFile,
             detail: `Missing CHK-STEP-${stepNum}-EXIT receipt. Per workflow-adherence Rule 4, every step must emit an exit receipt enumerating actions executed and artifacts produced before transitioning.`,
-            fix: `Insert a "## STEP EXIT (CHK-STEP-${stepNum}-EXIT)" block at the end of the step before the Next: transition. Template in src/core-skills/bmad-shared/workflow-adherence.md.`,
+            fix: `Insert a "## STEP EXIT (CHK-STEP-${stepNum}-EXIT)" block at the end of the step before the Next: transition. Template in src/core-skills/bmad-shared/core/workflow-adherence.md.`,
           });
         }
 
@@ -768,7 +768,7 @@ function validateSkill(skillDir) {
             file: `steps/${stepFiles.at(-1)}`,
             detail:
               'Neither the last step file nor workflow.md declares a CHK-WORKFLOW-COMPLETE receipt. Per workflow-adherence Rule 7, every workflow must emit a final receipt enumerating all CHK-STEP-NN-EXIT emitted in the conversation.',
-            fix: 'Insert a "## WORKFLOW EXIT (CHK-WORKFLOW-COMPLETE)" block at the end of the last step file (or in workflow.md). Template in src/core-skills/bmad-shared/workflow-adherence.md.',
+            fix: 'Insert a "## WORKFLOW EXIT (CHK-WORKFLOW-COMPLETE)" block at the end of the last step file (or in workflow.md). Template in src/core-skills/bmad-shared/core/workflow-adherence.md.',
           });
         }
       }

@@ -21,13 +21,13 @@ Extract the following from the YAML frontmatter:
 
 ### 2. Load shared rules
 
-Read `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md`.
+Read `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md`.
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **never fabricate coverage status, test mappings, or gate decisions — all assessments must be grounded in actual test files and requirement documents.**
 
 ### 3. Load stack knowledge (optional)
 
-Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). It provides the technology stack, test framework conventions, and directory structure used to inform test discovery and level classification.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/core/knowledge-loading.md`). It provides the technology stack, test framework conventions, and directory structure used to inform test discovery and level classification.
 
 ### 4. Set defaults
 
@@ -112,7 +112,7 @@ These apply at ANY step:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)

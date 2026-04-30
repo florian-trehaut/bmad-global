@@ -173,7 +173,7 @@ Derive slug from ADR title or source (kebab-case, max 30 chars), then:
 WORKTREE_PATH_EXPECTED="../{WORKTREE_PREFIX}-review-adr-{SLUG}"
 ```
 
-**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
+**Apply the full protocol from `bmad-shared/lifecycle/worktree-lifecycle.md` with the following contract parameters:**
 
 | Parameter | Value |
 |-----------|-------|

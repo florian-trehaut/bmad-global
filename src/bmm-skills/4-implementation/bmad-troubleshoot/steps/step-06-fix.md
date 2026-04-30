@@ -36,7 +36,7 @@ Implement the fix using strict TDD — write failing test first (RED), then impl
 - **Minimum change** — fix the bug, nothing more. No refactoring of unrelated code.
 - **HALT on 3 consecutive failures** on the same test
 - Follow project dev standards from the tech-stack-lookup protocol (`~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`) if loaded
-- **Reproduction proof requirement** — per `~/.claude/skills/bmad-shared/evidence-based-debugging.md`, the RED test in §2 below MUST be a rung-1 reproduction. If `EVIDENCE_RUNG` from step-03 is < 1 AND no exception class is documented, this step HALTs at §2 — the bug must be promoted to rung 1 before fix code is written. Mocked tests are NOT acceptable as RED proof — the test must run against real dependencies (real DB, real file system, real APIs in the test environment)
+- **Reproduction proof requirement** — per `~/.claude/skills/bmad-shared/spec/evidence-based-debugging.md`, the RED test in §2 below MUST be a rung-1 reproduction. If `EVIDENCE_RUNG` from step-03 is < 1 AND no exception class is documented, this step HALTs at §2 — the bug must be promoted to rung 1 before fix code is written. Mocked tests are NOT acceptable as RED proof — the test must run against real dependencies (real DB, real file system, real APIs in the test environment)
 
 ## SEQUENCE
 

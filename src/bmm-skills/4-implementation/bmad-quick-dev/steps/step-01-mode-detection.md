@@ -31,7 +31,7 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 
 - Skip user prompt for execution mode. Read mode + tech-spec path (or direct task description) from `task_contract`:
   - If `task_contract.input_artifacts[type=document]` is present → mode=`tech-spec`, `tech_spec_path` = `document.path`

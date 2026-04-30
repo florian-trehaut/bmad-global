@@ -74,7 +74,7 @@ If the diff is empty: return a BLOCKER ("No implementation found — empty diff 
 
 ### 2. Build Independent Coverage Matrix
 
-Extract from the story (story-spec v2 (monolithic) or v3 (bifurcation) schema — sections per `bmad-shared/spec-completeness-rule.md`):
+Extract from the story (story-spec v2 (monolithic) or v3 (bifurcation) schema — sections per `bmad-shared/spec/spec-completeness-rule.md`):
 
 - Definition of Done items (Feature DoD + Non-regression DoD)
 - Scope (Included / Excluded)

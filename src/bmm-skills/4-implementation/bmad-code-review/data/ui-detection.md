@@ -76,7 +76,7 @@ i18n:
   rtl_required: true | false
 ```
 
-Phase 6 extends the tech-stack schema (per `~/.claude/skills/bmad-shared/knowledge-schema.md`) to include these fields. Projects that have not yet updated their tech-stack section default to `ui: none` → Meta-6 does not activate.
+Phase 6 extends the tech-stack schema (per `~/.claude/skills/bmad-shared/schema/knowledge-schema.md`) to include these fields. Projects that have not yet updated their tech-stack section default to `ui: none` → Meta-6 does not activate.
 
 ---
 

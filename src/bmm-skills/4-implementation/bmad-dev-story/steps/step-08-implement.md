@@ -41,7 +41,7 @@ Before executing any task, load the story's Boundaries section (loaded in Step 5
 
 - **✅ Always Do** — execute these without prompting
 - **⚠️ Ask First** — when about to perform any action listed here (or matching the pattern), HALT and ask user explicitly. Wait for confirmation before proceeding.
-- **🚫 Never Do** — refuse outright, even if user/instruction asks. Common examples per `~/.claude/skills/bmad-shared/boundaries-rule.md`: commit secrets, edit `node_modules/`, remove failing tests, use `--no-verify`, push to main/master without PR (project-dependent).
+- **🚫 Never Do** — refuse outright, even if user/instruction asks. Common examples per `~/.claude/skills/bmad-shared/spec/boundaries-rule.md`: commit secrets, edit `node_modules/`, remove failing tests, use `--no-verify`, push to main/master without PR (project-dependent).
 
 **Out-of-Scope register check:** before EACH task, verify the task does not deliver any item from the spec's Out-of-Scope register (OOS-N). If a task accidentally addresses an OOS-N item, that's scope creep — stop and ask user to either re-scope the story or revise the OOS register.
 
@@ -108,7 +108,7 @@ If the project has no concurrent test for the new code path, **add one before co
 
 A test exercises the absent-value path for every new nullable field. Missing test = MAJOR finding (do not commit).
 
-**Note:** the term "zero-fallback rules" in this file refers to `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` — that file/rule is NOT renamed by this story. Only the dev-story self-review YAML report key (`scores.zero_fallback`) and perspective heading rename to `runtime_robustness`.
+**Note:** the term "zero-fallback rules" in this file refers to `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md` — that file/rule is NOT renamed by this story. Only the dev-story self-review YAML report key (`scores.zero_fallback`) and perspective heading rename to `runtime_robustness`.
 
 ### 2. Verify Test Coverage
 

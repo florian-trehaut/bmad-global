@@ -70,7 +70,7 @@ Follow the instructions in ./workflow.md.
 
 ### Retrospective Integration (REQUIRED)
 
-Every workflow.md MUST end with a `## WORKFLOW COMPLETION — RETROSPECTIVE` section that references `~/.claude/skills/bmad-shared/retrospective-step.md`. This enables the self-improvement loop where each workflow execution can detect friction points and propose improvements.
+Every workflow.md MUST end with a `## WORKFLOW COMPLETION — RETROSPECTIVE` section that references `~/.claude/skills/bmad-shared/core/retrospective-step.md`. This enables the self-improvement loop where each workflow execution can detect friction points and propose improvements.
 
 Exception: read-only analysis workflows (like bmad-validate-skill) that don't modify anything and can't have meaningful friction points may omit this section.
 
@@ -101,12 +101,12 @@ This is a **{type}-skill** — {reason}.
 
 ### Knowledge Loading (JIT)
 
-All bmad-\* workflow skills must follow the protocol defined in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+All bmad-\* workflow skills must follow the protocol defined in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 ```markdown
 ### N. Load project knowledge (REQUIRED)
 
-Apply the protocol in `~/.claude/skills/bmad-shared/knowledge-loading.md`:
+Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — {what it provides and why}.
 - **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/domain.md` — {only if the skill needs ubiquitous language}.
@@ -259,7 +259,7 @@ The NEXT pointer in the body is the primary navigation mechanism.
 - Purpose: Agent Teams role definitions and team configuration for parallel execution
 - Only create this directory if the skill supports Agent Teams parallel execution
 - Contains exactly one file: `team-config.md`
-- The team router (`bmad-shared/team-router.md`) detects this directory to activate team mode
+- The team router (`bmad-shared/teams/team-router.md`) detects this directory to activate team mode
 - Skills without `team-workflows/` are completely unaffected — they run as today
 
 ### team-config.md Schema

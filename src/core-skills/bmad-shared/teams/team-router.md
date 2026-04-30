@@ -92,7 +92,7 @@ Add this step after loading project context and shared rules:
 ```markdown
 ### N. Detect Agent Teams capability
 
-Load and apply `~/.claude/skills/bmad-shared/team-router.md`.
+Load and apply `~/.claude/skills/bmad-shared/teams/team-router.md`.
 
 This sets TEAM_MODE for the duration of the workflow. If TEAM_MODE is true,
 team-config.md has been loaded and TEAM_ROLES are available for steps that

@@ -35,7 +35,7 @@ Push the branch and create or update the forge Merge Request.
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §B, when TEAMMATE_MODE=true:
 
 - Push the branch from `WORKTREE_PATH` directly (the orchestrator owns the worktree, not the tracker — push is a code-level operation, not a tracker write).
 - Do NOT create the MR/PR via the forge CLI directly. Emit a `tracker_write_request` SendMessage with `operation: 'create_mr'`, `args: {branch: BRANCH_NAME, title: MR_TITLE, body: MR_BODY, target: 'main'}`.

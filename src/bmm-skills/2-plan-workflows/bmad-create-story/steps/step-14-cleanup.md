@@ -38,7 +38,7 @@ Clean up the temporary worktree, then present a summary with next steps.
 
 ### 1. Cleanup Worktree
 
-**Apply §3 Cleanup from `bmad-shared/worktree-lifecycle.md`.**
+**Apply §3 Cleanup from `bmad-shared/lifecycle/worktree-lifecycle.md`.**
 
 <check if="REUSED_CURRENT_WORKTREE == true">
   The workflow reused the user's current worktree. Do NOT remove it — log "Worktree reused — cleanup skipped (user's worktree)." and skip branch deletion.

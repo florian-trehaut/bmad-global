@@ -27,7 +27,7 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 ## STEP GOAL
 
-Set up a read-only working environment synced with `origin/main` for code investigation. All code verification in subsequent steps must happen on the latest main. Apply the unified worktree lifecycle protocol from `bmad-shared/worktree-lifecycle.md`.
+Set up a read-only working environment synced with `origin/main` for code investigation. All code verification in subsequent steps must happen on the latest main. Apply the unified worktree lifecycle protocol from `bmad-shared/lifecycle/worktree-lifecycle.md`.
 
 ## RULES
 
@@ -45,7 +45,7 @@ Set up a read-only working environment synced with `origin/main` for code invest
 
 ### 2. Apply the Worktree Lifecycle Protocol
 
-**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
+**Apply the full protocol from `bmad-shared/lifecycle/worktree-lifecycle.md` with the following contract parameters:**
 
 | Parameter | Value |
 |-----------|-------|

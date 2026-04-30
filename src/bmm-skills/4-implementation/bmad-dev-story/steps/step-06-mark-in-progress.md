@@ -35,7 +35,7 @@ Update tracker status and load or auto-generate the test strategy from the issue
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teammate-mode-routing.md` §B, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §B, when TEAMMATE_MODE=true and `task_contract.constraints.tracker_writes == false`:
 
 - Do NOT update the tracker directly.
 - Emit a `tracker_write_request` SendMessage with `operation: 'update_status'`, `args: {issue_id: ISSUE_ID, target_status: TRACKER_STATES.in_progress}`.

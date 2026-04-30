@@ -93,11 +93,11 @@ If you are unsure whether a change triggers a knowledge update, ASK the user bef
 
 ## Debugging & Investigation Standard
 
-<!-- ALWAYS INCLUDED. Static content emitted verbatim by step-07. Cross-reference to bmad-shared/evidence-based-debugging.md so the principle applies in ad-hoc debugging conversations, not only inside `/bmad-troubleshoot`. -->
+<!-- ALWAYS INCLUDED. Static content emitted verbatim by step-07. Cross-reference to bmad-shared/spec/evidence-based-debugging.md so the principle applies in ad-hoc debugging conversations, not only inside `/bmad-troubleshoot`. -->
 
 **Code reading is never proof of a bug.** Reproducing the bug is. When investigating any error, unexpected behaviour, or "this should work but doesn't" question:
 
-1. **Climb the Reproduction Hierarchy** (full rule: `~/.claude/skills/bmad-shared/evidence-based-debugging.md`):
+1. **Climb the Reproduction Hierarchy** (full rule: `~/.claude/skills/bmad-shared/spec/evidence-based-debugging.md`):
    - **Rung 1 (target)** — local reproduction via automated test running against real dependencies (real DB, real file system, no mocks of the suspected component). The test must FAIL at the baseline commit and PASS after the fix.
    - **Rung 2** — local manual reproduction (intermediate; promote to rung 1 before shipping).
    - **Rung 3** — captured production artifact (log + correlation ID, DB snapshot, stack trace, distributed trace).
@@ -114,9 +114,9 @@ This rule applies in `/bmad-troubleshoot` (where it is mandatorily wired into st
 
 ## Workflow Adherence
 
-<!-- ALWAYS INCLUDED. Static content emitted verbatim by step-07. Cross-reference to bmad-shared/workflow-adherence.md so the CHK pattern is known even outside formal workflow execution. -->
+<!-- ALWAYS INCLUDED. Static content emitted verbatim by step-07. Cross-reference to bmad-shared/core/workflow-adherence.md so the CHK pattern is known even outside formal workflow execution. -->
 
-When executing a bmad-\* workflow (any `/bmad-*` slash command), the workflow's INITIALIZATION ends with a `CHK-INIT` Read Receipt — a structured block enumerating which files were actually loaded. **Emit it before running the first step.** If you cannot emit it truthfully, HALT and report the missing precondition. Full rule: `~/.claude/skills/bmad-shared/workflow-adherence.md`.
+When executing a bmad-\* workflow (any `/bmad-*` slash command), the workflow's INITIALIZATION ends with a `CHK-INIT` Read Receipt — a structured block enumerating which files were actually loaded. **Emit it before running the first step.** If you cannot emit it truthfully, HALT and report the missing precondition. Full rule: `~/.claude/skills/bmad-shared/core/workflow-adherence.md`.
 
 This rule exists because Claude Code's documented failure mode is to skim long workflow files and skip steps it judges "simple" — verified across community issues ([anthropics/claude-code#36997](https://github.com/anthropics/claude-code/issues/36997), [anthropics/claude-code#20024](https://github.com/anthropics/claude-code/issues/20024), [bmad-code-org/BMAD-METHOD#387](https://github.com/bmad-code-org/BMAD-METHOD/issues/387)). The receipt is a mechanical countermeasure — emitting it forces the read to actually happen.
 

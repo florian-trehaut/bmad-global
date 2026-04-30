@@ -2,7 +2,7 @@
 
 Template for composing the tracker issue description in Step 11/13.
 
-This template implements the **story-spec v2 (monolithic) or v3 (bifurcation) schema** defined by `bmad-shared/spec-completeness-rule.md`. All sections marked ALWAYS are mandatory for both `bmad-create-story` (full mode) and `bmad-quick-dev` (quick mode, with N/A allowances on Real-Data Findings + External Research).
+This template implements the **story-spec v2 (monolithic) or v3 (bifurcation) schema** defined by `bmad-shared/spec/spec-completeness-rule.md`. All sections marked ALWAYS are mandatory for both `bmad-create-story` (full mode) and `bmad-quick-dev` (quick mode, with N/A allowances on Real-Data Findings + External Research).
 
 ## Structure
 
@@ -265,8 +265,8 @@ Tests to execute in production after deployment. The story moves to the testing 
 
 ## Cross-references
 
-- `bmad-shared/spec-completeness-rule.md` — canonical mandatory section list
-- `bmad-shared/ac-format-rule.md` — BAC vs TAC format rule
-- `bmad-shared/boundaries-rule.md` — boundaries triple rule
+- `bmad-shared/spec/spec-completeness-rule.md` — canonical mandatory section list
+- `bmad-shared/spec/ac-format-rule.md` — BAC vs TAC format rule
+- `bmad-shared/spec/boundaries-rule.md` — boundaries triple rule
 - `bmad-shared/data/*-template.md` — per-section templates
 - `tools/validate-story-spec.js` — automated enforcement (heading match, format check, N/A justification)

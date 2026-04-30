@@ -34,7 +34,7 @@ Produce three mandatory sections:
 2. Security Gate with binary verdict (PASS / FAIL / N/A)
 3. Observability Requirements (logs / metrics / traces / alerts / dashboards / SLOs)
 
-Apply `~/.claude/skills/bmad-shared/validation-verdict-protocol.md` for the Security Gate's binary semantics.
+Apply `~/.claude/skills/bmad-shared/validation/validation-protocol.md#verdict` for the Security Gate's binary semantics.
 
 ## MANDATORY SEQUENCE
 

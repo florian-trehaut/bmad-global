@@ -75,7 +75,7 @@ If the diff is empty: return a BLOCKER ("No fix found — empty diff against bas
 
 ### 2. Build Independent Coverage Matrix
 
-Extract from the issue body (story-spec v2 (monolithic) or v3 (bifurcation) schema where applicable — see `~/.claude/skills/bmad-shared/spec-completeness-rule.md`):
+Extract from the issue body (story-spec v2 (monolithic) or v3 (bifurcation) schema where applicable — see `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`):
 
 - **Root Cause** (one paragraph from the Diagnosis section)
 - **Causal Chain** (Five Whys or equivalent)
@@ -112,7 +112,7 @@ Search the codebase for things the FIX should have addressed:
 - **Symptom vs root cause:** Does the fix address the root cause from the Causal Chain, or just the proximate symptom? If the fix patches a side-effect rather than the cause, flag MAJOR.
 - **Cross-references:** if the fix renames an identifier, `grep -rn "{old name}"` to find every site that breaks under the rename.
 - **Sibling files / similar patterns:** if "Similar Patterns" was flagged in the diagnosis, confirm those locations were NOT modified (out-of-scope) — modifying them is a violation, not modifying them is correct.
-- **Fallback / silent default introduced:** A bug fix that adds `|| default`, `?? fallback`, or wraps an error in `try/catch + log` to make the symptom disappear is hiding the bug, not fixing it. Cross-reference the `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` rule. Flag BLOCKER.
+- **Fallback / silent default introduced:** A bug fix that adds `|| default`, `?? fallback`, or wraps an error in `try/catch + log` to make the symptom disappear is hiding the bug, not fixing it. Cross-reference the `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md` rule. Flag BLOCKER.
 - **Diagnosis evidence still valid:** read the diagnosis evidence trail (logs, DB queries) — does the fix's intervention point match where the evidence pointed?
 - **VM items addressable:** for each VM item, is there a way to verify it post-deploy? Or is the VM hand-wavy ("ça marche")?
 

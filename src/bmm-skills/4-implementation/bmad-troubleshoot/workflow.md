@@ -41,13 +41,13 @@ Extract the following from the YAML frontmatter:
 
 ### 2. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **never fabricate evidence. If a log, DB query, or API call cannot be executed, HALT — never substitute with code analysis or "it probably works".**
 
 ### 3. Load stack knowledge (optional)
 
-Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/knowledge-loading.md`). This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (HALT if missing — see `~/.claude/skills/bmad-shared/core/knowledge-loading.md`). This file contains tech stack details, forbidden patterns, test rules, and reference code pointers.
 
 ### 4. Setup working environment
 
@@ -58,7 +58,7 @@ Derive paths:
 - `WORKTREE_PATH_EXPECTED`: `../{WORKTREE_PREFIX}-troubleshoot`
 - `BRANCH_NAME`: `troubleshoot/{date}` where `{date}` is today in `YYYY-MM-DD` format
 
-**Apply the full protocol from `bmad-shared/worktree-lifecycle.md` with the following contract parameters:**
+**Apply the full protocol from `bmad-shared/lifecycle/worktree-lifecycle.md` with the following contract parameters:**
 
 | Parameter | Value |
 |-----------|-------|
@@ -81,7 +81,7 @@ After the protocol completes, `WORKTREE_PATH` is set.
 
 ### 6. CHK-INIT — Initialization Read Receipt
 
-Per `~/.claude/skills/bmad-shared/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
+Per `~/.claude/skills/bmad-shared/core/workflow-adherence.md` Rule 2, before starting step-01, emit EXACTLY this block (filling in actual values you read). If any line cannot be filled truthfully, HALT and report which precondition failed.
 
 ```
 CHK-INIT PASSED — bmad-troubleshoot initialization complete:
@@ -163,7 +163,7 @@ These apply at ANY step:
 
 ## WORKFLOW COMPLETION — RETROSPECTIVE
 
-After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/retrospective-step.md`.
+After the final step completes (whether successfully or via early termination), read fully and follow `~/.claude/skills/bmad-shared/core/retrospective-step.md`.
 
 This shared step reviews the execution for friction points and proposes improvements to either:
 - The global skill (workflow steps, data files)

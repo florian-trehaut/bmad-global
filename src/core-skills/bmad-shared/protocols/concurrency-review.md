@@ -133,4 +133,4 @@ Each stack file may override these defaults for language-specific patterns (e.g.
 - **Extensibility**: adding a language = adding `stacks/{lang}.md` with a `## Concurrency` H2. Zero changes to this protocol or to consuming workflows.
 - **Composability**: this protocol composes with `tech-stack-lookup.md` for language detection — no duplicated detection logic.
 
-See `~/.claude/skills/bmad-shared/knowledge-schema.md` for the full architecture rationale.
+See `~/.claude/skills/bmad-shared/schema/knowledge-schema.md` for the full architecture rationale.

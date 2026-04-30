@@ -134,7 +134,7 @@ Reject any bullet matching these patterns. The grep regex is given so the §5.4 
 | Validator/regex internals | `(validateMandatorySections\|validateAcFormat\|regex literally rejects\|regex pattern\|(case-insensitive\|code-fence-aware) ?[—-])` | "Validator regex literally rejects PARTIAL", "case-insensitive, supports compound numbers like 02d, 01b" |
 | Refactor narratives | `(rewritten\|deleted\|renumbered\|cloned from\|+\d+ steps\b\|step-\d{2}[a-z]?-[a-z-]+\.md)` | "step-04-investigate → step-07-investigate (R092)", "rewritten (was 128 → 244 lines, +90%)" |
 | Codemod/script internals | `(codemod\|key transformation function\|line \d+ of diff\|migrate-\w+\.js)` | "Mass migration via idempotent codemod (462 lines, kept in tree)" |
-| Internal file paths | `(src/[^ ]*\.md\|protocols/[^ ]*\.md\|bmad-shared/[^ ]*\b)` (only allowed when the user must edit/install that file) | "in `src/core-skills/bmad-shared/workflow-adherence.md`" |
+| Internal file paths | `(src/[^ ]*\.md\|protocols/[^ ]*\.md\|bmad-shared/[^ ]*\b)` (only allowed when the user must edit/install that file) | "in `src/core-skills/bmad-shared/core/workflow-adherence.md`" |
 | Cross-workflow propagation lists | `\b\d+\s+workflows?\s+(touched\|rewired\|consumers?\|propagation)\b` | "Cross-workflow consumer rewiring (9 workflows touched)" |
 | Diff stats | `\b\d+\s+files?\s+changed\b\|\b\+\d+\s+/\s+-\d+\b` | "331 files / +13988 / -94" |
 

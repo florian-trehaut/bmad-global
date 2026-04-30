@@ -14,7 +14,7 @@ The perspective formerly named `zero_fallback` is renamed to `runtime_robustness
 
 - `scores.zero_fallback` → `scores.runtime_robustness` (YAML key changed)
 - `findings[].perspective: zero_fallback` → `findings[].perspective: runtime_robustness`
-- The shared rule file `~/.claude/skills/bmad-shared/no-fallback-no-false-data.md` is **NOT** renamed — its identifier remains "zero-fallback rules" wherever cited in workflow prose
+- The shared rule file `~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md` is **NOT** renamed — its identifier remains "zero-fallback rules" wherever cited in workflow prose
 - The `bmad-code-review` meta-2 sub-axis `2a` (zero_fallback) is **NOT** renamed — code-review keeps fine-grained sub-axes (2a zero_fallback, 2e null_safety, 2f concurrency) while dev-story summarises them under one perspective
 
 External tools that parse this YAML must handle the rename. No backwards-compat alias is provided in v1.

@@ -30,9 +30,9 @@ These checks verify our fork's distinctiveness survived the merge:
 grep '"name"' package.json
 
 # Our shared rules still exist
-ls src/core-skills/bmad-shared/worktree-lifecycle.md
-ls src/core-skills/bmad-shared/project-root-resolution.md
-ls src/core-skills/bmad-shared/no-fallback-no-false-data.md
+ls src/core-skills/bmad-shared/lifecycle/worktree-lifecycle.md
+ls src/core-skills/bmad-shared/core/project-root-resolution.md
+ls src/core-skills/bmad-shared/core/no-fallback-no-false-data.md
 
 # Our workflow-context not overwritten
 ls .claude/workflow-context.md

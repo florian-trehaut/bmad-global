@@ -93,7 +93,7 @@ Agent(
   description: 'Meta-1 Contract & Spec Integrity',
   prompt: |
     Read and apply: {meta1}
-    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+    Read and apply: ~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md
 
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
@@ -124,7 +124,7 @@ Agent(
   description: 'Meta-2 Correctness & Reliability',
   prompt: |
     Read and apply: {meta2}
-    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+    Read and apply: ~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md
 
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
@@ -149,7 +149,7 @@ Agent(
   description: 'Meta-3 Security S1: attacker POV (voting 1/2)',
   prompt: |
     Read and apply: {meta3}
-    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+    Read and apply: ~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md
 
     POV_FRAMING: attacker
     CREATIVITY: low (emulate temperature 0.2 — deterministic, focused)
@@ -184,7 +184,7 @@ Agent(
   description: 'Meta-3 Security S2: defender POV (voting 2/2)',
   prompt: |
     Read and apply: {meta3}
-    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+    Read and apply: ~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md
 
     POV_FRAMING: defender
     CREATIVITY: medium (emulate temperature 0.5 — creative, coverage-oriented)
@@ -220,7 +220,7 @@ Agent(
   description: 'Meta-4 Engineering Quality',
   prompt: |
     Read and apply: {meta4}
-    Read and apply: ~/.claude/skills/bmad-shared/no-fallback-no-false-data.md
+    Read and apply: ~/.claude/skills/bmad-shared/core/no-fallback-no-false-data.md
 
     review_contract:
       worktree_path: '{REVIEW_WORKTREE_PATH}'
@@ -249,7 +249,7 @@ If `M6` is in `ACTIVE_METAS` → add Agent E (Meta-6 User-facing Quality) using 
 
 ## Handle Agent Failures
 
-Any agent that returns empty / timeout / parse-error: record its group_id in `failed_layers`. Do NOT retry silently. Per `bmad-shared/no-fallback-no-false-data.md`, a failed layer must be surfaced to the user rather than substituted with an empty report. Judge-triage (step-03) carries `failed_layers` through to the consolidated verdict.
+Any agent that returns empty / timeout / parse-error: record its group_id in `failed_layers`. Do NOT retry silently. Per `bmad-shared/core/no-fallback-no-false-data.md`, a failed layer must be surfaced to the user rather than substituted with an empty report. Judge-triage (step-03) carries `failed_layers` through to the consolidated verdict.
 
 ---
 

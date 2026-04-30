@@ -42,7 +42,7 @@ The check is name-based, exact match, case-sensitive. No wildcards, no version r
 HALT — INITIALIZATION teammate-mode-routing
   reason: task_contract.metadata.orchestrator_invoked is true but metadata.orchestrator_skill is missing or empty
   action: the spawning skill MUST set metadata.orchestrator_skill to its own skill name (e.g., 'bmad-auto-flow')
-  reference: src/core-skills/bmad-shared/orchestrator-registry.md
+  reference: src/core-skills/bmad-shared/teams/orchestrator-registry.md
 ```
 
 **Skill not in registry:**
@@ -51,7 +51,7 @@ HALT — INITIALIZATION teammate-mode-routing
 HALT — INITIALIZATION teammate-mode-routing
   reason: metadata.orchestrator_skill='{value}' is not in the orchestrator registry
   action: only registered orchestrator skills may set metadata.orchestrator_invoked=true; this prevents non-orchestrator skills from bypassing Decision D16 of spec-agent-teams-integration.md
-  registry_path: src/core-skills/bmad-shared/orchestrator-registry.md
+  registry_path: src/core-skills/bmad-shared/teams/orchestrator-registry.md
   current_authorized_list: [bmad-auto-flow]
 ```
 
@@ -86,7 +86,7 @@ Embedding the authorized list inside `teammate-mode-routing.md` would couple the
 
 ## Cross-References
 
-- `src/core-skills/bmad-shared/teammate-mode-routing.md` — the consumer that validates against this registry
+- `src/core-skills/bmad-shared/teams/teammate-mode-routing.md` — the consumer that validates against this registry
 - `_bmad-output/planning-artifacts/spec-agent-teams-integration.md` §8.1 Amendments — the architectural authorization for the exception
-- `src/core-skills/bmad-shared/task-contract-schema.md` — defines the `metadata.orchestrator_invoked` and `metadata.orchestrator_skill` fields
+- `src/core-skills/bmad-shared/teams/task-contract-schema.md` — defines the `metadata.orchestrator_invoked` and `metadata.orchestrator_skill` fields
 - `src/bmm-skills/4-implementation/bmad-auto-flow/` — the first (and currently only) registered orchestrator

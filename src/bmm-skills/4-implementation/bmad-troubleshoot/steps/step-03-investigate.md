@@ -27,7 +27,7 @@ Si une precondition manque => HALT, signaler quelle precondition.
 
 ## STEP GOAL
 
-Aggressively investigate the bug — logs, database, code, deployments — without asking the user. Launch parallel investigations via subagents when available. This is the autonomous phase. **Climb the Reproduction Hierarchy** defined in `~/.claude/skills/bmad-shared/evidence-based-debugging.md` as far as possible — rung 1 (local reproduction via test) is the target for any deterministic bug.
+Aggressively investigate the bug — logs, database, code, deployments — without asking the user. Launch parallel investigations via subagents when available. This is the autonomous phase. **Climb the Reproduction Hierarchy** defined in `~/.claude/skills/bmad-shared/spec/evidence-based-debugging.md` as far as possible — rung 1 (local reproduction via test) is the target for any deterministic bug.
 
 ## RULES
 
@@ -36,7 +36,7 @@ Aggressively investigate the bug — logs, database, code, deployments — witho
 - **Use local skills** — invoke project skills from `LOCAL_SKILLS` (discovered in step 2)
 - **NEVER fabricate evidence** — if a source is inaccessible, report it, don't substitute
 - **Parallel when possible** — launch subagent investigations concurrently
-- **Evidence-based mandate** — apply `~/.claude/skills/bmad-shared/evidence-based-debugging.md`:
+- **Evidence-based mandate** — apply `~/.claude/skills/bmad-shared/spec/evidence-based-debugging.md`:
   - Code reading is **never** proof on its own — it identifies WHERE to look, never WHAT happened
   - Attempt rung-1 reproduction (local test that fails at the baseline commit) for every deterministic bug
   - If rung 1 is unreachable, document which exception class (E-1 to E-8) applies and climb to the highest rung that IS reachable
@@ -128,7 +128,7 @@ Flag any investigation axis that could not be executed (no log access, no DB acc
 
 ### 5. Determine reproduction rung achieved
 
-Per `~/.claude/skills/bmad-shared/evidence-based-debugging.md`, classify the highest evidence rung obtained for the bug:
+Per `~/.claude/skills/bmad-shared/spec/evidence-based-debugging.md`, classify the highest evidence rung obtained for the bug:
 
 - **Rung 1** — local reproduction via automated test (deterministic). Capture pre-fix failure output now, even if the fix is not yet implemented (the test exists and fails at baseline)
 - **Rung 2** — local reproduction via manual run (deterministic but no test artifact yet — must be promoted to rung 1 in step-06)
