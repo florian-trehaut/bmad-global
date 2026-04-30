@@ -107,11 +107,24 @@ Iterative fix cycles with degressive thresholds:
 | 2 | 0.75 | 1 | Fix remaining blockers |
 | 3 | 0.65 | 2 | Fix critical security blockers only |
 
+Per `~/.claude/skills/bmad-shared/core/workflow-adherence.md` Rule 8 (Findings Handling Policy) — **all findings are fixed by default regardless of severity** (BLOCKER, MAJOR, MINOR, INFO), unless a documented skip reason applies (deferred-by-phase, OOS confirmed, user-approved design decision, duplicate of converging finding, honest non-reproduction). Severity is NOT the criterion for fix decision ; severity informs **priority of attention** (BLOCKER first, INFO last).
+
 For each cycle:
-1. Address findings with severity >= threshold
+1. Address findings — fix all by default ; only skip with documented reason
 2. Run validations: `{TEST_COMMAND} && {BUILD_COMMAND} && {LINT_COMMAND}`
 3. Re-run self-review
 4. Check scores against cycle threshold
+
+#### TEAMMATE_MODE branch (autonomy_policy=spec-driven)
+
+**If `TEAMMATE_MODE=true AND autonomy_policy=spec-driven`** :
+
+After fix cycles, classify any remaining findings :
+
+- **TACTICAL** (MINOR / INFO findings that don't suggest structural rework, fixed per Rule 8 fix-by-default) : auto-include in MR description as "Design decisions open for discussion" + push despite remaining findings. Capture in workflow's `AUTONOMY_DECISIONS[]` accumulator : `{decision: 'self-review-tactical', classification: 'tactical', default_applied: 'fix-by-default per Rule 8 ; remainder pushed with disclosure', rationale: 'TAC-5b — MINOR findings covered by spec Rule 8'}`.
+- **STRUCTURAL** (MAJOR finding suggests structural rework — refactor scope, arch deviation, contract violation, integration boundary issue) : emit `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` and HALT. Do NOT push with structural rework hidden in disclosure (TAC-6).
+
+**Else (TEAMMATE_MODE=false standalone, or TEAMMATE_MODE=true strict)** :
 
 <check if="still failing after cycle 3">
   HALT — report to user with remaining findings, scores, options:

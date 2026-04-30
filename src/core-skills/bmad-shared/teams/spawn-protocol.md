@@ -131,21 +131,48 @@ This ensures the knowledge system self-heals across all projects.
 - Output format: {DELIVERABLE_FORMAT} as defined in task contract
 - You are {READ_ONLY|READ_WRITE} for this task
 
+### Trace work to disk (mandatory before phase_complete)
+
+Write detailed work to `{TRACE_PATH}` BEFORE emitting `phase_complete`. The file is the durable audit anchor that lets the lead drill down into reasoning the synthetic `summary:` cannot carry.
+
+Required structure (markdown, 5 sections, in order) :
+1. **Task Assignment** — verbatim copy of the task_contract YAML
+2. **Steps Executed** — chronological log of each workflow step + CHK-STEP-NN-ENTRY/EXIT receipts emitted
+3. **Decisions Taken** — verbatim copy of every `autonomy_decisions[]` entry accumulated during execution
+4. **Artifacts Produced** — files modified/created with absolute paths + stats (+N/-M lines), or synthetic outputs if read-only
+5. **Phase Complete Payload** — verbatim copy of the YAML payload sent via SendMessage
+
+The trace file MUST exist before the SendMessage(phase_complete) is invoked. If the parent directory of `{TRACE_PATH}` is non-creatable (permission denied, disk full, etc.), emit `SendMessage(blocker)` with the underlying error and HALT — never silently fall back to a different path. See `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md §Trace work to disk`.
+
+### Autonomy policy enforcement
+
+When `task_contract.constraints.autonomy_policy == spec-driven`, branch every interactive decision per the 4-way classification :
+- **acknowledge** (verbatim spec match) — auto-resolve, capture in autonomy_decisions[]
+- **TACTICAL** (Boundaries Always Do, Findings Rule 8 fix-MINOR, format choices) — apply spec pattern, capture in autonomy_decisions[]
+- **STRUCTURAL** (arch decision, ADR gap, plan divergence, missing spec section, drift, dependency add, CI/CD modify, major-version bump) — emit `SendMessage(question, critical_ambiguity: true)`, HALT until reply
+- **Runtime CRITIQUE** (test fail unfix-able, contract violation, real-data ambiguity) — emit `SendMessage(question, critical_ambiguity: true)`, HALT
+
+When `autonomy_policy == strict` (default, backward-compat), all interactive decisions route to lead via `SendMessage(question)` — no auto-resolution. See `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md §Autonomy policy enforcement`.
+
 ### Completion Protocol
 1. Build your output in the exact format specified by deliverable.format
 2. Verify your output contains all required fields before reporting
-3. SendMessage your complete output to '{LEAD_NAME}'
-4. Call TaskUpdate(status: "completed")
-5. If you receive validation feedback:
+3. **Write the trace file at `{TRACE_PATH}` per the structure above** — this is mandatory before step 4
+4. SendMessage your complete output to '{LEAD_NAME}' (include `trace_files: ['{TRACE_PATH}']` in the phase_complete payload)
+5. Call TaskUpdate(status: "completed")
+6. If you receive validation feedback:
    a. Read the feedback carefully
    b. Revise your output to fix the issues
-   c. Re-send via SendMessage
-   d. Call TaskUpdate(status: "completed") again
+   c. Update the trace file (sections 4-5) with the revision
+   d. Re-send via SendMessage
+   e. Call TaskUpdate(status: "completed") again
 
 ### Constraints
 - NEVER communicate with other teammates directly — only via lead
 - NEVER modify files unless constraints.read_only == false
-- If blocked: SendMessage to lead explaining the blocker — do NOT silently degrade
+- NEVER invoke `Agent()` (sub-agent fork) — Agent Teams platform constraint per anthropics/claude-code#32723 (TAC-18). Hub-and-spoke architecture forbids forks inside teammates ; all delegation happens lead-side.
+- NEVER write secrets, credentials, API keys, tokens, or PII into the trace file at `{TRACE_PATH}`
+- If blocked: SendMessage(blocker) to lead explaining the blocker — do NOT silently degrade
 - HALT on any condition in constraints.halt_conditions
 ```
 
@@ -177,6 +204,8 @@ Workflow steps assemble the spawn prompt by:
 | `{LEAD_NAME}` | Orchestrator agent name |
 | `{DELIVERABLE_FORMAT}` | Task contract → `deliverable.format` |
 | `{READ_ONLY\|READ_WRITE}` | Task contract → `constraints.read_only` |
+| `{TRACE_PATH}` | Task contract → `constraints.trace_path` (default `/tmp/bmad-{project_slug}-auto-flow/{RUN_ID}/{role}-{task_id}.md`) |
+| `{AUTONOMY_POLICY}` | Task contract → `constraints.autonomy_policy` (default `strict`) |
 
 ---
 

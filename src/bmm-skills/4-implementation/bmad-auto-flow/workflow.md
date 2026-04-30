@@ -74,12 +74,61 @@ If TEAM_MODE=false → fallback path (BAC-9, TAC-12, TAC-21):
 - `PHASE_RESULTS = {}` (one entry per phase)
 - `QUESTION_BUFFER = []` (consumed by question-routing protocol — see `data/question-routing.md`)
 - `MR_IID = null`, `MR_URL = null` (set in dev phase)
+- `TRACE_FILES = []` (aggregates `phase_complete.trace_files` paths from each phase teammate; consumed by step-09 final report)
 
-### 6. CHK-INIT — Initialization Read Receipt
+### 6. Discover project-local lifecycle skills (axe 3 — project-aware)
+
+Glob the project-local skills directory for ci-watch / deploy-watch implementations :
+
+```bash
+# Patterns matched (case-insensitive, first match wins per pattern)
+ls {MAIN_PROJECT_ROOT}/.claude/skills/{ci-watch,deploy-watch,*-ci-watch,*-deploy-watch}/SKILL.md 2>/dev/null
+```
+
+Extract :
+- `CI_WATCH_SKILL_PATH` = first match for `ci-watch*` pattern, else `null`
+- `DEPLOY_WATCH_SKILL_PATH` = first match for `deploy-watch*` pattern, else `null`
+
+If multiple skills match a pattern, log a warning but use the first match (alphabetical order). The user is responsible for project-local skill naming uniqueness.
+
+### 7. Extract lifecycle_artifacts (axe 3)
+
+From the `agent_teams.lifecycle_artifacts` block extracted in §1 :
+
+```yaml
+LIFECYCLE_ARTIFACTS:
+  pr_required: {value or false}
+  staging_required: {value or false}
+  ci_watch_skill: {value or null}
+  deploy_watch_skill: {value or null}
+```
+
+Validate per `agent-teams-config-schema.md` §Validation Rules 9-12 — HALT on type mismatch citing the field.
+
+**Resolution priority** (per TAC-12) :
+- Highest : explicit `lifecycle_artifacts.{ci|deploy}_watch_skill` value (literal skill name in config)
+- Middle : auto-discovered project-local skill path (`CI_WATCH_SKILL_PATH` / `DEPLOY_WATCH_SKILL_PATH` from §6)
+- Lowest : absent (skip the corresponding gate gracefully — no HALT)
+
+This resolution is performed at gate evaluation time (step-07 / step-08), not at INIT — INIT just collects the candidates.
+
+### 8. Initialize trace folder (axe 4)
+
+Set `RUN_ID = {ISO-8601-timestamp}-{slug}` where `slug = lowercase(FEATURE_DESCRIPTION).replace(non-alphanumeric, '-').truncate(40)` (slug is set in step-01 after FEATURE_DESCRIPTION is gathered ; INIT just reserves the variable). Set `PROJECT_SLUG = lowercase(PROJECT_NAME).replace(non-alphanumeric, '-')`.
+
+The trace folder is created in step-01-entry once `FEATURE_DESCRIPTION` is known :
+
+```bash
+mkdir -p /tmp/bmad-{PROJECT_SLUG}-auto-flow/{RUN_ID}/
+```
+
+`mkdir -p` is idempotent. If creation fails (permission denied, disk full, etc.), the orchestrator HALTs with the underlying error — never silently fall back to a different path (no-fallback-no-false-data.md). The folder hosts trace files written by every spawned teammate per §Trace work to disk in `teammate-mode-routing.md`.
+
+### 9. CHK-INIT — Initialization Read Receipt
 
 ```
 CHK-INIT PASSED — bmad-auto-flow initialization complete:
-  shared_rules_loaded: {N} files (must include teammate-mode-routing.md, orchestrator-registry.md, task-contract-schema.md, agent-teams-config-schema.md, worktree-lifecycle.md)
+  shared_rules_loaded: {N} files (must include teammate-mode-routing.md, orchestrator-registry.md, task-contract-schema.md, agent-teams-config-schema.md, worktree-lifecycle.md, spawn-protocol.md)
   project_context: {MAIN_PROJECT_ROOT}/.claude/workflow-context.md (schema_version: {X})
   project_knowledge:
     - project.md (schema_version: {X})
@@ -92,6 +141,15 @@ CHK-INIT PASSED — bmad-auto-flow initialization complete:
   phase_timeout_minutes: {N}
   audit_log_enabled: {true | false}
   worktree_enabled: {true | false}
+  lifecycle_artifacts:
+    pr_required: {true | false}
+    staging_required: {true | false}
+    ci_watch_skill: {value or null}
+    deploy_watch_skill: {value or null}
+  ci_watch_skill_path: {auto-discovered path or null}
+  deploy_watch_skill_path: {auto-discovered path or null}
+  project_slug: {PROJECT_SLUG}
+  run_id: {set in step-01 after feature description gathered}
   user_name: {USER_NAME}
   communication_language: {LANGUAGE}
   fallback_active: {true if TEAM_MODE=false, else false}
@@ -126,10 +184,15 @@ You are the **lead orchestrator** of a 5-phase BMAD lifecycle. You:
 - **TRACKER WRITES ARE EXCLUSIVE** — only this orchestrator writes the tracker (BAC-8). Teammates emit `tracker_write_request` SendMessage — orchestrator processes them. Set `task_contract.constraints.tracker_writes: false` on every spawn.
 - **WORKTREE PATH PROPAGATED** — all teammates receive the same `WORKTREE_PATH` via `task_contract.constraints.worktree_path` (consumed by `worktree-lifecycle.md` Branch D). Single shared worktree per BAC-6 / TAC-19.
 - **QUESTION BATCHING** — flush buffer when N=3 OR T=30s OR URGENT tag (TAC-23). Single AskUserQuestion call per flush (TAC-24).
-- **TEAMDELETE ON EXIT** — call TeamDelete in step-09-finalize on EVERY exit path (success, HALT, blocker). Guardrail 9.
+- **TEAMDELETE ON EXIT** — every phase team is created at phase start and deleted at phase end (TeamCreate→TaskCreate(s)→await phase_complete→TeamDelete per BAC-7 / TAC-22). step-09-finalize ensures any residual team is cleaned up on HALT/blocker exit paths.
 - **PERMISSION INHERITANCE TRANSPARENCY** — startup banner displays the inherited permission mode before TeamCreate (TAC-29 / BAC-14).
 - **PRE-SPAWN VALIDATION (TAC-28)** — before each TaskCreate, assert `task_contract.input_artifacts.tracker_issue.identifier` is non-null and well-formed. HALT if missing.
 - **SERIALIZE SENDMESSAGE HANDLING (TAC-27)** — single-threaded message queue, processed in arrival order. See `data/question-routing.md` §Ordering.
+- **AUTONOMY POLICY PROPAGATION** — every dev teammate spawn contract sets `task_contract.constraints.autonomy_policy: spec-driven` (TAC-4). Other phase teammates default to `strict` unless explicitly noted. Spec-driven policy semantics defined in `teammate-mode-routing.md §Autonomy policy enforcement`.
+- **TRACE PATH PROPAGATION** — every spawn contract sets `task_contract.constraints.trace_path: /tmp/bmad-{PROJECT_SLUG}-auto-flow/{RUN_ID}/{role}-{task_id}.md` (TAC-13). Each teammate writes detailed work to its trace file BEFORE emitting `phase_complete`. Lead aggregates `phase_complete.trace_files[]` into `TRACE_FILES` and renders them in the final user report (step-09).
+- **FORBIDDEN: `Agent(` literal in this skill** — per Anthropic Issue #32723 hub-and-spoke architecture, all delegation in auto-flow happens via TaskCreate to teammates within phase teams. Forks via `Agent()` are OUT OF SCOPE for auto-flow (TAC-26). Verification : `grep -nE "Agent\(" src/bmm-skills/4-implementation/bmad-auto-flow/` MUST return 0 hits — strict regex matching only literal tool invocation, not prose mentions ("Agent Teams", "Agent tool", etc.).
+- **TEAM-PER-PHASE LIFECYCLE (axe 5)** — each lifecycle phase (1-spec, 5-review, 6-dev, 7-code-review, 8-validation) instantiates its own phase-scoped team via `TeamCreate(name="{phase}-{RUN_ID}", composition from team-config.md)` at phase start, runs `TaskCreate(s)` to each teammate per its `workflow_to_invoke`, awaits `phase_complete` from each teammate, then `TeamDelete(name="{phase}-{RUN_ID}")` before transitioning. Each team's size respects `max_teammates ≤ 5` (BAC-7 / TAC-21 / TAC-22 / TAC-23).
+- **STRICT WORKFLOW EXECUTION (BAC-8 / TAC-24)** — every TaskCreate spawn contract MUST include `workflow_to_invoke: '{absolute path to workflow.md or step file}'`. The teammate MUST execute that workflow integrally per `teammate-mode-routing.md §Required Workflow Application` — Read all step files, emit CHK-INIT + CHK-STEP-NN-ENTRY/EXIT receipts, emit `phase_complete` only after `CHK-WORKFLOW-COMPLETE`. No skim, no shortcut, no rationalization (R-01..R-12 from `workflow-adherence.md`).
 
 ---
 

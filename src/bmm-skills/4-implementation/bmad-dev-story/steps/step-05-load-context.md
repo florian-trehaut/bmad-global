@@ -53,7 +53,11 @@ Else (mode: monolithic, or absent for legacy v2) → monolithic mode.
 
 **If `mode: bifurcation`:**
 
-1. Apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 3 (drift check) — fetch lightweight `tracker.updatedAt`, compare with frontmatter `business_synced_at` (60s tolerance). If drift detected, HALT, present `[R]/[I]/[V]` menu, wait for user input. On `[R]` apply operation 4. On `[I]` log and continue.
+1. Apply `~/.claude/skills/bmad-shared/protocols/spec-bifurcation.md` operation 3 (drift check) — fetch lightweight `tracker.updatedAt`, compare with frontmatter `business_synced_at` (60s tolerance). If drift detected, branch on autonomy_policy :
+   - **TEAMMATE_MODE=true AND autonomy_policy=spec-driven** : drift is STRUCTURAL (canonical source changed mid-impl ; cannot be auto-resolved). Emit `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` with the drift diagnostic and options `[R]ebase to canonical / [I]gnore and continue / [V]iew diff first`. Block until reply. (Per TAC-6 structural escalation in `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md §Autonomy policy enforcement`.)
+   - **TEAMMATE_MODE=true AND autonomy_policy=strict (or unset)** : emit `SendMessage(question)` (non-critical) to `LEAD_NAME` with `[R]/[I]/[V]` options.
+   - **TEAMMATE_MODE=false (standalone)** : HALT inline, present `[R]/[I]/[V]` menu, wait for user input.
+   In all cases : on `[R]` apply operation 4. On `[I]` log and continue. On `[V]` display diff first then re-prompt.
 2. Apply protocol operation 2 (compose unified view) — read local file (technical sections) + tracker description (business sections) and compose the unified view. Use the unified view as the input to step-08 (implementation) and step-12 (traceability).
 3. The technical sections (TACs, NFR, Security, etc.) are loaded from the LOCAL file — never from the tracker description, which only contains business sections in bifurcation mode.
 
@@ -79,7 +83,9 @@ Else (mode: monolithic, or absent for legacy v2) → monolithic mode.
 - INVEST: {n_yes}/6 YES
 ```
 
-If the spec is missing v2 mandatory sections (per `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`), HALT and prompt the user to either fix the spec via `/bmad-create-story` (Enrichment mode) or grant explicit waiver per section.
+If the spec is missing v2 mandatory sections (per `~/.claude/skills/bmad-shared/spec/spec-completeness-rule.md`), branch on autonomy_policy :
+- **TEAMMATE_MODE=true AND autonomy_policy=spec-driven** : missing sections are STRUCTURAL (the spec was supposed to anticipate). Emit `SendMessage(question, critical_ambiguity: true)` with the list of missing sections and options `[F]ix spec via /bmad-create-story / [W]aiver per section / [A]bandon`. Block until reply. (Per TAC-6 structural escalation.)
+- **Else** : HALT and prompt the user (lead in TEAMMATE_MODE=true strict ; user directly in TEAMMATE_MODE=false) to either fix the spec via `/bmad-create-story` (Enrichment mode) or grant explicit waiver per section.
 
 ### 2. Load Project Context
 

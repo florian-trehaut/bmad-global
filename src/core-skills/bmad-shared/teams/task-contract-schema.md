@@ -21,6 +21,12 @@ task_contract:
   task_id: '{unique-id}'             # Unique within team (e.g., 'A', 'B', 'S1')
   role: '{role-key}'                 # Matches a role from team-config.md
 
+  # ── Workflow Selection (CONDITIONAL) ─────────────────────────
+  workflow_to_invoke: '{path/to/workflow.md or step file}'  # NEW. REQUIRED when the teammate must execute a nominated workflow integrally.
+                                     # The teammate MUST execute this workflow per teammate-mode-routing.md §Required Workflow Application —
+                                     # Read workflow.md AND each step file, emit CHK-INIT + CHK-STEP-NN-ENTRY/EXIT receipts, emit phase_complete only after full execution.
+                                     # When omitted, the teammate executes the workflow inferred from `metadata.parent_phase` per orchestrator-registry mapping.
+
   # ── Scope (REQUIRED) ─────────────────────────────────────────
   scope_type: 'review'               # review | investigation | generation | planning | validation
   scope_files:                       # File paths to work on (REQUIRED for review/investigation)
@@ -59,6 +65,14 @@ task_contract:
     tracker_writes: false            # NEW. true | false. Default: false in TEAMMATE_MODE, true otherwise.
                                      # When false, the teammate emits tracker_write_request via SendMessage instead of writing the tracker directly.
                                      # See teammate-mode-routing.md §B.
+    autonomy_policy: 'strict'        # NEW. enum: spec-driven | strict. Default: strict (backward-compat = current behavior pre-impl).
+                                     # When spec-driven, the teammate auto-acknowledges decisions that verbatim-match the spec, auto-resolves TACTICAL items
+                                     # from spec patterns (Boundaries Always Do, Findings Rule 8 fix-MINOR, format choices), and HALTs on STRUCTURAL
+                                     # divergence/absence (arch decisions, ADR gap, plan-shape divergence, missing spec section, drift, dependency add,
+                                     # migration files, major-version bump). See teammate-mode-routing.md §Autonomy policy enforcement.
+    trace_path: '/tmp/bmad-{project_slug}-auto-flow/{RUN_ID}/{role}-{task_id}.md'  # NEW. Absolute path the teammate writes detailed work to before phase_complete.
+                                     # Default templated path; project_slug = lowercase(project_name).replace(non-alphanumeric, '-'); RUN_ID = {ISO-timestamp}-{slug}.
+                                     # See teammate-mode-routing.md §Trace work to disk.
     halt_conditions:                 # Conditions that must trigger a HALT
       - 'Missing required knowledge file after generation attempt'
       - 'Scope ambiguity that cannot be resolved from context'
@@ -95,6 +109,9 @@ task_contract:
 | `constraints.read_only` | NO | boolean | Default `true`. Only set `false` for generation/planning tasks |
 | `constraints.worktree_path` | NO | string | Path to isolated worktree if applicable. When non-null in TEAMMATE_MODE, consumed by `worktree-lifecycle.md` Branch D (provided path mode) |
 | `constraints.tracker_writes` | NO | boolean | Default `false` in TEAMMATE_MODE, `true` otherwise. When `false`, the teammate MUST emit `tracker_write_request` SendMessage instead of writing the tracker directly. Enforces BAC-8 of story `auto-flow-orchestrator` |
+| `constraints.autonomy_policy` | NO | enum | Default `strict`. Enum: `spec-driven` \| `strict`. When `spec-driven`, teammate auto-acknowledges spec-verbatim decisions, auto-resolves TACTICAL items from spec patterns, and HALTs (`SendMessage(question, critical_ambiguity: true)`) on STRUCTURAL divergence/absence. When `strict`, all decisions route to lead/user (current behavior pre-impl). See `teammate-mode-routing.md §Autonomy policy enforcement` |
+| `constraints.trace_path` | NO | string | Default `/tmp/bmad-{project_slug}-auto-flow/{RUN_ID}/{role}-{task_id}.md`. Absolute path the teammate writes detailed work to before emitting `phase_complete`. `project_slug = lowercase(project_name).replace(non-alphanumeric, '-')`; `RUN_ID` set in orchestrator INIT. HALT if parent dir non-creatable (no silent fallback). See `teammate-mode-routing.md §Trace work to disk` |
+| `workflow_to_invoke` | conditional | string | REQUIRED when teammate must execute a nominated workflow integrally. Path to `workflow.md` (or specific step file). Forces teammate to apply `teammate-mode-routing.md §Required Workflow Application` — Read all step files, emit CHK receipts, emit `phase_complete` only after `CHK-WORKFLOW-COMPLETE` |
 | `constraints.halt_conditions` | NO | list | Skill-specific halt triggers beyond global HALT rules |
 | `metadata.orchestrator_invoked` | NO | boolean | Default `false`. When `true`, signals the spawning skill is an authorized orchestrator that may override Decision D16. Validated against `orchestrator-registry.md` by `teammate-mode-routing.md` |
 | `metadata.orchestrator_skill` | conditional | string | REQUIRED when `metadata.orchestrator_invoked=true`. Must match a skill name listed in `src/core-skills/bmad-shared/teams/orchestrator-registry.md`. Mismatch → HALT (TAC-30) |
@@ -182,8 +199,11 @@ A task contract is **invalid** if any of these conditions are true:
 6. `metadata.orchestrator_invoked` is `true` but `metadata.orchestrator_skill` is missing or empty (TAC-30)
 7. `metadata.orchestrator_invoked` is `true` but `metadata.orchestrator_skill` is not listed in `src/core-skills/bmad-shared/teams/orchestrator-registry.md` (TAC-30)
 8. `input_artifacts` contains a `tracker_issue` artifact whose `identifier` is null/missing/malformed (TAC-28)
+9. `constraints.autonomy_policy` is set to a value outside the enum `spec-driven | strict` (TAC-4)
+10. `constraints.trace_path` is set but its parent directory is non-creatable (permission denied, disk full, etc.) — HALT with `blocker` SendMessage citing the underlying error; never silently fall back to a different path (TAC-16)
+11. `workflow_to_invoke` is non-empty but the path does not resolve to an existing `workflow.md` or step file readable by the teammate (per `teammate-mode-routing.md §Required Workflow Application`). **Validation timing (per Phase 7 code-review F-correctness-7)** : the lead validates at TaskCreate emission (resolves the path against `~/.claude/skills/` from the orchestrator's filesystem) AND the teammate re-validates at INIT (resolves the path against its own filesystem after spawn) — both checks required per defensive programming.
 
-An invalid contract MUST cause the teammate to HALT immediately and report the validation failure to the lead via SendMessage. For violations 6–8, the HALT message MUST cite the registry path or the missing field per the `teammate-mode-routing.md` HALT messages section.
+An invalid contract MUST cause the teammate to HALT immediately and report the validation failure to the lead via SendMessage. For violations 6–8, the HALT message MUST cite the registry path or the missing field per the `teammate-mode-routing.md` HALT messages section. For violations 9–11, the HALT message MUST cite the offending field and the schema rule (`task-contract-schema.md` §Validation Rules) and reference the relevant TAC.
 
 ---
 

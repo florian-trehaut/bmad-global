@@ -66,7 +66,13 @@ Examine the user's direct instructions for evidence triggers:
 | Mentions an external library upgrade or new dependency | Suggest a quick docs/changelog check via WebSearch / Context7; OR note "external research not done" |
 | Pure internal refactor (no providers, DB, cloud, new deps) | Note "N/A — pure internal scope" and proceed |
 
-For each trigger detected, ASK the user:
+For each trigger detected, branch on TEAMMATE_MODE + autonomy_policy:
+
+**TEAMMATE_MODE=true AND autonomy_policy=spec-driven** (TACTICAL — default to spec-declared evidence) :
+- The spec already declared the evidence approach in Real-Data Findings + External Research sections (loaded in step-02). Auto-apply the spec's declared evidence path.
+- Skip extra investigation trigger — capture in `AUTONOMY_DECISIONS[]` : `{decision: 'evidence-trigger-tactical', classification: 'tactical', default_applied: 'use spec-declared evidence', rationale: 'TAC-5b — spec Real-Data Findings is the authority'}`.
+
+**Else (TEAMMATE_MODE=false standalone, or autonomy_policy=strict)** — ASK the user:
 
 > Detected: {trigger}. Quick-dev evidence pass options:
 > [V] **Verify** — pause and gather real data / docs now (~minutes)

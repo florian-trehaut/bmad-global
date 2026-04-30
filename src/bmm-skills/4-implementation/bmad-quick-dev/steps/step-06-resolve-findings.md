@@ -6,6 +6,20 @@
 
 Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`, when TEAMMATE_MODE=true:
 
+### Branch on `autonomy_policy`
+
+**If `task_contract.constraints.autonomy_policy == 'spec-driven'`** (Rule 8 fix-by-default + structural escalation per TAC-5b / TAC-6) :
+
+Apply the Findings Handling Policy from `~/.claude/skills/bmad-shared/core/workflow-adherence.md` Rule 8 :
+
+- **BLOCKER findings** : auto-fix mandatory (no choice — non-skippable per existing rule below). Capture in `AUTONOMY_DECISIONS[]` : `{decision: 'resolve-findings-blocker', classification: 'tactical', default_applied: 'auto-fix BLOCKER per Rule 8 + spec', rationale: 'TAC-5b — BLOCKER fix is mandatory routine'}`.
+- **MAJOR findings** : these are STRUCTURAL — emit `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` for review. Do NOT auto-fix without lead approval (a MAJOR may indicate structural rework).
+- **MINOR / INFO findings** : auto-fix per Rule 8 fix-by-default (TACTICAL). Capture in `AUTONOMY_DECISIONS[]` : `{decision: 'resolve-findings-minor', classification: 'tactical', default_applied: 'auto-fix MINOR per Rule 8', rationale: 'TAC-5b — Rule 8 says all findings fixed by default ; severity is not the criterion'}`.
+
+After auto-fix and lead approval (if MAJOR escalated), re-run validation. Skip the [W]/[F]/[S] interactive menu entirely — auto-resolution per spec.
+
+**If `task_contract.constraints.autonomy_policy == 'strict'` (default, backward-compat)** — current behavior :
+
 - §A — every per-finding interactive prompt is rerouted via SendMessage `question` payload; block on reply.
 - §B — any tracker write (status update, MR creation) goes through `tracker_write_request` SendMessage (constraint `tracker_writes: false` enforced).
 - §D — the workflow ends with a `phase_complete` SendMessage to the lead with verdict DONE / FINDINGS, the MR URL (if created) as a deliverable, and the resolved findings summary.

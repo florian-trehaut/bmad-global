@@ -88,6 +88,16 @@ agent_teams:
   code_review_team_size: 3            # BAC-12
   phase_timeout_minutes: 30           # TAC-14
   audit_log_enabled: false            # T-SEC-1 (optional)
+
+  # Optional — example lifecycle_artifacts for project-aware gates (axe 3 of standalone-auto-flow-context-reduction).
+  # NOT defined as active here because BMAD-METHOD is trunk-based (no PR workflow needed for the dev loop) and has no staging.
+  # Other projects can copy this block, set values per their needs:
+  # lifecycle_artifacts:
+  #   pr_required: true              # When true, bmad-auto-flow step-07 creates a PR via forge_mr_create before code-review TaskCreate
+  #   staging_required: false        # When true, bmad-auto-flow step-08 invokes deploy_watch_skill before validator TaskCreate
+  #   ci_watch_skill: 'ci-watch'     # Optional. Skill name; auto-discovered from .claude/skills/{ci-watch,*-ci-watch}/ if absent
+  #   deploy_watch_skill: 'deploy-watch'  # Same resolution priority
+
   knowledge_mapping:
     spec-reviewer:
       - project.md

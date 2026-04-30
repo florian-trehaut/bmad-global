@@ -103,20 +103,23 @@ Review the `{diff_output}` from these perspectives:
 7. **Fact-check**: Do all code comments accurately describe what the code does? Are all function/variable names semantically correct? Would a PR description based on these names and comments be truthful?
 8. **ADR conformity** (if ADRs loaded): Does the implementation follow all active Architecture Decision Records? Any new patterns that contradict decided approaches? Any architectural choices that should have an ADR but don't?
 
-   If an ADR gap is found — **HALT.** Present the menu:
+   If an ADR gap is found, branch on TEAMMATE_MODE + autonomy_policy:
 
-   > This implementation introduces **{description}** which should be recorded as an Architecture Decision Record.
-   >
-   > **[A]** Create ADR now (invoke `bmad-create-adr`)
-   > **[S]** Skip — will create ADR later
-   > **[N]** Not needed — this doesn't warrant an ADR
+   - **TEAMMATE_MODE=true AND autonomy_policy=spec-driven** : ADR gap is **STRUCTURAL** (arch decision absent from spec — must reach user even if spec didn't anticipate). Per TAC-6, emit `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` with the ADR description and options `[A]/[S]/[N]`. Block until reply. Do NOT auto-resolve regardless of how "obvious" the answer seems.
+   - **Else (TEAMMATE_MODE=false standalone, or autonomy_policy=strict)** : **HALT** inline. Present the menu:
 
-   WAIT for user selection.
+     > This implementation introduces **{description}** which should be recorded as an Architecture Decision Record.
+     >
+     > **[A]** Create ADR now (invoke `bmad-create-adr`)
+     > **[S]** Skip — will create ADR later
+     > **[N]** Not needed — this doesn't warrant an ADR
 
-   - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume the review.
-   - **IF S or N:** Log the user's choice and resume the review.
+     WAIT for user selection.
 
-   **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT forces an explicit decision.
+     - **IF A:** Invoke `skill:bmad-create-adr` with the decision context, then resume the review.
+     - **IF S or N:** Log the user's choice and resume the review.
+
+   **NEVER** silently document an ADR need as a "note" or "recommendation". The HALT (or critical_ambiguity escalation) forces an explicit decision.
 
 Apply review perspectives from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` (loaded in INITIALIZATION).
 

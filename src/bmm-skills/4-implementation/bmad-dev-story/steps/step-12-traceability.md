@@ -119,6 +119,15 @@ A TAC with `pattern_scaffold_match: FALSE` is a MINOR finding (test exists but d
 
 <check if="verdict == PASS">
   Log: "Traceability: PASS — all ACs covered at expected test levels"
+
+  **TEAMMATE_MODE branch (autonomy_policy=spec-driven)** :
+  - Verdict PASS = all BACs/TACs linked → auto-resolve (TACTICAL). Capture in `AUTONOMY_DECISIONS[]` : `{decision: 'traceability-tactical', classification: 'tactical', default_applied: 'all BACs/TACs linked — auto-resolve PASS', rationale: 'TAC-5b — full coverage matches spec test strategy'}`.
+</check>
+
+<check if="orphan TAC found (TAC referenced in spec but no corresponding implementation file or test)">
+  **STRUCTURAL** — orphan TAC indicates spec inconsistency (TAC-6).
+  - **TEAMMATE_MODE=true AND autonomy_policy=spec-driven** : emit `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` with the orphan TAC details. Block until reply.
+  - **Else** : HALT inline, surface to user as MAJOR finding.
 </check>
 
 <check if="gaps include P0 ACs">
@@ -128,10 +137,12 @@ A TAC with `pattern_scaffold_match: FALSE` is a MINOR finding (test exists but d
 </check>
 
 <check if="gaps are P1+ only">
-  Ask user:
-  1. Complete missing tests now
-  2. Continue and note gaps in tracker comment
-  WAIT for user choice.
+  Branch on autonomy_policy:
+  - **TEAMMATE_MODE=true AND autonomy_policy=spec-driven** : check if gap is TACTICAL (test-write only, no scope change) — if yes, complete missing tests automatically per Rule 8 (fix-by-default). Capture in `AUTONOMY_DECISIONS[]` : `{decision: 'traceability-gap-fill', classification: 'tactical', default_applied: 'auto-write missing P1+ tests', rationale: 'TAC-5b — gap-fill is routine test scaffold'}`. If gap is STRUCTURAL (architecture missing, contract change required) → emit `SendMessage(question, critical_ambiguity: true)` and HALT.
+  - **Else** : Ask user:
+    1. Complete missing tests now
+    2. Continue and note gaps in tracker comment
+    WAIT for user choice.
 </check>
 
 ### 5. Verify Task Completion

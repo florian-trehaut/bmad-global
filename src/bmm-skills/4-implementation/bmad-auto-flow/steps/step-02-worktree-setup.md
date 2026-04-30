@@ -67,7 +67,7 @@ auto-flow worktree: {WORKTREE_PATH} on branch {BRANCH_NAME}
 If audit_log_enabled:
 
 ```bash
-echo "[step-02-worktree-setup] worktree_enabled={value}, WORKTREE_PATH={path}, BRANCH_NAME={branch}" >> $LOG_FILE
+echo "[step-02-worktree-setup] worktree_enabled={value}, WORKTREE_PATH={path}, BRANCH_NAME={branch}" >> "${LOG_FILE}"
 ```
 
 ### 4. Proceed

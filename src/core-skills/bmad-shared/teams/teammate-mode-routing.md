@@ -149,7 +149,7 @@ deliverable:
   format: '{from task_contract.deliverable.format}'
   artifacts:
     - path: '{path to artifact 1}'
-      kind: '{spec | diff | report | knowledge_file}'
+      kind: '{spec | diff | report | knowledge_file | code-mod}'
     # ...
   summary: |
     {2-5 lines summarizing what was produced}
@@ -158,7 +158,20 @@ findings:
   - severity: '{BLOCKER | MAJOR | MINOR | INFO}'
     description: '{finding text}'
   # ... (only if verdict == FINDINGS or FAIL)
+trace_files:                    # NEW. REQUIRED when constraints.trace_path is non-null (closed-protocol-set extension granted user 2026-04-30)
+  - '{absolute path to teammate trace file written before phase_complete}'
+  # one entry per file the lead can Read for drill-down beyond the summary
+autonomy_decisions:             # NEW. Optional. Present only when autonomy_policy=spec-driven applied an acknowledge or tactical resolution
+  - decision: '{short label}'
+    classification: 'acknowledge | tactical'
+    default_applied: '{value chosen}'
+    rationale: '{cite spec section or pattern that justifies the auto-resolution}'
+  # STRUCTURAL HALTs are NOT captured here — they emit SendMessage(question, critical_ambiguity: true) instead
 ```
+
+**Limitations note (audit-trail tamper-resistance — F-M3-S1-005)** : `autonomy_decisions[].rationale` is teammate self-report and unverified. Lead should treat the rationale as evidence-of-intent, not proof-of-correctness. For high-stakes decisions, prefer `autonomy_policy=strict` over `spec-driven`, OR require lead to Read the `trace_file` for evidence triangulation. Step-09 final report should disclose : "autonomy_decisions are self-reported by teammates — verify against trace files for high-stakes audit".
+
+**Closed-protocol-set extension citation** : the `trace_files` and `autonomy_decisions` fields extend the closed protocol set per explicit user approval 2026-04-30 — citation : "les teammates d'agents ne doivent pas hésiter à écrire quelque part leurs avancements pour le tracer au cas où le lead a besoin de plus de détails". Adding any other fields to this payload requires fresh "Ask First" approval (see `bmad-shared/spec/boundaries-rule.md`).
 
 When the workflow encounters an unrecoverable error (HALT condition), it MUST emit a `blocker` payload instead:
 
@@ -181,6 +194,153 @@ recovery_options:
 ```
 
 The four message types — `question`, `tracker_write_request`, `phase_complete`, `blocker` — are the **closed protocol set** between teammates and the orchestrator. Adding new types requires explicit user approval per the story's "Ask First" boundary.
+
+---
+
+## Trace work to disk
+
+**Loaded by every teammate after `task_contract.constraints.trace_path` is resolved.** Mandates that the teammate write detailed reasoning + intermediate artifacts to `{trace_path}` BEFORE emitting `phase_complete`. The trace file is the durable audit anchor that survives the teammate's context termination and lets the lead drill down into reasoning the synthetic `summary:` cannot carry.
+
+### When this applies
+
+The teammate MUST write the trace file when ALL of these hold :
+
+1. `task_contract.constraints.trace_path` is non-null (set by the orchestrator at spawn).
+2. The parent directory of `trace_path` exists OR is creatable via `mkdir -p`.
+3. The teammate is about to emit `phase_complete` (not `blocker` — blockers carry their own context).
+
+If condition 2 fails (parent dir non-creatable — permission denied, disk full, etc.), the teammate emits `SendMessage(blocker)` with the underlying error and HALTs. **Never silently fall back to a different path** (TAC-16, no-fallback-no-false-data.md).
+
+### Required structure (markdown, 5 sections)
+
+The trace file is a markdown document with the following 5 sections, in order :
+
+```markdown
+# {role}-{task_id} — Trace
+
+## (1) Task Assignment
+
+{verbatim copy of the task_contract YAML received from the orchestrator — **WITH SECRET SCRUBBING per F-M3-S1-006** : before writing, scan the YAML for secret-shaped tokens (regex bank : `api[_-]?key`, `secret`, `token`, `password`, `bearer`, `AKIA[0-9A-Z]{16}`, `ghp_*`, `sk_live_*`, `xoxb-*`) and replace any match with `[REDACTED]`. The lead MUST NEVER include raw secrets in spawn contracts in the first place — defense in depth.}
+
+## (2) Steps Executed
+
+{chronological log of each workflow step executed, with CHK-STEP-NN-ENTRY and CHK-STEP-NN-EXIT receipts emitted in the conversation,
+plus a 1-3 line note of what was done at each step}
+
+## (3) Decisions Taken
+
+{verbatim copy of every autonomy_decisions[] entry accumulated during execution — same shape as in the phase_complete payload}
+
+## (4) Artifacts Produced
+
+{list of files modified or created, with absolute paths and stats (+N/-M lines), plus a 1-line description of the change ; if no files were modified (e.g. read-only review task), list the synthetic outputs (findings, recommendations) instead}
+
+## (5) Phase Complete Payload
+
+{verbatim copy of the YAML payload emitted via SendMessage(phase_complete) to the lead}
+```
+
+### HALT conditions
+
+- Parent directory of `trace_path` non-creatable → emit `blocker`, HALT (TAC-16)
+- Trace file write fails (disk full mid-write, permission revoked, etc.) → emit `blocker`, HALT
+- The teammate cannot construct one of the 5 required sections truthfully → emit `blocker`, HALT — do NOT fabricate sections
+
+### Why this exists
+
+The `phase_complete.summary:` is a 2-5 line synthetic deliverable — it cannot carry full reasoning, intermediate analysis, or every decision rationale. Without a trace file, the lead's only drill-down option is to re-spawn the teammate (which costs context + tokens, and the original reasoning is lost to the teammate's terminated context). Trace files give the lead durable, on-demand drill-down via the `Read` tool.
+
+This pattern is informed by W3C distributed tracing concepts (TRACEPARENT chain ID + depth) but stays project-local — trace files live under `/tmp/bmad-{project_slug}-auto-flow/{RUN_ID}/` and are not persisted beyond the run. See External Research §Best Practices in `_bmad-output/implementation-artifacts/standalone-auto-flow-context-reduction.md` for the cross-link.
+
+---
+
+## Autonomy policy enforcement
+
+**Loaded by every teammate after `task_contract.constraints.autonomy_policy` is read at INITIALIZATION end.** Mandates the branching logic the teammate applies when a workflow step would otherwise emit `SendMessage(question)` to the lead.
+
+### Enum values
+
+| Value | Semantics | When set |
+|-------|-----------|----------|
+| `strict` (default) | All decisions route to lead via `SendMessage(question)` — current behavior pre-impl, backward-compat preserved | Default ; standalone usage ; orchestrators that want full lead/user oversight |
+| `spec-driven` | Three-way branch : (a) acknowledge spec-verbatim decisions, (b) auto-resolve TACTICAL items from spec patterns, (c) HALT on STRUCTURAL divergence | Set explicitly by `bmad-auto-flow` for dev teammates after spec validation |
+
+### Branching logic for `spec-driven`
+
+When the teammate hits an interactive decision point (would call `EnterPlanMode`, `AskUserQuestion`, or emit `SendMessage(question)` per §A), classify the decision :
+
+#### (a) Acknowledge — auto-resolve, no SendMessage
+
+A decision is **acknowledged** (treated as a check, not a real choice) if it matches **verbatim** an element already declared in the spec :
+
+- **Plan-approval** that reproduces the spec's `Implementation Plan` section verbatim → acknowledge (TAC-5)
+- **Default value** that matches the spec's declared default (e.g., a config field's default value)
+- **Pattern application** that the spec named explicitly (e.g., "use the {pattern} from project.md#conventions")
+
+The teammate captures this in `phase_complete.autonomy_decisions[]` with `classification: acknowledge`.
+
+#### (b) Tactical auto-resolve — apply spec pattern, no SendMessage
+
+A decision is **TACTICAL** when it is covered by spec patterns and would not change the spec's architectural intent (TAC-5b) :
+
+- **Boundaries Triple Always Do** routine actions (run quality gate, follow naming conventions, use project logger, etc.)
+- **Findings Handling Rule 8** : fix-MINOR / fix-INFO findings during self-review (Rule 8 says "all findings fixed by default" — severity is not the criterion)
+- **Format choices** within an established convention (e.g., commit message scope, log line format)
+- **Refactor approach** within scope (e.g., choose between two equivalent extract patterns when the spec doesn't name one)
+
+The teammate applies the spec pattern and captures the resolution in `phase_complete.autonomy_decisions[]` with `classification: tactical`.
+
+#### (c) Structural HALT — emit SendMessage(question, critical_ambiguity: true)
+
+A decision is **STRUCTURAL** when the implementation diverges from or hits an arch decision absent from the spec — the spec is the authority on these and "should have resolved them in step-11" (TAC-6) :
+
+- Architecture decision not anticipated in spec
+- ADR gap (a new pattern that warrants documentation but no ADR exists or is referenced)
+- Plan-shape divergence (the implementation plan needs to differ from the spec's Implementation Plan section in non-trivial ways)
+- Missing spec section (the spec is silent on a question the implementation needs answered)
+- Bifurcation drift (canonical source changed mid-impl)
+- Dependency add (new package, new framework, new external service)
+- CI/CD or migration files modification not planned in spec
+- Major-version bump (any runtime/framework/database client major-version change)
+
+The teammate **never auto-resolves these**, regardless of how "obvious" the answer seems. It emits `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` and HALTs until reply.
+
+#### (d) Runtime CRITIQUE — emit SendMessage(question, critical_ambiguity: true) (TAC-6b)
+
+Some runtime conditions always escalate, regardless of policy :
+
+- Test failure unfix-able after 3 attempts on same task
+- Real implementation ambiguity not covered by spec (e.g. data shape mismatch in production)
+- Contract violation (task contract field rejected, validation rule violated)
+- HALT precondition triggered (per workflow.md HALT CONDITIONS)
+
+These are NEVER captured as `autonomy_decisions[]` — they exit through the `question` channel.
+
+### The 11 default-documentable decisions in dev workflows
+
+Per `_bmad-output/implementation-artifacts/standalone-auto-flow-context-reduction.md` Real-Data Findings, the following dev workflow decisions are auto-resolvable when `autonomy_policy=spec-driven` :
+
+| # | Decision point | File:Step | Class | Default applied |
+|---|----------------|-----------|-------|-----------------|
+| 1 | Plan-approval menu (cause root) | `bmad-dev-story/steps/step-07-plan-approval.md` | acknowledge | reproduce Implementation Plan verbatim |
+| 2 | ADR gap menu | `bmad-dev-story/steps/step-07-plan-approval.md` | STRUCTURAL HALT | emit critical_ambiguity |
+| 3 | Bifurcation drift `[R]/[I]/[V]` | `bmad-dev-story/steps/step-05-load-context.md` | STRUCTURAL HALT | emit critical_ambiguity |
+| 4 | Missing spec sections menu | `bmad-dev-story/steps/step-05-load-context.md` | STRUCTURAL HALT | emit critical_ambiguity |
+| 5 | Ask-First boundary trigger (TACTICAL) | `bmad-dev-story/steps/step-08-implement.md` | tactical | apply spec Boundaries Always Do pattern |
+| 6 | Ask-First boundary trigger (STRUCTURAL — dependency add, CI/CD modify) | `bmad-dev-story/steps/step-08-implement.md` | STRUCTURAL HALT | emit critical_ambiguity |
+| 7 | Self-review findings push (MINOR) | `bmad-dev-story/steps/step-11-self-review.md` | tactical | fix-MINOR per Rule 8 + push |
+| 8 | Self-review findings push (MAJOR — structural rework) | `bmad-dev-story/steps/step-11-self-review.md` | STRUCTURAL HALT | emit critical_ambiguity |
+| 9 | Traceability auto-resolve | `bmad-dev-story/steps/step-12-traceability.md` | tactical | auto-resolve when all BACs/TACs linked |
+| 10 | Orphan TAC found (traceability) | `bmad-dev-story/steps/step-12-traceability.md` | STRUCTURAL HALT | emit critical_ambiguity (orphan = spec inconsistency) |
+| 11 | Resolve-findings menu (BLOCKER/MAJOR/MINOR) | `bmad-quick-dev/steps/step-06-resolve-findings.md` | tactical (MINOR) / STRUCTURAL HALT (MAJOR) | apply Findings Rule 8 |
+
+The dev workflow steps that implement these branches are listed in `_bmad-output/implementation-artifacts/standalone-auto-flow-context-reduction.md` File List (M14-M21).
+
+### Cross-references
+
+- `bmad-shared/core/workflow-adherence.md` Rule 8 (Findings Handling Policy) — defines the fix-by-default rule used for tactical resolution
+- `bmad-shared/spec/boundaries-rule.md` — defines Boundaries Triple semantics consumed by branch (a)
+- `bmad-shared/teams/spawn-protocol.md` §5 — orchestrator-side counterpart that propagates `autonomy_policy` in spawn contracts
 
 ---
 

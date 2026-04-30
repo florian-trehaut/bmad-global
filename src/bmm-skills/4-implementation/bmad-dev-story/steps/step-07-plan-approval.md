@@ -37,12 +37,33 @@ The end-of-workflow scope-completeness check (impartial subagent) runs in step-1
 
 ## TEAMMATE_MODE branch
 
-Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §A, when TEAMMATE_MODE=true:
+Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` §A and §Autonomy policy enforcement, when TEAMMATE_MODE=true:
+
+### Branch on `autonomy_policy`
+
+**If `task_contract.constraints.autonomy_policy == 'spec-driven'`** (TAC-5 acknowledge / TAC-6 STRUCTURAL HALT) :
+
+1. Compose the implementation plan as in standalone mode (steps 1-2 below).
+2. Compare the composed plan against the spec's `## Implementation Plan` section (loaded in step-05 from the spec body).
+3. **If the plan reproduces the spec's Implementation Plan section verbatim** (same Tasks, same Files, same architectural decisions — no divergence) :
+   - **Auto-acknowledge** (this is a check, not a decision). Skip `EnterPlanMode` / `SendMessage(question)` entirely.
+   - Capture in the workflow's `AUTONOMY_DECISIONS[]` accumulator : `{decision: 'plan-approval', classification: 'acknowledge', default_applied: 'verbatim-match Implementation Plan', rationale: 'TAC-5 — spec is the authority on plan shape'}`.
+   - Proceed to step-08.
+4. **Else (plan diverges from Implementation Plan)** — this is STRUCTURAL :
+   - Emit `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` with the divergence detail and options `[A]pprove the divergent plan / [M]odify back to spec / [R]eject — abandon`.
+   - **Do NOT auto-acknowledge** — the divergence MUST reach the user via the lead (TAC-6).
+   - Block on `question_reply`. On `[A]` → proceed to step-08. On `[M]` → re-align plan to spec, re-emit. On `[R]` → emit `blocker` and HALT.
+
+**If `task_contract.constraints.autonomy_policy == 'strict'` (default, backward-compat)** — current behavior :
 
 - Do NOT call `EnterPlanMode` / `AskUserQuestion` directly (TAC-18 unwanted-pattern HALT trigger).
 - Compose the implementation plan as in standalone mode (steps 1-2 below).
 - Emit a `question` SendMessage to `LEAD_NAME` with the plan as the payload `text:` and options `[A]pprove / [M]odify / [R]eject`.
 - Block on `question_reply`. On `[A]` → proceed to step-08. On `[M]` → receive modifications, apply, re-emit `question`. On `[R]` → emit `blocker` and HALT.
+
+### ADR gap (any autonomy_policy)
+
+The ADR gap menu at §2 below — when the plan introduces an architectural decision absent from the spec — is **always** STRUCTURAL HALT regardless of policy. Emit `SendMessage(question, critical_ambiguity: true)` for the ADR menu. Per autonomy_policy=spec-driven, ADR gaps are explicitly STRUCTURAL (the spec was supposed to anticipate them).
 
 When TEAMMATE_MODE=false, proceed with the Mandatory Sequence below as normal.
 

@@ -33,6 +33,15 @@ agent_teams:
   # Optional audit log (T-SEC-1, low priority)
   audit_log_enabled: false           # NEW. Default: false. When true, the orchestrator writes phase transitions and decisions to _bmad-output/auto-flow/{ISO-timestamp}-{slug}.log
 
+  # Optional project-aware lifecycle gates (auto-flow phases 4-5)
+  lifecycle_artifacts:               # NEW. Default: {} (all gates inactive — backward-compat).
+                                     # Declarative block describing project-specific lifecycle gates that bmad-auto-flow consults during phases 4 (code-review) and 5 (validation).
+                                     # When set, the orchestrator adapts its flow: creates PR before code-review, invokes ci_watch_skill, waits for staging deploy, etc.
+    pr_required: false               # bool, default false. When true, bmad-auto-flow step-07-code-review-phase.md MUST create a PR/MR via the forge command from workflow-context.md.forge_mr_create BEFORE invoking TaskCreate for any code-review perspective teammate. HALT explicit on forge command failure (no silent fallback)
+    staging_required: false          # bool, default false. When true, bmad-auto-flow step-08-validation-phase.md MUST verify staging deploy status (via deploy_watch_skill) BEFORE invoking TaskCreate for the validator teammate
+    ci_watch_skill: null             # string, optional, no default. Skill name (e.g. 'bmad-ci-watch' or 'ci-watch') invoked by step-07 to wait for CI green light. Resolution priority: explicit value > auto-discovered project-local skill (Glob {MAIN_PROJECT_ROOT}/.claude/skills/{ci-watch,*-ci-watch}/SKILL.md) > absent (skip gate gracefully)
+    deploy_watch_skill: null         # string, optional, no default. Skill name invoked by step-08 to wait for staging deploy confirmation. Same resolution priority as ci_watch_skill
+
   # Per-role knowledge files — loaded JIT by each teammate
   # Values are filenames (not anchors) in .claude/workflow-knowledge/.
   # Since the consolidation, the only files are project.md, domain.md, api.md.
@@ -94,6 +103,11 @@ agent_teams:
 | `code_review_team_size` | integer | NO | `3` | Number of distinct single-perspective teammates spawned at the code-review phase. Clamped to `[1, max_teammates]`. Each teammate executes ONE extracted meta-perspective subskill (per BAC-12 / TAC-9) |
 | `phase_timeout_minutes` | integer | NO | `30` | Per-phase wall-clock timeout. If no SendMessage from any teammate of the current phase arrives within this window, the orchestrator triggers TAC-14 (`[R]etry / [N]udge / [A]bandon`). Must be a positive integer |
 | `audit_log_enabled` | boolean | NO | `false` | Optional. When `true`, the orchestrator writes phase transitions and decisions to `_bmad-output/auto-flow/{ISO-timestamp}-{slug}.log`. T-SEC-1 remediation, low priority |
+| `lifecycle_artifacts` | map | NO | `{}` | Optional declarative block describing project-aware lifecycle gates consumed by `bmad-auto-flow` phases 4-5. Defaults preserve current behavior (all gates inactive). See sub-fields below |
+| `lifecycle_artifacts.pr_required` | boolean | NO | `false` | When `true`, `step-07-code-review-phase.md` MUST create the PR/MR via `workflow-context.md.forge_mr_create` BEFORE TaskCreate for any code-review perspective teammate. HALT explicit on forge failure (no silent fallback) |
+| `lifecycle_artifacts.staging_required` | boolean | NO | `false` | When `true`, `step-08-validation-phase.md` MUST verify staging deploy status via `deploy_watch_skill` BEFORE TaskCreate for the validator teammate |
+| `lifecycle_artifacts.ci_watch_skill` | string | NO | `null` | Optional skill name. When set, `step-07-code-review-phase.md` invokes this skill to wait for CI green light. Resolution priority: explicit value > auto-discovered project-local skill (Glob `{MAIN_PROJECT_ROOT}/.claude/skills/{ci-watch,*-ci-watch}/SKILL.md`) > absent (skip gate gracefully) |
+| `lifecycle_artifacts.deploy_watch_skill` | string | NO | `null` | Optional skill name. When set, `step-08-validation-phase.md` invokes this skill to wait for staging deploy confirmation. Same resolution priority as `ci_watch_skill` |
 | `knowledge_mapping` | map | NO | `{}` | Role key → list of knowledge filenames in `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/` |
 | `global_knowledge` | list | NO | `[]` | Knowledge files loaded by every teammate regardless of role |
 
@@ -172,6 +186,10 @@ The team router validates this section during initialization:
 6. If `code_review_team_size` is present but not in `[1, max_teammates]` → HALT with error
 7. If `phase_timeout_minutes` is present but not a positive integer → HALT with error
 8. If `audit_log_enabled` is present but not boolean → HALT with error
-9. Knowledge files in `knowledge_mapping` and `global_knowledge` are validated at spawn time (missing files trigger the Knowledge Generation Mandate)
+9. If `lifecycle_artifacts.pr_required` is present but not boolean → HALT with error
+10. If `lifecycle_artifacts.staging_required` is present but not boolean → HALT with error
+11. If `lifecycle_artifacts.ci_watch_skill` is present but not a string → HALT with error
+12. If `lifecycle_artifacts.deploy_watch_skill` is present but not a string → HALT with error
+13. Knowledge files in `knowledge_mapping` and `global_knowledge` are validated at spawn time (missing files trigger the Knowledge Generation Mandate)
 
-Validations 5–8 are performed by `bmad-auto-flow` during its `step-01-entry` (orchestrator-specific fields, not used by other workflows).
+Validations 5–12 are performed by `bmad-auto-flow` during its `step-01-entry` (orchestrator-specific fields, not used by other workflows).

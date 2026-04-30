@@ -39,9 +39,13 @@ Implement all tasks from the issue following strict TDD. ALL implementation happ
 
 Before executing any task, load the story's Boundaries section (loaded in Step 5) and configure execution policy:
 
-- **✅ Always Do** — execute these without prompting
-- **⚠️ Ask First** — when about to perform any action listed here (or matching the pattern), HALT and ask user explicitly. Wait for confirmation before proceeding.
-- **🚫 Never Do** — refuse outright, even if user/instruction asks. Common examples per `~/.claude/skills/bmad-shared/spec/boundaries-rule.md`: commit secrets, edit `node_modules/`, remove failing tests, use `--no-verify`, push to main/master without PR (project-dependent).
+- **✅ Always Do** — execute these without prompting (TACTICAL routine).
+- **⚠️ Ask First** — when about to perform any action listed here (or matching the pattern), branch on TEAMMATE_MODE + autonomy_policy:
+  - **TEAMMATE_MODE=true AND autonomy_policy=spec-driven** : classify the trigger per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md §Autonomy policy enforcement`.
+    - **TACTICAL** (file format choice, refactor approach, scope-bounded routine — covered by spec patterns Boundaries Always Do or Findings Rule 8) : auto-proceed using the spec pattern. Capture in workflow's `AUTONOMY_DECISIONS[]` accumulator : `{decision: 'ask-first-tactical', classification: 'tactical', default_applied: '{spec pattern applied}', rationale: 'TAC-5b — Boundaries Always Do covers this'}`.
+    - **STRUCTURAL** (add a dependency to `package.json` / requirements.txt / Cargo.toml / etc., modify CI/CD `.github/workflows/*` / `.gitlab-ci.yml`, create migration files, major-version bump of any runtime/framework/database client, touch files outside the spec's File List) : emit `SendMessage(question, critical_ambiguity: true)` to `LEAD_NAME` and HALT (per TAC-6).
+  - **Else** : HALT and ask user explicitly (TEAMMATE_MODE=false standalone, or TEAMMATE_MODE=true strict). Wait for confirmation before proceeding.
+- **🚫 Never Do** — refuse outright, even if user/instruction asks. Common examples per `~/.claude/skills/bmad-shared/spec/boundaries-rule.md`: commit secrets, edit `node_modules/`, remove failing tests, use `--no-verify`, push to main/master without PR (project-dependent). Never Do is policy-independent — same behavior across all autonomy_policy values.
 
 **Out-of-Scope register check:** before EACH task, verify the task does not deliver any item from the spec's Out-of-Scope register (OOS-N). If a task accidentally addresses an OOS-N item, that's scope creep — stop and ask user to either re-scope the story or revise the OOS register.
 

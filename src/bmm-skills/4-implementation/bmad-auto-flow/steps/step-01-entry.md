@@ -77,21 +77,70 @@ Store as `SPEC_PROFILE = 'quick' | 'full'`. Per BAC-13, this choice determines w
 
 ### 4. Slug derivation
 
-`SLUG` = kebab-case of FEATURE_DESCRIPTION first 4-6 words (max 30 chars).
+`SLUG` = sanitized kebab-case of FEATURE_DESCRIPTION first 4-6 words (max 30 chars). **Explicit sanitization regex (security-critical — used in mkdir -p, audit log JSON, trace_path)** :
 
-### 5. Audit log (if enabled)
+```bash
+SLUG=$(echo "${FEATURE_DESCRIPTION}" \
+  | tr '[:upper:]' '[:lower:]' \
+  | sed 's/[^a-z0-9 ]//g' \
+  | awk '{ for(i=1; i<=NF && i<=6; i++) printf "%s%s", $i, (i<NF && i<6 ? "-" : ""); print "" }' \
+  | cut -c 1-30 \
+  | sed 's/-$//')
+```
+
+Drop everything outside `[a-z0-9-]`. Le regex est canonical source of truth — pas de "kebab-case" informel (security finding F-M3-S1-002 mitigation).
+
+### 5. RUN_ID derivation + trace folder creation (axe 4)
+
+```bash
+RUN_ID="$(date +%Y-%m-%dT%H-%M-%S)-${SLUG}"
+PROJECT_SLUG=$(echo "{PROJECT_NAME}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+TRACE_FOLDER="/tmp/bmad-${PROJECT_SLUG}-auto-flow/${RUN_ID}"
+
+# Security hardening (F-M3-S1-003 mitigation) : umask 077 + explicit perms 0700 + symlink check
+umask 077
+mkdir -p -m 0700 "${TRACE_FOLDER}"
+
+# HALT if any ancestor is a symlink (multi-user /tmp symlink-race / privesc protection)
+for path_component in "/tmp/bmad-${PROJECT_SLUG}-auto-flow" "${TRACE_FOLDER}"; do
+  if [ -L "${path_component}" ]; then
+    echo "ERROR: trace folder ancestor is a symlink: ${path_component} — refusing (security per F-M3-S1-003)" >&2
+    exit 1
+  fi
+done
+```
+
+**HALT explicit** if `mkdir -p` fails (permission denied, disk full, etc.) OR if any ancestor is a symlink — emit error citing the path and the underlying cause ; never silently fall back to a different path (no-fallback-no-false-data.md).
+
+The folder hosts trace files written by every spawned teammate per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md §Trace work to disk`. Each spawn contract receives `task_contract.constraints.trace_path: ${TRACE_FOLDER}/{role}-{task_id}.md` (TAC-13).
+
+Store `RUN_ID`, `PROJECT_SLUG`, `TRACE_FOLDER` for use in steps 03/05/06/07/08/09.
+
+### 6. Audit log (if enabled)
 
 If `agent_teams.audit_log_enabled == true` (T-SEC-1):
 
 ```bash
-mkdir -p {MAIN_PROJECT_ROOT}/_bmad-output/auto-flow/
-LOG_FILE={MAIN_PROJECT_ROOT}/_bmad-output/auto-flow/$(date +%Y-%m-%dT%H-%M-%S)-{SLUG}.log
-echo "[step-01-entry] FEATURE_DESCRIPTION={one-line summary}" >> $LOG_FILE
-echo "[step-01-entry] SPEC_PROFILE={profile}" >> $LOG_FILE
-echo "[step-01-entry] permission_mode={mode}" >> $LOG_FILE
+mkdir -p "{MAIN_PROJECT_ROOT}/_bmad-output/auto-flow/"
+LOG_FILE="{MAIN_PROJECT_ROOT}/_bmad-output/auto-flow/${RUN_ID}.log"
+
+# Structured JSON log entries (T-OBS-1) — use jq for safe JSON construction (avoids quote-injection per F-M3-S1-008)
+jq -nc --arg run_id "${RUN_ID}" --arg project_slug "${PROJECT_SLUG}" --arg feature_slug "${SLUG}" --arg spec_profile "{SPEC_PROFILE}" --argjson team_mode "{TEAM_MODE}" --arg autonomy_policy_default "strict" \
+  '{event:"auto-flow.run.started", run_id:$run_id, project_slug:$project_slug, feature_slug:$feature_slug, spec_profile:$spec_profile, team_mode:$team_mode, autonomy_policy_default:$autonomy_policy_default}' \
+  >> "${LOG_FILE}"
+
+jq -nc --arg run_id "${RUN_ID}" --arg skill_name "ci-watch" --arg path_resolved "${CI_WATCH_SKILL_PATH:-null}" \
+  '{event:"auto-flow.skill_discovery", run_id:$run_id, skill_name:$skill_name, path_resolved:$path_resolved}' \
+  >> "${LOG_FILE}"
+
+jq -nc --arg run_id "${RUN_ID}" --arg skill_name "deploy-watch" --arg path_resolved "${DEPLOY_WATCH_SKILL_PATH:-null}" \
+  '{event:"auto-flow.skill_discovery", run_id:$run_id, skill_name:$skill_name, path_resolved:$path_resolved}' \
+  >> "${LOG_FILE}"
 ```
 
-### 6. Proceed
+LOG_FILE et toutes les variables shell sont quotées (F-M3-S1-004 mitigation : portability + injection prevention sur paths avec spaces).
+
+### 7. Proceed
 
 Load and execute `{nextStepFile}`.
 
@@ -108,8 +157,8 @@ Avant de transitionner, emettre EXACTEMENT:
 
 ```
 CHK-STEP-01-EXIT PASSED — completed Step 1: Entry
-  actions_executed: displayed banner with permission_mode={mode}, gathered FEATURE_DESCRIPTION ({N} chars), chose SPEC_PROFILE={profile}, derived SLUG={slug}, audit log {initialized | skipped}
-  artifacts_produced: FEATURE_DESCRIPTION, SPEC_PROFILE, SLUG, LOG_FILE (if audit_log_enabled)
+  actions_executed: displayed banner with permission_mode={mode}, gathered FEATURE_DESCRIPTION ({N} chars), chose SPEC_PROFILE={profile}, derived SLUG={slug}, set RUN_ID={run_id}, created TRACE_FOLDER={trace_folder}, audit log {initialized | skipped}
+  artifacts_produced: FEATURE_DESCRIPTION, SPEC_PROFILE, SLUG, RUN_ID, PROJECT_SLUG, TRACE_FOLDER, LOG_FILE (if audit_log_enabled)
   next_step: ./steps/step-02-worktree-setup.md
 ```
 

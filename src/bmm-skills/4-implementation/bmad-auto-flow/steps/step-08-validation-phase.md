@@ -20,7 +20,7 @@ CHK-STEP-08-ENTRY PASSED — entering Step 8: Validation Phase with ISSUE_ID={id
 
 ## STEP GOAL
 
-Spawn exactly 1 validator teammate (BAC-3 / TAC-10). The workflow invoked depends on the project type:
+Spawn exactly 1 validator teammate (BAC-3 / BAC-7 / TAC-10 / TAC-21 / TAC-22) inside an isolated phase team `validation-{RUN_ID}`. The workflow invoked depends on the project type:
 
 - Default (backend / API): `bmad-validation-metier/workflow.md`
 - Frontend / full-stack: `bmad-validation-frontend/workflow.md`
@@ -28,7 +28,9 @@ Spawn exactly 1 validator teammate (BAC-3 / TAC-10). The workflow invoked depend
 
 The orchestrator detects the type from the spec's frontmatter `type:` field (if explicit) or from the project's tech stack via the protocol `~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md`; if ambiguous → ask user.
 
-Wait for `phase_complete` with verdict `PASS` / `FAIL`. PASS → tracker → done (BAC-8). FAIL → present `[R]/[F]/[A]` (TAC-25), tracker → in-progress on retry.
+Before spawning, the lifecycle gate `staging_required` (axe 3 / BAC-3 / TAC-10) is evaluated: if active, the lead invokes `deploy_watch_skill` to wait for staging deploy confirmation BEFORE TaskCreate.
+
+Wait for `phase_complete` with verdict `PASS` / `FAIL`. PASS → tracker → done (BAC-8). FAIL → present `[R]/[F]/[A]` (TAC-25), tracker → in-progress on retry. After phase complete, TeamDelete the phase team.
 
 ## MANDATORY SEQUENCE
 
@@ -37,9 +39,37 @@ Wait for `phase_complete` with verdict `PASS` / `FAIL`. PASS → tracker → don
 ```
 assert ISSUE_ID non-null and well-formed → else HALT.
 assert WORKTREE_PATH set → else HALT.
+assert RUN_ID set, TRACE_FOLDER exists and writable → else HALT.
 ```
 
-### 2. Determine validation workflow
+### 2. Lifecycle gate — staging_required (axe 3, BAC-3 / TAC-10)
+
+If `LIFECYCLE_ARTIFACTS.staging_required == true`:
+
+Resolution priority for `deploy_watch_skill` (TAC-12) :
+1. Highest : explicit `LIFECYCLE_ARTIFACTS.deploy_watch_skill` (literal skill name in config)
+2. Middle : auto-discovered `DEPLOY_WATCH_SKILL_PATH` (from workflow.md INIT §6)
+3. Lowest : absent → HALT (cannot validate without staging confirmation per `staging_required: true`)
+
+If a skill is resolved:
+
+```
+Invoke the skill via the Skill tool with appropriate args.
+Await PASS/FAIL/SKIP from the skill output.
+On FAIL: HALT — staging deploy not green ; user fixes deployment then re-runs auto-flow.
+On PASS: proceed to step 3.
+On SKIP (skill says "no deploy required for this scope"): proceed to step 3.
+```
+
+If `LIFECYCLE_ARTIFACTS.staging_required == false` (default), skip this section.
+
+Audit log:
+
+```bash
+echo "{\"event\":\"auto-flow.lifecycle.gate.checked\",\"run_id\":\"${RUN_ID}\",\"gate_name\":\"staging_required\",\"outcome\":\"{passed | skipped | failed}\"}" >> "${LOG_FILE}"
+```
+
+### 3. Determine validation workflow
 
 ```
 spec_type = spec frontmatter.type (or null)
@@ -54,13 +84,29 @@ else: validation_workflow = 'bmad-validation-metier/workflow.md'
 If still ambiguous: ASK user via AskUserQuestion (this is a direct user-touch point, not batched).
 ```
 
-### 3. Build task contract
+### 4. TeamCreate phase-scoped validation team (axe 5)
+
+```
+TeamCreate(
+  name = "validation-{RUN_ID}",
+  teammates = [
+    { role: "validator", model: default_worker_model },
+  ],
+  permission_mode: inherited from lead
+)
+```
+
+Composition declared in `team-workflows/team-config.md` §validation-team. Single teammate ≤ `max_teammates`.
+
+### 5. Build task contract
 
 ```yaml
 task_contract:
-  team_name: '{TEAM_NAME}'
-  task_id: 'validation-validator-1'
+  team_name: 'validation-{RUN_ID}'
+  task_id: 'validator-1'
   role: 'validator'
+
+  workflow_to_invoke: '~/.claude/skills/{validation_workflow}'  # TAC-24
 
   scope_type: 'validation'
   scope_files: []
@@ -83,6 +129,8 @@ task_contract:
     read_only: true
     worktree_path: '{WORKTREE_PATH}'
     tracker_writes: false
+    autonomy_policy: 'strict'                                              # validator routes questions to lead
+    trace_path: '{TRACE_FOLDER}/validator-1.md'                            # TAC-13
     halt_conditions:
       - 'Required environment access denied'
       - 'VM cannot be executed in real environment'
@@ -92,17 +140,21 @@ task_contract:
     orchestrator_skill: 'bmad-auto-flow'
     parent_phase: 'validation'
     environment: 'staging'   # or as the user specifies
-
-  workflow_to_invoke: '{validation_workflow}'
 ```
 
-### 4. Branch on TEAM_MODE
+### 6. Branch on TEAM_MODE
 
 #### TEAM_MODE=true: spawn 1 validator
 
 ```
 TaskCreate with the contract above.
 Wait for phase_complete.
+```
+
+Audit log per spawn:
+
+```bash
+echo "{\"event\":\"auto-flow.teammate.spawned\",\"run_id\":\"${RUN_ID}\",\"teammate_role\":\"validator\",\"task_id\":\"validator-1\",\"trace_path\":\"${TRACE_FOLDER}/validator-1.md\",\"autonomy_policy\":\"strict\"}" >> "${LOG_FILE}"
 ```
 
 #### TEAM_MODE=false: run validation inline
@@ -112,13 +164,21 @@ Read FULLY and apply: ~/.claude/skills/{validation_workflow} — load the file w
 Execute inline.
 ```
 
-### 5. Process verdict
+### 7. Process verdict
+
+Append `phase_complete.trace_files[]` to TRACE_FILES.
+
+Audit log per phase_complete:
+
+```bash
+echo "{\"event\":\"auto-flow.teammate.phase_complete\",\"run_id\":\"${RUN_ID}\",\"task_id\":\"validator-1\",\"verdict\":\"{verdict}\",\"findings_count\":{N},\"trace_files\":${trace_files_array}}" >> "${LOG_FILE}"
+```
 
 #### Case `verdict == PASS`
 
 - Apply `tracker_write_request` (or directly): transition `ISSUE_ID` → `done` (BAC-8).
-- Store `PHASE_RESULTS['validation'] = {verdict: 'PASS', per_vm_results: {...}}`.
-- Proceed to step-09.
+- Store `PHASE_RESULTS['validation'] = {verdict: 'PASS', per_vm_results: {...}, trace_files: [...]}`.
+- Proceed to step 8 (TeamDelete + transition).
 
 #### Case `verdict == FAIL`
 
@@ -129,26 +189,30 @@ Validation Métier a échoué sur {N} VMs :
 - VM-{n}: {description} → FAIL: {evidence}
 - ...
 
+Trace file pour drill-down : {trace_files[0]}
+
 [R] Retry — relancer la validation après fix
 [F] Fix manually — je m'occupe du fix manuellement, l'auto-flow termine
 [A] Abandon — close auto-flow, story reste à l'état actuel
 ```
 
 - Wait for user choice:
-  - **[R]**: Apply `tracker_write_request` to revert `done → in-progress`. Re-loop step-06 (dev) → step-07 (code-review) → step-08 (validation).
-  - **[F]**: HALT auto-flow, proceed to step-09 with abandon-cleanup.
-  - **[A]**: emit `tracker_write_request` to mark issue as `blocked`; proceed to step-09.
+  - **[R]**: TeamDelete current `validation-{RUN_ID}`, apply `tracker_write_request` to revert `done → in-progress`. Re-loop step-06 (dev) → step-07 (code-review) → step-08 (validation).
+  - **[F]**: HALT auto-flow, TeamDelete, proceed to step-09 with abandon-cleanup.
+  - **[A]**: emit `tracker_write_request` to mark issue as `blocked`; TeamDelete; proceed to step-09.
 
-### 6. Audit log
+### 8. TeamDelete phase team (axe 5)
 
-```bash
-echo "[step-08-validation-phase] validation_workflow={workflow}, verdict={verdict}, user_choice={choice if FAIL}" >> $LOG_FILE
 ```
+TeamDelete(name = "validation-{RUN_ID}")
+```
+
+Mandatory before transition to step-09 — finalize phase has no team of its own.
 
 ## SUCCESS / FAILURE
 
-- **SUCCESS**: 1 validator teammate spawned (BAC-3), `phase_complete` received, tracker transitioned per verdict, PHASE_RESULTS['validation'] set
-- **FAILURE**: spawning > 1 validator (BAC-3 violation), proceeding silently on FAIL without user input (TAC-25 violation)
+- **SUCCESS**: lifecycle gate `staging_required` evaluated (deploy_watch invoked or skipped per config); TeamCreate `validation-{RUN_ID}` invoked; 1 validator teammate spawned (BAC-3) with trace_path; `phase_complete` received; TRACE_FILES extended; tracker transitioned per verdict; TeamDelete invoked; PHASE_RESULTS['validation'] set
+- **FAILURE**: spawning > 1 validator (BAC-3 violation), proceeding silently on FAIL without user input (TAC-25 violation), forgetting `staging_required` gate when configured (BAC-3 violation), forgetting trace_path propagation (TAC-13 violation), forgetting TeamDelete (axe 5 lifecycle violation)
 
 ---
 
@@ -156,8 +220,8 @@ echo "[step-08-validation-phase] validation_workflow={workflow}, verdict={verdic
 
 ```
 CHK-STEP-08-EXIT PASSED — completed Step 8: Validation Phase
-  actions_executed: pre-spawn validation passed; selected validation_workflow={workflow}; {TaskCreate validator | inline}; phase_complete verdict={value}; tracker {transitioned to done | menu shown — user chose {choice}}
-  artifacts_produced: PHASE_RESULTS['validation'] = {verdict, per_vm_results, deliverable_path}
+  actions_executed: lifecycle gate staging_required={value} {evaluated/skipped}; deploy_watch_skill={path/name or null} {invoked/skipped}; TeamCreate(validation-{RUN_ID}); pre-spawn validation passed; selected validation_workflow={workflow}; {TaskCreate validator with trace_path | inline}; phase_complete verdict={value}; TRACE_FILES extended ({N} entries); tracker {transitioned to done | menu shown — user chose {choice}}; TeamDelete(validation-{RUN_ID})
+  artifacts_produced: PHASE_RESULTS['validation'] = {verdict, per_vm_results, deliverable_path, trace_files}
   next_step: ./steps/step-09-finalize.md
 ```
 

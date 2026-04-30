@@ -20,12 +20,14 @@ CHK-STEP-06-ENTRY PASSED — entering Step 6: Dev Phase with dev_team_size={N}, 
 
 ## STEP GOAL
 
-Spawn N dev teammates (`agent_teams.dev_team_size`, default 1, clamped to `[1, max_teammates]` per TAC-26). The workflow each teammate invokes depends on `SPEC_PROFILE` (BAC-13):
+Spawn N dev teammates (`agent_teams.dev_team_size`, default 1, clamped to `[1, max_teammates]` per TAC-26) inside an isolated phase team `dev-{RUN_ID}`. The workflow each teammate invokes depends on `SPEC_PROFILE` (BAC-13):
 
 - `SPEC_PROFILE == 'quick'` → `bmad-quick-dev/workflow.md`
 - `SPEC_PROFILE == 'full'` → `bmad-dev-story/workflow.md`
 
-Wait for `phase_complete` from each. On all DONE → transition tracker to `review`. On any blocker / fail → present `[R]/[F]/[A]` (TAC-25).
+Spawn contracts set `autonomy_policy: spec-driven` (BAC-2 / TAC-4 / TAC-5 / TAC-5b / TAC-6 / TAC-6b) — dev teammate auto-acknowledges spec-verbatim decisions, auto-resolves TACTICAL items from spec patterns, HALTs on STRUCTURAL divergence/absence. Each spawn contract sets `trace_path` for durable audit (TAC-13 / TAC-14).
+
+Wait for `phase_complete` from each. On all DONE → transition tracker to `review`. On any blocker / fail → present `[R]/[F]/[A]` (TAC-25). After phase complete, TeamDelete the phase team.
 
 ## MANDATORY SEQUENCE
 
@@ -34,6 +36,7 @@ Wait for `phase_complete` from each. On all DONE → transition tracker to `revi
 ```
 assert ISSUE_ID non-null and well-formed → else HALT.
 assert WORKTREE_PATH set → else HALT.
+assert RUN_ID set, TRACE_FOLDER exists and writable → else HALT.
 ```
 
 ### 2. Compute N
@@ -48,12 +51,26 @@ If N > 1, the orchestrator will need to coordinate merging/distributing dev work
 ### 3. Determine workflow per BAC-13
 
 ```
-if SPEC_PROFILE == 'quick': dev_workflow = 'bmad-quick-dev/workflow.md'
-elif SPEC_PROFILE == 'full': dev_workflow = 'bmad-dev-story/workflow.md'
+if SPEC_PROFILE == 'quick': dev_workflow = '~/.claude/skills/bmad-quick-dev/workflow.md'
+elif SPEC_PROFILE == 'full': dev_workflow = '~/.claude/skills/bmad-dev-story/workflow.md'
 else: HALT (SPEC_PROFILE invalid)
 ```
 
-### 4. Branch on TEAM_MODE
+### 4. TeamCreate phase-scoped dev team (axe 5)
+
+```
+TeamCreate(
+  name = "dev-{RUN_ID}",
+  teammates = [
+    { role: "dev", model: default_worker_model } x N,
+  ],
+  permission_mode: inherited from lead
+)
+```
+
+Composition declared in `team-workflows/team-config.md` §dev-team. N teammates ≤ `max_teammates`.
+
+### 5. Branch on TEAM_MODE
 
 #### TEAM_MODE=true: spawn N dev teammates
 
@@ -61,9 +78,11 @@ For each teammate `i` in `1..N`:
 
 ```yaml
 task_contract:
-  team_name: '{TEAM_NAME}'
+  team_name: 'dev-{RUN_ID}'
   task_id: 'dev-{i}'
   role: 'dev'
+
+  workflow_to_invoke: '{dev_workflow}'                                     # TAC-24 — explicit per BAC-13
 
   scope_type: 'generation'
   scope_files: []                    # dev-story / quick-dev determines its own scope from the spec
@@ -83,23 +102,29 @@ task_contract:
     send_to: '{LEAD_NAME}'
 
   constraints:
-    read_only: false                 # dev writes code
+    read_only: false                                                        # dev writes code
     worktree_path: '{WORKTREE_PATH}'
     tracker_writes: false
+    autonomy_policy: 'spec-driven'                                          # TAC-4 — dev teammate auto-resolves spec-verbatim + TACTICAL ; HALTs on STRUCTURAL
+    trace_path: '{TRACE_FOLDER}/dev-{i}.md'                                 # TAC-13 / TAC-14
     halt_conditions:
       - '3 consecutive test failures on the same task'
       - 'Quality gate failure that cannot be resolved by the teammate'
+      - 'STRUCTURAL ambiguity not anticipated in spec (per autonomy_policy=spec-driven)'
 
   metadata:
     orchestrator_invoked: true
     orchestrator_skill: 'bmad-auto-flow'
     parent_phase: 'dev'
-
-  # Pass-through: which dev workflow to invoke
-  workflow_to_invoke: '{dev_workflow}'
 ```
 
-The teammate's INITIALIZATION reads `workflow_to_invoke` from a custom field in `metadata` and loads the corresponding workflow.md. (Alternative: use the `role` mapping in team-config.md — but workflow_to_invoke makes the choice explicit per BAC-13.)
+**Citation rationale** (autonomy_policy=spec-driven set explicitly per user 2026-04-30) : the dev phase is the heaviest user-touchpoint hotspot in the pre-impl flow ; spec-driven policy lets the dev teammate execute autonomously while preserving STRUCTURAL escalation for arch deviations. Semantics defined in `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md §Autonomy policy enforcement`.
+
+Audit log per spawn:
+
+```bash
+echo "{\"event\":\"auto-flow.teammate.spawned\",\"run_id\":\"${RUN_ID}\",\"teammate_role\":\"dev\",\"task_id\":\"dev-${i}\",\"trace_path\":\"${TRACE_FOLDER}/dev-${i}.md\",\"autonomy_policy\":\"spec-driven\"}" >> "${LOG_FILE}"
+```
 
 Invoke TaskCreate for each i.
 
@@ -112,30 +137,39 @@ Read FULLY and apply: ~/.claude/skills/bmad-{quick-dev | dev-story}/workflow.md 
 Execute inline.
 ```
 
-### 5. Wait for all phase_complete reports
+### 6. Wait for all phase_complete reports
 
 Process inbound messages per `data/question-routing.md`. Special handling for dev:
 - `tracker_write_request` for `update_status` → orchestrator updates tracker → `in-progress` (handled inline; the teammate would have done it standalone)
 - `tracker_write_request` for `create_mr` → orchestrator runs `gh pr create` (or equivalent forge CLI) and replies with MR_IID, MR_URL
-- `phase_complete` with `verdict: 'DONE'` → store result, await all N teammates' reports
+- `question` with `critical_ambiguity: true` → autonomy_policy=spec-driven escalation. Surface to user via AskUserQuestion (TAC-6 / TAC-6b). Reply via SendMessage(question_reply).
+- `phase_complete` with `verdict: 'DONE'` → store result, append `trace_files[]` to TRACE_FILES, append `autonomy_decisions[]` to PHASE_RESULTS['dev'].autonomy_decisions, await all N teammates' reports
 
 When all N teammates report `DONE`:
 - Apply tracker transition `in-progress → review` per BAC-8.
-- Store `PHASE_RESULTS['dev'] = {verdict: 'DONE', commit_id, mr_url, test_results}` (aggregating across N teammates if > 1).
+- Store `PHASE_RESULTS['dev'] = {verdict: 'DONE', commit_id, mr_url, test_results, trace_files, autonomy_decisions}` (aggregating across N teammates if > 1).
 
 If any teammate reports `blocker` or `verdict != DONE`:
 - Present `[R]/[F]/[A]` menu per TAC-25.
 
-### 6. Audit log
+Audit log per phase_complete:
 
 ```bash
-echo "[step-06-dev-phase] dev_team_size={N}, dev_workflow={workflow}, verdict={verdict}, MR_URL={url}" >> $LOG_FILE
+echo "{\"event\":\"auto-flow.teammate.phase_complete\",\"run_id\":\"${RUN_ID}\",\"task_id\":\"dev-${i}\",\"verdict\":\"{verdict}\",\"findings_count\":{N},\"trace_files\":${trace_files_array},\"autonomy_decisions_count\":{N}}" >> "${LOG_FILE}"
 ```
+
+### 7. TeamDelete phase team (axe 5)
+
+```
+TeamDelete(name = "dev-{RUN_ID}")
+```
+
+Mandatory before transition to step-07 — the next phase team is `codereview-{RUN_ID}` (different scope, 5 teammates).
 
 ## SUCCESS / FAILURE
 
-- **SUCCESS**: N teammates spawned (or inline), all DONE, tracker transitioned to review, MR created, PHASE_RESULTS['dev'] set
-- **FAILURE**: wrong workflow invoked (BAC-13 violation), spawning > MAX_TEAMMATES (TAC-26 violation), advancing without all teammates DONE
+- **SUCCESS**: TeamCreate `dev-{RUN_ID}` invoked, N teammates spawned with autonomy_policy=spec-driven + trace_path (or inline), all DONE, TRACE_FILES extended, autonomy_decisions captured, tracker transitioned to review, MR created, TeamDelete invoked, PHASE_RESULTS['dev'] set
+- **FAILURE**: wrong workflow invoked (BAC-13 violation), spawning > MAX_TEAMMATES (TAC-26 violation), advancing without all teammates DONE, omitting autonomy_policy=spec-driven (BAC-2 violation), forgetting TeamDelete before step-07 (axe 5 lifecycle violation), forgetting trace_path propagation (TAC-13 violation)
 
 ---
 
@@ -143,8 +177,8 @@ echo "[step-06-dev-phase] dev_team_size={N}, dev_workflow={workflow}, verdict={v
 
 ```
 CHK-STEP-06-EXIT PASSED — completed Step 6: Dev Phase
-  actions_executed: pre-spawn validation passed; spawned N={N} dev teammates with workflow={dev_workflow}; collected {N} phase_complete; tracker → review; MR_URL captured
-  artifacts_produced: PHASE_RESULTS['dev'] = {verdict, commit_id, MR_URL, test_results}, MR_IID, MR_URL
+  actions_executed: TeamCreate(dev-{RUN_ID}, N={N} teammates); pre-spawn validation passed; spawned N={N} dev teammates with workflow={dev_workflow}, autonomy_policy=spec-driven, trace_path; collected {N} phase_complete; TRACE_FILES extended ({N} entries); autonomy_decisions captured; tracker → review; MR_URL captured; TeamDelete(dev-{RUN_ID})
+  artifacts_produced: PHASE_RESULTS['dev'] = {verdict, commit_id, MR_URL, test_results, trace_files, autonomy_decisions}, MR_IID, MR_URL
   next_step: ./steps/step-07-code-review-phase.md
 ```
 

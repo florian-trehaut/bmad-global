@@ -2,7 +2,7 @@
 nextStepFile: null
 ---
 
-# Step 9: Finalize — TeamDelete + User Report (Guardrail 9)
+# Step 9: Finalize — Trace aggregation + User Report (axe 4 + Guardrail 9 cleanup safety net)
 
 ## NO-SKIP CLAUSE (workflow-adherence Rule 1)
 
@@ -20,12 +20,13 @@ CHK-STEP-09-ENTRY PASSED — entering Step 9: Finalize with TEAM_NAME={name}, ex
 
 ## STEP GOAL
 
-Always called as the final step regardless of how the workflow ended (success, HALT, abandon). Per Guardrail 9, the orchestrator MUST call TeamDelete on EVERY exit path — leaking team state at `~/.claude/teams/{team-name}/` violates Agent Teams "one team per session" limitation.
+Always called as the final step regardless of how the workflow ended (success, HALT, abandon). Per axe 5, each phase manages its own TeamCreate/TeamDelete lifecycle (steps 03/05/06/07/08) — this step is NOT responsible for a global TeamDelete (legacy Guardrail 9 pre-axe-5). It IS responsible for :
 
-Additionally:
-- Display a final report to the user summarizing what was accomplished and the final tracker state.
-- If audit_log_enabled, close the audit log file.
-- Emit CHK-WORKFLOW-COMPLETE per `workflow-adherence.md` Rule 7.
+- Aggregating all `TRACE_FILES` paths collected from `phase_complete` payloads of all 5 delegated phases (axe 4 / BAC-5 / TAC-17)
+- Cleanup safety net : if any phase team was not properly TeamDeleted (e.g. due to a HALT before its step's TeamDelete invocation), invoke `TeamDelete` for any residual team
+- Display a final report to the user summarizing what was accomplished, the final tracker state, AND every trace_path the user can drill down into for audit
+- If audit_log_enabled, close the audit log file
+- Emit CHK-WORKFLOW-COMPLETE per `workflow-adherence.md` Rule 7
 
 ## MANDATORY SEQUENCE
 
@@ -37,21 +38,28 @@ exit_path = 'success' if PHASE_RESULTS contains all 5 phases with positive verdi
           | 'abandon' if user chose [A]bandon at any phase
 ```
 
-### 2. TeamDelete (Guardrail 9 — every exit path)
+### 2. TeamDelete fallback cleanup (axe 5)
 
-If TEAM_MODE=true and TEAM_NAME is non-null:
+**Each phase owns its TeamDelete** (steps 03/05/06/07/08 invoke their own `TeamDelete({phase}-{RUN_ID})` before transitioning). This section is a **fallback cleanup ONLY for HALT-paths that aborted before the phase's TeamDelete fired** — never the canonical cleanup. (Wording clarification per Phase 7 specs MINOR finding.)
 
 ```
-Invoke TeamDelete with team_name = TEAM_NAME.
+if RUN_ID is not None:                # F-correctness-6 mitigation : guard against unset RUN_ID (e.g. HALT in step-01 before RUN_ID derivation)
+  for phase in ['spec', 'review', 'dev', 'codereview', 'validation']:
+    team_name = "{phase}-{RUN_ID}"
+    if team is still active (TeamList check):
+      Invoke TeamDelete with team_name=team_name (fallback cleanup only)
+      Log: "TeamDelete fallback: {team_name} was residual ; cleaned up (HALT-path recovery)"
+else:
+  Log: "TeamDelete fallback skipped: RUN_ID not set (HALT in step-01 before derivation)"
 ```
 
-If TeamDelete fails:
+If TeamDelete fails for a residual team:
 - Log the failure (do not HALT — we are in cleanup)
-- Suggest manual cleanup: `rm -rf ~/.claude/teams/{TEAM_NAME}/`
+- Suggest manual cleanup: `rm -rf ~/.claude/teams/{team_name}/`
 
-If TEAM_MODE=false: skip TeamDelete (no team to delete).
+If TEAM_MODE=false: skip TeamDelete (no teams were ever created).
 
-### 3. Build user report
+### 3. Build user report (axe 4 — trace_files aggregated for drill-down)
 
 Compose the final report (in `COMMUNICATION_LANGUAGE`):
 
@@ -61,16 +69,42 @@ Compose the final report (in `COMMUNICATION_LANGUAGE`):
 **Status final tracker** : {PHASE_RESULTS aggregated to final tracker state}
 **MR** : {MR_URL or "n/a"}
 **Worktree** : {WORKTREE_PATH or "n/a (worktree_enabled=false)"}
+**RUN_ID** : {RUN_ID}
 
 ## Phases
 
-| Phase | Verdict | Notes |
-|-------|---------|-------|
-| 1. Spec ({SPEC_PROFILE}) | {APPROVED-INLINE} | Spec at {SPEC_PATH} |
-| 2. Review | {PHASE_RESULTS['review'].verdict} | {findings_count} findings |
-| 3. Dev ({SPEC_PROFILE → workflow}) | {PHASE_RESULTS['dev'].verdict} | MR: {MR_URL} |
-| 4. Code Review | {PHASE_RESULTS['code-review'].verdict} | {N} perspectives, {findings_count} findings |
-| 5. Validation | {PHASE_RESULTS['validation'].verdict} | {per_vm_results summary} |
+| Phase | Verdict | Notes | Trace files |
+|-------|---------|-------|-------------|
+| 1. Spec ({SPEC_PROFILE}) | APPROVED-INLINE | Spec at {SPEC_PATH} | {trace_files for spec teammates} |
+| 2. Review | {PHASE_RESULTS['review'].verdict} | {findings_count} findings | {PHASE_RESULTS['review'].trace_files} |
+| 3. Dev ({SPEC_PROFILE → workflow}) | {PHASE_RESULTS['dev'].verdict} | MR: {MR_URL} ; autonomy_decisions: {N} | {PHASE_RESULTS['dev'].trace_files} |
+| 4. Code Review | {PHASE_RESULTS['code-review'].verdict} | {N triggered} perspectives, {findings_count} findings | {PHASE_RESULTS['code-review'].trace_files} |
+| 5. Validation | {PHASE_RESULTS['validation'].verdict} | {per_vm_results summary} | {PHASE_RESULTS['validation'].trace_files} |
+
+## Trace files for audit / drill-down
+
+All teammate trace files are at `/tmp/bmad-{PROJECT_SLUG}-auto-flow/{RUN_ID}/` :
+
+{enumerate every entry of TRACE_FILES with file:absolute-path}
+
+**Disclaimer (per F-M3-S1-005)** : `autonomy_decisions[]` rationale fields are teammate self-report and unverified. For high-stakes audit, Read the trace files for evidence triangulation rather than relying on the rationale field alone.
+
+**Retention decision (per F-M3-S1-007)** : the trace files contain detailed reasoning + findings (potentially with sensitive context citations). Default behavior : kept under /tmp (cleaned up by system tmpwatch — macOS ~3 days, Linux varies). Ask the user :
+
+```
+Trace files at /tmp/bmad-{PROJECT_SLUG}-auto-flow/{RUN_ID}/ :
+  [K] Keep — let system tmpwatch reclaim eventually (default if non-interactive)
+  [D] Delete now — `rm -rf /tmp/bmad-{PROJECT_SLUG}-auto-flow/{RUN_ID}/` immediately
+  [M] Move to {WORKTREE_PATH}/.bmad-traces/{RUN_ID}/ — preserve under repo (gitignored)
+```
+
+In CI / non-interactive contexts, default to [D] to minimize multi-user /tmp exposure. In dev contexts, default to [K] for ad-hoc drill-down.
+
+## Autonomy decisions captured (axe 2)
+
+If any teammate ran with `autonomy_policy=spec-driven` and applied auto-resolutions, they are listed here for audit :
+
+{enumerate PHASE_RESULTS['dev'].autonomy_decisions if any}
 
 {If exit_path == 'abandon' or 'halt':}
 Reason: {explanation of why exited early}
@@ -85,8 +119,7 @@ Display to user via assistant text output (not AskUserQuestion — this is the w
 If audit_log_enabled:
 
 ```bash
-echo "[step-09-finalize] exit_path={path}, TeamDelete={ok|failed|skipped}" >> $LOG_FILE
-echo "[end-of-auto-flow] $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $LOG_FILE
+echo "{\"event\":\"auto-flow.run.finalized\",\"run_id\":\"${RUN_ID}\",\"exit_path\":\"{path}\",\"trace_files_count\":{N},\"team_safety_net\":\"{ok|residual_cleaned|failed}\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" >> "${LOG_FILE}"
 ```
 
 ### 5. Worktree cleanup decision
@@ -120,8 +153,8 @@ If `steps_executed != [01..09]` sequential AND `steps_skipped` non-empty without
 
 ## SUCCESS / FAILURE
 
-- **SUCCESS**: TeamDelete called (Guardrail 9), final report displayed, audit log closed, CHK-WORKFLOW-COMPLETE emitted, worktree decision documented
-- **FAILURE**: skipping TeamDelete (Guardrail 9 violation), missing CHK-WORKFLOW-COMPLETE (Rule 7 violation), removing worktree without asking on abandon path
+- **SUCCESS**: residual TeamDelete safety net invoked (each phase already TeamDeleted in 03/05/06/07/08 per axe 5); TRACE_FILES aggregated and rendered in final report; final report displayed; audit log closed; CHK-WORKFLOW-COMPLETE emitted; worktree decision documented
+- **FAILURE**: skipping residual cleanup safety net (would leak teams on HALT path), missing CHK-WORKFLOW-COMPLETE (Rule 7 violation), removing worktree without asking on abandon path, omitting trace_files from final report (axe 4 violation), invoking TeamDelete for ALL phases even when each phase already deleted its own (would error — this step is safety net only, not duplicate delete)
 
 ---
 
@@ -129,8 +162,8 @@ If `steps_executed != [01..09]` sequential AND `steps_skipped` non-empty without
 
 ```
 CHK-STEP-09-EXIT PASSED — completed Step 9: Finalize
-  actions_executed: TeamDelete {invoked → ok | failed → manual cleanup suggested | skipped (TEAM_MODE=false)}; user report displayed; audit log {closed | not enabled}; worktree decision: {kept | removed | asked user}
-  artifacts_produced: final user-facing report; CHK-WORKFLOW-COMPLETE emitted
+  actions_executed: residual TeamDelete safety net {invoked for {N} residual teams | no residuals — all phases self-cleaned (axe 5)}; trace files aggregated ({N} entries from PHASE_RESULTS); final user report displayed with trace_paths and autonomy_decisions; audit log {closed | not enabled}; worktree decision: {kept | removed | asked user}
+  artifacts_produced: final user-facing report including TRACE_FILES list; CHK-WORKFLOW-COMPLETE emitted
   next_step: WORKFLOW-COMPLETE
 ```
 
