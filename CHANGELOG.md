@@ -1,12 +1,59 @@
 # Changelog
 
-## Unreleased
+## v2.0.0 - 2026-04-30
 
-> **TL;DR** — `bmad-shared` shared rules folder restructured into 6 semantic subdirectories. Workflows now load only `core/` (5 files) plus the JIT subdir(s) they need. Average -78.5% chars at workflow INIT. Plus a new "Inbound Message Filtering" rule for Agent Teams teammates and a "Findings Handling Policy" (default = fix all reviewer findings).
-> **Action:** `npx @florian-trehaut/bmad-global install --force` (required to deploy the new shared structure).
-> **Breaking:** any custom skill that does `Glob ~/.claude/skills/bmad-shared/*.md` directly must update to `Glob ~/.claude/skills/bmad-shared/core/*.md` and add JIT loads for the subdir(s) they need (per the matrix in `bmad-shared/SKILL.md`). Bundled skills are migrated.
+> **TL;DR** — New `/bmad-auto-flow` chains the full story lifecycle (spec → review → dev → code-review → validation) via Agent Teams; new `/bmad-quick-spec` is story-spec v2 quick profile in 6 steps; 6 code-review perspective skills now invocable inline; `bmad-shared` rules folder restructured into 6 semantic subdirs (-78.5% chars at workflow INIT); 3 new Agent Teams teammate rules (workflow application, message filtering, findings policy); `/changelog` self-polices voice with a mandatory TL;DR and grep voice gate.
+> **Action:** `npx @florian-trehaut/bmad-global install --force` (required). For `/bmad-auto-flow`: also set `agent_teams.enabled: true` in `.claude/workflow-context.md` and export `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
+> **Breaking:** custom skills that `Glob ~/.claude/skills/bmad-shared/*.md` must migrate to `Glob ~/.claude/skills/bmad-shared/core/*.md` plus JIT loads for the subdir(s) they need (matrix in `bmad-shared/SKILL.md`); bundled skills are already migrated.
 
-### bmad-shared restructure (-78.5% chars at workflow INIT)
+### 🔥 Highlight: `/bmad-auto-flow` — full story lifecycle in one command
+
+You start a story spec, you wait for review, you do dev, you wait for code-review, you wait for validation. Five workflows, a lot of context-switching, a lot of "OK what's next?". `/bmad-auto-flow` chains them.
+
+**Lifecycle phases:**
+
+| Phase | Mode | What runs |
+|-------|------|-----------|
+| Spec | Interactive (lead) | `/bmad-quick-spec` or `/bmad-create-story` — runs in your conversation, you answer the questions |
+| Review | Isolated (teammate) | `/bmad-review-story` — impartial review of the spec |
+| Dev | Isolated (teammate) | `/bmad-dev-story` — implementation against the approved spec |
+| Code review | Isolated (teammate) | The 6 perspective skills, dispatched in parallel |
+| Validation | Isolated (teammate) | `/bmad-validation-metier` + frontend / desktop validators as configured |
+
+**What changes for you:**
+
+- **One command, full flow.** Run `/bmad-auto-flow` instead of stepping through 5 separate workflows. Lead orchestrator stays in your conversation; the 4 post-spec phases run as isolated teammates for impartial review and parallelism.
+- **Question routing is batched.** When a teammate has a question for you mid-phase, the lead collects them and forwards them at phase boundaries — no interrupt-driven thrash.
+- **Phase failure menu.** If a teammate hits a wall, you get `[R]etry / [F]ix / [A]bandon` instead of a half-finished tree.
+- **Sequential fallback.** If Agent Teams isn't enabled (or unavailable), the orchestrator falls back to sequential inline execution — you can use `/bmad-auto-flow` as a structured guide even without the experimental flag.
+
+**Configuration.** Requires `agent_teams.enabled: true` in `.claude/workflow-context.md` and `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` exported in your shell. New tunables in the `agent_teams` config block: `dev_team_size` (default 1), `code_review_team_size` (default 6 perspectives), `phase_timeout_minutes`, `audit_log_enabled`.
+
+### ✨ `/bmad-quick-spec` — story-spec v2 quick profile in 6 steps
+
+Companion to `/bmad-create-story` (which is the 14-step full profile). Both produce a story-spec v2 with all 22 mandatory sections — `/bmad-quick-spec` lets you write a terse "N/A — internal scope, no fresh data needed" on Real-Data Findings and External Research when the change doesn't warrant the full investigation.
+
+**When to use which:**
+
+- `/bmad-create-story` (full profile, 14 steps) — external integrations, customer-facing features, anything where production data shape matters.
+- `/bmad-quick-spec` (quick profile, 6 steps) — refactors, internal CLI tweaks, small evolutions of an existing module. Auto-escalates to `/bmad-create-story` if your scope grows beyond the quick thresholds.
+
+Same output format, same validators, same Linear / GitHub / GitLab / Jira tracker integration — just a faster path when the work justifies it.
+
+### ✨ 6 single-perspective code-review skills now invocable inline
+
+`/bmad-code-review` (the standalone version with parallel `Agent()` dispatch) is preserved unchanged. The new addition: 6 separate code-review skills you can invoke directly when you only need one lens:
+
+- `/bmad-code-review-perspective-specs` — spec adherence (BACs, TACs, OOS items, NFR registry coverage)
+- `/bmad-code-review-perspective-correctness` — logic, edge cases, error paths
+- `/bmad-code-review-perspective-security` — OWASP, injection, authn/z, secrets
+- `/bmad-code-review-perspective-engineering-quality` — design, complexity, naming
+- `/bmad-code-review-perspective-operations` — observability, deployability, ops readiness
+- `/bmad-code-review-perspective-user-facing` — UX, error messages, accessibility
+
+These are also what the Agent Teams orchestrator dispatches when it parallelizes a review — but you can invoke any of them on-demand for a targeted review.
+
+### `bmad-shared` restructure — workflows load -78.5% chars at INIT
 
 The flat 22-file `bmad-shared/` folder is now organized into 6 semantic subdirectories. Auto-loaded budget at workflow INIT drops from ~176k chars (~44k tokens) to ~38k chars (~9.5k tokens) — validated empirically on the bundled workflows.
 
@@ -25,7 +72,7 @@ src/core-skills/bmad-shared/
 └── stacks/      (unchanged — language-keyed rules, JIT)
 ```
 
-**Migration for users with custom skills.** If your skill's `workflow.md` does `Glob ~/.claude/skills/bmad-shared/*.md`, replace it with:
+⚠️ **Breaking — migration for users with custom skills.** If your skill's `workflow.md` does `Glob ~/.claude/skills/bmad-shared/*.md`, replace it with:
 
 ```markdown
 Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file.
@@ -38,17 +85,27 @@ Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file.
 # - knowledge-aware → Read `~/.claude/skills/bmad-shared/schema/knowledge-schema.md`
 ```
 
-`npm run validate:skills --strict` and the new `test/test-shared-glob-patterns.js` enforce the new pattern (rejecting leftover `bmad-shared/*.md` flat Globs).
+`npm run validate:skills --strict` enforces the new pattern (rejecting leftover `bmad-shared/*.md` flat Globs).
 
-**Cross-references.** Old refs to `validation-proof-principles.md`, `validation-verdict-protocol.md`, `validation-intake-protocol.md` now use anchors on the merged file: `validation/validation-protocol.md#proof-principles`, `#verdict`, `#intake`. The `daily-planning-awareness.md` file (0 refs in the codebase) was deleted.
+**Cross-references.** Old refs to `validation-proof-principles.md`, `validation-verdict-protocol.md`, `validation-intake-protocol.md` now use anchors on the merged file: `validation/validation-protocol.md#proof-principles`, `#verdict`, `#intake`. The `daily-planning-awareness.md` file is removed (no skills referenced it — no migration needed).
 
 ### Process integrity for Agent Teams teammates
 
 Three new rule sections, derived from failure modes observed during the development of this restructure:
 
-- **`teams/teammate-mode-routing.md` §"Required Workflow Application"** — a teammate executing a sub-workflow MUST follow workflow.md AND every step file step-by-step (no "I read workflow.md, I got the gist") AND MUST invoke `SendMessage(phase_complete)` at task end. Codifies what was tribal knowledge.
-- **`teams/teammate-mode-routing.md` §"Inbound Message Filtering"** — teammates validate the SENDER of every inbound SendMessage. Cross-teammate messages (e.g., from auto-spawned `task-list` queues) are refused with a `blocker` to the lead. Defense-in-depth against routing bugs and stale task assignments.
-- **`core/workflow-adherence.md` Rule 8 — Findings Handling Policy** — all reviewer findings (BLOCKER/MAJOR/MINOR/INFO) are fixed BY DEFAULT before merge, regardless of severity. Skip allowed only with an explicit documented reason. Severity is NOT the criterion.
+- **Required workflow application** — a teammate executing a sub-workflow MUST follow `workflow.md` AND every step file step-by-step (no "I read workflow.md, I got the gist") AND MUST emit `phase_complete` at task end. Codifies what was tribal knowledge.
+- **Inbound message filtering** — teammates validate the SENDER of every inbound message. Cross-teammate messages (e.g., from auto-spawned task-list queues) are refused with a `blocker` to the lead. Defense-in-depth against routing bugs and stale task assignments.
+- **Findings handling policy** — all reviewer findings (BLOCKER / MAJOR / MINOR / INFO) are fixed BY DEFAULT before merge, regardless of severity. Skip allowed only with an explicit documented reason. Severity is NOT the criterion — consensus is.
+
+### Other changes
+
+- **`/changelog` self-policing voice rule.** Every entry now opens with a 3-line TL;DR (TL;DR / Action / Breaking) and is grep-checked for tech-dump leakage (file:line refs, line counts, internal validator IDs) before you see the draft. The skill loops the rewrite until the draft talks to users, not contributors. Effective for this v2.0.0 entry and all future entries.
+
+### Post-upgrade
+
+1. **Required:** `npx @florian-trehaut/bmad-global install --force` — deploys the new shared structure and the new skills.
+2. **Optional (custom skills):** if you maintain custom skills that load `bmad-shared`, update your `Glob` patterns from `bmad-shared/*.md` to `bmad-shared/core/*.md` and add JIT loads for the subdir(s) you need (matrix in `bmad-shared/SKILL.md`).
+3. **Optional (Agent Teams):** to enable `/bmad-auto-flow`, set `agent_teams.enabled: true` in `.claude/workflow-context.md` and export `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in your shell.
 
 ## v1.11.0 - 2026-04-29
 

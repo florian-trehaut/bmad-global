@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@florian-trehaut/bmad-global",
-  "version": "1.11.0",
+  "version": "2.0.0",
   "description": "Personal fork of BMad Method with global flat install, Agent Teams, and workflow improvements",
   "keywords": [
     "agile",
