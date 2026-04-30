@@ -34,7 +34,7 @@ Key rules:
 - `orchestrator-registry.md` — closed list of authorized orchestrators (`bmad-auto-flow` is here)
 - `teammate-mode-routing.md` — teammate-side detection + interactivity rerouting (consumed by spawned teammates, not by this orchestrator)
 - `worktree-lifecycle.md` — worktree protocol with new Branch D (provided path mode) consumed by teammates
-- `boundaries-rule.md`, `validation-verdict-protocol.md`
+- `boundaries-rule.md`, `validation/validation-protocol.md#verdict`
 
 ### 3. Load project knowledge (REQUIRED)
 

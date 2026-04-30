@@ -2,7 +2,7 @@
 
 **This document is loaded by all bmad-\* workflow skills at initialization.** It defines the mandatory standard for what counts as proof of a diagnosis when investigating bugs, errors, or unexpected behaviour.
 
-**Companion to:** `no-fallback-no-false-data.md` (data integrity), `validation-proof-principles.md` (business validation proof), and `workflow-adherence.md` (process integrity). This rule covers **diagnostic integrity**.
+**Companion to:** `no-fallback-no-false-data.md` (data integrity), `validation/validation-protocol.md#proof-principles` (business validation proof), and `workflow-adherence.md` (process integrity). This rule covers **diagnostic integrity**.
 
 **Primary consumer:** `bmad-troubleshoot`. Secondary consumers: any workflow that performs root-cause analysis (review-story when investigating reported bugs, dev-story when reproducing a flaky test, validation-\* when verifying a bug is actually fixed).
 
@@ -188,6 +188,6 @@ This makes the rule applicable in ad-hoc debugging conversations (not only insid
 
 ## Cross-references
 
-- `validation-proof-principles.md` — proof principles for **business validation** (rejects code analysis); this rule is the **debugging-time** analog
+- `validation/validation-protocol.md#proof-principles` — proof principles for **business validation** (rejects code analysis); this rule is the **debugging-time** analog
 - `no-fallback-no-false-data.md` — data integrity (a fallback hides a bug); this rule applies when investigating that hidden bug
 - `workflow-adherence.md` — process integrity; CHK-INVESTIGATE checkpoints in troubleshoot step-03 emit which rung was achieved as part of the receipt

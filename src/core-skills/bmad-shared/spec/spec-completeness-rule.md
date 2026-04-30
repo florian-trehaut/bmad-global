@@ -194,6 +194,16 @@ The bifurcation pattern (v3) is informed by:
 
 ---
 
+## Findings handling — story spec scope
+
+A story spec that produces reviewer findings (in any review pass : multi-validator gate, adversarial review, code-review per perspective, validation VMs) MUST include the fix of those findings within its scope, unless a documented skip reason applies (per `core/workflow-adherence.md` Rule 8 — Findings Handling Policy).
+
+**Concretely** : if reviewer findings emerge during the story's lifecycle, the story is amended (new tasks added, scope extended) to fix them in the same PR / commit chain. Creating a "follow-up story" for findings is allowed ONLY when an explicit documented skip reason justifies the deferral — not as a default tactic to ship faster.
+
+The criterion is not the finding's severity (BLOCKER / MAJOR / MINOR / INFO are all fixed by default) — it is the absence of a documented reason to skip.
+
+---
+
 ## Exemption rule
 
 The only valid exemption is an explicit user instruction in the conversation citing this rule by name. Generic excuses ("simple story", ".md only", "auto mode", "no time") are forbidden rationalizations per `workflow-adherence.md`.

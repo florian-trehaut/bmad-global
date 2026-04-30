@@ -100,7 +100,7 @@ Store as `EXTERNAL_RESEARCH`.
 ### 5. Architectural decisions surfaced
 
 Note any decisions that emerged from the investigation. Examples:
-- "Use the existing `bmad-shared/foo.md` rule rather than creating a new one"
+- "Use the existing `bmad-shared/{subdir}/foo.md` rule (e.g. `bmad-shared/spec/ac-format-rule.md`) rather than creating a new one"
 - "Place the skill under `2-plan-workflows/` (not `4-implementation/`) because it produces a planning artifact"
 
 Check `adr_location` from workflow-context.md:

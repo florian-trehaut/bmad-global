@@ -30,7 +30,7 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 - `ac-format-rule.md` — BACs in Given/When/Then; TACs in EARS (5 patterns)
 - `spec-completeness-rule.md` — mandatory sections list (story-spec v2 schema, quick profile)
 - `boundaries-rule.md` — boundaries triple (Always / Ask First / Never)
-- `validation-verdict-protocol.md` — binary Security Gate verdict
+- `validation/validation-protocol.md#verdict` — binary Security Gate verdict
 - `teammate-mode-routing.md` — auto-detect TEAMMATE_MODE; reroute interactivity if running inside an Agent Teams teammate
 
 ### 2. Load project context (REQUIRED)

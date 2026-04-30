@@ -122,7 +122,15 @@ Never use the soft `If exists, read it` pattern for knowledge files — required
 ```markdown
 ### N. Load shared rules
 
-Glob `~/.claude/skills/bmad-shared/*.md`, then Read each file individually. (bmad-shared is a directory, not a file — do NOT attempt to Read it directly.)
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. (`core/` contains the universal rules auto-loaded by every workflow.)
+
+If your skill is type-specific (spec, team-aware, validation, etc.), ALSO Glob the relevant subdirectory(ies) per the matrix in `~/.claude/skills/bmad-shared/SKILL.md`:
+
+- Spec workflows: also `Glob ~/.claude/skills/bmad-shared/spec/*.md`
+- Team-aware / orchestrator-spawned workflows: also `Glob ~/.claude/skills/bmad-shared/teams/*.md`
+- Validation workflows: also `Read ~/.claude/skills/bmad-shared/validation/validation-protocol.md`
+- Workflows with worktree: also `Read ~/.claude/skills/bmad-shared/lifecycle/worktree-lifecycle.md`
+- Knowledge-aware workflows: also `Read ~/.claude/skills/bmad-shared/schema/knowledge-schema.md`
 
 Apply these rules for the entire workflow execution. Key rule for this workflow: **{one-sentence key rule}.**
 ```

@@ -42,6 +42,11 @@ function isWorkflowOrStepFile(absPath) {
   if (/\/steps\/step-\d+/.test(rel)) return true;
   if (/\/subagent-workflows\/[^/]+\.md$/.test(rel)) return true;
   if (rel.endsWith('/SKILL.md')) return true;
+  // Templates and conventions files in bmad-create-skill — they propagate
+  // patterns to NEW skills, so a legacy Glob in a template leaks legacy patterns
+  // to every future skill (Phase 4 finding F-CR2).
+  if (rel.startsWith('src/core-skills/bmad-create-skill/templates/')) return true;
+  if (rel === 'src/core-skills/bmad-create-skill/data/skill-conventions.md') return true;
   return false;
 }
 

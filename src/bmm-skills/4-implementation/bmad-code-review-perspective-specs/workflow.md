@@ -14,7 +14,7 @@
 
 Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
-Key rules: `no-fallback-no-false-data.md`, `validation-proof-principles.md`, `validation-verdict-protocol.md`, `workflow-adherence.md`, `teammate-mode-routing.md`, `task-contract-schema.md`.
+Key rules: `no-fallback-no-false-data.md`, `validation/validation-protocol.md#proof-principles`, `validation/validation-protocol.md#verdict`, `workflow-adherence.md`, `teammate-mode-routing.md`, `task-contract-schema.md`.
 
 ### 2. Load project context
 

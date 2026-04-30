@@ -44,9 +44,9 @@ Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually.
 
 Apply these rules for the entire workflow execution. Key rules for this workflow:
 - **Real environment responses only — code analysis is NEVER proof** (from no-fallback-no-false-data.md)
-- **Universal proof principles** (from validation-proof-principles.md)
-- **Intake protocol** (from validation-intake-protocol.md)
-- **Verdict protocol** (from validation-verdict-protocol.md)
+- **Universal proof principles** (from validation/validation-protocol.md#proof-principles)
+- **Intake protocol** (from validation/validation-protocol.md#intake)
+- **Verdict protocol** (from validation/validation-protocol.md#verdict)
 
 ### 3. Load environment config (optional)
 

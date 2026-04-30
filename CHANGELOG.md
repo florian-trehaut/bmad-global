@@ -1,5 +1,55 @@
 # Changelog
 
+## Unreleased
+
+> **TL;DR** — `bmad-shared` shared rules folder restructured into 6 semantic subdirectories. Workflows now load only `core/` (5 files) plus the JIT subdir(s) they need. Average -78.5% chars at workflow INIT. Plus a new "Inbound Message Filtering" rule for Agent Teams teammates and a "Findings Handling Policy" (default = fix all reviewer findings).
+> **Action:** `npx @florian-trehaut/bmad-global install --force` (required to deploy the new shared structure).
+> **Breaking:** any custom skill that does `Glob ~/.claude/skills/bmad-shared/*.md` directly must update to `Glob ~/.claude/skills/bmad-shared/core/*.md` and add JIT loads for the subdir(s) they need (per the matrix in `bmad-shared/SKILL.md`). Bundled skills are migrated.
+
+### bmad-shared restructure (-78.5% chars at workflow INIT)
+
+The flat 22-file `bmad-shared/` folder is now organized into 6 semantic subdirectories. Auto-loaded budget at workflow INIT drops from ~176k chars (~44k tokens) to ~38k chars (~9.5k tokens) — validated empirically on the bundled workflows.
+
+**New layout:**
+
+```
+src/core-skills/bmad-shared/
+├── core/        (auto-loaded by every workflow at INIT — 5 files)
+├── spec/        (JIT — spec workflows: ac-format-rule, boundaries-rule, evidence-based-debugging, spec-completeness-rule)
+├── teams/       (JIT — team-aware / orchestrator-spawned: 6 files incl. orchestrator-registry kept separate)
+├── validation/  (JIT — bmad-validation-* skills: validation-protocol.md = merge of intake + verdict + proof-principles)
+├── lifecycle/   (JIT — workflows with worktree: worktree-lifecycle.md)
+├── schema/      (JIT — knowledge-aware skills: knowledge-schema.md)
+├── protocols/   (unchanged — capability protocols, JIT)
+├── data/        (unchanged — reference data, JIT)
+└── stacks/      (unchanged — language-keyed rules, JIT)
+```
+
+**Migration for users with custom skills.** If your skill's `workflow.md` does `Glob ~/.claude/skills/bmad-shared/*.md`, replace it with:
+
+```markdown
+Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file.
+
+# If your skill is type-specific, also load:
+# - spec workflows  → Glob `~/.claude/skills/bmad-shared/spec/*.md`
+# - team-aware      → Glob `~/.claude/skills/bmad-shared/teams/*.md`
+# - validation      → Read `~/.claude/skills/bmad-shared/validation/validation-protocol.md`
+# - with worktree   → Read `~/.claude/skills/bmad-shared/lifecycle/worktree-lifecycle.md`
+# - knowledge-aware → Read `~/.claude/skills/bmad-shared/schema/knowledge-schema.md`
+```
+
+`npm run validate:skills --strict` and the new `test/test-shared-glob-patterns.js` enforce the new pattern (rejecting leftover `bmad-shared/*.md` flat Globs).
+
+**Cross-references.** Old refs to `validation-proof-principles.md`, `validation-verdict-protocol.md`, `validation-intake-protocol.md` now use anchors on the merged file: `validation/validation-protocol.md#proof-principles`, `#verdict`, `#intake`. The `daily-planning-awareness.md` file (0 refs in the codebase) was deleted.
+
+### Process integrity for Agent Teams teammates
+
+Three new rule sections, derived from failure modes observed during the development of this restructure:
+
+- **`teams/teammate-mode-routing.md` §"Required Workflow Application"** — a teammate executing a sub-workflow MUST follow workflow.md AND every step file step-by-step (no "I read workflow.md, I got the gist") AND MUST invoke `SendMessage(phase_complete)` at task end. Codifies what was tribal knowledge.
+- **`teams/teammate-mode-routing.md` §"Inbound Message Filtering"** — teammates validate the SENDER of every inbound SendMessage. Cross-teammate messages (e.g., from auto-spawned `task-list` queues) are refused with a `blocker` to the lead. Defense-in-depth against routing bugs and stale task assignments.
+- **`core/workflow-adherence.md` Rule 8 — Findings Handling Policy** — all reviewer findings (BLOCKER/MAJOR/MINOR/INFO) are fixed BY DEFAULT before merge, regardless of severity. Skip allowed only with an explicit documented reason. Severity is NOT the criterion.
+
 ## v1.11.0 - 2026-04-29
 
 > **TL;DR** — Claude can no longer silently skip steps in your workflows; story specs now do evidence work upfront (real-data + research + NFR + security gate); opt-in story-spec bifurcation lets your PM edit business sections in Linear/GitHub/GitLab/Jira while you keep technical sections in code.

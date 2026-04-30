@@ -56,17 +56,19 @@ Every bmad-* workflow Globs `~/.claude/skills/bmad-shared/core/*.md` at INITIALI
 
 Workflows load additional subdirectories based on what they need. Reference the matrix below for the canonical mapping.
 
-| Workflow type | core/ | spec/ | teams/ | validation/ | lifecycle/ | schema/ |
-|---------------|:-----:|:-----:|:------:|:-----------:|:----------:|:-------:|
-| `bmad-create-story`, `bmad-quick-spec` | YES | YES | optional | — | conditional | conditional |
-| `bmad-review-story` | YES | YES | optional | — | conditional | — |
-| `bmad-dev-story` | YES | YES | optional | — | YES | conditional |
-| `bmad-code-review` | YES | YES | optional | — | YES | — |
-| `bmad-validation-*` | YES | — | — | YES | conditional | — |
-| `bmad-troubleshoot` | YES | partial (evidence-based-debugging) | — | — | conditional | — |
-| `bmad-knowledge-*` | YES | — | — | — | — | YES |
-| `bmad-auto-flow` (orchestrator) | YES | — | YES | — | YES | conditional |
-| `bmad-help`, `bmad-status`, `bmad-daily-planning` | YES | — | — | — | — | — |
+| Workflow type | core/ | spec/ | teams/ | validation/ | lifecycle/ | schema/ | data/ |
+|---------------|:-----:|:-----:|:------:|:-----------:|:----------:|:-------:|:-----:|
+| `bmad-create-story`, `bmad-quick-spec` | YES | YES | optional | — | conditional | conditional | YES (spec templates) |
+| `bmad-review-story` | YES | YES | optional | — | conditional | — | optional |
+| `bmad-dev-story` | YES | YES | optional | — | YES | conditional | optional |
+| `bmad-code-review` | YES | YES | optional | — | YES | — | — |
+| `bmad-validation-*` | YES | — | — | YES | conditional | — | — |
+| `bmad-troubleshoot` | YES | partial (evidence-based-debugging) | — | — | conditional | — | — |
+| `bmad-knowledge-*` | YES | — | — | — | — | YES | — |
+| `bmad-auto-flow` (orchestrator) | YES | — | YES | — | YES | conditional | — |
+| `bmad-help`, `bmad-status`, `bmad-daily-planning` | YES | — | — | — | — | — | — |
+
+**Note on `data/`** : contains 16+ template files (NFR registry, security gate, observability requirements, business context, EARS AC, INVEST checklist, out-of-scope, risks register, boundaries triple, etc.). Loaded JIT by spec-producing/consuming skills (`bmad-create-story`, `bmad-quick-spec`, `bmad-review-story` review pass) — see Rule Type Lookup Table below for canonical per-template paths.
 
 ## Rule Type Lookup Table
 
@@ -102,3 +104,4 @@ When you need a specific shared rule, consult this table to find the canonical p
 | Null-safety review per stack | `protocols/null-safety-review.md` |
 | Spec bifurcation operations (compose, drift, sync, handoff) | `protocols/spec-bifurcation.md` |
 | Per-language stack rules | `stacks/{language}.md` |
+| Spec templates (NFR registry, security gate, observability, business context, EARS AC, INVEST, out-of-scope, risks, boundaries triple, …) | `data/{name}-template.md` (loaded JIT by spec-producing skills) |

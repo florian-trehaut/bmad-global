@@ -372,6 +372,59 @@ Then proceed to the SEQUENCE below.
 
 ---
 
+## Rule 8 — Findings Handling Policy
+
+When a reviewer (human or teammate) emits findings on a story spec, a code review, a security review, or any review pass, the response policy is :
+
+> **All findings are fixed BY DEFAULT before merge — regardless of severity (BLOCKER, MAJOR, MINOR, INFO). The only valid skip criterion is an explicit documented reason.**
+
+Severity is **NOT** the criterion for whether to fix. The criterion is the absence of a reason to skip.
+
+### Valid documented skip reasons (closed list)
+
+A finding MAY be skipped only if the reason fits one of these documented categories AND is explicitly recorded in the review's amendment table or in the story spec's "skip reasons" section :
+
+1. **Deferred by phase** — the finding's resolution belongs to a different phase of the same story by design (e.g., a code-review finding on workflow execution proof is deferred to the validation phase).
+2. **Out of scope (OOS) confirmed** — the finding addresses an item already declared OOS in the original spec, with no new evidence to revisit the OOS decision.
+3. **Conflict with user-approved design decision** — the finding's remediation would reverse a design decision the user explicitly approved earlier (cite the approval verbatim).
+4. **Duplicate of a converging finding being fixed** — the finding is a less precise restatement of another finding being fixed in the same pass (cite the converging finding ID).
+5. **Honest non-reproduction** — the reviewer cannot reproduce the issue locally and there is no captured artifact to investigate (rare ; treat with the `evidence-based-debugging.md` exception classes).
+
+Any skip reason outside this list is a rationalization (per Rule 1's forbidden patterns R-01 to R-12) and the finding MUST be fixed.
+
+### Anti-patterns (forbidden skip reasoning)
+
+- ❌ "MINOR is not worth the effort" → severity is not the criterion
+- ❌ "Easy to fix later in a follow-up story" → if no documented reason, fix now
+- ❌ "INFO can be ignored" → INFO is reviewer signal, often a precursor to a future MAJOR
+- ❌ "It's just doc / test / typo" → category is not the criterion
+- ❌ "Reviewer is being too pedantic" → reject the finding with explicit rebut, do not silently skip
+- ❌ "We can group all the small fixes in a tech-debt sprint" → unless that sprint is concretely scheduled with an issue ID, this is procrastination dressed as planning
+
+### Application by workflow phase
+
+| Workflow | Where this rule applies |
+|----------|-------------------------|
+| `bmad-create-story` | Multi-validator gate (step-12-review) findings — all fixed before publication |
+| `bmad-review-story` | Adversarial findings — all fixed before dev-story handoff |
+| `bmad-code-review` | Per-perspective findings — all fixed before merge |
+| `bmad-validation-*` | VM failures — all addressed before status → done |
+| `bmad-troubleshoot` | Diagnosis findings — all integrated into the fix plan |
+| `bmad-auto-flow` (orchestrator) | Phase 2 review + Phase 4 code-review aggregate — all fixed in follow-up commit before Phase 5 |
+
+### Why this rule exists
+
+Empirically observed during the development of this skill (auto-flow story Phase 4 review of `bmad-shared-restructure`) :
+
+- 3 code-reviewer teammates emitted 11 findings (2 MAJOR, 6 MINOR, 3 INFO, 0 BLOCKER).
+- The orchestrator's natural reflex was to apply the auto-flow §4 rule "if `n_blocker == 0` → APPROVE" and propose a menu "(F)ix MAJOR / (A)pprove all / (P)artial fix" that classified by severity.
+- The user corrected this : "Blocker, minor ou major, quand on a pas de raison de pas corriger on le fait. C'est pas une histoire de fix trivial, plutôt de fix consensuel."
+- This rule codifies the corrected policy : **consensus is the criterion, not severity.**
+
+This is a defense against the rationalization pattern of using severity as a proxy for "should I bother fixing this." Severity informs *priority of attention* (BLOCKER first, INFO last) but does NOT inform *whether* to fix. Without a documented skip reason, every finding is fixed.
+
+---
+
 ## What this rule does NOT do
 
 - It does NOT replace HALT directives — HALTs remain the primary stop mechanism

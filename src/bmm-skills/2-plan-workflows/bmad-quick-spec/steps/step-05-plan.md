@@ -71,7 +71,7 @@ For each BAC, write one VM:
 - [ ] VM-N [{api|e2e|db|code}] *(BAC-N)*: {how to verify with REAL DATA, not code analysis}.
 ```
 
-Apply `validation-proof-principles.md` — code analysis is NEVER proof. VMs must be runnable.
+Apply `validation/validation-protocol.md#proof-principles` — code analysis is NEVER proof. VMs must be runnable.
 
 Store as `VALIDATION_METIER`.
 

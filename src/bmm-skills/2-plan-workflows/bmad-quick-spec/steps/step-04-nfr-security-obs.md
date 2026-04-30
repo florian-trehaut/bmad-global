@@ -78,7 +78,7 @@ Build the table with one row per item (skip N/A for compliance categories the pr
 | 10 | Compliance — PCI-DSS | {…} | {…} |
 | 11 | Compliance — Other | {…} | {…} |
 
-**Binary verdict:** the Security Gate is PASS only if 0 items are FAIL. Any FAIL → overall verdict = FAIL → HALT (apply `validation-verdict-protocol.md` semantics).
+**Binary verdict:** the Security Gate is PASS only if 0 items are FAIL. Any FAIL → overall verdict = FAIL → HALT (apply `validation/validation-protocol.md#verdict` semantics).
 
 For each PARTIAL or FAIL row, add a remediation task. PASS-with-PARTIAL is acceptable; FAIL is not.
 

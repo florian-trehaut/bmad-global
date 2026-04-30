@@ -42,8 +42,8 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 
 - `no-fallback-no-false-data.md` — Zero Fallback / Zero False Data
 - `evidence-based-debugging.md` — diagnostic integrity (rungs of proof)
-- `validation-proof-principles.md` — proof standards for business validation (real environment only)
-- `validation-verdict-protocol.md` — binary verdict semantics (used by Step 9 Security Gate)
+- `validation/validation-protocol.md#proof-principles` — proof standards for business validation (real environment only)
+- `validation/validation-protocol.md#verdict` — binary verdict semantics (used by Step 9 Security Gate)
 - `workflow-adherence.md` — NO-SKIP discipline + CHK-STEP receipts
 - **`ac-format-rule.md`** — BACs in Given/When/Then; TACs in EARS (5 patterns)
 - **`spec-completeness-rule.md`** — mandatory sections list (story-spec v2 (monolithic) or v3 (bifurcation) schema)
