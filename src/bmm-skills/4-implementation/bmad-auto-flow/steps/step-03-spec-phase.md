@@ -1,5 +1,5 @@
 ---
-nextStepFile: './step-04-team-create.md'
+nextStepFile: './step-04-team-lifecycle-guide.md'
 ---
 
 # Step 3: Spec Phase — Lead orchestrates inline + delegates to Phase 1 spec team (axe 1 + axe 5)
@@ -20,7 +20,7 @@ CHK-STEP-03-ENTRY PASSED — entering Step 3: Spec Phase with SPEC_PROFILE={prof
 
 ## STEP GOAL
 
-Run the spec phase as a hybrid : the **lead orchestrates inline** (drives the workflow + handles user-facing interactivity touchpoints — preserves TAC-6) but **delegates the heavy sub-tasks to a Phase 1 spec team of teammates** via TaskCreate (real-data investigation, external research, deep code investigation, multi-validator review). The lead never holds the raw teammate output — only synthetic summaries + trace_path. **0 usage of `Agent()`** — uniform teammate-based delegation per Anthropic Issue #32723 hub-and-spoke architecture (TAC-26).
+Run the spec phase as a hybrid : the **lead orchestrates inline** (drives the workflow + handles user-facing interactivity touchpoints — preserves TAC-6) but **delegates the heavy sub-tasks to a Phase 1 spec team of teammates** via TaskCreate (real-data investigation, external research, deep code investigation, multi-validator review). The lead never holds the raw teammate output — only synthetic summaries + trace_path. **0 usage of the Agent tool** — uniform teammate-based delegation per Anthropic Issue #32723 hub-and-spoke architecture (TAC-26a source-time grep ban + TAC-26b runtime spawning constraint).
 
 The choice of sub-workflow depends on `SPEC_PROFILE`:
 - `SPEC_PROFILE == 'full'` → invoke `bmad-create-story/workflow.md` 14-step flow with delegated sub-tasks 02e/05/06/07/12 (BAC-1 / TAC-1)
@@ -28,9 +28,9 @@ The choice of sub-workflow depends on `SPEC_PROFILE`:
 
 ## MANDATORY SEQUENCE
 
-### 1. Pre-condition check (TAC-6 + TAC-26)
+### 1. Pre-condition check (TAC-6 + TAC-26a/26b)
 
-Verify the lead orchestrates the spec phase inline (TAC-6 preserved — lead drives the workflow + user touchpoints) and that all heavy sub-tasks are delegated to teammates via TaskCreate (TAC-26 — no `Agent()` invocation in this skill). Both conditions are simultaneously enforced :
+Verify the lead orchestrates the spec phase inline (TAC-6 preserved — lead drives the workflow + user touchpoints) and that all heavy sub-tasks are delegated to teammates via TaskCreate (TAC-26a source-time grep ban + TAC-26b runtime constraint — no the Agent tool invocation in this skill). Both conditions are simultaneously enforced :
 
 - **Lead-side orchestration** : the lead reads each step file, drives the user-facing prompts (steps 01-04, 08-11, 13-14 for `bmad-create-story` ; steps 01, 03, 04, 05 for `bmad-quick-spec`), composes the final spec body
 - **Teammate-side heavy work** : the lead emits TaskCreate for each delegable sub-task (steps 02e, 05, 06, 07, 12 for `bmad-create-story` ; step 02 for `bmad-quick-spec`)
@@ -84,7 +84,7 @@ The lead reads `~/.claude/skills/bmad-create-story/workflow.md` AND each step fi
 | 13 — Comprehension Gate | LEAD INLINE | User confirms understanding |
 | 14 — Output + cleanup | LEAD INLINE | Lead writes spec file + transitions tracker |
 
-The lead's `Agent()` usage in step-12 (impartial scope-completeness audit) is replaced by TaskCreate to one of the spec-validators — no `Agent()` invocation remains.
+The lead's the Agent tool usage in step-12 (impartial scope-completeness audit) is replaced by TaskCreate to one of the spec-validators — no the Agent tool invocation remains.
 
 #### Case `SPEC_PROFILE == 'quick'` (bmad-quick-spec 6 steps)
 
@@ -206,8 +206,8 @@ Load and execute `{nextStepFile}`.
 
 ## SUCCESS / FAILURE
 
-- **SUCCESS**: lead orchestrated inline ; heavy sub-tasks delegated to spec team via TaskCreate ; spec team teammates each emitted phase_complete with trace_files ; TeamDelete invoked ; CHK-WORKFLOW-COMPLETE emitted by the sub-workflow ; ISSUE_ID + SPEC_PATH + TRACE_FILES captured ; TAC-28 pre-condition validated ; **0 `Agent()` invocations in this step (TAC-26)**
-- **FAILURE**: running heavy sub-tasks inline (TAC-1/TAC-2 violation), invoking `Agent()` literal (TAC-26 violation), delegating the lead-orchestration loop itself (TAC-6 violation), proceeding with null ISSUE_ID (TAC-28 violation), forgetting TeamDelete before step-04 (axe 5 lifecycle violation)
+- **SUCCESS**: lead orchestrated inline ; heavy sub-tasks delegated to spec team via TaskCreate ; spec team teammates each emitted phase_complete with trace_files ; TeamDelete invoked ; CHK-WORKFLOW-COMPLETE emitted by the sub-workflow ; ISSUE_ID + SPEC_PATH + TRACE_FILES captured ; TAC-28 pre-condition validated ; **0 the Agent tool invocations in this step (TAC-26a / TAC-26b)**
+- **FAILURE**: running heavy sub-tasks inline (TAC-1/TAC-2 violation), invoking the Agent tool literal (TAC-26a / TAC-26b violation), delegating the lead-orchestration loop itself (TAC-6 violation), proceeding with null ISSUE_ID (TAC-28 violation), forgetting TeamDelete before step-04 (axe 5 lifecycle violation)
 
 ---
 
@@ -217,7 +217,7 @@ Load and execute `{nextStepFile}`.
 CHK-STEP-03-EXIT PASSED — completed Step 3: Spec Phase
   actions_executed: TeamCreate(spec-{RUN_ID}, 5 teammates) ; lead drove {bmad-quick-spec | bmad-create-story} inline ; delegated heavy sub-tasks ({list of TaskCreate emitted}) ; awaited {N} phase_complete ; TeamDelete(spec-{RUN_ID}) ; captured ISSUE_ID={id}, SPEC_PATH={path}, TRACE_FILES={N entries}
   artifacts_produced: ISSUE_ID, SPEC_PATH, ISSUE_TITLE, TRACE_FILES (extended)
-  next_step: ./steps/step-04-team-create.md
+  next_step: ./steps/step-04-team-lifecycle-guide.md
 ```
 
-**Next:** Read FULLY and apply: `./steps/step-04-team-create.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+**Next:** Read FULLY and apply: `./steps/step-04-team-lifecycle-guide.md` — load the file with the Read tool, do not summarise from memory, do not skip sections.

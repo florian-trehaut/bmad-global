@@ -20,7 +20,20 @@ CHK-STEP-07-ENTRY PASSED — entering Step 7: Code Review Phase with code_review
 
 ## STEP GOAL
 
-Spawn 5 **distinct single-perspective teammates** (BAC-7 / BAC-12 / TAC-9 / TAC-21 / TAC-22 / TAC-23) inside an isolated phase team `codereview-{RUN_ID}`. Each teammate runs ONE perspective subskill from `bmad-code-review-perspective-{specs,correctness,security,operations,user-facing}` — NOT `bmad-code-review/workflow.md` (which uses Agent() removed from teammates per Anthropic platform contract). **Note** : engineering-quality (Meta-4) perspective is intentionally OUT OF SCOPE for auto-flow per OOS-9 — spec-driven autonomy and team-per-phase architecture limit Phase 7 to 5 teammates max ; engineering-quality coverage relies on standalone `/bmad-code-review` invocation when needed.
+Spawn 5 **distinct single-perspective teammates** (BAC-7 / BAC-12 / TAC-9 / TAC-21 / TAC-22 / TAC-23) inside an isolated phase team `codereview-{RUN_ID}`. Each teammate runs ONE perspective subskill from `bmad-code-review-perspective-{specs,correctness,security,operations,user-facing}` — NOT `bmad-code-review/workflow.md` (which uses the Agent tool, removed from teammates per Anthropic platform contract). **Note** : engineering-quality (Meta-4) perspective is intentionally OUT OF SCOPE for auto-flow per OOS-9 — spec-driven autonomy and team-per-phase architecture limit Phase 7 to 5 teammates max ; engineering-quality coverage relies on standalone `/bmad-code-review` invocation when needed.
+
+### OOS-9 Banner — engineering-quality coverage (M5 / `standalone-auto-flow-unification.md`)
+
+Display this banner to the user before TeamCreate (in `{COMMUNICATION_LANGUAGE}`):
+
+```
+{COMMUNICATION_LANGUAGE}-banner:
+ℹ️  Phase 7 (Code Review) couvre 5 perspectives : specs, correctness, security, operations (reserve), user-facing (reserve).
+   La perspective engineering-quality (Meta-4) n'est PAS exécutée dans cette phase (OOS-9 — sweet spot Anthropic 3-5 teammates).
+   Pour une revue engineering-quality complémentaire, invoque `/bmad-code-review` standalone après le merge.
+```
+
+The banner is informational — it does NOT block phase 7 execution. Its presence satisfies BAC-7 transparency requirement and resolves the silent OOS-9 contradiction documented in `standalone-auto-flow-unification.md` §Real-Data Findings.
 
 Composition (axe 5) : 3 always (specs, correctness, security) + 2 reserve (operations, user-facing). The 2 reserve teammates are spawned as part of TeamCreate but receive a TaskCreate ONLY if step-07 detects ops or UI changes in the diff — otherwise idle until TeamDelete (TAC-23).
 
@@ -196,6 +209,24 @@ For each perspective p in (ALWAYS + RESERVE_TASK_TRIGGERED — same triggering l
 ```
 
 ### 7. Wait for all phase_complete reports + aggregate
+
+#### 7a. Apply teammate completion gate per teammate (M25 / TAC-19)
+
+After receiving `TaskUpdate(status='completed')` from each code-review perspective teammate AND BEFORE aggregating verdicts or invoking TeamDelete:
+
+**Apply** `~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md` §Verification Algorithm. The algorithm verifies each `TaskUpdate(completed)` has a matching `SendMessage(phase_complete, task_id=N)`.
+
+```
+for each p in (ALWAYS + RESERVE_TASK_TRIGGERED):
+  on TaskUpdate(task_id='code-reviewer-{p}-1', status='completed'):
+    Apply ~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md §Verification Algorithm.
+    If gate FAILs → present Remediation menu [N]/[R]/[A]/[I] per gate spec
+    If gate PASSes → record verdict and proceed
+```
+
+This invocation operationalizes the gate per RevS-1 BLOCKER fix in `standalone-auto-flow-unification.md`.
+
+#### 7b. Aggregate findings
 
 Process inbound messages. Append `phase_complete.trace_files[]` to global TRACE_FILES per teammate. When all triggered teammates report `phase_complete`:
 

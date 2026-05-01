@@ -23,15 +23,38 @@ Apply this detection at the END of INITIALIZATION (after `team-router.md`, after
 
 ### 1. Look for a task contract
 
-When a workflow is invoked by Agent Teams (via TaskCreate), the spawn prompt embeds a `task_contract:` YAML block. Detect its presence:
+When a workflow is invoked by Agent Teams (via TaskCreate), the spawn prompt embeds a `task_contract:` YAML block. Detect its presence, then check for explicit `mode_override` (testing/debugging only):
 
 ```
-TEAMMATE_MODE = (the spawn prompt or the originating message contains a `task_contract:` YAML block as a top-level key)
+# Default detection: structural — TEAMMATE_MODE iff task_contract YAML is present
+if no `task_contract:` YAML block in spawn prompt:
+  TEAMMATE_MODE = false → skip rest of this rule (workflow runs standalone)
+
+# Explicit override (does NOT bypass ORCH_AUTHORIZED, computed in step 2)
+if task_contract.constraints.mode_override == 'standalone':
+  TEAMMATE_MODE = false → skip rest of this rule
+elif task_contract.constraints.mode_override == 'teammate':
+  TEAMMATE_MODE = true → continue to step 2
+else:
+  TEAMMATE_MODE = true → continue to step 2  # structural detection (default)
 ```
 
-If no such block is present → `TEAMMATE_MODE = false`. The workflow runs standalone (the default behavior). Skip the rest of this rule.
+**Critical (RevSec-1 mitigation)** : `mode_override='standalone'` only suppresses TEAMMATE_MODE branching (interactivity rerouting per §A, tracker_writes deferral per §B, phase_complete contract per §D). It does NOT bypass `ORCH_AUTHORIZED` computation in step 2 — orchestrator-as-teammate authorization rules still apply per `orchestrator-registry.md`. This separation prevents `mode_override` from becoming a confused-deputy bypass for D16 enforcement.
 
-If present → continue to step 2.
+### 1b. Validate operating_rules paths (HALT-eligible — RevSec-4 hardening)
+
+If `task_contract.constraints.operating_rules` is non-empty, validate each path before loading any of its contents :
+
+```
+for path in task_contract.constraints.operating_rules:
+  canonical = realpath(path)  # resolve `~`, follow symlinks, eliminate `..`
+  if not canonical.startswith(expanduser("~/.claude/skills/bmad-shared/")):
+    HALT — operating_rules entry escapes bmad-shared/ (path traversal attempt or misconfigured contract)
+  if not file_exists(canonical):
+    HALT — operating_rules entry does not resolve to an existing file
+```
+
+Why this exists : `operating_rules` paths are loaded BEFORE the workflow's INIT block runs, which means they are read into the teammate's context before any defenses kick in. A buggy or malicious orchestrator (or future orchestrator added to `orchestrator-registry.md`) could populate `operating_rules` with a path traversal value (e.g. `~/.claude/skills/bmad-shared/../../etc/passwd`) ; the runtime teammate would Read that path before INIT, potentially exfiltrating system files into the trace file's "Task Assignment" section before secret-scrubbing applies. The realpath check enforces the schema's documented invariant ("MUST resolve to an existing file under `~/.claude/skills/bmad-shared/`") at runtime — defense-in-depth complementary to the static check that may exist in `validate-skills.js` (currently absent — future HARD rule).
 
 ### 2. Validate orchestrator authorization (HALT-eligible)
 
@@ -441,11 +464,62 @@ If TEAMMATE_MODE=true and ORCH_AUTHORIZED=true, every subsequent step branches o
 
 ---
 
+## ENFORCEMENT Registry — AskUserQuestion call-site audit (M21 / TAC-12)
+
+This registry enumerates every step file in teammate-spawnable workflows that contains an `AskUserQuestion` call. Each entry documents the rerouting status: whether the call is wrapped in a TEAMMATE_MODE-conditional block (`If TEAMMATE_MODE=true: SendMessage(question)` / `else: AskUserQuestion`) and is therefore compliant, or whether it is unconditional and would silently fail in TEAMMATE_MODE.
+
+The HARD-09 rule in `tools/validate-skills.js` (severity HIGH, exit 1 in `--strict`) flags non-compliant call sites. The validator enumerates teammate-spawnable workflows via the SKILL.md frontmatter `teammate_spawnable: true` field (per Data Model in `standalone-auto-flow-unification.md` §"SKILL.md frontmatter delta").
+
+### Registry — verified counts at impl baseline
+
+| Workflow | Step file | AskUserQuestion calls | Compliance | Notes |
+|----------|-----------|-----------------------|------------|-------|
+| bmad-quick-spec | `steps/step-06-review.md` | 1 | wrapped (M21 + HARD-09) | wrapped in TEAMMATE_MODE-conditional |
+| bmad-dev-story | `steps/step-07-plan-approval.md` | 1 | wrapped via spec-driven autonomy (acknowledge) | reroutes to lead per `autonomy_policy=spec-driven` (cross-story dep) |
+| bmad-quick-dev | `steps/step-05-adversarial-review.md` | 1 | wrapped (M21 + HARD-09) | wrapped in TEAMMATE_MODE-conditional |
+| bmad-review-story | `steps/step-06-interactive-review.md` | 2 | wrapped (M21 + HARD-09) | both calls wrapped |
+| bmad-review-story | `steps/step-06b-dod-update.md` | 2 | wrapped (M21 + HARD-09) | both calls wrapped |
+| **Total** | **5 step files in 4 lifecycle skills** | **7 actual interactive calls** | **all wrapped** | enumerated via SKILL.md `teammate_spawnable: true`. Note: the count reflects ACTUAL interactive prompts (verified by grep + manual inspection per RevCorr-2/RevCorr-4) — documentation/negative references like "Do NOT call AskUserQuestion" are excluded |
+
+### Skills NOT in the registry (no AskUserQuestion calls)
+
+These teammate-spawnable skills have `teammate_spawnable: true` but contain 0 AskUserQuestion calls — the HARD-09 rule applies but is a no-op for them :
+
+- bmad-create-story (full spec lead-orchestrated, no AskUserQuestion in step files — verified via grep — RevS-3 fix)
+- bmad-code-review-perspective-{specs,correctness,security,operations,user-facing,engineering-quality} (6 perspective skills — pure teammate, no user touchpoints)
+- bmad-validation-{metier,frontend,desktop} (3 validation skills — pure teammate, no user touchpoints)
+
+### Skills NOT teammate-spawnable (HARD-09 rule does NOT apply)
+
+These skills are user-only entry points (lead orchestrators OR pure inline) — `teammate_spawnable: false` in SKILL.md frontmatter, HARD-09 skips them :
+
+- bmad-auto-flow (the orchestrator itself — never spawned as teammate per `orchestrator-registry.md` "orchestrators not spawnable" rule)
+- bmad-help, bmad-status, bmad-daily-planning, bmad-project-init, bmad-knowledge-bootstrap, bmad-knowledge-refresh, bmad-create-prd, bmad-create-architecture, bmad-sprint-planning, bmad-troubleshoot, bmad-retrospective (10 hors-lifecycle skills — preserved inline-only)
+- bmad-code-review (orchestrator workers via `Agent()` in standalone — TEAMMATE_MODE=true HALTs per its own workflow, so it is NOT teammate-spawnable)
+
+### Adding a new AskUserQuestion call to a teammate-spawnable workflow
+
+When adding `AskUserQuestion` to a step file in a workflow whose SKILL.md declares `teammate_spawnable: true`, the call MUST be wrapped in :
+
+```markdown
+If TEAMMATE_MODE=true:
+  Emit SendMessage(question) per §A — block until question_reply
+Else:
+  AskUserQuestion(...) directly
+```
+
+The HARD-09 validator detects unwrapped calls via static analysis (regex looking for `AskUserQuestion` outside a `TEAMMATE_MODE` conditional block). On detection : exit 1 in `--strict`, with offending file:line cited.
+
+If the new call cannot be wrapped (e.g. it would change semantics in standalone mode), the resolution is to set `teammate_spawnable: false` for the workflow OR to refactor the step to remove the user touchpoint. There is no allow-list mechanism — the rule is binary.
+
+---
+
 ## Cross-References
 
 - `src/core-skills/bmad-shared/teams/orchestrator-registry.md` — the closed list of authorized orchestrator skills (consumed by this rule's authorization step)
 - `src/core-skills/bmad-shared/teams/task-contract-schema.md` — defines the `metadata.{orchestrator_invoked, orchestrator_skill, parent_phase}` block and `constraints.tracker_writes` field consumed by this rule
 - `src/core-skills/bmad-shared/lifecycle/worktree-lifecycle.md` — defines Branch D (Provided Path Mode) consumed when `worktree_path` is provided
-- `src/core-skills/bmad-shared/teams/spawn-protocol.md` — the orchestrator-side counterpart that builds the spawn prompt with these contract fields
+- `src/core-skills/bmad-shared/teams/spawn-protocol.md` — the orchestrator-side counterpart that builds the spawn prompt with these contract fields ; documents the orchestrator-as-teammate HALT scenario (TAC-15)
+- `tools/validate-skills.js` — implements HARD-09 (M23) referencing the registry above
 - `_bmad-output/planning-artifacts/spec-agent-teams-integration.md` §8.1 Amendments — the architectural authorization for the D16 override
 - `src/bmm-skills/4-implementation/bmad-auto-flow/` — the only currently-registered orchestrator (per `orchestrator-registry.md`)

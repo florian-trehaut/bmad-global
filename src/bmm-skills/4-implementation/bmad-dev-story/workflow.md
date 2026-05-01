@@ -60,10 +60,11 @@ Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
 HALT if either file is missing with the message defined in `knowledge-loading.md` (run `/bmad-knowledge-bootstrap`).
 
-### 4. Set defaults
+### 4. Set defaults (PRE-§4b — minimal, no EXECUTION_MODE yet — M11 / RevS-4b)
 
-- `EXECUTION_MODE = SOLO` (always solo — no team mode)
 - `MR_IID = null` (populated by step-04)
+
+(Note: `EXECUTION_MODE` is intentionally NOT set here. It is set in §4c below — AFTER §4b detects TEAMMATE_MODE — so that teammate-spawned runs adopt EXECUTION_MODE=TEAM rather than the prior unconditional SOLO assignment that broke `/bmad-dev-story` standalone vs auto-flow Phase 6 differentiation.)
 
 ### 4b. Detect teammate mode
 
@@ -80,6 +81,35 @@ When TEAMMATE_MODE=true and ORCH_AUTHORIZED=true:
 - step-03-setup-worktree consumes the provided `WORKTREE_PATH` via `worktree-lifecycle.md` Branch D (no new worktree created; Branch D supersedes Branch A)
 - step-06-mark-in-progress, step-13-push-mr, step-14-complete emit `tracker_write_request` SendMessage instead of direct tracker writes (per `teammate-mode-routing.md` §B)
 - step-07-plan-approval reroutes the plan-approval AskUserQuestion via SendMessage (§A) — TAC-18 enforcement
+
+### 4c. Set EXECUTION_MODE conditionally (M11 of `standalone-auto-flow-unification.md`)
+
+```
+EXECUTION_MODE = 'TEAM' if TEAMMATE_MODE else 'SOLO'
+```
+
+**Rationale (M11 / RevS-4b)** : the prior unconditional `EXECUTION_MODE = SOLO` assignment in §4 ran BEFORE §4b detected TEAMMATE_MODE — preserving SOLO even in teammate context. This broke the contract that `/bmad-dev-story` standalone runs SOLO mode AND teammate-spawned via auto-flow Phase 6 runs TEAM mode. Moving the assignment to §4c (after §4b) restores the correct conditional behavior.
+
+VM verifying this : `/bmad-dev-story` standalone → SOLO mode preserved AND teammate-spawned via auto-flow Phase 6 → TEAM mode active (per `standalone-auto-flow-unification.md` §VM-NR-2).
+
+Audit downstream EXECUTION_MODE references in step-06-mark-in-progress, step-13-push-mr, step-14-complete to confirm both branches resolve correctly.
+
+### 4d. TEAMMATE_MODE skip-INIT-redundancy branch (M12 of `standalone-auto-flow-unification.md`)
+
+When TEAMMATE_MODE=true, skip extracting variables that are already provided in the spawn `task_contract` — the orchestrator has already collected and propagated them. This achieves ~30% INIT context reduction by avoiding duplicate Reads of `workflow-context.md` for variables that travel via the contract.
+
+**Variables to SKIP extraction from `workflow-context.md` when TEAMMATE_MODE=true** (read from `task_contract` instead) :
+
+| Variable | Source in TEAMMATE_MODE | Source in standalone (TEAMMATE_MODE=false) |
+|----------|-------------------------|---------------------------------------------|
+| `WORKTREE_PATH` | `task_contract.constraints.worktree_path` | derived from `WORKTREE_TEMPLATE_DEV` after step-03 |
+| `BRANCH_NAME` (= `worktree_branch_name`) | `task_contract.constraints.worktree_branch_name` (M18 field) | derived from `BRANCH_TEMPLATE` after step-03 |
+| `ISSUE_IDENTIFIER` | `task_contract.input_artifacts[].identifier` | gathered via step-01-discover |
+| `TRACKER_STATES` (subset for transitions) | provided via `tracker_write_request` ack from lead | extracted from `workflow-context.md` |
+
+The remaining ~25 variables (FORGE_*, INSTALL_COMMAND, BUILD_COMMAND, TEST_COMMAND, LINT_COMMAND, etc.) MUST still be extracted from `workflow-context.md` — they are project-wide defaults not propagated via contract.
+
+In standalone (TEAMMATE_MODE=false), all 25+ variables are extracted from `workflow-context.md` per §1 above (no skip — full INIT preserved per VM-NR-2).
 
 ### 5. CHK-INIT — Initialization Read Receipt
 
@@ -99,7 +129,8 @@ CHK-INIT PASSED — bmad-dev-story initialization complete:
   orch_authorized: {true | false | "n/a"}
   user_name: {USER_NAME}
   communication_language: {COMMUNICATION_LANGUAGE}
-  defaults: EXECUTION_MODE=SOLO, MR_IID=null
+  defaults: EXECUTION_MODE={SOLO|TEAM} (per §4c — TEAM if TEAMMATE_MODE else SOLO), MR_IID=null
+  init_skipped_vars (M12): {list of variables skipped extraction from workflow-context.md when TEAMMATE_MODE=true (worktree_path, branch_name, issue_identifier, tracker_states subset) | "n/a — TEAMMATE_MODE=false, full extraction"}
 ```
 
 ---

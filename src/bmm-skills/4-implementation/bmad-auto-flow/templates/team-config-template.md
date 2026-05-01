@@ -2,7 +2,7 @@
 
 **Use this template when creating a new orchestrator skill that needs Agent Teams.** The template mirrors the structure of `bmad-auto-flow/team-workflows/team-config.md` (the first reference implementation in BMAD).
 
-**Loaded by:** `team-router.md` during INITIALIZATION when the parent skill is invoked, AND by the parent skill's `step-04-team-create.md` (or equivalent) to build the `TeamCreate` payload.
+**Loaded by:** `team-router.md` during INITIALIZATION when the parent skill is invoked, AND by the parent skill's `step-04-team-lifecycle-guide.md` (or equivalent) to build the `TeamCreate` payload.
 
 **Reminder:** Adding a new orchestrator requires registration in `src/core-skills/bmad-shared/teams/orchestrator-registry.md` (see that file's "How to Add a New Orchestrator Skill" section). Skills NOT in the registry MUST NOT set `metadata.orchestrator_invoked: true`.
 

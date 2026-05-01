@@ -45,13 +45,15 @@ Bonjour {USER_NAME} — auto-flow orchestrator (BMAD lifecycle complete: spec �
 Permission mode inherited by all teammates: {permission_mode}
 {If TEAM_MODE=false:}
 ⚠️  TEAM_MODE=false — running phases sequentially inline in this session (no Agent Teams).
-   Phases 2-5 will execute in YOUR context, not in isolated teammates. Question routing is direct (no batching). To enable team mode: set `agent_teams.enabled: true` in workflow-context.md and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1.
+   Phases 2-5 will execute in YOUR context, not in isolated teammates. Question routing is direct (no batching).
+   ~3x context cost vs team mode (heavy work re-inlines into orchestrator — derivation in spec §Real-Data Findings).
+   To enable team mode: set `agent_teams.enabled: true` in workflow-context.md and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1.
 {End if}
 ```
 
 The permission_mode value is read from the current Claude Code session (look for the system reminder `Auto Mode Active`, `Plan Mode`, or default mode).
 
-The banner is the operational form of TAC-29 — it MUST appear before any TeamCreate call.
+The banner is the operational form of TAC-29 — it MUST appear before any TeamCreate call. The "~3x context cost" warning satisfies TAC-10 / BAC-7 (M4 of `standalone-auto-flow-unification.md`) — derivation: Anthropic baseline ~15× tokens for multi-agent vs single-agent + ~30% INIT savings observed when TEAMMATE_MODE skip-INIT-redundancy applied; TEAM_MODE=false re-inlines heavy work into orchestrator's 1M-token window, empirically estimated ~3x current TEAM_MODE=true cost.
 
 ### 2. Gather feature description
 
@@ -63,14 +65,70 @@ Call AskUserQuestion (orchestrator's only direct user-touch points are this step
 
 Store as `FEATURE_DESCRIPTION`.
 
-### 3. Choose spec profile
+Optionally, the user may invoke `/bmad-auto-flow --profile=quick` or `/bmad-auto-flow --profile=full` via the slash-command argument. If a `--profile` flag is present, it MUST be parsed and stored as `PROFILE_OVERRIDE` (one of `quick`, `full`, or any other value). This is consumed in §3 below.
 
-Call AskUserQuestion:
+### 3. Choose spec profile (M1 — auto-detection per BAC-1, no [Q]/[F] menu)
+
+Per BAC-1, the orchestrator MUST select `SPEC_PROFILE` automatically without emitting an AskUserQuestion menu. Auto-detection uses the same heuristic trigger table as `bmad-quick-spec/steps/step-01-entry.md` §3 (proven heuristic, reused per OOS-9).
+
+#### 3.1. Apply override flag (TAC-2)
+
+If `PROFILE_OVERRIDE` is set:
 
 ```
-Profil spec :
-[Q] Quick — bmad-quick-spec (6 steps, condensé, scope interne, pas d'investigation real-data ; bon pour petites évolutions)
-[F] Full — bmad-create-story (14 steps, investigation rigoureuse real-data + recherche externe ; bon pour features impactantes ou avec dépendances externes)
+if PROFILE_OVERRIDE == 'quick':
+  SPEC_PROFILE = 'quick'
+  log: "Profile override: --profile=quick → SPEC_PROFILE=quick"
+elif PROFILE_OVERRIDE == 'full':
+  SPEC_PROFILE = 'full'
+  log: "Profile override: --profile=full → SPEC_PROFILE=full"
+elif PROFILE_OVERRIDE is set but not in {quick, full}:
+  # TAC-2b — Unwanted: explicit refusal, no fall-through
+  Display error message:
+    "ERROR: --profile value '{PROFILE_OVERRIDE}' is not a valid value.
+     Allowed values: quick | full
+     Re-invoke /bmad-auto-flow with a valid --profile flag, or omit it for auto-detection."
+  HALT.
+```
+
+If `PROFILE_OVERRIDE` is unset → proceed to §3.2.
+
+#### 3.2. Auto-detection heuristic (TAC-1)
+
+Inspect `FEATURE_DESCRIPTION` for keywords / patterns that indicate scope BEYOND the quick profile (full profile required). The trigger table is reused verbatim from `bmad-quick-spec/steps/step-01-entry.md` §3:
+
+| Trigger | Pattern in FEATURE_DESCRIPTION | Action |
+|---------|--------------------------------|--------|
+| External API | mentions third-party API, webhook, OAuth provider, payment gateway, external service | SPEC_PROFILE = full |
+| Real data dependency | mentions production data, real customer records, prod DB, prod cloud logs | SPEC_PROFILE = full |
+| Multi-bounded-context | mentions ≥ 2 distinct domains (auth + billing, frontend + backend with new API surface) | SPEC_PROFILE = full |
+| Compliance | mentions GDPR, HIPAA, SOC2, PCI-DSS, audit | SPEC_PROFILE = full (Security Gate review needed) |
+| Scope > 5 ACs | description sketches > 5 distinct user-observable behaviors | SPEC_PROFILE = full |
+
+```
+if any trigger fires:
+  SPEC_PROFILE = 'full'
+  TRIGGERS_DETECTED = [list of trigger names that fired]
+else:
+  SPEC_PROFILE = 'quick'
+  TRIGGERS_DETECTED = []
+```
+
+#### 3.3. Announce the auto-detected profile (state-machine "announced mode" per External Research §State-machine context detection)
+
+Display to the user:
+
+```
+Profil spec auto-détecté : {SPEC_PROFILE}
+{If SPEC_PROFILE == 'full':}
+Triggers détectés dans FEATURE_DESCRIPTION : {TRIGGERS_DETECTED join ", "}
+→ Invocation de bmad-create-story (14 steps, investigation real-data + recherche externe).
+{Else:}
+Aucun trigger détecté qui dépasse le profile quick.
+→ Invocation de bmad-quick-spec (6 steps, condensé, scope interne).
+{End if}
+
+Override possible : invoque `/bmad-auto-flow --profile=quick` ou `--profile=full` pour bypass l'auto-détection.
 ```
 
 Store as `SPEC_PROFILE = 'quick' | 'full'`. Per BAC-13, this choice determines which dev workflow is invoked at step-06.

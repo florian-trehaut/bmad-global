@@ -1,6 +1,6 @@
 # Question Routing — Orchestrator-Side Protocol
 
-**Loaded by:** `bmad-auto-flow/steps/step-04-team-create.md` onwards. Defines the orchestrator's batching policy for `question` SendMessage payloads coming from teammates, the AskUserQuestion presentation format, and the reply routing back to teammates via SendMessage.
+**Loaded by:** `bmad-auto-flow/steps/step-04-team-lifecycle-guide.md` onwards. Defines the orchestrator's batching policy for `question` SendMessage payloads coming from teammates, the AskUserQuestion presentation format, and the reply routing back to teammates via SendMessage.
 
 This protocol implements TAC-23 (batching: N=3 OR T=30s OR URGENT), TAC-24 (block teammates until reply), and TAC-27 (serialize SendMessage handling — single-threaded queue).
 

@@ -28,7 +28,15 @@ This uses **step-file architecture** for focused execution:
 
 ## INITIALIZATION
 
-### 1. Load shared rules
+(Canonical 4-section pattern per dev-story — M10 of `standalone-auto-flow-unification.md` normalization fix : §1 project context, §2 shared rules, §3 knowledge, §4 defaults / paths / related workflows, §4b detect teammate mode, §5 CHK-INIT.)
+
+### 1. Load project context
+
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` — resolve `user_name`, `communication_language`, `user_skill_level`, tracker, forge, quality gate. **HALT if missing.**
+
+**Communication:** Always speak in the configured `communication_language`.
+
+### 2. Load shared rules
 
 Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.
 
@@ -44,31 +52,28 @@ Apply these rules for the entire workflow execution. Key rules for this workflow
 - **`boundaries-rule.md`** — boundaries triple (Always / Ask First / Never)
 - **`knowledge-schema.md`** — schema_version v1.1 expected (with optional sections data-sources / compliance-requirements / observability-standards / nfr-defaults / security-baseline)
 
-### 2. Configuration Loading (REQUIRED)
+### 3. Load knowledge files (REQUIRED)
 
 Apply the protocol in `~/.claude/skills/bmad-shared/core/knowledge-loading.md`:
 
-- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` — resolve `user_name`, `communication_language`, `user_skill_level`, tracker, forge, quality gate. HALT if missing.
-- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — conventions (`#conventions`), test rules (`#test-rules`), tech stack (`#tech-stack`), validation tooling (`#validation-tooling`). HALT if missing.
+- **Read** `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md` — conventions (`#conventions`), test rules (`#test-rules`), tech stack (`#tech-stack`), validation tooling (`#validation-tooling`). **HALT if missing.**
 - **Optional v1.1 sections (additive, no HALT if absent):** `#data-sources`, `#compliance-requirements`, `#observability-standards`, `#nfr-defaults`, `#security-baseline` — used to cross-reference per-story values when the story declares NFR / security / observability requirements.
 
-**Communication:** Always speak in the configured `communication_language`.
+### 4. Set defaults / paths / related workflows
 
-### 3. Paths
+```yaml
+wipFile: '{implementation_artifacts}/spec-wip.md'
+related_workflows:
+  escalation_planning: '/bmad-create-story'   # story creation/enrichment, full v2 profile
+  escalation_full: '/bmad-create-prd'         # PRD workflow
+  spec_template_quick: 'templates/spec-template.md'
+```
 
-- `wipFile` = `{implementation_artifacts}/spec-wip.md`
-
-### 4. Related Workflows
-
-- Escalation to planning: `/bmad-create-story` (story creation/enrichment, full v2 profile)
-- Escalation to full method: `/bmad-create-prd` (PRD workflow)
-- Spec template (v2 quick profile): `templates/spec-template.md`
-
-### 5. Detect teammate mode (inserted AFTER Configuration Loading, BEFORE CHK-INIT — non-canonical INIT structure per F-005)
+### 4b. Detect teammate mode (canonical position — same as dev-story §4b)
 
 Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. This sets:
 
-- `TEAMMATE_MODE` (boolean)
+- `TEAMMATE_MODE` (boolean — true when invoked by an Agent Teams orchestrator's dev phase)
 - `ORCH_AUTHORIZED` (boolean — only meaningful when TEAMMATE_MODE=true)
 - `LEAD_NAME`, `TASK_ID`, `WORKTREE_PATH`, `TRACKER_WRITES_ENABLED` (when TEAMMATE_MODE=true)
 

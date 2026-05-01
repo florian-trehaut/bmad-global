@@ -117,6 +117,21 @@ Read FULLY and apply: ~/.claude/skills/bmad-review-story/workflow.md — load th
 Execute inline. The workflow's TEAMMATE_MODE detection finds task_contract is null → standalone mode. Use the orchestrator's local state directly (ISSUE_ID, WORKTREE_PATH, etc.) instead of task_contract fields.
 ```
 
+### 4b. Apply teammate completion gate (M25 / TAC-19 — orchestrator-side enforcement)
+
+After receiving `TaskUpdate(status='completed')` from the spec-reviewer teammate AND BEFORE advancing to verdict processing or TeamDelete:
+
+**Apply** `~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md` §Verification Algorithm. The algorithm verifies that for each `TaskUpdate(completed)` a corresponding `SendMessage(phase_complete, task_id=N)` was received.
+
+```
+on TaskUpdate(task_id='spec-reviewer-1', status='completed'):
+  Apply ~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md §Verification Algorithm.
+  If gate FAILs (no SendMessage OR invalid fields) → present Remediation menu [N]/[R]/[A]/[I] per gate spec
+  If gate PASSes → record verdict and proceed to step 5 below
+```
+
+This invocation operationalizes the gate that was previously documented but unwired (per RevS-1 BLOCKER fix in `standalone-auto-flow-unification.md`). The pattern was empirically validated during Phase 4 of `standalone-bmad-shared-restructure.md` where a teammate emitted `TaskUpdate(completed)` without `SendMessage(phase_complete)`.
+
 ### 5. Process verdict
 
 After `phase_complete` is received (or inline workflow returns):

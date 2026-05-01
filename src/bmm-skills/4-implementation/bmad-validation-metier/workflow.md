@@ -4,6 +4,19 @@
 
 ---
 
+## No worktree required (M16 of `standalone-auto-flow-unification.md`)
+
+**This workflow is API/DB-driven and runs IN-PLACE in the project root** — it does NOT create a worktree. Validation Metier executes business validation queries against staging or production environments (real-environment proof per `validation/validation-protocol.md#proof-principles`) — there is no source code modification, no git branch, no MR.
+
+This is intentionally different from the `bmad-validation-{frontend,desktop}` pattern (those create worktrees because they execute build/test commands that mutate filesystem state). Metier validation does not :
+- It does NOT have a `step-03-setup-worktree.md` step (and never should).
+- The `WORKTREE_TEMPLATE_VALIDATION` variable extracted in §1 below is informational only — it is not consumed by metier.
+- When invoked via `bmad-auto-flow` Phase 8 with `task_contract.constraints.worktree_path` set, the validator IGNORES the path and runs in the orchestrator's project root — Branch D of `worktree-lifecycle.md` does NOT apply.
+
+This decision is committed per D-7 of `standalone-auto-flow-unification.md` (option "document explicitly that metier validation runs in-place").
+
+---
+
 ## INITIALIZATION
 
 ### 1. Load project context

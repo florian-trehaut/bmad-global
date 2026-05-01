@@ -34,14 +34,24 @@ Greet the user (or the orchestrator if TEAMMATE_MODE=true), gather the feature d
 
 ## MANDATORY SEQUENCE
 
-### 1. Greet
+### 1. Greet (TEAMMATE_MODE-conditional per M8 / TAC-3)
 
-In `{COMMUNICATION_LANGUAGE}` to `{USER_NAME}` (standalone) or to `{LEAD_NAME}` via SendMessage (TEAMMATE_MODE):
+**If TEAMMATE_MODE=false (standalone)** — display the greet to `{USER_NAME}` in `{COMMUNICATION_LANGUAGE}` :
 
 ```
 Bonjour {user_name} — je vais te guider pour rédiger une spec condensée (story-spec v2 quick profile, ~6 étapes).
 Décris la fonctionnalité en 2–3 phrases : quel problème, pour qui, quel résultat attendu.
 ```
+
+**If TEAMMATE_MODE=true** — SKIP the greet entirely. The lead has already gathered FEATURE_DESCRIPTION via auto-flow step-01-entry.md and propagated it via `task_contract.input_artifacts`. Extract :
+
+```
+FEATURE_DESCRIPTION = task_contract.input_artifacts[type='document'].content
+                   OR task_contract.input_artifacts[type='custom'].data.feature_description
+                   OR HALT (TAC-4 violation: required input missing)
+```
+
+Skip §2 Gather feature description below — proceed directly to §3 Escalation thresholds with the propagated FEATURE_DESCRIPTION.
 
 ### 2. Gather feature description
 

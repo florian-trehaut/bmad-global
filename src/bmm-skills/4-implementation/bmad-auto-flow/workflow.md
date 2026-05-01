@@ -52,7 +52,7 @@ Apply `~/.claude/skills/bmad-shared/teams/team-router.md`. This sets:
 - `KNOWLEDGE_MAPPING`, `GLOBAL_KNOWLEDGE`
 
 Validate orchestrator-specific fields from `agent_teams` block:
-- `dev_team_size` (default 1, must be in `[1, max_teammates]`) — TAC-26
+- `dev_team_size` (default 1, must be in `[1, max_teammates]`) — TAC-26c (clamping rule)
 - `code_review_team_size` (default 3, must be in `[1, max_teammates]`) — BAC-12
 - `phase_timeout_minutes` (default 30, must be positive) — TAC-14
 - `audit_log_enabled` (default false, must be boolean) — T-SEC-1
@@ -190,7 +190,11 @@ You are the **lead orchestrator** of a 5-phase BMAD lifecycle. You:
 - **SERIALIZE SENDMESSAGE HANDLING (TAC-27)** — single-threaded message queue, processed in arrival order. See `data/question-routing.md` §Ordering.
 - **AUTONOMY POLICY PROPAGATION** — every dev teammate spawn contract sets `task_contract.constraints.autonomy_policy: spec-driven` (TAC-4). Other phase teammates default to `strict` unless explicitly noted. Spec-driven policy semantics defined in `teammate-mode-routing.md §Autonomy policy enforcement`.
 - **TRACE PATH PROPAGATION** — every spawn contract sets `task_contract.constraints.trace_path: /tmp/bmad-{PROJECT_SLUG}-auto-flow/{RUN_ID}/{role}-{task_id}.md` (TAC-13). Each teammate writes detailed work to its trace file BEFORE emitting `phase_complete`. Lead aggregates `phase_complete.trace_files[]` into `TRACE_FILES` and renders them in the final user report (step-09).
-- **FORBIDDEN: `Agent(` literal in this skill** — per Anthropic Issue #32723 hub-and-spoke architecture, all delegation in auto-flow happens via TaskCreate to teammates within phase teams. Forks via `Agent()` are OUT OF SCOPE for auto-flow (TAC-26). Verification : `grep -nE "Agent\(" src/bmm-skills/4-implementation/bmad-auto-flow/` MUST return 0 hits — strict regex matching only literal tool invocation, not prose mentions ("Agent Teams", "Agent tool", etc.).
+- **FORBIDDEN: `Agent(` literal in this skill (TAC-26a — source-time grep ban)** — per Anthropic Issue #32723 hub-and-spoke architecture, all delegation in auto-flow happens via TaskCreate to teammates within phase teams. Forks via `Agent()` are OUT OF SCOPE for auto-flow. Verification : `grep -nE "Agent\(" src/bmm-skills/4-implementation/bmad-auto-flow/` MUST return 0 hits — strict regex matching only literal tool invocation, not prose mentions ("Agent Teams", "Agent tool", etc.). The original rule has been split into three semantic axes (per DesB-1 of `standalone-auto-flow-unification.md`) :
+  - **TAC-26a (source-time grep ban)** — verbatim : "The bmad-auto-flow source files MUST NOT contain `Agent\(` literal. Verification: `grep -nE \"Agent\\(\" src/bmm-skills/4-implementation/bmad-auto-flow/` returns 0 hits." (anchor: `#tac-26a`)
+  - **TAC-26b (runtime spawning constraint)** — verbatim : "Teammates spawned by bmad-auto-flow MUST NOT invoke `Agent()` at runtime. Enforcement: Anthropic Agent Teams platform per Issue #32723 (TeamCreate unavailability for teammates is structural)." (anchor: `#tac-26b`)
+  - **TAC-26c (dev_team_size clamping)** — verbatim : "The `agent_teams.dev_team_size` field MUST satisfy `1 <= dev_team_size <= max_teammates`. Validated at orchestrator startup." (anchor: `#tac-26c`)
+  Cross-doc linking : Markdown anchors `#tac-26a`, `#tac-26b`, `#tac-26c` (per Guardrail 9 of `standalone-auto-flow-unification.md`).
 - **TEAM-PER-PHASE LIFECYCLE (axe 5)** — each lifecycle phase (1-spec, 5-review, 6-dev, 7-code-review, 8-validation) instantiates its own phase-scoped team via `TeamCreate(name="{phase}-{RUN_ID}", composition from team-config.md)` at phase start, runs `TaskCreate(s)` to each teammate per its `workflow_to_invoke`, awaits `phase_complete` from each teammate, then `TeamDelete(name="{phase}-{RUN_ID}")` before transitioning. Each team's size respects `max_teammates ≤ 5` (BAC-7 / TAC-21 / TAC-22 / TAC-23).
 - **STRICT WORKFLOW EXECUTION (BAC-8 / TAC-24)** — every TaskCreate spawn contract MUST include `workflow_to_invoke: '{absolute path to workflow.md or step file}'`. The teammate MUST execute that workflow integrally per `teammate-mode-routing.md §Required Workflow Application` — Read all step files, emit CHK-INIT + CHK-STEP-NN-ENTRY/EXIT receipts, emit `phase_complete` only after `CHK-WORKFLOW-COMPLETE`. No skim, no shortcut, no rationalization (R-01..R-12 from `workflow-adherence.md`).
 
@@ -203,7 +207,7 @@ You are the **lead orchestrator** of a 5-phase BMAD lifecycle. You:
 | 1 | `step-01-entry.md` | Greet user, gather feature description, choose spec profile (quick / full), display permission-mode banner (TAC-29) |
 | 2 | `step-02-worktree-setup.md` | Create single shared worktree IF `worktree_enabled=true` (BAC-6) — else skip (BAC-7) |
 | 3 | `step-03-spec-phase.md` | Run spec INLINE — invoke `bmad-create-story` (full) or `bmad-quick-spec` (quick) in this context |
-| 4 | `step-04-team-create.md` | TeamCreate with config from `team-workflows/team-config.md` (skipped if TEAM_MODE=false) |
+| 4 | `step-04-team-lifecycle-guide.md` | TeamCreate with config from `team-workflows/team-config.md` (skipped if TEAM_MODE=false) |
 | 5 | `step-05-review-phase.md` | Spawn 1 spec-reviewer teammate; await `phase_complete`; transition tracker → reviewed |
 | 6 | `step-06-dev-phase.md` | Spawn N=`dev_team_size` dev teammates (default 1); workflow choice based on SPEC_PROFILE (BAC-13); await `phase_complete`; transition tracker → review |
 | 7 | `step-07-code-review-phase.md` | Spawn N=`code_review_team_size` distinct single-perspective teammates (BAC-12 / TAC-9); collect findings; transition tracker → ready-for-merge |
@@ -216,7 +220,7 @@ Each step file has its own `nextStepFile` frontmatter for sequential enforcement
 
 ## SUBAGENT WORKFLOWS
 
-This orchestrator does NOT use `Agent()` (subagent dispatch). It uses Agent Teams (`TeamCreate`, `TaskCreate`, `SendMessage`). For TEAM_MODE=false fallback, all phase logic runs inline in the lead's context — no subagent dispatch in any path.
+This orchestrator does NOT use the Agent tool (subagent dispatch). It uses Agent Teams (`TeamCreate`, `TaskCreate`, `SendMessage`). For TEAM_MODE=false fallback, all phase logic runs inline in the lead's context — no subagent dispatch in any path.
 
 ---
 

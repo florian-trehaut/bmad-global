@@ -65,13 +65,21 @@ HALT if either file is missing (run `/bmad-knowledge-bootstrap`).
 
 Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. **Important:** standalone `bmad-code-review` uses `Agent()` for parallel meta dispatch (preserved unchanged for backward compatibility per VM-NR-4 of story `auto-flow-orchestrator`). When invoked as a teammate (TEAMMATE_MODE=true), the Agent tool is removed at spawn time per Anthropic platform contract — running this workflow inside a teammate would FAIL at step-02.
 
-Therefore: when TEAMMATE_MODE=true, this workflow MUST HALT in INITIALIZATION with:
+Therefore: when TEAMMATE_MODE=true, this workflow MUST HALT in INITIALIZATION with the message below (M13 of `standalone-auto-flow-unification.md` — banner directing to perspective subskills OR to auto-flow Phase 7):
 
 ```
 HALT — bmad-code-review is not designed to run as a teammate.
   reason: bmad-code-review's step-02 spawns 5–7 metas via Agent(), which is removed from teammates at spawn time per Anthropic platform contract.
-  action: orchestrators (bmad-auto-flow) MUST spawn the per-perspective subskills instead — see src/bmm-skills/4-implementation/bmad-code-review-perspective-{specs,correctness,security,engineering-quality,operations,user-facing}/.
-  reference: spec auto-flow-orchestrator BAC-12, TAC-9, Risk-4.
+
+  RECOMMENDED ALTERNATIVES (choose one) :
+
+  (1) /bmad-auto-flow Phase 7 — full lifecycle code-review with 5 distinct single-perspective teammates
+      (specs / correctness / security always + operations / user-facing reserve, conditionally task-assigned).
+      Engineering-quality (Meta-4) NOT covered in auto-flow Phase 7 per OOS-9 — invoke /bmad-code-review standalone for it.
+
+  (2) Direct delegation to one or more perspective subskills at ~/.claude/skills/bmad-code-review-perspective-{specs,correctness,security,operations,user-facing,engineering-quality}/workflow.md (each is teammate-only, no fictional standalone branch — per M14 of `standalone-auto-flow-unification.md`).
+
+  reference: spec auto-flow-orchestrator BAC-12, TAC-9, Risk-4 ; spec auto-flow-unification M13/M14.
 ```
 
 When TEAMMATE_MODE=false (standalone), this workflow runs unchanged with full Agent() parallel dispatch.

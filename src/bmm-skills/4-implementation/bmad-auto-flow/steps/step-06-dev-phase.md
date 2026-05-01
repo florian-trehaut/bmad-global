@@ -20,7 +20,7 @@ CHK-STEP-06-ENTRY PASSED — entering Step 6: Dev Phase with dev_team_size={N}, 
 
 ## STEP GOAL
 
-Spawn N dev teammates (`agent_teams.dev_team_size`, default 1, clamped to `[1, max_teammates]` per TAC-26) inside an isolated phase team `dev-{RUN_ID}`. The workflow each teammate invokes depends on `SPEC_PROFILE` (BAC-13):
+Spawn N dev teammates (`agent_teams.dev_team_size`, default 1, clamped to `[1, max_teammates]` per TAC-26c) inside an isolated phase team `dev-{RUN_ID}`. The workflow each teammate invokes depends on `SPEC_PROFILE` (BAC-13):
 
 - `SPEC_PROFILE == 'quick'` → `bmad-quick-dev/workflow.md`
 - `SPEC_PROFILE == 'full'` → `bmad-dev-story/workflow.md`
@@ -145,6 +145,22 @@ Process inbound messages per `data/question-routing.md`. Special handling for de
 - `question` with `critical_ambiguity: true` → autonomy_policy=spec-driven escalation. Surface to user via AskUserQuestion (TAC-6 / TAC-6b). Reply via SendMessage(question_reply).
 - `phase_complete` with `verdict: 'DONE'` → store result, append `trace_files[]` to TRACE_FILES, append `autonomy_decisions[]` to PHASE_RESULTS['dev'].autonomy_decisions, await all N teammates' reports
 
+#### 6b. Apply teammate completion gate per teammate (M25 / TAC-19)
+
+After receiving `TaskUpdate(status='completed')` from each dev teammate AND BEFORE transitioning the tracker or invoking TeamDelete:
+
+**Apply** `~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md` §Verification Algorithm. The algorithm verifies each `TaskUpdate(completed)` has a matching `SendMessage(phase_complete, task_id=N)`.
+
+```
+for each i in [1..dev_team_size]:
+  on TaskUpdate(task_id='dev-{i}', status='completed'):
+    Apply ~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md §Verification Algorithm.
+    If gate FAILs (no SendMessage OR invalid fields) → present Remediation menu [N]/[R]/[A]/[I] per gate spec
+    If gate PASSes → record verdict and proceed
+```
+
+This invocation operationalizes the gate that was previously documented but unwired (per RevS-1 BLOCKER fix). The pattern was empirically validated during Phase 4 of `standalone-bmad-shared-restructure.md`.
+
 When all N teammates report `DONE`:
 - Apply tracker transition `in-progress → review` per BAC-8.
 - Store `PHASE_RESULTS['dev'] = {verdict: 'DONE', commit_id, mr_url, test_results, trace_files, autonomy_decisions}` (aggregating across N teammates if > 1).
@@ -169,7 +185,7 @@ Mandatory before transition to step-07 — the next phase team is `codereview-{R
 ## SUCCESS / FAILURE
 
 - **SUCCESS**: TeamCreate `dev-{RUN_ID}` invoked, N teammates spawned with autonomy_policy=spec-driven + trace_path (or inline), all DONE, TRACE_FILES extended, autonomy_decisions captured, tracker transitioned to review, MR created, TeamDelete invoked, PHASE_RESULTS['dev'] set
-- **FAILURE**: wrong workflow invoked (BAC-13 violation), spawning > MAX_TEAMMATES (TAC-26 violation), advancing without all teammates DONE, omitting autonomy_policy=spec-driven (BAC-2 violation), forgetting TeamDelete before step-07 (axe 5 lifecycle violation), forgetting trace_path propagation (TAC-13 violation)
+- **FAILURE**: wrong workflow invoked (BAC-13 violation), spawning > MAX_TEAMMATES (TAC-26c clamping violation), advancing without all teammates DONE, omitting autonomy_policy=spec-driven (BAC-2 violation), forgetting TeamDelete before step-07 (axe 5 lifecycle violation), forgetting trace_path propagation (TAC-13 violation)
 
 ---
 

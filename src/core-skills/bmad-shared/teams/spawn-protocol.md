@@ -269,3 +269,76 @@ When `TEAM_MODE == false` (Agent Teams unavailable), the workflow MUST still fun
 - The spawn protocol is NOT used — tasks are executed directly using the task contract as inline instructions
 
 Agent Teams is an **enhancement** for context isolation and parallelism — never a hard requirement.
+
+---
+
+## Orchestrator-as-teammate scenario (M22 / TAC-15)
+
+**Verdict: orchestrators are NOT spawnable as teammates.** This is a STRUCTURAL constraint enforced by the closed list in `~/.claude/skills/bmad-shared/teams/orchestrator-registry.md` and the hub-and-spoke architecture documented in Anthropic Issue #32723 (TeamCreate unavailability for teammates).
+
+### Why this matters
+
+A naïve refactor might attempt to spawn `bmad-auto-flow` itself as a teammate (e.g., for parallel sub-orchestration, for nested workflows, for testing). This is forbidden for three reasons :
+
+1. **TeamCreate is unavailable to teammates** — Anthropic platform constraint per Issue #32723. A spawned auto-flow would HALT immediately at step-04 trying to call `TeamCreate({phase}-{RUN_ID})`.
+2. **Closed registry of orchestrators** — `orchestrator-registry.md` lists exactly the skills authorized to override Decision D16 of `spec-agent-teams-integration.md` (currently: only `bmad-auto-flow`). A teammate that claims to be an orchestrator without being in the registry MUST HALT at INIT per `teammate-mode-routing.md §Detection step 2`.
+3. **Hub-and-spoke is structural** — every additional orchestration level multiplies token cost and breaks the lead/teammate contract. Nested orchestration is OUT OF SCOPE per OOS-7 of `standalone-auto-flow-unification.md`.
+
+### Detection at TaskCreate time
+
+When the lead orchestrator (the only currently-registered orchestrator, `bmad-auto-flow`) is about to spawn a teammate, it MUST verify the spawn does NOT target an orchestrator-class skill :
+
+```
+forbidden_workflow_invocations = [
+  '~/.claude/skills/bmad-auto-flow/workflow.md',
+  '~/.claude/skills/bmad-auto-flow/steps/*',
+]
+
+if task_contract.workflow_to_invoke matches any forbidden pattern:
+  HALT with message:
+    "spawn-protocol violation: cannot spawn an orchestrator-class skill as a teammate.
+     Orchestrator: bmad-auto-flow.
+     Authorized orchestrators are listed in:
+       ~/.claude/skills/bmad-shared/teams/orchestrator-registry.md
+     Teammates are NOT in that list — they MUST invoke a worker skill (e.g.
+     bmad-create-story, bmad-dev-story, bmad-code-review-perspective-*)."
+```
+
+### Detection at teammate INIT time (defense in depth)
+
+A teammate that boots and detects via `task_contract.workflow_to_invoke` that it has been asked to execute an orchestrator-class workflow MUST HALT at the end of INITIALIZATION (per `teammate-mode-routing.md §Detection step 2`) with a `blocker` SendMessage to the lead :
+
+```yaml
+type: blocker
+task_id: '{TASK_ID}'
+parent_phase: '{from task_contract.metadata.parent_phase}'
+reason: |
+  spawn-protocol violation: this teammate received a task contract pointing to an orchestrator-class workflow.
+  Orchestrators are not spawnable as teammates per orchestrator-registry.md.
+context:
+  workflow_to_invoke: '{the offending path}'
+  registry_path: '~/.claude/skills/bmad-shared/teams/orchestrator-registry.md'
+recovery_options:
+  - key: 'F'
+    label: 'Fix the spawn contract — replace workflow_to_invoke with a non-orchestrator skill (worker)'
+  - key: 'A'
+    label: 'Abandon this task'
+```
+
+### Future orchestrators
+
+If a new orchestrator skill is added (e.g., `bmad-multi-story-orchestrator`), it MUST :
+
+1. Be added to `orchestrator-registry.md` with explicit authorization rationale
+2. Be added to the `forbidden_workflow_invocations` list above
+3. Have its own `metadata.orchestrator_skill` value validated by `teammate-mode-routing.md §Detection step 2`
+
+This rule's verification is performed by **VM-8** of `standalone-auto-flow-unification.md` :
+
+```
+VM-8 [code_log]: grep `bmad-shared/teams/spawn-protocol.md` for `## Orchestrator-as-teammate scenario`
+                  + verify the section contains an explicit HALT directive
+                  + verify the citation to orchestrator-registry.md is present
+```
+
+This rule is referenced by **TAC-15** of `standalone-auto-flow-unification.md`.

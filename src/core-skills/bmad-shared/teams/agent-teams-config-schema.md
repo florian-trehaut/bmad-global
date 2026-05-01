@@ -99,7 +99,7 @@ agent_teams:
 | `default_worker_model` | string | NO | `sonnet` | Model suggestion for worker teammates. Informational — Claude Code may override |
 | `default_lead_model` | string | NO | `opus` | Model suggestion for lead/orchestrator |
 | `max_teammates` | integer | NO | `5` | Upper bound on concurrent teammates. Prevents runaway token usage |
-| `dev_team_size` | integer | NO | `1` | Number of dev teammates spawned at the dev phase by `bmad-auto-flow`. Clamped to `[1, max_teammates]`. Validated at orchestrator startup (TAC-26) |
+| `dev_team_size` | integer | NO | `1` | Number of dev teammates spawned at the dev phase by `bmad-auto-flow`. Clamped to `[1, max_teammates]`. Validated at orchestrator startup (TAC-26c clamping rule — see `bmad-auto-flow/workflow.md#tac-26c`) |
 | `code_review_team_size` | integer | NO | `3` | Number of distinct single-perspective teammates spawned at the code-review phase. Clamped to `[1, max_teammates]`. Each teammate executes ONE extracted meta-perspective subskill (per BAC-12 / TAC-9) |
 | `phase_timeout_minutes` | integer | NO | `30` | Per-phase wall-clock timeout. If no SendMessage from any teammate of the current phase arrives within this window, the orchestrator triggers TAC-14 (`[R]etry / [N]udge / [A]bandon`). Must be a positive integer |
 | `audit_log_enabled` | boolean | NO | `false` | Optional. When `true`, the orchestrator writes phase transitions and decisions to `_bmad-output/auto-flow/{ISO-timestamp}-{slug}.log`. T-SEC-1 remediation, low priority |

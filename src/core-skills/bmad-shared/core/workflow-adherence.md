@@ -180,7 +180,7 @@ Every workflow MUST satisfy:
 - **Rule 6 (NEW)** — `## NO-SKIP CLAUSE` block at the top of every step file (see Section "NO-SKIP CLAUSE" below)
 - **Rule 7 (NEW)** — `CHK-WORKFLOW-COMPLETE` Read Receipt at the end of the last step
 
-The validator (`tools/validate-skills.js`) **enforces** these rules via the `HARD-01` through `HARD-08` rule family, severity HIGH, exit 1 in `--strict` mode. CI runs `--strict`. New skills cannot be added without satisfying these rules — `bmad-create-skill` templates are pre-hardened.
+The validator (`tools/validate-skills.js`) **enforces** these rules via the `HARD-01` through `HARD-09` rule family, severity HIGH, exit 1 in `--strict` mode. CI runs `--strict`. New skills cannot be added without satisfying these rules — `bmad-create-skill` templates are pre-hardened. (HARD-09 — AskUserQuestion-rerouting in teammate-spawnable workflows — added by `standalone-auto-flow-unification.md` M23 ; enforced via SKILL.md frontmatter `teammate_spawnable: true`.)
 
 ---
 

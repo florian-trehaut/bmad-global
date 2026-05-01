@@ -2,7 +2,7 @@
 
 **This is the FIRST `team-workflows/team-config.md` implementation in BMAD using the team-per-phase architecture.** It serves as the reference for future orchestrator skills.
 
-**Loaded by:** `step-04-team-create.md` (lifecycle guide), and EACH of `step-03-spec-phase.md`, `step-05-review-phase.md`, `step-06-dev-phase.md`, `step-07-code-review-phase.md`, `step-08-validation-phase.md` to build that phase's `TeamCreate` payload.
+**Loaded by:** `step-04-team-lifecycle-guide.md` (lifecycle guide), and EACH of `step-03-spec-phase.md`, `step-05-review-phase.md`, `step-06-dev-phase.md`, `step-07-code-review-phase.md`, `step-08-validation-phase.md` to build that phase's `TeamCreate` payload.
 
 ---
 

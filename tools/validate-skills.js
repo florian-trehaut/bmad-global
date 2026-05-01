@@ -772,6 +772,62 @@ function validateSkill(skillDir) {
           });
         }
       }
+
+      // --- HARD-09: AskUserQuestion in teammate-spawnable workflows must be TEAMMATE_MODE-conditional ---
+      // M23 of `standalone-auto-flow-unification.md` / TAC-12.
+      // Enumeration mechanism (DesB-8): SKILL.md frontmatter `teammate_spawnable: true|false`.
+      // The rule applies ONLY when SKILL.md declares `teammate_spawnable: true`.
+      // When `teammate_spawnable` is absent or false, this rule is a no-op (backward-compat with existing skills).
+      const teammateSpawnable =
+        skillFm !== null &&
+        Object.prototype.hasOwnProperty.call(skillFm, 'teammate_spawnable') &&
+        String(skillFm.teammate_spawnable).trim().toLowerCase() === 'true';
+
+      if (teammateSpawnable && fs.existsSync(stepsDir)) {
+        for (const stepFile of stepFiles) {
+          const stepPath = path.join(stepsDir, stepFile);
+          const relStepFile = `steps/${stepFile}`;
+          const stepContent = safeReadFile(stepPath, findings, relStepFile);
+          if (stepContent === null) continue;
+
+          // Find every line that mentions AskUserQuestion (excluding fenced code blocks).
+          // Use stripCodeBlocks() which uses the canonical /```[\s\S]*?```/ pattern — handles
+          // unmatched fences correctly (no inFence state to leak across files) per RevSec-2 fix.
+          const stepStripped = stripCodeBlocks(stepContent);
+          const linesWithFences = stepStripped.split('\n');
+          for (let i = 0; i < linesWithFences.length; i++) {
+            const line = linesWithFences[i];
+            if (!/AskUserQuestion/.test(line)) continue;
+
+            // Allow lines that explicitly mark themselves as TEAMMATE_MODE-conditional.
+            // Heuristic per `bmad-shared/teams/teammate-mode-routing.md §A` (rerouting pattern):
+            // either (a) the same line names TEAMMATE_MODE / TEAM_MODE / SendMessage in proximity, OR
+            // (b) the surrounding ±10 lines contain a literal "If TEAMMATE_MODE" or "When TEAMMATE_MODE=false" guard.
+            const sameLineCompliant = /TEAMMATE_MODE/.test(line) || /SendMessage/.test(line) || /teammate-mode-routing/.test(line);
+
+            const window = linesWithFences.slice(Math.max(0, i - 10), Math.min(linesWithFences.length, i + 11)).join('\n');
+            const surroundingCompliant =
+              /If\s+TEAMMATE_MODE/i.test(window) ||
+              /When\s+TEAMMATE_MODE/i.test(window) ||
+              /TEAMMATE_MODE=false\s*\(standalone\)/i.test(window) ||
+              /reroute(d)?\s+via\s+SendMessage/i.test(window) ||
+              /per\s+`?teammate-mode-routing\.md`?\s+§A/i.test(window);
+
+            if (!sameLineCompliant && !surroundingCompliant) {
+              findings.push({
+                rule: 'HARD-09',
+                title: 'AskUserQuestion Must Be TEAMMATE_MODE-Conditional in Teammate-Spawnable Workflow',
+                severity: 'HIGH',
+                file: relStepFile,
+                line: i + 1,
+                detail:
+                  'AskUserQuestion call detected in a teammate-spawnable workflow without a TEAMMATE_MODE-conditional guard. Per `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md §A`, AskUserQuestion silently fails in TEAMMATE_MODE — the call must be rerouted via `SendMessage(question)` to the lead.',
+                fix: 'Wrap the AskUserQuestion call in a TEAMMATE_MODE-conditional block: `If TEAMMATE_MODE=true: emit SendMessage(question) per §A — block until question_reply. Else: AskUserQuestion(...) directly.` See `src/core-skills/bmad-shared/teams/teammate-mode-routing.md §ENFORCEMENT Registry` for compliant examples.',
+              });
+            }
+          }
+        }
+      }
     }
   }
 

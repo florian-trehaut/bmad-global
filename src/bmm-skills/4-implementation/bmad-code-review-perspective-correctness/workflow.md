@@ -1,8 +1,10 @@
 # Single-Perspective Code Review — Correctness & Reliability (Meta-2)
 
-**Purpose:** Execute a single-perspective code review covering Meta-2 (correctness, error handling, reliability, edge cases) as a standalone workflow. Does not use the `Agent()` tool — designed for invocation as an Agent Teams teammate (Agent tool removed at spawn time per Anthropic platform contract) or for focused single-perspective reviews.
+**Purpose:** Execute a single-perspective code review covering Meta-2 (correctness, error handling, reliability, edge cases). Does not use the `Agent()` tool.
 
-**Spec reference:** Story `auto-flow-orchestrator` Task D3.
+**This skill is teammate-only** (M14 of `standalone-auto-flow-unification.md`). It is invoked via `/bmad-auto-flow` Phase 7 OR directly via TaskCreate from any orchestrator. It does NOT support direct user invocation.
+
+**Spec reference:** Story `auto-flow-orchestrator` Task D3 + story `auto-flow-unification` M14/M15.
 
 ---
 
@@ -19,9 +21,19 @@ Key rules: `no-fallback-no-false-data.md`, `validation/validation-protocol.md#pr
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`. HALT if missing.
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`. HALT if missing.
 
-### 3. Detect teammate mode
+### 3. Detect teammate mode (M14 — teammate-only enforcement)
 
-Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. Expected: TEAMMATE_MODE=true with `task_contract.role = 'code-reviewer-correctness'`. Standalone supported. HALT if TEAMMATE_MODE=true and ORCH_AUTHORIZED=false.
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. **This skill REQUIRES TEAMMATE_MODE=true** with `task_contract.role = 'code-reviewer-correctness'`.
+
+If TEAMMATE_MODE=false → HALT with the message :
+
+```
+HALT — bmad-code-review-perspective-correctness is a teammate-only skill (M14 of `standalone-auto-flow-unification.md`).
+  recommended action: invoke /bmad-auto-flow Phase 7 OR /bmad-code-review standalone.
+  reference: spec auto-flow-unification §VM-NR-4.
+```
+
+If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (D16 strict).
 
 ### 4. Resolve review contract
 
@@ -33,7 +45,7 @@ Same shape as `bmad-code-review-perspective-specs` — see that workflow's §4 f
 CHK-INIT PASSED — bmad-code-review-perspective-correctness initialization complete:
   shared_rules_loaded: {N} files
   project_knowledge: project.md (loaded)
-  teammate_mode: {true | false}
+  teammate_mode: true
   review_contract: {summary}
 ```
 
@@ -47,7 +59,12 @@ Read FULLY and apply `~/.claude/skills/bmad-code-review/subagent-workflows/meta-
 
 ## OUTPUT
 
-Same shape as `bmad-code-review-perspective-specs` — `phase_complete` SendMessage in TEAMMATE_MODE with `parent_phase: 'code-review'` and findings tagged `meta: 2`.
+**Load:** `~/.claude/skills/bmad-shared/data/code-review-perspective-output-schema.md` — single canonical output schema for all 6 perspective subskills (M15 of `standalone-auto-flow-unification.md` ; enforced by TAC-18 ; verified by VM-9).
+
+For Meta-2, use the schema with :
+- `parent_phase`: `code-review`
+- `deliverable.summary`: "Meta-2 (correctness-reliability) review complete. {N} findings ..."
+- `findings[].sub_axis`: one of `2a` (Logic Correctness), `2b` (Edge Cases), `2c` (Concurrency / Race Conditions), `2d` (Error Handling)
 
 ## WORKFLOW EXIT
 

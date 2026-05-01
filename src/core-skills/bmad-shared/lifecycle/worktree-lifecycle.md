@@ -112,6 +112,8 @@ Verify branch alignment per the declared `worktree_alignment_check`:
 - **For `feature-branch` / `match-remote` strategies**: `CURRENT_BRANCH == {worktree_branch_name}` MUST hold. If not, HALT — the orchestrator and teammate disagree on branch state, which is a contract violation.
 - **For `detached` strategy**: `CURRENT_BRANCH == ""` (empty) MUST hold. If not, HALT.
 
+**Source of `{worktree_branch_name}` in TEAMMATE_MODE (RevCorr-3 fix)** : when this protocol runs from a teammate, `{worktree_branch_name}` MUST be read from `task_contract.constraints.worktree_branch_name` (M18 of `standalone-auto-flow-unification.md`). The orchestrator sets it explicitly when it differs from `current_branch` ; if absent, defaults to whatever `git branch --show-current` returns at the provided `worktree_path`. See `~/.claude/skills/bmad-shared/teams/task-contract-schema.md` §Validation Rule 12 for format constraints.
+
 Set `REUSED_CURRENT_WORKTREE=true` so cleanup (§3) skips worktree removal — the orchestrator owns this worktree's lifecycle, not the teammate.
 
 Proceed to **§2 Post-Creation Setup**.

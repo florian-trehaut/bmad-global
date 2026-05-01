@@ -83,6 +83,50 @@ EPIC_SLUG: null
 SPEC_WORKTREE_PATH: null
 ```
 
+### 6. Detect teammate mode (M7 of `standalone-auto-flow-unification.md` — TAC-3 / TAC-4 / TAC-5)
+
+Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md` to detect whether this workflow is running inside an Agent Teams teammate context (e.g., spawned by `bmad-auto-flow` Phase 1 spec team).
+
+This sets:
+- `TEAMMATE_MODE` (boolean — true when invoked by an authorized orchestrator's spec phase)
+- `ORCH_AUTHORIZED` (only meaningful when TEAMMATE_MODE=true)
+- `LEAD_NAME`, `TASK_ID`, `WORKTREE_PATH`, `TRACKER_WRITES_ENABLED` (when TEAMMATE_MODE=true)
+
+If TEAMMATE_MODE=true and ORCH_AUTHORIZED=false → HALT (D16 strict applies; only orchestrator-spawned teammates may run create-story).
+
+**Behavior in TEAMMATE_MODE=true:**
+- Step 01 (entry / mode detection) skips the user-facing greet/banner — reads `MODE` and `ISSUE_IDENTIFIER` from `task_contract.input_artifacts[].identifier` (TAC-4)
+- Steps 02e (real-data investigation), 05 (external research), 06 (NFR/security/observability), 07 (planning), 12 (multi-validator review) are sub-tasks — when this workflow runs as a teammate (rare), the lead would have already delegated these as TaskCreates via auto-flow step-03-spec-phase.md
+- The "lead-orchestration loop itself" is NEVER delegated — TEAMMATE_MODE=true on `bmad-create-story` is an exceptional path used only when auto-flow orchestrator delegates the entire spec phase to a teammate (NOT current architecture per TAC-6)
+- Step 13 (output) emits `tracker_write_request` SendMessage instead of direct tracker writes (per `teammate-mode-routing.md` §B)
+- The full 14-step structure is preserved — this is FCIS pattern (Pattern Application Matrix, M7+M9 of `standalone-auto-flow-unification.md`) with TEAMMATE_MODE-conditional behavior, NOT a new file
+
+**Behavior in TEAMMATE_MODE=false (standalone):**
+- Full inline behavior preserved — greet/banner/AskUserQuestion/14-step interactive flow identical to pre-refactor (BAC-3 / TAC-5 / VM-NR-1)
+
+#### Inline-vs-delegated step matrix (M9 of `standalone-auto-flow-unification.md`)
+
+When `bmad-create-story` runs inside `bmad-auto-flow` Phase 1 (auto-flow step-03-spec-phase.md), the lead orchestrates inline AND delegates heavy sub-tasks to spec-team teammates via TaskCreate. Reference matrix per `bmad-auto-flow/steps/step-03-spec-phase.md` :
+
+| Step | File | Inline (lead) | Delegated (teammate) | Teammate role |
+|------|------|---------------|----------------------|---------------|
+| 01 | step-01-entry.md | YES | — | (lead) |
+| 02 | step-02-investigate.md | YES (driver) | step-02e (real-data confrontation) | spec-investigator |
+| 03 | step-03-real-data-confrontation.md | YES (synthesizer) | — (subsumed by step-02e teammate) | (lead) |
+| 04 | step-04-business-context.md | YES | — | (lead) |
+| 05 | step-05-external-research.md | YES (driver) | YES (external-researcher) | external-researcher |
+| 06 | step-06-nfr-security-obs.md | YES (driver) | YES (nfr-investigator) | spec-investigator |
+| 07 | step-07-tac-plan.md | YES (driver) | YES (planning-investigator) | spec-investigator |
+| 08 | step-08-validation-metier.md | YES | — | (lead) |
+| 09 | step-09-security-gate.md | YES | — | (lead) |
+| 10 | step-10-impact-analysis.md | YES | — | (lead) |
+| 11 | step-11-boundaries-risks.md | YES | — | (lead) |
+| 12 | step-12-review.md | YES (driver) | YES (3 validators) | spec-validator-A/B/C |
+| 13 | step-13-output.md | YES | — | (lead) |
+| 14 | step-14-test-strategy.md | YES | — | (lead) |
+
+This matrix is informational and authoritative — the auto-flow orchestrator builds its TaskCreate contracts from this table. Any future change to the lead/delegated split MUST be reflected here AND in `bmad-auto-flow/steps/step-03-spec-phase.md`.
+
 ---
 
 

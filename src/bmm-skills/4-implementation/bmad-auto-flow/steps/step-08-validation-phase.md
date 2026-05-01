@@ -164,6 +164,21 @@ Read FULLY and apply: ~/.claude/skills/{validation_workflow} — load the file w
 Execute inline.
 ```
 
+### 6b. Apply teammate completion gate (M25 / TAC-19)
+
+After receiving `TaskUpdate(status='completed')` from the validator teammate AND BEFORE processing the verdict or invoking TeamDelete:
+
+**Apply** `~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md` §Verification Algorithm. The algorithm verifies the `TaskUpdate(completed)` has a matching `SendMessage(phase_complete, task_id='validator-1')`.
+
+```
+on TaskUpdate(task_id='validator-1', status='completed'):
+  Apply ~/.claude/skills/bmad-auto-flow/data/teammate-completion-gate.md §Verification Algorithm.
+  If gate FAILs (no SendMessage OR invalid fields) → present Remediation menu [N]/[R]/[A]/[I] per gate spec
+  If gate PASSes → record verdict and proceed
+```
+
+This invocation operationalizes the gate per RevS-1 BLOCKER fix in `standalone-auto-flow-unification.md`.
+
 ### 7. Process verdict
 
 Append `phase_complete.trace_files[]` to TRACE_FILES.

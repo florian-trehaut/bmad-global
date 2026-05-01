@@ -73,6 +73,32 @@ task_contract:
     trace_path: '/tmp/bmad-{project_slug}-auto-flow/{RUN_ID}/{role}-{task_id}.md'  # NEW. Absolute path the teammate writes detailed work to before phase_complete.
                                      # Default templated path; project_slug = lowercase(project_name).replace(non-alphanumeric, '-'); RUN_ID = {ISO-timestamp}-{slug}.
                                      # See teammate-mode-routing.md §Trace work to disk.
+
+    # ── Auto-flow-unification additive fields (M18-M20) ───────────
+    worktree_branch_name: '{git-branch-name}'  # NEW. string | null. Default: derives from current_branch in worktree at spawn time.
+                                     # Type: git branch name. Validation: matches `[a-zA-Z0-9/_.-]+`.
+                                     # Backward-compat: optional — existing contracts without this field continue to work (defaulted at runtime).
+                                     # Read by: worktree-lifecycle.md Branch D alignment check (orchestrator vs teammate worktree branch consistency).
+                                     # Written by: orchestrator at spawn time (set explicitly when worktree branch != current_branch).
+
+    operating_rules:                 # NEW. list[string]. Default for read-only investigators:
+                                     #   ['~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md',
+                                     #    '~/.claude/skills/bmad-shared/teams/task-contract-schema.md']
+                                     # Type: list of ABSOLUTE paths (or `~/.claude/skills/...` resolved paths).
+                                     # Loaded BEFORE workflow's INIT block — sets the runtime-behavior context.
+                                     # Distinct from `scope_files` (investigation targets) — this list is operating rules, not work targets.
+                                     # Mitigates the over-prescription pattern documented in `feedback_spawn_prompt_scope_discipline.md`.
+                                     # Validation: each path MUST resolve to an existing file under `~/.claude/skills/bmad-shared/`.
+                                     # Backward-compat: optional with safe default — existing contracts work.
+      - '~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md'
+      - '~/.claude/skills/bmad-shared/teams/task-contract-schema.md'
+
+    mode_override: 'standalone'      # NEW. enum: standalone | teammate | null. Default: null (auto-detect from task_contract YAML presence).
+                                     # Type: enum string. Purpose: testing/debugging only — bypasses auto-detection of TEAMMATE_MODE.
+                                     # Does NOT bypass authorization checks (ORCH_AUTHORIZED still validated separately per orchestrator-registry.md).
+                                     # Validation: enum check (one of standalone | teammate | null).
+                                     # Backward-compat: optional, null = current behavior.
+
     halt_conditions:                 # Conditions that must trigger a HALT
       - 'Missing required knowledge file after generation attempt'
       - 'Scope ambiguity that cannot be resolved from context'
@@ -116,6 +142,9 @@ task_contract:
 | `metadata.orchestrator_invoked` | NO | boolean | Default `false`. When `true`, signals the spawning skill is an authorized orchestrator that may override Decision D16. Validated against `orchestrator-registry.md` by `teammate-mode-routing.md` |
 | `metadata.orchestrator_skill` | conditional | string | REQUIRED when `metadata.orchestrator_invoked=true`. Must match a skill name listed in `src/core-skills/bmad-shared/teams/orchestrator-registry.md`. Mismatch → HALT (TAC-30) |
 | `metadata.parent_phase` | NO | enum | One of `spec` \| `review` \| `dev` \| `code-review` \| `validation`. Used by the teammate to determine which sub-workflow to invoke when the role is generic |
+| `constraints.worktree_branch_name` | NO | string \| null | Default: derives from current_branch in worktree at spawn time. Validation: matches `[a-zA-Z0-9/_.-]+`. Read by `worktree-lifecycle.md` Branch D alignment check. Written by orchestrator at spawn time when worktree branch != current_branch. Backward-compat: optional (M18) |
+| `constraints.operating_rules` | NO | list[string] | Default for read-only investigators: `['~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md', '~/.claude/skills/bmad-shared/teams/task-contract-schema.md']`. List of ABSOLUTE paths (or `~/.claude/skills/...` resolved paths) loaded BEFORE workflow INIT to set runtime-behavior context. **Distinct from `scope_files`** — operating rules are policy, not work targets. Mitigates over-prescription pattern from `feedback_spawn_prompt_scope_discipline.md`. Each path MUST resolve to an existing file under `~/.claude/skills/bmad-shared/`. Backward-compat: optional with safe default (M19) |
+| `constraints.mode_override` | NO | enum \| null | Default: null (auto-detect from task_contract YAML presence). Enum: `standalone` \| `teammate` \| null. Testing/debugging only — bypasses auto-detection of TEAMMATE_MODE. **Does NOT bypass authorization checks** (ORCH_AUTHORIZED still validated separately per `orchestrator-registry.md`). Backward-compat: optional, null = current behavior (M20) |
 
 ### Scope Type Semantics
 
@@ -202,8 +231,11 @@ A task contract is **invalid** if any of these conditions are true:
 9. `constraints.autonomy_policy` is set to a value outside the enum `spec-driven | strict` (TAC-4)
 10. `constraints.trace_path` is set but its parent directory is non-creatable (permission denied, disk full, etc.) — HALT with `blocker` SendMessage citing the underlying error; never silently fall back to a different path (TAC-16)
 11. `workflow_to_invoke` is non-empty but the path does not resolve to an existing `workflow.md` or step file readable by the teammate (per `teammate-mode-routing.md §Required Workflow Application`). **Validation timing (per Phase 7 code-review F-correctness-7)** : the lead validates at TaskCreate emission (resolves the path against `~/.claude/skills/` from the orchestrator's filesystem) AND the teammate re-validates at INIT (resolves the path against its own filesystem after spawn) — both checks required per defensive programming.
+12. `constraints.worktree_branch_name` is set but does not match the regex `[a-zA-Z0-9/_.-]+` — HALT with offending value cited (M18 / TAC-11)
+13. `constraints.operating_rules` contains a path that does not resolve to an existing file under `~/.claude/skills/bmad-shared/` — HALT with offending path cited (M19 / TAC-11)
+14. `constraints.mode_override` is set to a value outside the enum `standalone | teammate | null` — HALT with offending value cited (M20 / TAC-11). Note: setting `mode_override` does NOT bypass `ORCH_AUTHORIZED` — the authorization check in `teammate-mode-routing.md §Detection step 2` still applies.
 
-An invalid contract MUST cause the teammate to HALT immediately and report the validation failure to the lead via SendMessage. For violations 6–8, the HALT message MUST cite the registry path or the missing field per the `teammate-mode-routing.md` HALT messages section. For violations 9–11, the HALT message MUST cite the offending field and the schema rule (`task-contract-schema.md` §Validation Rules) and reference the relevant TAC.
+An invalid contract MUST cause the teammate to HALT immediately and report the validation failure to the lead via SendMessage. For violations 6–8, the HALT message MUST cite the registry path or the missing field per the `teammate-mode-routing.md` HALT messages section. For violations 9–14, the HALT message MUST cite the offending field and the schema rule (`task-contract-schema.md` §Validation Rules) and reference the relevant TAC.
 
 ---
 
