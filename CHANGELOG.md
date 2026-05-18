@@ -1,5 +1,57 @@
 # Changelog
 
+## v2.1.0 - 2026-05-18
+
+> **TL;DR** — New `project_type: game` opt-in unlocks a 19-file game-dev knowledge stack, 4 game-dev agents, and 5 new game workflows (GDD, narrative, readiness, playtest, test framework); `/bmad-auto-flow` rebuilt around per-phase teams + spec-driven autonomy; Rust knowledge stack expanded 8-axis with a new multi-file pattern shared with `bmad-shared/stacks/`.
+> **Action:** `npx @florian-trehaut/bmad-global install --force`. Game projects: add `project_type: game` to `.claude/workflow-context.md`, then `/bmad-knowledge-refresh`.
+> **Breaking:** `/bmad-code-review-perspective-{specs,correctness,security,engineering-quality,operations,user-facing}` no longer accept direct user invocation — **migrate via:** `/bmad-code-review` (standalone meta-orchestrator) or `/bmad-auto-flow` Phase 7.
+
+### 🔥 Highlight: `project_type` config + game-dev pilot domain
+
+Declare `project_type: game` in `.claude/workflow-context.md` and every BMAD workflow that touches scope, architecture, NFRs, security, observability, or assets now reads the game-dev knowledge stack at INIT. Five new game-design workflows ship alongside, plus 4 dedicated game-dev personas. The knowledge stack covers Unity 6.3 LTS / Unreal 5.7 / Godot 4.6 / Phaser 4.0 / Bevy 0.18 / Stride 4.3 (.NET 10), 14 genre-specific question banks, per-platform NFR budgets (PS5 / PS5 Pro / Xbox Series X|S / Steam Deck / Quest 3 / Switch 2 docked+handheld / mobile / web), 2026 regulatory baseline (GDPR / CCPA / PIPL / LGPD / EAA / CVAA / COPPA + loot box laws per country), live-ops cadences, monetization (Steam tiered 30/25/20% / Epic 12% / Apple SBP 15%), anti-cheat (EAC / BattlEye / VAC / Vanguard / Denuvo AC), multiplayer (Photon Fusion / Mirror / NGO / Nakama / PlayFab + AWS GameLift / Edgegap scaling), CI/CD (Unity DevOps 2026-03 pricing rewrite / Buildkite / TeamCity / Codemagic).
+
+- **New `project_type` field** in `.claude/workflow-context.md`. Set to `game` (or leave blank for backward-compat — projects without it see zero change, zero token cost).
+- **New game-design workflows:** `/bmad-create-gdd` (6 steps + 24 game-type fragments), `/bmad-create-narrative` (11 steps), `/bmad-check-readiness-game` (GDD↔Architecture↔Epics gate), `/bmad-playtest-plan`, `/bmad-tea-game-framework` (auto-detects Unity/Unreal/Godot).
+- **4 new game-dev personas:** `bmad-agent-game-designer` (Samus Shepard), `bmad-agent-game-dev` (Link Freeman), `bmad-agent-game-solo-dev` (Indie), `bmad-agent-game-tech-writer` (Paige).
+- **`project.md` gains 3 optional sections** — `## NFR Defaults`, `## Observability Standards`, `## Security Baseline` — auto-populated from the domain stack via `/bmad-knowledge-bootstrap` or `/bmad-knowledge-refresh`. Drift detection differentiates source-only (auto-refresh), manual-edit (preserved), dual-drift (deferred to interactive review).
+- **Multi-file knowledge pattern** for domain stacks (game-dev uses 1 master + 18 sub-files: engines / personas / discovery hints / NFR baselines / security / observability / asset pipeline / audio / localization / QA / live-ops / monetization / architecture patterns / design patterns / KPIs / anti-cheat / multiplayer / CI/CD). Backward compatible: single-file pattern still works.
+- **DOM-01 validator rule** — `npm run validate:skills --strict` blocks releases where `project-types.csv` declares a `domain_stack` file that does not exist.
+
+### ✨ `/bmad-auto-flow` rebuilt — per-phase teams + spec-driven autonomy
+
+`/bmad-auto-flow` shipped in v2.0.0 already chained the 5-phase story lifecycle, but each phase pulled the orchestrator into ad-hoc decisions. v2.1.0 makes the orchestration deterministic: every phase instantiates and tears down its own team, a new `autonomy_policy` setting lets dev teammates auto-resolve tactical questions from the spec, and the orchestrator delegates sub-tasks instead of doing them inline.
+
+- **Single entry-point** — sub-workflows auto-detect teammate context and skip the greeting/banner; standalone invocation still works.
+- **`autonomy_policy: spec-driven | strict`** (default `strict`) — when `spec-driven`, dev teammates auto-resolve tactical "X or Y when the spec says Y" without round-tripping to you; strategic ambiguity still HALTs; each decision logged to a trace file.
+- **Per-phase teams** — Phase 1 spec team = 1 spec-investigator + 1 external-researcher + 3 spec-validators; Phase 7 code-review team = 5 teammates (3 always-active: specs/correctness/security + 2 reserve: operations/user-facing).
+- **Forge-agnostic lifecycle gates** — new `lifecycle_artifacts` block (`pr_required`, `staging_required`, `ci_watch_skill`, `deploy_watch_skill`) auto-discovers your forge/CI/staging skills.
+- **Trace files** at `/tmp/bmad-{project_slug}-auto-flow/{run_id}/{role}-{task_id}.md` — orchestrator surfaces them at phase boundaries.
+- **Hardening** — shell-injection prevention in PR creation (`--title-file`/`--body-file`), sanitized branch names, `/tmp` `umask 077` + symlink guard, secret scrubbing in trace section 1.
+- **New HARD-09 validator rule** — `npm run validate:skills --strict` requires `teammate_spawnable: true|false` in every SKILL.md frontmatter. Bundled skills migrated; custom skills need the field added.
+- **⚠️ Breaking** — `/bmad-code-review-perspective-{specs, correctness, security, engineering-quality, operations, user-facing}` now HALT on standalone invocation (v2.0.0 documented inline mode; v2.1.0 enforces teammate-only). **Migrate by** running `/bmad-code-review` (meta-orchestrator, all perspectives in parallel) or `/bmad-auto-flow` (Phase 7). The HALT message surfaces the migration commands inline.
+
+### ⚙️ Rust knowledge stack — 8 new sub-files + multi-file pattern for `stacks/`
+
+The Rust knowledge stack expands from concurrency + null-safety only to 8 axis-specific sub-files plus a dedicated `rust-gamedev.md` cross-domain file. All content fresh as of May 2026, synthesized from Rust Book / Cargo Book / Performance Book / Async Book / Rustonomicon / RFC tracker + ~217 canonical source URLs. The same multi-file pattern game-dev uses now applies to `stacks/{lang}/` — opt-in; single-file stacks (Go / Python / TypeScript) keep working unchanged.
+
+- **8 new Rust sub-files** under `bmad-shared/stacks/rust/`:
+  - `performance.md` — Rust Performance Book chapters, criterion/divan/iai-callgrind, build profile recipes (LTO fat / codegen-units=1 / panic=abort / strip), mold/wild linker, samply/Tracy/dhat, SIMD via `portable_simd`. Rust 1.85 + 2024 Edition (Feb 2025 GA), rust-lld default 1.90 (Sept 2025), Tokio 1.47 LTS verified.
+  - `error-handling.md` — 18 anti-patterns with Detection/Why/Fix tuples; thiserror 2.0 / anyhow 1.x / eyre / miette / snafu matrix; async error patterns including JoinError; FFI `C-unwind` (Rust 1.71+); WASM panic+abort.
+  - `memory-layout.md` — struct layout (`repr` C/transparent/packed/align), niche optimisation, Layout API, `offset_of!` stable 1.77, Pin/Unpin + pin-project, Sanitizers (asan/tsan/msan/hwasan), Miri + Tree Borrows (PLDI 2025).
+  - `unsafe-usage.md` — 10 justified vs 9 unjustified use cases, SAFETY comment convention, Rust 2024 `unsafe extern { ... }` + `safe fn` + `#[unsafe(no_mangle)]`, FFI (bindgen/cbindgen/safer_ffi), Miri auditing with MIRIFLAGS matrix, 6-point soundness audit checklist.
+  - `tooling.md` — `rust-toolchain.toml`, cargo-nextest 0.9.135 (Feb 2026), mold + wild 0.8 (Jan 2026, 2× mold per April 2026 benchmarks), sccache + `Swatinem/rust-cache`, clippy 600+ lints, rustfmt 2024 edition, cargo-deny 0.19.5 (May 2026), cargo-audit, cargo-machete, cargo-llvm-cov 0.8.5 (March 2026).
+  - `async.md` — tokio 1.47/1.51 LTS + embassy/smol/monoio/glommio/tokio-uring/bevy_tasks; Rust 1.75 async fn in trait + Rust 1.85 async closures; 13 anti-patterns; cancellation safety table per future-type; CancellationToken; tokio::time deterministic testing (`start_paused` + `time::advance`); tokio-console; OpenTelemetry distributed tracing.
+  - `concurrency.md` + `null-safety.md` — moved verbatim from the legacy single-file stack (no content loss, same protocol bindings).
+- **New `domains/game-dev/rust-gamedev.md`** — Bevy 0.18 (March 2026) + 0.19-rc.1 deep-dive (ECS scheduler v3, asset pipeline rewrite, editor preview, bevy_rapier3d 0.34.0 / bevy_kira_audio / bevy_egui / bevy_mod_picking / bevy_xpbd ecosystem); "build your own engine" stack (Wgpu / Glam / Rapier / Kira / Lyon / winit / egui); Macroquad 0.4.14 / ggez 0.9.3 / Fyrox 0.36.2 alternatives; production game refs (Tiny Glade / JARL / MegaFactory Tycoon / Veloren); build & distribution (Windows MSVC/GNU, Linux glibc + AppImage/Flatpak, macOS universal + notarisation, WASM via wasm-server-runner/Trunk + 30 MB → 15 MB via wasm-opt, mobile via cargo-mobile2/cargo-apk, honest "no first-party Rust toolchain for PS5/Xbox/Switch" note); hot-reload (`bevy_dylib` vs `dexterous_developer_cli` 0.4.0-alpha.3).
+- **Multi-file stack pattern** documented in `bmad-shared/stacks/README.md`: when a stack grows beyond a single-file's worth, organise as master TOC + per-axis sub-files. Protocols `concurrency-review.md` and `null-safety-review.md` try sub-file first, fall back to master section. Both layouts supported indefinitely.
+- **STACK-15 validator rule extended** — `npm run validate:skills` accepts either single-file H2 sections (Go/Python/TypeScript) or multi-file sub-files (Rust). Only fails when both are missing.
+
+## Post-upgrade
+
+1. **All users:** `npx @florian-trehaut/bmad-global install --force`. Updates `~/.claude/skills/bmad/` with the perspective-skill teammate-only enforcement, the BMGD imports, the Rust sub-files, and the new `bmad-shared/domains/` directory.
+2. **Game projects only:** add `project_type: game` to `.claude/workflow-context.md` frontmatter, then run `/bmad-knowledge-refresh`. This populates the new `## NFR Defaults`, `## Observability Standards`, `## Security Baseline` sections of `project.md` from the game-dev domain stack and registers `domain_stack` as a source in `source_hash`.
+3. **Custom-skill maintainers only:** add `teammate_spawnable: true|false` to each of your custom SKILL.md frontmatters. Without it, `npm run validate:skills --strict` will fail your CI.
+
 ## v2.0.0 - 2026-04-30
 
 > **TL;DR** — New `/bmad-auto-flow` chains the full story lifecycle (spec → review → dev → code-review → validation) via Agent Teams; new `/bmad-quick-spec` is story-spec v2 quick profile in 6 steps; 6 code-review perspective skills now invocable inline; `bmad-shared` rules folder restructured into 6 semantic subdirs (-78.5% chars at workflow INIT); 3 new Agent Teams teammate rules (workflow application, message filtering, findings policy); `/changelog` self-polices voice with a mandatory TL;DR and grep voice gate.
