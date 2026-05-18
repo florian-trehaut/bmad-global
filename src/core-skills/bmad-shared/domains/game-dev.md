@@ -34,6 +34,7 @@ The split exists because the full game-dev knowledge surface (engines + design +
 | [`game-dev/anti-cheat.md`](./game-dev/anti-cheat.md) | Per-genre threat model + defense strategies (server authority / replay verification / behavioral detection) + EAC / BattlEye / VAC / Vanguard | bmad-create-architecture (competitive games), bmad-code-review-perspective-security |
 | [`game-dev/multiplayer-architecture.md`](./game-dev/multiplayer-architecture.md) | Topology (dedicated / P2P / server-relayed) + netcode (lockstep / rollback / client prediction) + matchmaking + voice chat + libraries (Photon / Mirror / Nakama / PlayFab) | bmad-create-architecture, bmad-agent-game-architect |
 | [`game-dev/ci-cd.md`](./game-dev/ci-cd.md) | Build farm + content cooking + automated testing + store deployment automation + versioning + hot-patching live games + quality gates | bmad-tea-ci, bmad-tea-framework |
+| [`game-dev/rust-gamedev.md`](./game-dev/rust-gamedev.md) | Rust gamedev landscape : Bevy 0.18/0.19 ECS-first + Macroquad / ggez / Fyrox + standalone Wgpu / Glam / Rapier / Kira / Lyon stack + WASM target + Cargo workspace patterns + production-shipped games (Tiny Glade / JARL / MegaFactory Tycoon) | bmad-create-architecture (Rust-target projects), bmad-agent-game-architect (engine choice), reviewers on Rust gamedev codebases |
 
 ## Engines — Quick Reference
 

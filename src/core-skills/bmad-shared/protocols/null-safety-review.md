@@ -53,23 +53,35 @@ Language-specific anti-patterns live in `~/.claude/skills/bmad-shared/stacks/{la
 
 Apply `~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md` to extract the language list from `project.md`.
 
-### Step 2 — JIT load the matching stack files
+### Step 2 — JIT load the matching stack files (single-file OR multi-file pattern)
 
 For each detected language `L`:
+
+**Try multi-file pattern first** (used when a language stack exceeds the 600-line single-file target — e.g. Rust as of May 2026) :
+
+```
+Read(~/.claude/skills/bmad-shared/stacks/{L}/null-safety.md)
+```
+
+If this file exists, use it directly — it carries all the null-safety content for language `L`.
+
+**Otherwise fall back to single-file pattern** (used when a language stack fits in one file — e.g. TypeScript, Python, Go) :
 
 ```
 Read(~/.claude/skills/bmad-shared/stacks/{L}.md)
 ```
 
-If the file exists, extract the `## Null Safety` section and apply:
+If the file exists, extract the `## Null Safety` H2 section. This is the legacy single-file layout, still supported indefinitely.
+
+**In both cases**, apply :
 - The "Anti-patterns to flag" list — turn each pattern into a finding template
 - The "Required guardrails" list — verify the project's compiler / lint config enforces them (`strictNullChecks`, `mypy --strict`, `clippy::unwrap_used`, `go vet` / `staticcheck` / `nilaway`)
 - The "Language-specific principles" list — additional rubric on top of the 6 generic principles
 
-If the file does NOT exist for a detected language, log:
+If NEITHER the multi-file sub-file `stacks/{L}/null-safety.md` NOR the single-file `stacks/{L}.md` exists for a detected language, log:
 
 ```
-INFO: No null-safety stack file for language "{L}". Applying only generic principles.
+INFO: No null-safety stack file for language "{L}" (checked both stacks/{L}/null-safety.md and stacks/{L}.md). Applying only generic principles.
 ```
 
 Do NOT halt. The generic principles still apply.

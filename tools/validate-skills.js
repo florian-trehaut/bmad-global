@@ -589,15 +589,24 @@ function validateSkill(skillDir) {
     }
   }
 
-  // --- STACK-15: bmad-shared/stacks/{lang}.md must have required H2 sections ---
+  // --- STACK-15: bmad-shared/stacks/{lang}.md must have required H2 sections (single-file pattern)
+  //              OR stacks/{lang}/{concurrency,null-safety}.md must exist (multi-file pattern) ---
   // Stack files describe per-language runtime-robustness rules consumed by
   // protocols (concurrency-review, null-safety-review). The required sections
   // mirror the H2 anchors those protocols read.
   // Severity is LOW (warning) so partial files are allowed during development.
+  //
+  // Multi-file pattern: when a language stack exceeds the 600-line target, organise
+  // as `stacks/{lang}.md` (master TOC) + `stacks/{lang}/{concurrency,null-safety}.md`
+  // (axis sub-files). The protocols (`concurrency-review.md`, `null-safety-review.md`)
+  // try the sub-file first, fall back to the master `## H2` section. Both layouts pass.
   if (dirName === 'bmad-shared') {
     const stacksDir = path.join(skillDir, 'stacks');
     if (fs.existsSync(stacksDir) && fs.statSync(stacksDir).isDirectory()) {
-      const REQUIRED_STACK_H2 = ['## Concurrency', '## Null Safety'];
+      const REQUIRED_AXES = [
+        { h2: '## Concurrency', subFile: 'concurrency.md' },
+        { h2: '## Null Safety', subFile: 'null-safety.md' },
+      ];
       const stackFiles = fs.readdirSync(stacksDir).filter((f) => f.endsWith('.md') && path.basename(f) !== 'README.md');
 
       for (const stackFile of stackFiles) {
@@ -606,18 +615,29 @@ function validateSkill(skillDir) {
         const content = safeReadFile(stackPath, findings, relFile);
         if (content === null) continue;
 
-        for (const requiredH2 of REQUIRED_STACK_H2) {
-          // Match the H2 header on its own line (anchored, multiline).
-          const escaped = requiredH2.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+        // Detect the canonical {lang} basename (e.g. `rust.md` -> `rust`)
+        const lang = path.basename(stackFile, '.md');
+        const subDir = path.join(stacksDir, lang);
+        const hasSubDir = fs.existsSync(subDir) && fs.statSync(subDir).isDirectory();
+
+        for (const { h2, subFile } of REQUIRED_AXES) {
+          // Match the H2 header on its own line (anchored, multiline) — single-file pattern
+          const escaped = h2.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
           const regex = new RegExp(`^${escaped}\\s*$`, 'm');
-          if (!regex.test(content)) {
+          const hasInlineH2 = regex.test(content);
+
+          // Multi-file pattern: sub-file exists at stacks/{lang}/{axis}.md
+          const subFilePath = hasSubDir ? path.join(subDir, subFile) : null;
+          const hasSubFile = subFilePath !== null && fs.existsSync(subFilePath);
+
+          if (!hasInlineH2 && !hasSubFile) {
             findings.push({
               rule: 'STACK-15',
               title: 'Stack File Required H2 Sections',
               severity: 'LOW',
               file: relFile,
-              detail: `Stack file is missing required H2 section: "${requiredH2}".`,
-              fix: `Add a "${requiredH2}" H2 section per src/core-skills/bmad-shared/stacks/README.md convention.`,
+              detail: `Stack file is missing required content for axis "${h2}": neither the inline H2 section in ${relFile} nor the multi-file sub-file ${path.join('stacks', lang, subFile)} exists.`,
+              fix: `Either add an inline "${h2}" H2 section to ${relFile} (single-file pattern), OR create ${path.join('stacks', lang, subFile)} (multi-file pattern per src/core-skills/bmad-shared/stacks/README.md).`,
             });
           }
         }

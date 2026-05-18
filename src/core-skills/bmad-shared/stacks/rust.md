@@ -1,120 +1,69 @@
 # Stack: Rust
 
-**Loaded by:** Protocols `concurrency-review.md` and `null-safety-review.md` when the project's tech-stack section includes `rust`.
+**Loaded by:** Protocols `concurrency-review.md` and `null-safety-review.md` (resolve to `stacks/rust/{concurrency,null-safety}.md` sub-files first, fall back to this master file's H2 sections if sub-files are missing). Other axes (performance, error-handling, memory-layout, unsafe-usage, tooling, async) are loaded inline by reviewers when their respective axes are in scope.
 
-**Conventions:** Rust-specific runtime-robustness rules. Rust's type system catches many issues at compile-time, but `.unwrap()`, `.expect()`, and async deadlocks remain real production hazards.
-
----
-
-## Concurrency
-
-### Anti-patterns to flag
-
-- **`std::sync::MutexGuard` held across `.await`** (BLOCKER)
-  - Detection: in an `async fn` (or async block), a `let _guard = mutex.lock()...` (returning `MutexGuard<'_, T>`) is followed by an `.await` while `_guard` is still in scope.
-  - Why: the future is parked at the `.await` while holding a thread-blocking lock; if the executor reschedules another task that needs the same lock, the runtime deadlocks. This is one of the most common Tokio production bugs.
-  - Fix: drop the guard before `.await` (`drop(_guard);` or scoping with `{}`), OR use `tokio::sync::Mutex` (whose guard is `Send` and `.await`-friendly), OR redesign so the locked critical section contains no `.await`. Tokio's mutex is more expensive — reach for it only when necessary.
-
-- **Inconsistent lock acquisition order** (BLOCKER)
-  - Detection: code path A locks `m1` then `m2`; code path B locks `m2` then `m1`. Use grep on `.lock()` calls within the same module.
-  - Why: classic deadlock — A waits for `m2`, B waits for `m1`, neither releases.
-  - Fix: enforce a global lock order (e.g., document "always lock A before B"). Better: combine the two mutexes into one wrapping struct, or use lock-free primitives.
-
-- **Mixing `std::sync` and `tokio::sync` for the same data** (MAJOR)
-  - Detection: a struct field is locked via `std::sync::Mutex` in one path and via `tokio::sync::Mutex` in another.
-  - Why: they're incompatible types and protect different invariants. The compiler refuses, but a `parking_lot::Mutex` mixed with `tokio::sync::Mutex` may compile and silently misbehave.
-  - Fix: pick one and use it consistently for that data.
-
-- **Spin loop with `loop { lock.try_lock() ... }`** (MAJOR)
-  - Detection: explicit `try_lock`/`try_read`/`try_write` calls inside a tight `loop` without backoff.
-  - Why: burns CPU, starves the lock holder, and is rarely the right pattern.
-  - Fix: use the blocking `lock()`, or `tokio::sync::Notify`, or a `Condvar`.
-
-- **Unbounded `tokio::spawn` from external input** (MAJOR)
-  - Detection: `for ... { tokio::spawn(async move { ... }) }` over an unbounded source (stream, request fan-out).
-  - Why: spawns can outpace the executor; memory unbounded.
-  - Fix: `JoinSet` with explicit limit, `tokio::sync::Semaphore::acquire`, or `futures::stream::buffer_unordered(N)`.
-
-- **`Arc<Mutex<T>>` where channels would do** (MINOR — design smell)
-  - Detection: `Arc<Mutex<T>>` shared across many tasks for state that flows in one direction (producer → consumers).
-  - Why: shared-state concurrency is harder to reason about than message passing.
-  - Fix: `tokio::sync::mpsc` channel; mutate state only inside the receiver task; readers receive copies/snapshots.
-
-### Required guardrails
-
-- **`cargo test` MUST run** for every change touching async code, channels, atomics, mutexes.
-- **`clippy::await_holding_lock` lint MUST be enabled** (it catches the `MutexGuard across await` bug at compile-time).
-- **`loom`** (optional, for low-level critical paths): exhaustive scheduler exploration in tests.
-- **`miri`** (optional): detects undefined behavior including some races.
-
-### Language-specific principles
-
-- **`Send` and `Sync` are proof, not paperwork.** If the compiler refuses to share a value across threads, redesign — don't reach for `unsafe` to bypass.
-- **Prefer message passing.** `tokio::sync::mpsc` and `crossbeam::channel` are first-class; `Arc<Mutex<T>>` is the last resort.
-- **`tokio::sync::Mutex` ONLY when the lock must be held across `.await`.** Otherwise `parking_lot::Mutex` or `std::sync::Mutex` are faster.
-- **Drop guards before `.await`.** Even `tokio::sync::MutexGuard` benefits from minimal critical sections.
-- **Cancellation safety.** When a future is dropped (e.g., `tokio::select!` losing a branch), in-progress operations may be cancelled. Long critical sections amplify this risk.
-- **No `unsafe` to silence the borrow checker.** If borrow rules block your design, the design is wrong, not the compiler.
+**Conventions:** Rust-specific runtime-robustness rules. Rust's type system catches many issues at compile-time, but `.unwrap()`, `.expect()`, async deadlocks, unsafe soundness, allocation in hot paths, and unsafe-induced UB remain real production hazards. The 8 sub-files below break down each axis with anti-patterns, guardrails, principles, and sourced URLs (May 2026 fresh research).
 
 ---
 
-## Null Safety
+## How to use this stack
 
-The user noted that "ça ne peut pas vraiment arriver en Rust" — true in spirit (no nullable references), but the moral equivalents remain real production bugs:
+This master file carries the **overview + cross-cutting summary + Sub-files index**. The actual rules live in the 8 sub-files under `stacks/rust/` and are **JIT-loaded by the consuming protocol or reviewer**.
 
-### Anti-patterns to flag
+The split exists because Rust's runtime-robustness knowledge surface (concurrency / null-safety / performance / error-handling / memory layout / unsafe usage / tooling / async) is ~3500+ lines — well above the 600-line single-file target.
 
-- **`.unwrap()` in production code paths** (MAJOR)
-  - Detection: `grep -rn "\.unwrap()"` excluding `tests/`, `*test*.rs`, examples, build scripts.
-  - Why: `Option::None.unwrap()` and `Result::Err(_).unwrap()` panic the thread; in async tasks, the panic propagates only with `JoinHandle::await` checks. Often the panic message is unhelpful ("called `unwrap()` on a `None` value").
-  - Fix: `?` operator (when in a function returning `Result`/`Option`), `match`, `let-else`, `unwrap_or`, `unwrap_or_else`, `ok_or(error)`, `context("description")` (anyhow/eyre). Reserve `unwrap()` for tests and provably-Some invariants.
+Other stacks (Go, Python, TypeScript) stay single-file until their content grows large enough to warrant a split — same rule, same migration path. The two protocols that consume stack files (`concurrency-review.md`, `null-safety-review.md`) support both single-file and multi-file layouts transparently.
 
-- **`.expect("should never happen")` masking real cases** (MAJOR)
-  - Detection: `.expect(...)` calls; the message is part of the literal.
-  - Why: same as `unwrap()` but with a slightly better panic message. Often used to "document" an invariant the author didn't actually verify.
-  - Fix: if the invariant is real, prove it (refactor to a type that excludes the impossible case). If not, return `Result`.
+## Sub-files index
 
-- **Slice / array index `s[i]` from external input** (MAJOR)
-  - Detection: `s[i]` where `i` is parsed from input.
-  - Why: out-of-bounds panics; not caught by `Option`.
-  - Fix: `s.get(i)?` (returns `Option<&T>`), then handle `None`.
+| Sub-file | Topic | Loaded by (typical) |
+|---|---|---|
+| [`rust/concurrency.md`](./rust/concurrency.md) | `MutexGuard` across await, lock ordering, channels over `Arc<Mutex>`, `Send`/`Sync` proof, cancellation safety | `concurrency-review.md` protocol (auto), code reviewers on async/threaded changes |
+| [`rust/null-safety.md`](./rust/null-safety.md) | `.unwrap()` / `.expect()` in production, slice indexing, integer cast truncation, `&str` byte boundary, `Option<T>` vs `Result<T, E>` | `null-safety-review.md` protocol (auto), code reviewers on parsing / boundary code |
+| [`rust/performance.md`](./rust/performance.md) | Hot-path allocations, `clone()` cost, iterator-over-loop, build profiles, `criterion` benchmarking, flamegraph / samply / Tracy profiling, mold linker, SIMD | Reviewers on performance-sensitive changes ; future `performance-review.md` protocol |
+| [`rust/error-handling.md`](./rust/error-handling.md) | `thiserror` (libraries) vs `anyhow` / `eyre` (apps) vs `miette` (diagnostics), `?` propagation, error context, `From` conversions, panics-when-justified, async error patterns, FFI boundaries | Reviewers, API design discussions |
+| [`rust/memory-layout.md`](./rust/memory-layout.md) | `repr(C)` / `repr(transparent)` / `repr(packed)`, niche optimisation, `Pin`/`Unpin`, `Cow`/`Arc`/`Rc`, `MaybeUninit`, Miri + sanitizers (asan/tsan/msan), Stacked Borrows | Reviewers on FFI / unsafe / performance hotspots |
+| [`rust/unsafe-usage.md`](./rust/unsafe-usage.md) | When unsafe is justified, SAFETY comment convention, soundness audit, FFI patterns (`bindgen` / `cbindgen`), Miri exhaustive testing, sanitizers, `cargo-geiger` | Reviewers on any unsafe block, FFI changes |
+| [`rust/tooling.md`](./rust/tooling.md) | rustup / `rust-toolchain.toml`, clippy 600+ lints, rustfmt, rust-analyzer, cargo-nextest, mold/wild/lld linkers, sccache, cargo-deny / cargo-audit / cargo-machete, code coverage via cargo-llvm-cov, mdBook docs | Reviewers, CI / DevX engineers |
+| [`rust/async.md`](./rust/async.md) | tokio (current LTS 1.x), runtime ecosystem (async-std / smol / embassy / monoio / glommio / bevy_tasks), `async fn` in traits (Rust 1.75+), cancellation safety, `JoinSet` / `JoinHandle`, `select!`, streams, tokio-console, tracing | Reviewers on async / networking / runtime code |
 
-- **Integer cast that can truncate or wrap** (MAJOR)
-  - Detection: `as` casts between integer types of different widths/signs (`u64 as u32`, `i64 as usize`).
-  - Why: silent truncation; in security-critical contexts, controlled truncation can bypass length checks.
-  - Fix: `try_from`/`u32::try_from(value).map_err(...)`. Use `as` only for known-safe narrowings (e.g., a value already proved < 2^32).
+## Cross-cutting summary
 
-- **`&str` indexing on byte boundary not character boundary** (MAJOR)
-  - Detection: `&s[i..j]` where `s: &str` and `i`/`j` come from external input.
-  - Why: panics if the range falls inside a multi-byte UTF-8 char.
-  - Fix: `s.get(i..j)` (returns `Option<&str>`), or operate on `chars()`/`char_indices()`.
+For protocols that consume stack rules JIT (concurrency-review / null-safety-review), the sub-files are the canonical source.
 
-- **`Option<T>` returned where `Result<T, E>` is correct** (MINOR — design smell)
-  - Detection: a function returns `Option<T>` and the call sites use `.ok_or(SomeError)` to convert.
-  - Why: the function is the right place to attach error context; callers shouldn't manufacture it.
-  - Fix: return `Result<T, E>` directly with a meaningful error type.
+For reviewers running an ad-hoc code review on Rust code, the recommended reading order depends on the change :
 
-### Required guardrails
+| Change touches… | Read first |
+|---|---|
+| Async fn / futures / runtime | `async.md` + `concurrency.md` (cancellation, locks-across-await) |
+| Public API surface | `error-handling.md` (Result types) + `null-safety.md` (no panics) |
+| FFI / extern C / bindgen | `unsafe-usage.md` + `memory-layout.md` (repr, ABI) |
+| Hot loops / per-frame code | `performance.md` (allocations, iterators) + `memory-layout.md` (cache locality) |
+| CI config / `Cargo.toml` / lint setup | `tooling.md` |
+| Game-dev (Bevy / Wgpu / Macroquad) | `domains/game-dev/rust-gamedev.md` (cross-domain, not stack-axis) |
 
-- **`#![deny(clippy::unwrap_used)]` and `#![deny(clippy::expect_used)]`** in production crates (allow them only in `#[cfg(test)]` modules).
-- **`#![deny(clippy::indexing_slicing)]`** for crates parsing untrusted input.
-- **`#![deny(clippy::integer_arithmetic)]`** for crates handling money or security-critical sizes.
-- **`cargo clippy --all-targets -- -D warnings`** in CI.
+## Rust 2024 Edition (stabilized 1.85.0 — Feb 2025)
 
-### Language-specific principles
+Major edition features impacting all sub-files :
 
-- **Use the type system as proof.** A `Vec<T>` with a `NonEmpty<T>` newtype removes the empty-case bug forever.
-- **`?`, `match`, `let-else`, `if let` — choose the most local form.** Don't reach for `.unwrap()` because it's shorter.
-- **`Option<T>` is an honest type.** It says "this may be absent." `.unwrap()` discards that honesty.
-- **Boundary parsers (`serde`, `clap`, custom) should reject invalid input early.** Beyond the boundary, types should be total.
-- **Tests cover both arms.** For every `Option`/`Result` type at a boundary, at least one test for `None`/`Err`.
+- `unsafe_op_in_unsafe_fn` lint now default-on (forces inner `unsafe { ... }` blocks within `unsafe fn`) — see `unsafe-usage.md`
+- RPIT (return-position impl Trait) lifetime capture rules — see `async.md`
+- `cargo` workspace inheritance — see `tooling.md`
+- `let_chains` stabilised — affects guard patterns in `concurrency.md` examples
 
----
+Set `edition = "2024"` in `[package]` of `Cargo.toml` to opt in.
 
-## Sources
+## Sources (cross-cutting)
 
-- [Tokio — Shared state](https://tokio.rs/tokio/tutorial/shared-state)
-- [How to Prevent Async Deadlocks in Rust (Savan Nahar)](https://savannahar68.medium.com/rust-deadlock-do-not-hold-blocking-locks-over-await-1628bf12c6d9)
-- [Don't Unwrap Options (corrode)](https://corrode.dev/blog/rust-option-handling-best-practices/)
-- [The Rust Programming Language — Shared-State Concurrency](https://doc.rust-lang.org/book/ch16-03-shared-state.html)
-- [Rust Concurrency Guide Favors Message Passing Over Shared State (Prism)](https://www.prismnews.com/hobbies/rust-programming/rust-concurrency-guide-favors-message-passing-over-shared)
+Each sub-file carries its own `## Sources` section with axis-specific canonical URLs. The cross-cutting references are :
+
+- The Rust Programming Language (book) : <https://doc.rust-lang.org/book/>
+- Rust By Example : <https://doc.rust-lang.org/rust-by-example/>
+- Rust API Guidelines : <https://rust-lang.github.io/api-guidelines/>
+- The Cargo Book : <https://doc.rust-lang.org/cargo/>
+- Clippy Lints : <https://rust-lang.github.io/rust-clippy/master/>
+- Rustonomicon (Unsafe) : <https://doc.rust-lang.org/nomicon/>
+- Rust 2024 Edition Guide : <https://doc.rust-lang.org/edition-guide/rust-2024/>
+- Rust Performance Book (Nicholas Nethercote) : <https://nnethercote.github.io/perf-book/>
+- Async Book : <https://rust-lang.github.io/async-book/>
+- Rust 1.85 release notes (Feb 2025, 2024 Edition GA) : <https://blog.rust-lang.org/2025/02/20/Rust-1.85.0.html>

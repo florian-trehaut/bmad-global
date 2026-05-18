@@ -104,6 +104,31 @@ The bundled v1 set covers Go, Rust, TypeScript, and Python. Other languages (Jav
 
 ---
 
+## Multi-file stacks (master + sub-files)
+
+When a language's runtime-robustness knowledge surface exceeds the 600-line NFR target for a single file, organise as :
+
+```
+stacks/
+├── {lang}.md                  (master file — overview + Sub-files index table)
+└── {lang}/                    (NEW subdirectory)
+    ├── concurrency.md         (required by concurrency-review.md protocol)
+    ├── null-safety.md         (required by null-safety-review.md protocol)
+    ├── performance.md         (additive, future performance-review.md may consume)
+    ├── error-handling.md      (additive)
+    └── …                      (any additional axes the language warrants)
+```
+
+**How the protocols resolve multi-file stacks** : `concurrency-review.md` and `null-safety-review.md` were updated to **try `stacks/{L}/concurrency.md` (or `null-safety.md`) first, and fall back to `stacks/{L}.md#concurrency` H2 section if not found**. Both layouts are supported indefinitely — a language with rich content uses sub-files, a language with concise content stays single-file.
+
+**Required sub-files** : `concurrency.md` and `null-safety.md` (the two protocol-consumed axes). All other sub-files (performance, error-handling, memory-layout, unsafe-usage, tooling, async, …) are additive — future protocols may target them ; reviewers can consult them inline.
+
+**Backward compatibility** : the single-file layout (`stacks/{L}.md` with `## Concurrency` and `## Null Safety` H2 sections) remains fully supported. Existing stack files (Go, Python, TypeScript) continue to work without change.
+
+**Current example** : `rust` follows the multi-file pattern with 8 sub-files (concurrency, null-safety, performance, error-handling, memory-layout, unsafe-usage, tooling, async) — roughly 3000-4000 lines of detail spread across sub-files plus a 100-line master file. See `stacks/rust.md` for the canonical TOC pattern.
+
+---
+
 ## When a stack file is missing for a detected language
 
 The protocols `concurrency-review.md` and `null-safety-review.md` log INFO and apply only the generic (language-agnostic) principles. They do NOT halt. The user can choose to add the missing stack file later.

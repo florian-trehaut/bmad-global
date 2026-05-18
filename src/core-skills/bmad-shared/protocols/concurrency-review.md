@@ -48,23 +48,35 @@ Language-specific rules live in `~/.claude/skills/bmad-shared/stacks/{language}.
 
 Apply the protocol `~/.claude/skills/bmad-shared/protocols/tech-stack-lookup.md` to read the project's `tech-stack` section from `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`. Extract the list of language identifiers.
 
-### Step 2 — JIT load the matching stack files
+### Step 2 — JIT load the matching stack files (single-file OR multi-file pattern)
 
 For each detected language `L` (canonical lowercase identifier — `go`, `rust`, `typescript`, `python`, …):
+
+**Try multi-file pattern first** (used when a language stack exceeds the 600-line single-file target — e.g. Rust as of May 2026) :
+
+```
+Read(~/.claude/skills/bmad-shared/stacks/{L}/concurrency.md)
+```
+
+If this file exists, use it directly — it carries all the concurrency content for language `L`.
+
+**Otherwise fall back to single-file pattern** (used when a language stack fits in one file — e.g. TypeScript, Python, Go) :
 
 ```
 Read(~/.claude/skills/bmad-shared/stacks/{L}.md)
 ```
 
-If the file exists, extract the `## Concurrency` section and apply:
+If the file exists, extract the `## Concurrency` H2 section. This is the legacy single-file layout, still supported indefinitely.
+
+**In both cases**, apply :
 - The "Anti-patterns to flag" list — convert each to a finding template
 - The "Required guardrails" list — verify CI/build commands include them
 - The "Language-specific principles" list — use as additional rubric on top of the 9 generic principles
 
-If the file does NOT exist for a detected language, log:
+If NEITHER the multi-file sub-file `stacks/{L}/concurrency.md` NOR the single-file `stacks/{L}.md` exists for a detected language, log:
 
 ```
-INFO: No concurrency stack file for language "{L}". Applying only generic principles.
+INFO: No concurrency stack file for language "{L}" (checked both stacks/{L}/concurrency.md and stacks/{L}.md). Applying only generic principles.
 ```
 
 Do NOT halt. The generic principles still apply.
