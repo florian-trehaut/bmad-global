@@ -169,6 +169,47 @@ After frontmatter, before `# {Project Name}` heading, emit a header reflecting a
 
 Store the complete draft (frontmatter + header comment + populated content) keyed by filename.
 
+### 2b. Enrich project.md with Domain Stack (if applicable)
+
+**Gate:** Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` YAML frontmatter. Extract the `project_type` field.
+
+- If `project_type` is absent / empty / null → **NO-OP**: skip this sub-step (preserves backward compatibility — projects without domain awareness see zero change).
+- If `project_type` is set AND non-empty: apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column.
+  - If the resolved `domain_stack` value is empty → **NO-OP**: skip this sub-step (type declared but no preset content backs it).
+  - If the protocol HALTs (e.g., declared-but-missing file) → propagate the HALT immediately (Zero Fallback — never silently degrade).
+  - Otherwise: Read the referenced `bmad-shared/domains/{type}.md` file.
+
+**Apply the loaded domain content to the project.md draft** by populating the optional v1.2 sections — `## NFR Defaults`, `## Observability Standards`, `## Security Baseline`:
+
+| Domain stack section (input) | project.md section (output) |
+|---|---|
+| `## NFR Baselines` | `## NFR Defaults` |
+| `## Observability Defaults` | `## Observability Standards` |
+| `## Security Baseline` | `## Security Baseline` |
+
+The mapping is content-preserving: copy section bodies verbatim. The output section receives an HTML comment citation at its top:
+
+```html
+<!-- Generated from bmad-shared/domains/{type}.md @ {git SHA or "current"}. Edits will be flagged on next refresh. -->
+```
+
+**Cite the domain stack as a source** in the project.md frontmatter's `sources_used` array:
+
+```yaml
+sources_used: [planning, specs, code, domain_stack]   # appended: ", domain_stack" when applicable
+source_hash:
+  ...
+  domain_stack: {8-char hash of bmad-shared/domains/{type}.md body}
+```
+
+**Log:**
+
+```
+Domain stack enriched project.md: {type} → 3 sections populated (NFR Defaults / Observability Standards / Security Baseline). Source cited.
+```
+
+When `project_type` is absent or NO-OP → do **not** emit this line, do **not** add the `domain_stack` entry to `sources_used` or `source_hash`. Silent skip.
+
 ### 3. Log Generation Summary
 
 ```

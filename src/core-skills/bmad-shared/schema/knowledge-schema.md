@@ -186,6 +186,13 @@ protocols:
     sections_consumed: []
     consumed_by: "create-story step-13-output, quick-dev step-oneshot, dev-story step-03-setup-worktree, review-story step-05-analyze, validation-{metier,frontend,desktop} step-01-intake, knowledge-bootstrap step-01-preflight, knowledge-refresh step-01-detect-changes, project-init step-03-generate-context"
     cross_reference: "bmad-shared/spec/spec-completeness-rule.md (v3 schema definition), bmad-shared/protocols/tracker-crud.md (CRUD recipes)"
+  domain-stack-lookup:
+    file: "~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md"
+    sections_consumed: []
+    csv_consumed: "src/bmm-skills/2-plan-workflows/bmad-create-prd/data/project-types.csv (canonical) — domain_stack column"
+    domains_consumed: ["bmad-shared/domains/{slug}.md"]
+    consumed_by: "create-story step-02d-discover (pilot), knowledge-bootstrap step-04-generate-knowledge, knowledge-refresh step-02-scan-and-generate, and the ~32-35 domain-consuming workflow.md INIT sections + 8 agent SKILL.md activation sections per Guardrail #7 of standalone-presets-foundation-and-game-dev-pilot"
+    cross_reference: "bmad-shared/core/no-fallback-no-false-data.md (HALT-on-missing semantics), bmad-shared/domains/README.md (per-domain structure)"
 
 # ============================================================
 # DIRECT-REFERENCE EXCEPTIONS

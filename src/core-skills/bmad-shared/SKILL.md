@@ -41,9 +41,13 @@ bmad-shared/
 │   ├── validation-tooling-lookup.md
 │   ├── concurrency-review.md
 │   ├── null-safety-review.md
-│   └── spec-bifurcation.md
+│   ├── spec-bifurcation.md
+│   └── domain-stack-lookup.md
 ├── data/                             (JIT — reference data, unchanged)
-└── stacks/                           (JIT — language-keyed rules, unchanged)
+├── stacks/                           (JIT — language-keyed rules, unchanged)
+└── domains/                          (JIT — project-type / domain-keyed presets)
+    ├── README.md
+    └── game-dev.md
 ```
 
 ## Loading Patterns
@@ -69,6 +73,8 @@ Workflows load additional subdirectories based on what they need. Reference the 
 | `bmad-help`, `bmad-status`, `bmad-daily-planning` | YES | — | — | — | — | — | — |
 
 **Note on `data/`** : contains 16+ template files (NFR registry, security gate, observability requirements, business context, EARS AC, INVEST checklist, out-of-scope, risks register, boundaries triple, etc.). Loaded JIT by spec-producing/consuming skills (`bmad-create-story`, `bmad-quick-spec`, `bmad-review-story` review pass) — see Rule Type Lookup Table below for canonical per-template paths.
+
+**Note on `domains/`** : contains project-type-specific preset files (game-dev, future: embedded, scientific, …). JIT-loaded by `protocols/domain-stack-lookup.md` when `workflow-context.md` declares a non-empty `project_type` whose CSV row has a non-empty `domain_stack` column. The current domain-consuming subset (~32-35 workflows + 8 agents per the originating story's Guardrail #7) mechanically applies the JIT-load block at INIT/activation; absent `project_type` → silent NO-OP (preserves backward compatibility for non-domain projects).
 
 ## Rule Type Lookup Table
 
@@ -103,5 +109,7 @@ When you need a specific shared rule, consult this table to find the canonical p
 | Concurrency review per stack | `protocols/concurrency-review.md` |
 | Null-safety review per stack | `protocols/null-safety-review.md` |
 | Spec bifurcation operations (compose, drift, sync, handoff) | `protocols/spec-bifurcation.md` |
+| Domain stack lookup (project_type → CSV row → preset file) | `protocols/domain-stack-lookup.md` |
 | Per-language stack rules | `stacks/{language}.md` |
+| Per-domain preset content (engines, personas, NFR baselines, security baseline, observability defaults) | `domains/{slug}.md` (loaded JIT via `protocols/domain-stack-lookup.md`) |
 | Spec templates (NFR registry, security gate, observability, business context, EARS AC, INVEST, out-of-scope, risks, boundaries triple, …) | `data/{name}-template.md` (loaded JIT by spec-producing skills) |

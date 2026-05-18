@@ -39,6 +39,8 @@ Conduct project-type specific discovery using CSV-driven guidance to define tech
 
 ## SEQUENCE
 
+<!-- Verified on 2026-05-18 against the enriched `game` row of `project-types.csv` (column 8 `domain_stack` added, REDIRECT placeholder replaced with full config per story standalone-presets-foundation-and-game-dev-pilot). No REDIRECT-specific code path exists in this step — the CSV row is iterated blindly. No modification required. -->
+
 ### 1. Load Project-Type Configuration Data
 
 Load `../data/project-types.csv` and find the row where `project_type` matches the type from step 2. Extract:

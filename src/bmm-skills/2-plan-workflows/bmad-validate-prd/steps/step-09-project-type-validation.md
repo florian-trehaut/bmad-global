@@ -43,6 +43,8 @@ Validate project-type specific requirements are properly documented -- different
 
 ## SEQUENCE
 
+<!-- Verified on 2026-05-18 against the enriched canonical `project-types.csv` (column 8 `domain_stack` added, `game` row enriched per story standalone-presets-foundation-and-game-dev-pilot). No REDIRECT-specific code path exists in this step. NOTE: this step uses its OWN local `project-types.csv` (under `bmad-validate-prd/data/`) with a different 4-column schema — NOT the canonical CSV consumed by `bmad-create-prd`. Step-09's section 4 also hardcodes a project-type list that excludes `game` (api_backend, web_app, mobile_app, desktop_app, data_pipeline, ml_system, library_sdk, infrastructure). This is a pre-existing limitation outside the scope of this story; reconciliation deferred to follow-up story `bmad-validate-prd-schema-alignment` (OOS-9). No modification required here. -->
+
 ### 1. Load Project Types Data
 
 Load and read the complete file at `{projectTypesData}`.

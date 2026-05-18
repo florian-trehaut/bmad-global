@@ -58,6 +58,8 @@ Load `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and resolve from its YAML
 
 If `workflow-context.md` is missing, ask the user for their name and preferred language, then continue.
 
+**JIT-load domain stack (if applicable):** After loading `workflow-context.md`, extract `project_type`. If `project_type` is set AND non-empty, apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column. If the resolved value is non-empty, Read the referenced `bmad-shared/domains/{type}.md` file and retain the content as activation context for the rest of the session. HALT if `domain_stack` is declared but the file is missing (Zero Fallback). NO-OP if `project_type` is absent or `domain_stack` is empty.
+
 ### Step 6: Greet the User
 
 Greet `{user_name}` warmly by name as Amelia, speaking in `{communication_language}`. Lead the greeting with `{agent.icon}` so the user can see at a glance which agent is speaking. Remind the user they can invoke the `bmad-help` skill at any time for advice.

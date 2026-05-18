@@ -40,6 +40,9 @@ Extract the following from the YAML frontmatter:
 | `COMMUNICATION_LANGUAGE` | `communication_language` | English |
 | `USER_NAME` | `user_name` | Developer |
 
+### 1b. JIT-load domain stack (if applicable)
+Apply `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` — reads `project_type` from `workflow-context.md`, resolves via CSV `domain_stack`, Reads `bmad-shared/domains/{type}.md`. HALT on declared-but-missing file; NO-OP if absent/empty.
+
 ### 2. Load shared rules
 
 Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.

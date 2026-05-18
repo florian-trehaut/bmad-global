@@ -21,6 +21,18 @@ Key rules: `no-fallback-no-false-data.md`, `validation/validation-protocol.md#pr
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md`. HALT if missing.
 - Read `{MAIN_PROJECT_ROOT}/.claude/workflow-knowledge/project.md`. HALT if missing.
 
+### 2b. JIT-load domain stack (if applicable)
+
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` → extract `project_type`. If `project_type` is set AND non-empty:
+
+Apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column. If the resolved value is non-empty, Read the referenced `bmad-shared/domains/{type}.md` file.
+
+On success, the loaded content is available in conversation context for the remainder of the workflow execution.
+
+HALT conditions: `domain_stack` declared but file missing → HALT (Zero Fallback).
+NO-OP conditions: `project_type` absent OR `domain_stack` empty → silent skip.
+
+
 ### 3. Detect teammate mode (M14 — teammate-only enforcement)
 
 Apply `~/.claude/skills/bmad-shared/teams/teammate-mode-routing.md`. **This skill REQUIRES TEAMMATE_MODE=true** with `task_contract.role = 'code-reviewer-correctness'`.

@@ -165,11 +165,27 @@ If `worktree_enabled: false`, worktree templates are still generated (for docume
 - **communication_language**: ask (default: English)
 - **user_skill_level**: ask (beginner/intermediate/expert)
 - **issue_prefix**: suggest uppercase abbreviation of project name
+- **project_type** (domain): ask
+
+  > Project type (domain)? This activates project-type-specific preset content (engines, personas, NFR baselines, security baseline, observability defaults) via the `domain-stack-lookup` protocol.
+  >
+  > Options (closed list — must match a row in `src/bmm-skills/2-plan-workflows/bmad-create-prd/data/project-types.csv`):
+  > `api_backend` / `mobile_app` / `saas_b2b` / `developer_tool` / `cli_tool` / `web_app` / `game` / `desktop_app` / `iot_embedded` / `blockchain_web3` / (leave blank to opt out)
+  >
+  > Default: empty (opt out — no domain-aware behavior, identical to projects before v1.2).
+
+  Validation rules:
+  - Empty value is valid (opt-out, preserves backward compatibility).
+  - Non-empty value MUST match a row in the canonical CSV (case-sensitive lowercase kebab-case, regex `^[a-z][a-z0-9-]*$`).
+  - **HALT** with `project_type "{value}" does not match any row in project-types.csv. Run /bmad-knowledge-bootstrap or pick a valid value.` if non-empty value has no match.
+
+  Store as `project_type`. Default to empty when the user accepts default.
 
 ### 5. Present Combined Summary
 
 ```
 Project:          {project_name} ({app_type})
+Project type:     {project_type or "(none — opt out)"}
 Issue prefix:     {issue_prefix}
 Monorepo:         {yes/no}
 Package manager:  {pm}

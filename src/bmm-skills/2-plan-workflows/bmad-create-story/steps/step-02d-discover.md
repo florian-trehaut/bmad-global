@@ -47,6 +47,41 @@ Scan the codebase and tracker for context, ask informed questions, capture scope
 
 ## SEQUENCE
 
+### PART A0 — JIT-load Domain Stack (if applicable)
+
+**Purpose:** Enrich subsequent discovery questions with domain-specific patterns when the project has declared a `project_type` in `workflow-context.md`.
+
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` YAML frontmatter (already loaded by `bmad-create-story` workflow.md INIT — reuse the in-memory value if available).
+
+Extract the `project_type` field.
+
+**Gate:**
+
+- If `project_type` is absent / empty / null → **NO-OP**: skip this part entirely. Existing PART A1, A2, A3, B1-B7 logic is preserved unchanged (backward compatibility — BAC-3 of the originating story).
+- If `project_type` is set AND non-empty: apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column.
+  - If the resolved `domain_stack` value is empty → **NO-OP**: skip this part (the type is declared but no preset content backs it — valid opt-out per CSV design).
+  - If the protocol HALTs (e.g., `project_type` regex mismatch, declared-but-missing `domain_stack` file) → propagate the HALT immediately. Do not silently degrade (Zero Fallback).
+  - Otherwise: Read the referenced `bmad-shared/domains/{type}.md` file. Retain the content in the conversation context for the remainder of step-02d.
+
+**Behavioral effects when domain stack is loaded:**
+
+1. PART A2 (Ask Informed Questions) **surfaces domain-specific discovery hints** from the loaded `## GDD Discovery Hints` section (e.g., engine question, gameplay loop, performance budget for `project_type: game`).
+2. PART A3 (Capture Core Understanding) **pre-populates suggested Out-of-Scope items** drawn from the domain's typical OOS patterns where applicable.
+3. PART B5 (Validation Metier) **suggests domain-specific VM types** from the loaded `## NFR Baselines` and `## Observability Defaults` sections (e.g., `[performance]` / `[crash-reporting]` / `[telemetry]` for game-dev).
+4. PART B7 (Definition of Done) **pre-fills NFR baselines** from the loaded `## NFR Baselines` section (e.g., 60 FPS hot path / 30 FPS mobile / 90 FPS VR for game-dev).
+5. **Suggest the domain agent** if the loaded `## Personas` section names an agent skill in this fork (e.g., `bmad-agent-game-architect` for game-dev) — surface as a hint to the user that they may want to consult that persona for architectural decisions.
+
+**Emit explicit confirmation when domain content has been loaded:**
+
+```
+Domain stack loaded: project_type={value} → bmad-shared/domains/{slug}.md (N lines, sections: {comma-separated H2 list})
+Behavior enrichments active: domain-aware questions, NFR defaults pre-populated, domain agent suggestion available.
+```
+
+When `project_type` is absent or the protocol returned NO-OP, do **not** emit this line — silent skip preserves the zero-token-cost backward-compat property.
+
+**Next:** Read FULLY and apply: `./step-02d-discover.md#part-a-orient-scope` — load the file with the Read tool, do not summarise from memory, do not skip sections.
+
 ### PART A — Orient & Scope
 
 #### A1. Quick Context Scan

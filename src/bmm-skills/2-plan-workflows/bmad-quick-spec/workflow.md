@@ -71,6 +71,18 @@ CHK-INIT PASSED — bmad-quick-spec initialization complete:
 
 ---
 
+### 6. JIT-load domain stack (if applicable)
+
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` → extract `project_type`. If `project_type` is set AND non-empty:
+
+Apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column. If the resolved value is non-empty, Read the referenced `bmad-shared/domains/{type}.md` file.
+
+On success, the loaded content is available in conversation context for the remainder of the workflow execution.
+
+HALT conditions: `domain_stack` declared but file missing → HALT (Zero Fallback).
+NO-OP conditions: `project_type` absent OR `domain_stack` empty → silent skip.
+
+
 ## YOUR ROLE
 
 You are an **expert spec author** producing a condensed but complete story spec. Your work feeds directly into `/bmad-dev-story` or `/bmad-quick-dev`. The spec MUST be implementable as-is — no follow-up clarifications needed.

@@ -1,10 +1,11 @@
 /**
  * Deterministic Skill Validator
  *
- * Validates 15 deterministic rules across all skill directories.
- * Acts as a fast first-pass complement to the inference-based skill validator.
+ * Validates 16 deterministic rules across all skill directories (per-skill)
+ * plus 1 project-wide rule (DOM-01). Acts as a fast first-pass complement
+ * to the inference-based skill validator.
  *
- * What it checks:
+ * What it checks (per-skill):
  * - SKILL-01: SKILL.md exists
  * - SKILL-02: SKILL.md frontmatter has name
  * - SKILL-03: SKILL.md frontmatter has description
@@ -20,19 +21,28 @@
  * - STEP-07: step count 2-15
  * - SEQ-02: no time estimates
  * - STACK-15: bmad-shared/stacks/{lang}.md files contain required H2 sections
+ * - HARD-09: AskUserQuestion in teammate-spawnable workflows must be TEAMMATE_MODE-conditional
+ *
+ * What it checks (project-wide):
+ * - DOM-01: project-types.csv `domain_stack` references resolve to existing files
  *
  * Usage:
- *   node tools/validate-skills.js                    # All skills, human-readable
- *   node tools/validate-skills.js path/to/skill-dir  # Single skill
+ *   node tools/validate-skills.js                    # All skills + project-wide, human-readable
+ *   node tools/validate-skills.js path/to/skill-dir  # Single skill (skips project-wide checks)
  *   node tools/validate-skills.js --strict           # Exit 1 on HIGH+ findings
  *   node tools/validate-skills.js --json             # JSON output
+ *
+ * Test override:
+ *   BMAD_PROJECT_TYPES_CSV_OVERRIDE=path/to/fixture.csv  # used by test/test-domain-stack-rule.js
  */
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { parse: parseCsv } = require('csv-parse/sync');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const SRC_DIR = path.join(PROJECT_ROOT, 'src');
+const CANONICAL_PROJECT_TYPES_CSV = path.join(SRC_DIR, 'bmm-skills', '2-plan-workflows', 'bmad-create-prd', 'data', 'project-types.csv');
 
 // --- CLI Parsing ---
 
@@ -834,6 +844,87 @@ function validateSkill(skillDir) {
   return findings;
 }
 
+// --- DOM-01: domain_stack references must resolve to existing files ---
+//
+// Per `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md`, each row in
+// the canonical project-types.csv with a non-empty `domain_stack` column MUST point
+// to a file that exists on disk (relative to repo root). A missing target is a
+// HIGH-severity violation of the zero-fallback policy.
+//
+// Test environment override: BMAD_PROJECT_TYPES_CSV_OVERRIDE env var allows tests
+// to point at a fixture CSV instead of the canonical one.
+function validateDomainStackReferences() {
+  const findings = [];
+  const csvPath = process.env.BMAD_PROJECT_TYPES_CSV_OVERRIDE || CANONICAL_PROJECT_TYPES_CSV;
+  const relCsvPath = path.relative(PROJECT_ROOT, csvPath) || csvPath;
+
+  if (!fs.existsSync(csvPath)) {
+    // Missing canonical CSV: emit a single CRITICAL — the framework installation is broken.
+    // Skip silently when the override env var is set but points at a missing file (test responsibility).
+    if (!process.env.BMAD_PROJECT_TYPES_CSV_OVERRIDE) {
+      findings.push({
+        rule: 'DOM-01',
+        title: 'Canonical project-types CSV Must Exist',
+        severity: 'CRITICAL',
+        file: relCsvPath,
+        line: null,
+        detail: `Canonical project-types.csv not found at ${relCsvPath}. The framework installation is incomplete.`,
+        fix: 'Run `node tools/cli/bmad-cli.js install --force` or restore the file from version control.',
+      });
+    }
+    return findings;
+  }
+
+  let rows;
+  try {
+    const content = fs.readFileSync(csvPath, 'utf-8');
+    rows = parseCsv(content, { columns: true, skip_empty_lines: true, trim: false });
+  } catch (error) {
+    findings.push({
+      rule: 'DOM-01',
+      title: 'project-types CSV Parse Error',
+      severity: 'CRITICAL',
+      file: relCsvPath,
+      line: null,
+      detail: `Failed to parse ${relCsvPath} as CSV: ${error.message}`,
+      fix: 'Fix the CSV syntax (check for unescaped quotes, missing columns, etc.).',
+    });
+    return findings;
+  }
+
+  for (const [i, row] of rows.entries()) {
+    const projectType = (row.project_type || '').trim();
+    const rawDomainStack = row.domain_stack;
+
+    // Skip rows without the domain_stack column at all (older schema) — DOM-01 silently no-ops
+    if (rawDomainStack === undefined) continue;
+
+    const trimmed = String(rawDomainStack).trim();
+    // Empty or whitespace-only: NO-OP per protocol (opt-out is valid)
+    if (trimmed === '') continue;
+
+    // Resolve the path. The CSV value is relative to repo root for `bmad-shared/...` refs,
+    // which means `src/core-skills/{value}` in the source tree. Try that resolution first.
+    const candidates = [path.join(SRC_DIR, 'core-skills', trimmed), path.join(PROJECT_ROOT, trimmed)];
+
+    const exists = candidates.some((p) => fs.existsSync(p));
+
+    if (!exists) {
+      findings.push({
+        rule: 'DOM-01',
+        title: 'domain_stack Reference Must Resolve to an Existing File',
+        severity: 'HIGH',
+        file: relCsvPath,
+        line: i + 2, // +1 for header row, +1 for 1-indexed line numbers
+        detail: `Row ${i + 1} (project_type "${projectType}") declares domain_stack "${trimmed}" but the file does not exist at any candidate path: ${candidates.map((c) => path.relative(PROJECT_ROOT, c)).join(' OR ')}.`,
+        fix: `Either create the file at \`src/core-skills/${trimmed}\` (preferred for shared rules) or clear the domain_stack column for the "${projectType}" row.`,
+      });
+    }
+  }
+
+  return findings;
+}
+
 // --- Output Formatting ---
 
 function formatHumanReadable(results) {
@@ -982,6 +1073,15 @@ if (require.main === module) {
   for (const skillDir of skillDirs) {
     const findings = validateSkill(skillDir);
     results.push({ skillDir, findings });
+  }
+
+  // Project-wide checks (DOM-01: domain_stack references). Only run when scanning all skills,
+  // not when targeting a single skill directory — keeps single-skill validation fast and focused.
+  if (positionalArgs.length === 0 || process.env.BMAD_PROJECT_TYPES_CSV_OVERRIDE) {
+    const domainFindings = validateDomainStackReferences();
+    if (domainFindings.length > 0) {
+      results.push({ skillDir: path.join(PROJECT_ROOT, '__project__'), findings: domainFindings });
+    }
   }
 
   // Format output

@@ -28,6 +28,18 @@ Extract the following from the YAML frontmatter:
 | `OUTPUT_FOLDER` | `output_folder` | _bmad-output |
 | `PLANNING_ARTIFACTS` | `planning_artifacts` | _bmad-output/planning-artifacts |
 
+### 1b. JIT-load domain stack (if applicable)
+
+Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` → extract `project_type`. If `project_type` is set AND non-empty:
+
+Apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column. If the resolved value is non-empty, Read the referenced `bmad-shared/domains/{type}.md` file.
+
+On success, the loaded content is available in conversation context for the remainder of the workflow execution.
+
+HALT conditions: `domain_stack` declared but file missing → HALT (Zero Fallback).
+NO-OP conditions: `project_type` absent OR `domain_stack` empty → silent skip.
+
+
 ### 2. Load shared rules
 
 Glob `~/.claude/skills/bmad-shared/core/*.md`, then Read each file individually. The 5 core rules are universal. Other subdirectories (`spec/`, `teams/`, `validation/`, `lifecycle/`, `schema/`, `protocols/`, `data/`, `stacks/`) are JIT-loaded per workflow type — see `~/.claude/skills/bmad-shared/SKILL.md` for the lookup table.

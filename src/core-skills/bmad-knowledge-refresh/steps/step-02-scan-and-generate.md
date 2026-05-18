@@ -169,6 +169,58 @@ Store the complete draft (frontmatter + updated content) keyed by filename. Also
 - New content added: yes/no
 - Stale content removed: yes/no
 
+#### h. Refresh project.md Domain Stack Sections (if applicable)
+
+**Gate (only applies to project.md):** Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` YAML frontmatter. Extract the `project_type` field.
+
+- If `project_type` is absent / empty / null → **NO-OP**: skip this sub-step. If the previous `project.md` had a `domain_stack` entry in `source_hash` and now no longer has it, log a "domain stack removed" note but do NOT delete the v1.2 sections (they may have been hand-edited — preserve user content).
+- If `project_type` is set AND non-empty: apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column.
+  - If the resolved `domain_stack` value is empty → **NO-OP**: skip this sub-step (type declared but no preset content backs it).
+  - If the protocol HALTs (e.g., declared-but-missing file) → propagate the HALT immediately (Zero Fallback).
+  - Otherwise: Read the referenced `bmad-shared/domains/{type}.md` file.
+
+**Refresh the three optional v1.2 sections of project.md** (`## NFR Defaults`, `## Observability Standards`, `## Security Baseline`) from the loaded domain stack content. Apply the same merge logic as Step 4.c.h. of `bmad-knowledge-bootstrap`:
+
+| Domain stack section (input) | project.md section (output) |
+|---|---|
+| `## NFR Baselines` | `## NFR Defaults` |
+| `## Observability Defaults` | `## Observability Standards` |
+| `## Security Baseline` | `## Security Baseline` |
+
+**Drift detection on v1.2 sections** (Axe-1 — code vs spec):
+
+1. Compute `domain_stack_hash_current` = md5 of the loaded domain stack file.
+2. Read `project.md` frontmatter's `source_hash.domain_stack` field (the previously-stored hash, if any).
+3. Compute `project_md_v12_hash_current` = md5 of the current text of the three v1.2 sections in `project.md` (concatenated `## NFR Defaults` + `## Observability Standards` + `## Security Baseline` bodies).
+4. Compute `project_md_v12_hash_expected` = md5 of the same three sections if regenerated from the current domain stack content (the proposed new content).
+
+Then classify:
+
+| Condition | Classification | Action |
+|---|---|---|
+| `domain_stack_hash_current` == frontmatter's previous `source_hash.domain_stack` AND `project_md_v12_hash_current` == `project_md_v12_hash_expected` | No drift | NO-OP — preserve current text, update frontmatter hash if needed |
+| `domain_stack_hash_current` != frontmatter's previous `source_hash.domain_stack` AND `project_md_v12_hash_current` == `project_md_v12_hash_expected` | Source-only drift | UPDATE — refresh the three sections from new domain stack content, update `source_hash.domain_stack` |
+| `domain_stack_hash_current` == frontmatter's previous `source_hash.domain_stack` AND `project_md_v12_hash_current` != `project_md_v12_hash_expected` | Manual-edit drift | PRESERVE — leave the user's manual edits intact, emit a warning summary "project.md v1.2 sections diverge from domain stack — preserved as manual override" |
+| Both hashes differ | Axe-1 drift (code vs spec — both source AND derived content changed) | DEFER to step-03 (interactive review). Add this as a new entry to `DRIFT_AXIS1_DETECTED` with explanatory context: "domain_stack content changed AND project.md v1.2 sections were manually edited — needs human reconciliation" |
+
+This logic preserves user agency: source-only drift auto-refreshes (the user explicitly opted into the domain stack as source of truth), manual edits are kept (signalled via warning), and double-drift triggers the existing step-03 interactive review path.
+
+**Update `source_hash` accordingly:**
+
+```yaml
+source_hash:
+  ...existing entries...
+  domain_stack: {new 8-char hash, only if project_type is set and resolved}
+```
+
+When `project_type` is absent or NO-OP → ensure `source_hash.domain_stack` is **removed** from the frontmatter (cleanup if it existed previously) and the three v1.2 sections are **preserved** unchanged (user may have hand-curated them; deletion would be destructive).
+
+**Log per outcome:**
+
+```
+project.md domain stack refresh: {classification} — {brief detail}
+```
+
 ### 5. Handle workflow-context.md (if in TARGET_FILES)
 
 workflow-context.md is different — it has YAML frontmatter as its primary content, not markdown sections.

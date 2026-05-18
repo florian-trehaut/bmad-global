@@ -105,6 +105,13 @@ branch_template: "feat/{issue_number}-{short_description}"
 # --- Application type ---
 app_type: "{app_type}"
 
+# --- Project type (domain) ---
+# Must match a project_type row in src/bmm-skills/2-plan-workflows/bmad-create-prd/data/project-types.csv if non-empty.
+# Empty value = opt out of domain-aware behaviors (preserves backward compatibility).
+# Non-empty value activates JIT-loading of the matching bmad-shared/domains/{slug}.md file
+# via ~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md.
+project_type: "{project_type}"
+
 # --- Build tooling & commands ---
 package_manager: {package_manager}
 install_command: "{install_command}"

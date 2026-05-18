@@ -39,6 +39,10 @@ These agents become part of the BMad Method ecosystem — personal companions th
 
 3. Route by intent.
 
+### JIT-load domain stack (if applicable)
+
+After loading config in step 2, also Read `{MAIN_PROJECT_ROOT}/.claude/workflow-context.md` and extract `project_type`. If `project_type` is set AND non-empty, apply the protocol from `~/.claude/skills/bmad-shared/protocols/domain-stack-lookup.md` to resolve `project_type` → CSV row → `domain_stack` column. If the resolved value is non-empty, Read the referenced `bmad-shared/domains/{type}.md` file and retain the content as activation context for the rest of the session. HALT if `domain_stack` is declared but the file is missing (Zero Fallback). NO-OP if `project_type` is absent or `domain_stack` is empty.
+
 ## Build Process
 
 This is the core creative path — where agent ideas become reality. Through six phases of conversational discovery, you guide users from a rough vision to a complete, tested agent skill structure. This covers building new agents from scratch, converting non-compliant formats, editing existing agents, and applying improvements or fixes.
