@@ -191,7 +191,8 @@ protocols:
     sections_consumed: []
     csv_consumed: "src/bmm-skills/2-plan-workflows/bmad-create-prd/data/project-types.csv (canonical) — domain_stack column"
     domains_consumed: ["bmad-shared/domains/{slug}.md"]
-    consumed_by: "create-story step-02d-discover (pilot), knowledge-bootstrap step-04-generate-knowledge, knowledge-refresh step-02-scan-and-generate, and the ~32-35 domain-consuming workflow.md INIT sections + 8 agent SKILL.md activation sections per Guardrail #7 of standalone-presets-foundation-and-game-dev-pilot"
+    multi_file_support: "Domain files may organise as `{slug}.md` (master) + `{slug}/*.md` (sub-files) when knowledge surface exceeds 600-line NFR target. Protocol resolves the entry file only ; sub-files are JIT-loaded by consumer workflows via the master file's Sub-files index table. Currently used by game-dev domain (1 master + 18 sub-files, ~6000 lines total)."
+    consumed_by: "create-story step-02d-discover (pilot), knowledge-bootstrap step-04-generate-knowledge, knowledge-refresh step-02-scan-and-generate, and the ~32-35 domain-consuming workflow.md INIT sections + 8 agent SKILL.md activation sections per Guardrail #7 of standalone-presets-foundation-and-game-dev-pilot. Plus the 9 game-specific skills imported from BMGD v0.5.0 SHA 9dcd1253 (4 agents: bmad-agent-game-designer/dev/solo-dev/tech-writer + 5 workflows: bmad-create-gdd/create-narrative/check-readiness-game/playtest-plan/tea-game-framework)."
     cross_reference: "bmad-shared/core/no-fallback-no-false-data.md (HALT-on-missing semantics), bmad-shared/domains/README.md (per-domain structure)"
 
 # ============================================================

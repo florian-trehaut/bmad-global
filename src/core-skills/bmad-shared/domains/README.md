@@ -106,6 +106,25 @@ A language can apply to many domains (Go is used for both game-server and IoT-em
 
 The bundled v1 set covers `game-dev.md`. Other domains can be added by users without modifying the protocol or any consumer workflow — the JIT-load block (per `domain-stack-lookup.md`) auto-picks them up via the CSV row.
 
+## Multi-file domain stacks (master + sub-files)
+
+When a domain's knowledge surface exceeds the 600-line NFR target for a single file, organise as :
+
+```
+domains/
+├── {slug}.md                  (master file — overview + cross-cutting summaries + Sub-files index table)
+└── {slug}/                    (NEW subdirectory)
+    ├── {topic-1}.md
+    ├── {topic-2}.md
+    └── …
+```
+
+**How the protocol resolves multi-file stacks** : the `domain-stack-lookup.md` protocol still resolves to ONE entry file (`{slug}.md`). The master file carries a **Sub-files index** H2 section with a markdown table listing each sub-file, its topic, and the typical consumer workflows that need it. Consumer workflows that want deeper context **JIT-load the relevant sub-file via the master file's table** — the protocol itself remains single-file.
+
+**Backward compatibility** : a domain that doesn't need split content stays as a single `{slug}.md` file (no `{slug}/` subdirectory). The protocol is identical for both cases.
+
+**Current example** : `game-dev` follows this pattern with 18 sub-files (engines, personas, discovery-hints, nfr-baselines, security-baseline, observability, asset-pipeline, audio, localization, qa-testing, live-ops, monetization, architecture-patterns, design-patterns, kpis-metrics, anti-cheat, multiplayer-architecture, ci-cd) — roughly 6000 lines of detail spread across the 18 sub-files plus a 130-line master file. See `game-dev.md` for the canonical TOC pattern.
+
 ---
 
 ## When a domain file is referenced but missing

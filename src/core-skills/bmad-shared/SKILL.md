@@ -76,6 +76,8 @@ Workflows load additional subdirectories based on what they need. Reference the 
 
 **Note on `domains/`** : contains project-type-specific preset files (game-dev, future: embedded, scientific, …). JIT-loaded by `protocols/domain-stack-lookup.md` when `workflow-context.md` declares a non-empty `project_type` whose CSV row has a non-empty `domain_stack` column. The current domain-consuming subset (~32-35 workflows + 8 agents per the originating story's Guardrail #7) mechanically applies the JIT-load block at INIT/activation; absent `project_type` → silent NO-OP (preserves backward compatibility for non-domain projects).
 
+**Multi-file domain stacks** : when a domain's knowledge surface exceeds the 600-line NFR target for a single domain file, the domain may organise as `domains/{slug}.md` (master file = overview + TOC) plus `domains/{slug}/*.md` (sub-files for deep dives). Consumer workflows JIT-load only the sub-file relevant to their step. The `game-dev` domain follows this pattern : `game-dev.md` master + 18 sub-files (engines, personas, discovery-hints, nfr-baselines, security-baseline, observability, asset-pipeline, audio, localization, qa-testing, live-ops, monetization, architecture-patterns, design-patterns, kpis-metrics, anti-cheat, multiplayer-architecture, ci-cd). The protocol `domain-stack-lookup.md` resolves to the entry file only ; sub-files are loaded by the consumer workflow via the master file's `Sub-files index` table.
+
 ## Rule Type Lookup Table
 
 When you need a specific shared rule, consult this table to find the canonical path.
